@@ -1,0 +1,144 @@
+{% extends 'geeknews.html' %}
+{% load i18n %} 
+
+{% block content %} 
+		<input type="hidden" name="similarid" class="otype" id="similarid" value="{{similarid}}">
+		<div id="castlist-box" class="clearfix">
+			<!--div class="cast-wall isotope" style="overflow: hidden; position: relative; height: 3260px; display: none; ">
+			</div--> 
+			<div id="list_left" class="cast-list isotope" style="float:left;"> 
+				<!--div class="item type-1-list cast-item isotope-item" style="position: absolute; left: 0px; top: 0px; opacity: 1; -webkit-transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1); ">
+				</div-->
+			</div>
+      <!--div id="aa" style="width:1px;height:585px;background:gray; float:left;"></div-->
+      <div class="feedback" style="display:none">
+      	<div id="fbk-reply-box" class="fbk-reply-box">
+        	<h2>建议 ...</h2>
+        	<form class="fbk-form" action="/news/feedback/" method="get">
+        	  <textarea name="content" cols="30" rows="10" placeholder="您的意见或建议 ..."></textarea> 
+        	  <input type="hidden" name="captcha" value="9d2dc1">   
+        	  <div class="message"></div>   
+        	  <input type="submit" name="submit" value="提交反馈" original-title=""></form>
+        	<div class="fbk-contact" style="display:none"> 
+        	</div>
+      	</div>
+			</div>
+			<!--div style="display:none;">
+				<form id="profile-setting-form" class="format account" action="#" method="post">
+						<section  id="container1">
+						<label for="tags" style="float:top;position:relative;top:4px">灯塔</label><br><br>
+						<div class="tag_dynamic_container wrap-text-box tag_dynamic_box" id="tagid">
+							<input id="tags" name="tags" type="text" class="text" style="width: 82px">
+						</div>
+						</section>
+				</form>
+			</div-->
+			
+			<div id="beacon" class="view-beacon" style="display:stock;left:50px;width: 300px;height: 500px;float:right"> 
+      	<div id="beacon-container" class="beacon-container">
+					<div class="tag-item"> 
+        		<li><span class="sina"><i></i>标签a</span><a href="#">Œ</a></li>
+        	</div> 
+					<div class="tag-item">
+        		<li><span class="sina"><i></i>标签b</span><a href="#">Œ</a></li>
+        	</div> 
+					<div class="tag-item">
+        		<li><input type="checkbox" checked="checked" name="project[]" value="aaaa">
+        			<label>aaaa</label>
+        			<a href="javascript:;" class="remove">x</a>
+        		</li>
+        	</div> 
+				</div>
+				<section id="beacon-box"> 
+						<div class="tag_dynamic_container" id="beacon-box">
+							<input id="beacon_txt" name="beacon_txt" type="text" class="text" placeholder="新的灯塔" style="width: 82px">
+							<button id="add_beacon" class="png_bg">添加灯塔</button>
+						</div>
+				</section>
+			</div>
+      <!--div id="aa" style="width:100px; height:100%; background-color:#222; float:left;"></div-->
+
+		</div>
+{% endblock %}
+  
+{% block feedback %} 
+ 	{% if otype == "rdd" %}
+	<div class="feedback-btn">
+    <a class="fancybox fancybox.ajax zh-cn" title="用户反馈" target="_blank" href="#"><i></i>用户反馈 </a>
+  </div>
+  {% endif %}
+{% endblock %}
+  
+{% block jscontent %} 
+	<script> 
+			$(function(){
+				/*
+		  		$('#tags').TagDynamic({
+		  		    container_class:"wrap-text-box tag_dynamic_box",
+      		        button_str: "添加灯塔",
+      		        //autocomplete_service: '/ajax/auto_tag/user/'  ajax load data
+      		        //autocomplete_service: [ {label:'Jenux', value:'1'}, {label:'Wang', value: '2'}, {label:'Qubenben', value:'3'} ]
+		  		});
+      		
+    			UI.tagDynamic($('#app'), {
+    			    "container_class":"wrap-text-box tag_dynamic_box",
+    			    //autocomplete_service: 'aaa', 
+    			      "button_str": "添加"
+    			});
+    			*/
+    			
+    	$('#add_beacon').click(function(){
+				//alert($tag_list_box.children())//devwxi
+					  //alert('aa');
+		 				$tag_list_box = $('div.beacon-container');
+						$tag_list_box.isotope({
+							itemSelector: '.tag-item',
+							masonry: {
+								columnWidth: 100
+							},
+							layoutMode: 'straightDown',
+  						//layoutMode: 'cellsByColumn',
+						});//straightAcross 
+						tagval = $("#beacon_txt").val() ; 
+      			var $remove = $('<a href="javascript:;" class="remove">x</a>').click(function() {
+							$(this).parent().remove();
+						}) 
+						var bit = "<div class='tag-item'><li class=''><a href='javascript:;'  title=''> "+tagval+"</a><a href='javascript:;' class='remove'>x</a></li></div>";
+						$("#beacon_txt").val("");
+						//$tag_list_box.isotope('remove', $tag_list_box.children());
+    				//alert(this.href);
+						$tag_list_box.isotope('insert', $(bit));
+						 
+    		
+						$tag_list_box.find('.remove').click(function(){
+								$(this).parent().remove();
+								//alert($(this).parent().parent().html());
+								//$tag_list_box.isotope('remove', $(this).parent().parent());
+								$tag_list_box.isotope('insert', "<div class='tag-item' style='display:none'></div>");
+						});
+						
+      });
+    
+    
+    
+    
+}) 
+
+
+		/*
+		$('#container').click(function() {
+			//$('<button class="png_bg">保存灯塔</button>').insertBefore($(this))
+			//alert($(this).find('.isotope-item')[0]);    
+			$(this).find('label').each(function() {
+				$(this).click(function(){
+				//alert($(this).html());
+				//$(this).html('灯塔');
+				})
+			}); 
+    });
+    */   
+  </script>   
+{% endblock %}
+	<a id="anchor-temp" href=""></a>
+	</body>
+	</html>

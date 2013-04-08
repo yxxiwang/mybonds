@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<title>
+			jQuery gvChart plugin - Google Visualization Charts via jQuery
+		</title>
+		<!--script type="text/javascript" src="/site_media/static/js/jquery-1.4.4.min.js"></script-->
+		<script src="/site_media/static/js/libs/jquery-1.7.2.min.js"></script> 
+		<script src="/site_media/static/js/highcharts.js" type="text/javascript"></script>
+		<script src="/site_media/static/js/highchartTable.js" type="text/javascript"></script>
+		<script type="text/javascript"> 
+		jQuery(document).ready(function(){
+		$('#tbody2').load('/bonds/daily_bond_yc_html/');
+
+			
+		$('table.highchart').highchartTable();
+			/**/
+		});
+		</script>
+		<style>
+			body{
+				text-align: center;
+				font-family: Arial, sans-serif;
+				font-size: 12px;
+			}
+			
+			a{
+				text-decoration: none;
+				font-weight: bold;
+				color: #555;
+			}
+			
+			a:hover{
+				color: #000;
+			}
+			
+			div.main{
+				margin: auto;
+				text-align: left;
+				width: 720px;
+			}
+		
+			div.clean{
+				border: 1px solid #850000;
+			}
+			
+			.clean td, .clean th{
+				border: 2px solid #bbb;
+				background: #ddd;
+				padding: 5px 10px;
+				text-align: center;
+				border-radius: 2px;
+			}
+			
+			.clean table{
+				margin: auto;
+				margin-top: 15px;
+				margin-bottom: 15px;
+			}
+			
+			.clean caption{
+				font-weight: bold;
+				
+			}
+			
+			.gvChart,.clean{
+				border: 2px solid #850000;
+				border-radius: 5px;
+				-moz-border-radius: 10px;
+				width: 720px;
+				
+				margin: auto;
+				margin-top: 20px;
+			}
+			
+			pre{
+				background: #eee;
+				padding: 10px;
+				border-radius: 10px;
+				-moz-border-radius: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="main">      
+			<h2 id="area">AreaChart</h2> 
+			<table class="highchart" data-graph-container-before="1" data-graph-type="line" >
+				<caption>daily_bond_yc</caption>
+				<thead>
+          <tr>
+          	<th>dr </th>
+          	<th>CURRENT YLD</th>
+          	<th>PREV YLD</th>
+          	<th>CHANGE</th>
+          	<th>1 WK YLD</th>
+          	<th>1 MO YLD</th>
+          	<th>6 MO YLD</th>
+          </tr>
+				</thead> 
+				<tbody>
+					<tr>
+						<th>1M</th>
+						<td>0.079 </td>
+						<td>0.100</td>
+						<td>0</td>
+						<td>0.100</td>
+						<td>0.079</td>
+						<td>0.057</td>
+					</tr>
+					<tr>
+						<th>3M</th>
+						<td>0.110</td>
+						<td>0.110</td>
+						<td>0</td>
+						<td>0.102</td>
+						<td>0.102</td>
+						<td>0.077</td>
+					</tr>
+					<tr>
+						<th>6M</th>
+						<td>0.130</td>
+						<td>0.130</td>
+						<td>0</td>
+						<td>0.132</td>
+						<td>0.142</td>
+						<td>0.124</td>
+					</tr>
+				</tbody>
+			</table>
+			 
+			<!--table class="highchart" data-graph-container-before="1" data-graph-type="column">
+				<caption>daily_bond_yc</caption>
+				<thead>
+          <tr>
+          	<th> </th>
+          	<th>CURRENT YLD</th>
+          	<th>PREV YLD</th>
+          	<th>CHANGE</th>
+          	<th>1 WK YLD</th>
+          	<th>1 MO YLD</th>
+          	<th>6 MO YLD</th>
+          </tr>
+				</thead>
+				<tbody id="tbody2"> 
+				</tbody>
+			</table-->
+			
+			<table class="highchart" data-graph-container-before="1" data-graph-type="line">
+				<caption>daily_bond_yc3</caption> 
+				<thead>
+      <tr>
+      	<th> </th>
+      	<th>current yld</th>
+      	<th>prev yld</th>
+      	<th>change</th>
+      	<th>1 wk yld</th>
+      	<th>1 mo yld</th>
+      	<th>6 mo yld</th>
+      </tr>
+				<thead>
+				<tbody> 
+     {% for bond in list_bond %} 
+      <tr>
+      	<th>{{ bond.0 }}  </th>
+      	<td>{{ bond.1 }} </td>
+      	<td>{{ bond.2 }} </td>
+      	<td>{{ bond.3 }}  </td>
+      	<td>{{ bond.4 }} </td>
+      	<td>{{ bond.5 }} </td>
+      	<td>{{ bond.6 }} </td>
+      </tr> 
+			</tbody> 
+     {% endfor %} 
+      </table>
+      
+			<h2>Credits</h2>
+			<p>Special thanks to <a href="http://yuijim.blogspot.com">Urszula Ciaputa</a> for her help in creating this plugin.</p>
+		</div>
+	</body>
+</html>

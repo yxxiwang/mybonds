@@ -1,0 +1,158 @@
+{% extends "bonds/Contact.html" %}
+
+{% load i18n %}
+
+{% block cond_banner %}
+		<div class="wrapper" id="cond_nav">
+		<li>
+			Country:<select id="country" class="select">
+			<option valuse="US">US</option>
+			<option valuse="EU">EU</option>
+			<option valuse="JP">JP</option>
+		</select></li>
+		<li>&nbsp;&nbsp;&nbsp;Currency:</li>
+		<li>
+			<select id="currency" class="select">
+			<option valuse="USD">USD</option>
+			<option valuse="EUR">EUR</option>
+			<option valuse="JPY">JPY</option>
+		</select></li>
+		<li>&nbsp;&nbsp;&nbsp;</li>
+		<li>
+			Rating:<select id="rating" class="select"  onmouseover= "this.disabled=true" onmouseout= "this.disabled=false">
+			<option valuse="AAA">AAA</option>
+			<option valuse="AA">AA</option>
+			<option valuse="A">A</option>
+		</select></li>
+		<li>&nbsp;&nbsp;&nbsp;</li>
+		<li>		Date:
+			<input id="d453" type="text" value="{{date}}" readonly="true"/>
+<!--input id="d453" type="text" class="Wdate" value="{{date}}"
+onFocus="WdatePicker({onpicked:pickedFunc,minDate:'1990-01-02',
+maxDate:'2012-08-27',disabledDates:['..-07-04','..-01-01'],disabledDays:[0,6]})"/-->
+</li> 
+
+</div>
+{% endblock %}
+
+{% block main_chart %}
+<div id="div1" class="Wdate"></div> 
+<TABLE class="mytable" cellpadding="0" cellspacing="0"  width="800" height="350">
+	<div id="tabledata">
+ <TR>
+ 	<th> </th>
+ 	<th>CURRENT YLD</th>
+ 	<th>PREV YLD</th>
+ 	<th>CHANGE</th>
+ 	<th>1 WK YLD</th>
+ 	<th>1 MO YLD</th>
+ 	<th>6 MO YLD</th>
+ </TR>
+{% for bond in list_bond %}
+{% if forloop.first  %} 
+ {% else %}
+ <TR class="{% cycle 'row1' 'row2' %}">
+ 	<th>{{ bond.0 }}  </th>
+ 	<TD>{{ bond.1 }}% </TD>
+ 	<TD>{{ bond.2 }}% </TD>
+ 	<TD>{{ bond.3 }}  </TD>
+ 	<TD>{{ bond.4 }}% </TD>
+ 	<TD>{{ bond.5 }}% </TD>
+ 	<TD>{{ bond.6 }}% </TD>
+ </TR>
+{% endif %}
+{% endfor %}
+	</div>
+ </TABLE>
+
+    <!--canvas id="myCanvas" width="578" height="20"></canvas>
+    <canvas id="graph" width="578" height="350"></canvas-->
+    {% if picname  %} 
+		<img src="/site_media/static/webdata/bonds/{{picname}}" width="800" height="500" title="Daily Bond YC" alt="[I]">
+		{% endif  %} 
+
+			<div style="display:none;" >
+			<aside>
+				<h3>aside</h3>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sodales urna non odio egestas tempor. Nunc vel vehicula ante. Etiam bibendum iaculis libero, eget molestie nisl pharetra in. In semper consequat est, eu porta velit mollis nec. Curabitur posuere enim eget turpis feugiat tempor. Etiam ullamcorper lorem dapibus velit suscipit ultrices.</p>
+			</aside>
+		</div>
+		
+  <div id="mytest"> 
+	</div>
+{% endblock %}
+ 
+
+
+{% block java_script %}
+<!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')
+</script-->
+
+<script type="text/javascript" charset="utf-8">
+
+WdatePicker({eCont:'div1',onpicked:function(dp){ pickedFunc(dp)},startDate:'{{date}}',minDate:'1990-01-02',
+maxDate:'2012-08-27',disabledDates:['..-07-04','..-01-01'],disabledDays:[0,6]})
+//onpicked:function(dp){alert('date:'+dp.cal.getDateStr())}
+function pickedFunc(dp){
+	$("#d453").value=dp.cal.getDateStr();
+//alert(dp.cal.getP('y')+dp.cal.getP('M')+dp.cal.getP('d') );
+//alert($dp.cal.getP('y')+$dp.cal.getP('M')+$dp.cal.getP('d') );
+var mydate = dp.cal.getP('y')+dp.cal.getP('M')+dp.cal.getP('d');
+var m_country = $('#country').find("option:selected").text();
+var m_currency = $('#currency').find("option:selected").text();
+var m_rating = $('#rating').find("option:selected").text();
+//alert(m_country);
+location.href = '/bonds/daily_bond_yc/?d='+mydate+'&ct='+m_country+'&cu='+m_currency+'&rt='+m_rating;
+//$('#tabledata').load('/bonds/daily_bond_yc_html/?d='+mydate+'&ct='+m_country+'&cu='+m_currency+'&rt='+m_rating);
+
+		//$.ajax({
+		//    url: '/bonds/resultdata',
+		//    type: 'GET',
+		//    dataType: 'xml',
+		//    timeout: 1000,
+		//    error: function(){
+		//        alert('Error loading XML document');
+		//    },
+		//    success: function(xml){
+		//    	//alert(xml);
+		//    	$(xml).find('item').each(function(){
+		//        var item_text = $(this).text();
+		//				alert(item_text);
+		//        $('<li></li>')
+		//            .html(item_text)
+		//            .appendTo('ol');
+		//    	});
+		//        // do something with xml
+		//    }
+		//});
+
+}
+ 
+
+// $("#mytest").load("/index",
+//		function (response,status){
+//			//alert(status);
+//		if (status=="success")
+//      {
+//      $("div").html("<ol></ol>");
+//      $(response).find("artist").each(function(){
+//        var item_text = $(this).text();
+//        $('<li></li>').html(item_text).appendTo('ol');
+//        });
+//      alert("There are "+$(response).find("cd").size()+" CDs")
+//      }
+//});
+
+//alert('dd');
+		//$('<p></p>')
+    //.html('Hey World!')
+    //.css('background', 'yellow')
+    //.appendTo("body");
+ 	//$("#headq").css("display","inline");
+  
+</script>
+
+{% endblock %}
+</body>
+</html>

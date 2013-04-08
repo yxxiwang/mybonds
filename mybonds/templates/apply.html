@@ -1,0 +1,56 @@
+<!DOCTYPE html> 
+<html lang="en" class="js">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8"> 
+<!--meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"-->
+<title>申请注册</title> 
+
+<link rel="stylesheet" href="/site_media/static/apply/style.css">
+<link rel="stylesheet" href="/site_media/static/apply/reg.css"> 
+<script type="text/javascript" async="" src="/site_media/static/apply/ga.js"></script>
+<script src="/site_media/static/apply/jquery-latest.min.js"></script>
+<script src="/site_media/static/apply/jquery.placeholder.js"></script>
+</head>
+<body>
+<div id="apply">
+	<!--h1>新闻 - 发现更大的世界</h1-->
+	{% if err_message %}
+	<div class="failure" id="summary" >
+		<ul> 
+		<li><i></i><span>{{err_message}}</span></li>  
+		</ul>
+	</div>
+	{% endif %}
+	<form class="login" method="post" action="/apply/" id="regist"> 
+		{% csrf_token %} 
+		<div>
+			<label class="aria" for="username">用户名</label>
+			<input class="text" id="username" name="username" placeholder="用户名(长度10以内的)" type="text" tabindex="1" value="{{username}}">
+		</div> 
+		<div>
+			<label class="aria" for="password">密码</label>
+			<input class="text" id="password" name="password" placeholder="密码" type="password" tabindex="2" value="">
+		</div> 
+ 		<div>
+			<label class="aria" for="email">邮箱</label>
+			<input class="text" id="email" name="email" placeholder="邮 箱" spellcheck="true" tabindex="3" type="email" value="{{email}}">
+		</div>
+		<div style="display:none;">
+			<label class="aria" for="captcha">邀请码</label>
+			<input class="text" id="captcha" name="captcha" placeholder="邀请码" type="text" tabindex="4" value="{{captcha}}">
+		</div> 
+		<input class="button" type="submit" value="申 请">
+	</form>
+	<!-- 新 app 通知 >
+	<div class="iphone-app-landing">
+		<a href="http://www.zhijixing.com/iphone">  iPhone 客户端 2.0</a>
+	</div-->
+	<div class="footer"> 
+	</div>
+</div>
+<div class="reg"> 
+	<a href="/apply/login/" class="register" style="color:white;font-weight:bold">登录</a>
+</div> 
+</body>
+</html>

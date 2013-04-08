@@ -1,0 +1,76 @@
+
+{% extends 'beacon/admin.html' %} 
+{% block content %} 
+<div class="container"> 
+	<div class="navbar navbar-inverse  pagination-centered">
+  			<!--div class="pagination ">
+  				<ul>
+  				  <li><a href="#">Prev</a></li>
+  				  <li><a href="#">1</a></li>
+  				  <li><a href="#">2</a></li>
+  				  <li><a href="#">3</a></li>
+  				  <li><a href="#">4</a></li>
+  				  <li><a href="#">Next</a></li>
+  				</ul>
+  			</div--> 	
+  		</div>
+  		
+  		<div class="tabbable  tabs-left"> <!-- Only required for left/right tabs -->
+  			<ul class="nav nav-tabs">
+  				<li ><a href="#tab1" data-toggle="tab">邀请码管理</a></li>
+  				<li class="active"><a href="#tab2" data-toggle="tab">-----</a></li>
+  			</ul>
+  			<div class="tab-content">
+  				<div class="tab-pane active" id="tab1">
+  					<table class="table table-hover table-striped table-bordered table-condensed">
+  						<caption>邀请码</caption>
+  						<thead>
+  							<tr>
+                  <th>邀请码</th>
+                  <th>来源用户</th>
+  								<th>创建时间</th>
+                  <th>使用用户</th>
+                  <th>使用时间</th>
+                  <th>操作</th>
+  							</tr>
+  						</thead>
+  						<tbody>
+  							{% for captcha in captchas %} 
+  							<tr class="info">
+                  <td id="captchaid">{{captcha.id}}</td>
+                  <td>{{captcha.crt_usr}}</td>
+  								<td>{{captcha.crt_tms}}</td>
+                  <td>{{captcha.used_usr}}</td>
+                  <td>{{captcha.used_tms}}</td>
+                  {% if captcha.used_usr  %}
+                    <td>邀请码已使用</td>
+                  {% elif captcha.issendmail == "True"  %}
+                    <td><button class="btn" id="sendmail_btn" data-loading-text="正在发送...">重新发送邮件</button></td>
+                  {% else %}
+                    <td><button class="btn" id="sendmail_btn" data-loading-text="正在发送...">发送邮件</button></td>
+                  {% endif %}
+  							</tr>
+  							{% endfor %}
+  						</tbody>
+  					</table>  
+  				</div>
+  				<div class="tab-pane" id="tab2">
+  					<p>Howdy, I'm in Section 2.</p>
+  				</div>
+  			</div>
+  		</div>
+  		 
+  		
+  	</div> <!-- /container -->
+  	{% endblock %} 
+
+{% block script %} 
+<script >    
+  $('.btn').click(function(){
+    var cid= $(this).parent().parent().find("#captchaid").text();
+    $(this).button('loading');
+    // alert('/news/captcha/?captchaid='+cid); 
+    window.location.href = encodeURI('/news/captchalist/?captchaid='+cid); 
+  });
+</script>
+{% endblock %}

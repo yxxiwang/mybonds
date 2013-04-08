@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Contact</title>
+<meta charset="utf-8">
+
+<style type="text/css">  
+/* ################## Sparkline Stuff ################## */
+#graph {
+    position: absolute;
+    display: inline;
+    margin-top: 2px;
+    }
+
+#average {
+    position: absolute;
+    width: 100%;
+    border-top: 1px dotted #CCF;
+    overflow; hidden;
+    }
+
+#point {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: #999;
+    overflow; hidden;
+    }
+
+#max {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: #F00;
+    overflow; hidden;
+    }
+
+#min {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: #00F;
+    overflow; hidden;
+    }
+
+#current {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: #F90;
+    overflow; hidden;
+    } 
+</style>
+
+<body>
+<div id="graph" style="height: 310px; width:313px;">
+<div id="average" style="top: 7px; height: 1px; width: 8px;"></div>
+<div id="max" style="left: 1px; top: 0px;"></div>
+<div id="max" style="left: 1px; top: -1px;"></div>
+<div id="max" style="left: 1px; top: 1px;"></div>
+<div id="max" style="left: 0px; top: 0px;"></div>
+<div id="max" style="left: 2px; top: 0px;"></div>
+<div id="point" style="left: 2px; top: 5px;"></div>
+<div id="point" style="left: 3px; top: 10px;"></div>
+<div id="point" style="left: 4px; top: 9px;"></div>
+<div id="point" style="left: 5px; top: 8px;"></div>
+<div id="point" style="left: 6px; top: 7px;"></div>
+<div id="min" style="left: 7px; top: 10px;"></div>
+<div id="min" style="left: 7px; top: 9px;"></div>
+<div id="min" style="left: 7px; top: 11px;"></div>
+<div id="min" style="left: 6px; top: 10px;"></div>
+<div id="min" style="left: 8px; top: 10px;"></div>
+</div> 
+
+<table style="margin:0;padding:0;line-height:1" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody> 
+<tr >
+    <td valign="top" width="5%"></td>
+    <td width="90%"> 
+    <div style="font-size:13px;border-bottom:2px solid #999;background-color: #f5f5f5;padding:17px 15px 24px 0">
+    	aaaaaaa
+    </div>
+    </td>
+    <td valign="top" width="5%"></td>
+</tr>
+
+<tr>
+    <td valign="top" width="5%"></td>
+    <td width="90%">
+      <div style="font-size:13px;border-bottom:1px dotted #999;margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
+      	<b><a style="color:#0055a2;text-decoration:none" 
+      		href="" target="_blank"> title</a></b>
+        <div>
+             <p ><small>{{doc.host}}&nbsp;  {{doc.create_time}}&nbsp; <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
+             </small></p>
+        </div>
+        <div>
+        	text
+        </div>
+      </div>
+    </td>
+    <td valign="top" width="5%"></td>
+</tr>
+<tr>
+    <td valign="top" width="5%"></td>
+    <td width="90%">
+      <div style="font-size:13px;border-bottom:1px dotted #999;">
+      	<b><a style="color:#0055a2;text-decoration:none" 
+      		href="" target="_blank"> title</a></b>
+        <div>
+             <p ><small>{{doc.host}}&nbsp;  {{doc.create_time}}&nbsp; <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
+             </small></p>
+        </div>
+        <div>
+        	text
+        </div>
+      </div>
+    </td>
+    <td valign="top" width="5%"></td>
+</tr>
+
+<tr >
+    <td valign="top" width="5%"></td>
+    <td width="90%">
+    <div style="font-size:13px;border-bottom:2px solid blue;background-color: #f5f5f5;padding:17px 15px 24px 0">
+    	aaaaadddaa
+    </div>
+    </td>
+    <td valign="top" width="5%"></td>
+</tr>
+<tr>
+    <td valign="top" width="5%"></td>
+    <td width="90%">
+      <div style="font-size:13px;border-bottom:1px dotted yellow;padding:1px 1px 2px 0;">
+      	<b><a style="color:#0055a2;text-decoration:none" 
+      		href="" target="_blank"> title</a></b>
+        <div>
+             <p ><small>{{doc.host}}&nbsp;  {{doc.create_time}}&nbsp; <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
+             </small></p>
+        </div>
+        <div>
+        	text
+        </div>
+      </div>
+    </td>
+    <td valign="top" width="5%"></td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>

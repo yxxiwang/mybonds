@@ -1,0 +1,43 @@
+
+{% extends 'beacon/admin.html' %}    
+{% block content %} 
+    <div class="container"> 
+	<div class="row-fluid">
+  		<div class="span12">
+    		<div class="row-fluid">
+      			<div class="span10">
+				      <input id="search"  type="text" class="search-query span12" placeholder="搜索" value="{{query}}"> 
+  				  </div> 
+      			<div class="span2">
+      				<button class="btn" id="mybtn" data-loading-text="正在搜索...">搜索</button>
+      			</div>
+    		</div>
+    		<div class="row-fluid">
+      			<div class="span10" style="display"></div>
+      			{% for doc in udata.docs %}
+      			<div class="span12"  style="margin-left:0px;">
+            <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
+             		<p><a target="_blank" href="{{doc.url}}">{{doc.title}}&nbsp;&nbsp;</a><a class="btn" href="/news/beaconinit/?otype=similar&similarid={{doc.docid}}">相关主题 &raquo;</a></p>
+             		<p style="font-size: 13px;"><a href="/news/beaconinit/?otype=related&relatedid={{doc.docid}}">{{doc.host}}</a>&nbsp; /&nbsp; {{doc.create_time}}&nbsp;&nbsp;&nbsp;{% for tag in doc.tags %}<span id='{{tag}}' class="badge-wxi-green" style="margin-right:4px;"><a href="/news/beaconinit/?otype=localtag&relatedid={{doc.docid}}&localtag={{tag}}">{{tag.split|join:""}}</a></span>{% endfor %} </p>
+                {{doc.text}}
+             		</blockquote> 
+      			</div>
+              	{% endfor %}
+    		</div>
+  		</div>
+	</div> 
+
+
+  		{% for user in user_list %}
+  		<!--p>
+  			{{ user }}
+  		</p-->
+  		{% endfor %} 
+		
+    </div> <!-- /container -->
+
+{% endblock %} 
+{% block script %} 
+<script >   
+</script>
+{% endblock %}

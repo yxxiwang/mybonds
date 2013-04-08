@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" class="js">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<!--meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"-->
+<title>登录</title>
+<link rel="stylesheet" href="/site_media/static/apply/style.css">
+<link rel="stylesheet" href="/site_media/static/apply/reg.css">
+<script type="text/javascript" async="" src="/site_media/static/apply/ga.js"></script>
+<script src="/site_media/static/apply/jquery-latest.min.js"></script>
+<script src="/site_media/static/apply/jquery.placeholder.js"></script>
+</head>
+<body youdao="bind">
+<div id="login" style="margin-top: -155px;">
+	<p style="position: absolute;left:-88px;font-size: 22px;font-weight: bold;color: white;margin-top: 5px;width:400px;"> 指极星
+		</p><div style="height:30px"></div>
+	<p style="position: absolute;left:22px;font-size: 22px;font-weight: bold;color: white;margin-top: 5px;width:400px;">帮助您发现您关注的新闻资讯</p><br><br><br>
+	
+	<!--h1>geek 新闻</h1-->
+	{% if err_message %}
+	<div class="failure" id="summary">
+		<ul>
+		<li><i></i><span>{{err_message}}</span></li>
+		</ul>
+	</div>
+	{% endif %}
+	<form class="login" action="/apply/login/" method="post" id="loginForm">
+		{% csrf_token %}
+		<!--div>
+			<label class="aria" for="email">邮箱</label>
+			<input class="text" type="email" id="email" name="email" spellcheck="false" placeholder="邮 箱" autofocus="" tabindex="1">
+		</div-->
+		<div>
+			<label class="aria" for="username">用户名</label>
+			<input class="text" id="username" name="username" placeholder="用户名" type="text" value="" autofocus=""  tabindex="1">
+		</div>
+		<div>
+			<label class="aria" for="password">密码</label>
+			<input class="text" type="password" id="password" name="password" placeholder="密 码" tabindex="2">
+		</div>
+		<input class="button" type="submit" value="登 录" tabindex="3">
+		<!--div class="actions">
+			<input id="remember_me" type="checkbox" name="rememberme" checked="">
+			<label class="remember_me" for="remember_me">记住我</label>
+			<span class="middot">·</span>
+			<a class="reset" href="http://www.zhihu.com/resetpassword">忘记密码？</a>
+		</div-->
+		<div class="clearfix">
+		</div>
+	</form>
+	<!--div class="promo">
+		<a href="/read" class="reader">
+		<span> 阅读 - 无需登录 立即使用</span>
+		</a>
+	</div-->
+	<!-- 新 app 通知 >
+	<div class="iphone-app-landing">
+		<a href="http://www.zhijixing.com/iphone"> iPhone 客户端 2.0</a>
+	</div-->
+	<div class="footer">
+
+	</div>
+</div>
+<div class="reg">
+	<!--a href="/news/" class="register mobi_hide">快速进入</a-->
+	<a href="/apply/" class="register"  style="color:white;font-weight:bold">注册</a>
+</div>
+<!--div class="mobi-iphone-app-landing release" id="mobi-iphone-app-landing">
+	<a href="http://itunes.apple.com/cn/app/id432274380">  iPhone 客户端 2.0</a>
+</div-->
+<script>
+	/*
+$(function() {
+if ( /iPhone/.test(navigator.userAgent) ) {
+$('#mobi-iphone-app-landing').addClass('visible')
+}
+})*/
+</script>
+<script>
+$(function() {
+var $form = $('#loginForm')
+var support = (function(input) {
+return function(attr) { return attr in input }
+})(document.createElement('input'))
+$('.text', $form).placeholder({ hideOnFocus: false })
+if ( !support('autofocus') ) {
+$('input[autofocus]', $form).focus()
+}
+})
+</script>
+<!--[if lt IE 7 ]>
+<script src="http://static.zhihu.com/static/js/dd_fix.js"></script>
+<script>DD_belatedPNG.fix('html, h1, .promo .reader, .promo .reader span, .ir, .ir span, .submit span, .next span, .back span');</script>
+<![endif]-->
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-20961733-1']);
+_gaq.push(['_setVar', 'Not Logged In']);
+_gaq.push(['_trackPageview']);
+_gaq.push(['_trackPageLoadTime']);
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</body>
+</html>

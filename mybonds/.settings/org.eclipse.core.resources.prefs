@@ -1,0 +1,14 @@
+eclipse.preferences.version=1
+encoding//apps/__init__.py=utf-8
+encoding//apps/geeknews/__init__.py=utf-8
+encoding//apps/geeknews/daemon.py=UTF-8
+encoding//apps/geeknews/daemonProcess.py=utf-8
+encoding//apps/geeknews/logexport.py=utf-8
+encoding//apps/geeknews/urls.py=utf-8
+encoding//apps/geeknews/views.py=utf-8
+encoding//apps/newsvc/__init__.py=utf-8
+encoding//apps/newsvc/views.py=utf-8
+encoding/<project>=UTF-8
+encoding/__init__.py=utf-8
+encoding/settings.py=utf-8
+encoding/views.py=utf-8

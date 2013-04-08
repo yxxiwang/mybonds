@@ -1,0 +1,63 @@
+{% extends "bonds/Contact.html" %}
+
+{% load i18n %}
+
+{% block cond_banner %}
+		<div class="wrapper" id="cond_nav">
+		<li>
+			User ID:<select id="country" class="select">
+			<option valuse="user111">user111</option>
+			<option valuse="user112">user112</option>
+			<option valuse="user113">user113</option>
+		</select></li> 
+		<li>&nbsp;&nbsp;&nbsp;</li>
+		<li>Date:<input id="d453" type="text"  value="{{cdate}} {{ctime}}" readonly="true"/> </li>
+		<li>&nbsp;&nbsp;&nbsp;</li>
+	</div>
+{% endblock %}
+
+{% block main_chart %}
+<TABLE class="mytable" cellpadding="0" cellspacing="0"  width="978"  width="800" >
+<div id="tabledata">
+ <TR>
+ 	<th>CUSIP</th>
+ 	<th>Amount</th>
+ 	<th>Rating</th>
+ 	<th>Maturity Date</th>
+ 	<th>Coupon</th>
+ 	<th>Eva Yield</th>
+ 	<th>Eva Price</th>
+ 	<th>Maket Value</th>
+ </TR>
+{% for bond in list_bond %} 
+ <TR class="{% cycle 'row1' 'row2' %}">
+ 	<TD>{{ bond.0 }}  </TD>
+ 	<TD>{{ bond.1 }}  </TD>
+ 	<TD>{{ bond.2 }}  </TD>
+ 	<TD>{{ bond.3 }}  </TD>
+ 	<TD>{{ bond.4 }}  </TD>
+ 	<TD>{{ bond.5 }}  </TD>
+ 	<TD>{{ bond.6 }}  </TD>
+ 	<TD>{{ bond.7 }}  </TD>
+ </TR> 
+{% endfor %}
+	</div>
+ </TABLE>
+ 
+  <div id="mytest"> 
+	</div>
+{% endblock %}
+ 
+
+
+{% block java_script %}   
+
+<script type="text/javascript" charset="utf-8"> 
+</script>
+<style type="text/css"> 
+.body7 {background:#eeeeee;height:500px}
+</style>
+	
+{% endblock %}
+</body>
+</html>

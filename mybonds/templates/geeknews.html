@@ -1,0 +1,432 @@
+{% load i18n %}
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html class="no-js" lang="zh-CN" dir="ltr"><!--<![endif]-->
+<html>
+<!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>指极星</title>
+<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.5;">
+<meta name="robots" content="index, follow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/site_media/static/news/style.css">
+<link rel="stylesheet" href="/site_media/static/news/icons.css">
+<link rel="stylesheet" href="/site_media/static/news/jquery.fancybox.css">
+<link rel="stylesheet" href="/site_media/static/news/jquery.tagDynamic.css">
+<style type="text/css">
+.flexcroll-hide-default {overflow: hidden !important;}
+</style>
+<script src="/site_media/static/news/jquery-1.7.1.min.js"></script>
+<script src="/site_media/static/news/modernizr-1.7.min.js"></script>
+<script src="/site_media/static/news/jquery.isotope.min.js"></script>
+</head>
+<body class="seed " youdao="bind">
+<script type="text/javascript"> 
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36713494-1']);
+  _gaq.push(['_trackPageview']); 
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })(); 
+</script>
+
+<div id="container">
+{% block header %}
+	<header id="header">
+	<div class="container">
+		<h1><a class="png_bg" href="/news/overview/?o=ppl">指极星</a><sup>2012</sup></h1>
+		<nav class="global">
+		<ul>
+			<!--li>
+				<a href="/news/loaddata/?o={{otype}}" rel="">更新推荐</a>
+			</li-->
+            <li><a href="/news/beaconnews" title="灯塔阅读">灯塔阅读</a></li> 
+			<li class="{{otypes.0}}">
+			<a href="/news/?o=ppl" title="今日热点">今日热点</a>
+			</li>
+			<!--li class="{{otypes.1}}">
+			<a href="/news/?o=01" title="聚焦">聚焦</a>
+			</li>
+			<li class="{{otypes.2}}">
+			<a href="/news/?o=rcm" title="精选">精选</a>
+			</li>
+			<li class="{{otypes.3}}">
+			<a href="/news/?o=nav" title="导航">导航</a>
+			</li>
+			<li class="{{otypes.4}}">
+			<a href="#" title="待读">待读</a>
+			</li-->
+			<li class="{{otypes.5}}">
+			<a href="/news/?o=rdd" title="我的足迹">我的足迹</a>
+			</li>
+		</ul>
+		</nav>
+		<div id="searchbox"  style="display: none;">
+			<form id="search-form" name="global-search" action="/news/search/all" method="post">
+				<input type="search" id="search" name="search" placeholder="搜索" autocomplete="off" class="ac_input">
+				<input type="submit" class="submit" value="">
+			</form>
+		</div>
+
+		<div class="tool-box">
+            {% if user.is_authenticated %}
+			<ul>
+				<li class="first">
+				<a href="#" title="登录">{{ user.username }}</a><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				</li>
+				<li>
+				<!--a href="{% url django.contrib.auth.views.password_change %}">修改密码</a>
+				<a href="{% url django.contrib.auth.views.logout %}">离开</a-->
+				<a href="/apply/logout">离开</a>
+				</li>
+			</ul>
+            {% else %}
+			<ul>
+				<li class="first">
+				<a href="#" title="登录">
+				<a href="/apply/login/" title="登录">登录</a>
+				</li>
+				<li>
+					<a href="/apply/" title="注册">注册</a>
+				</li>
+			</ul>
+            {% endif %}
+		</div>
+		<div id="ajaxing" style="display: none;">
+		</div>
+	</div>
+	</header>
+{% endblock %}
+	<div id="main" role="main" class="container">
+		<script type="text/javascript">
+    $('body.seed, body.cast').addClass('loading');
+		</script>
+
+{% block filter %}
+		<div id="filter-box" class="test">
+			<div class="container">
+				<div style="display:none">
+					<nav id="view-mode">
+					<h3>查看模式</h3>
+					<ul>
+						<li class="thumbs" data-rel="thumbs">
+						<a href="javascript:void(0)">缩略图</a>
+						</li>
+						<li class="list on" data-rel="list">
+						<a href="javascript:void(0)">列表</a>
+						</li>
+					</ul>
+					</nav>
+				</div>
+			{% if otype == "rcm" %}
+			<div style="display:none">
+					<nav id="view-mode-day">
+						<ul>
+							{% if onday == "1" %}<li class="on">{%else%}<li class="7day">{% endif %}
+							<a href="{{current_path}}&last=1" id="" class="1day" rel="" style="">1天</a></li>
+							{% if onday == "7" %}<li class="on">{%else%}<li class="1day">{% endif %}
+								<a href="{{current_path}}&last=7" id="" class="7day" rel="" style="">7天</a></li> 
+						</ul>
+					</nav>
+			</div>
+			{% endif %}
+				<input type="hidden" name="otype" class="otype" id="otype" value="{{otype}}">
+				<input type="hidden" name="onday" class="onday" id="onday" value="{{onday}}">
+				<input type="hidden" name="tag_name" class="tag_name" id="tag_name" value="{{ori_tag}}">
+				<div id="tag-extend" class="tag-list isotope" 
+			{% if otype == "nav" %} style="width: 990px;margin-left: -120px;" {% endif %}>
+					<ul id="view-tags" class="clearfix tags" >
+						<!--div class="tag-item">
+						{% if otype == "ppl" %}
+							<li class=""><a href="/news/?o=ppl"  title=""  > 全部综览</a></li>
+						{% elif otype == "rcm" %}
+							<li class=""><a href="/news/?o=rcm"  title=""  > 全部精选</a></li>
+						{% elif otype == "rcm" %}
+							<li class=""><a href="javascript:;"  title=""  > 全部追踪</a></li>
+						{% elif otype == "rdd" %}
+							<li class=""><a href="/news/?o=rdd"  title=""  > 全部历史</a></li>
+						{% endif %}
+						</div-->
+						{% for tag in list_tags %}
+						<div class="tag-item">
+							<li><a href="/news/tagdoc/{{ tag }}/?o={{otype}}" title="" class="{{ tag }}" rel="" style="">{{ tag }} </a></li>
+						</div>
+						{% endfor %} 
+												
+        {% if list_tags1 %}
+						<div style="float:right">
+							<li><a href="#" id="showup" class="down" rel="down" style="background: #7caee4; color:white;font-weight:bold;">&dArr;</a></li>
+						</div>
+				{% endif %}
+					</ul>
+				</div>
+
+        {% if list_tags1 %}
+				<div id="tag-extend1" class="tag-list isotope"   style="{% if otype == "nav" %}width: 990px;margin-left: -120px;{% endif %} display:none" >
+					<ul id="view-tags" class="clearfix tags" >
+						{% for tag in list_tags1 %}
+						<div class="tag-item">
+							<li><a href="/news/tagdoc/{{ tag }}/?o={{otype}}" title="" class="{{ tag }}" rel="" style="">{{ tag }} </a></li>
+						</div>
+						{% endfor %}
+					</ul>
+				</div>
+				{% endif %}
+
+        {% if list_tags2 %}
+				<div id="tag-extend2" class="tag-list isotope"   style="{% if otype == "nav" %}width: 990px;margin-left: -120px;{% endif %} display:none" >
+					<ul id="view-tags" class="clearfix tags" >
+						{% for tag in list_tags2 %}
+						<div class="tag-item">
+							<li><a href="/news/tagdoc/{{ tag }}/?o={{otype}}" title="" class="{{ tag }}" rel="" style="">{{ tag }} </a></li>
+						</div>
+						{% endfor %}
+					</ul>
+				</div>
+			{% endif %}
+
+        {% if list_tags3 %}
+				<div id="tag-extend3" class="tag-list isotope"   style="{% if otype == "nav" %}width: 990px;margin-left: -120px;{% endif %} display:none" >
+					<ul id="view-tags" class="clearfix tags" >
+						{% for tag in list_tags3 %}
+						<div class="tag-item">
+							<li><a href="/news/tagdoc/{{ tag }}/?o={{otype}}" title="" class="{{ tag }}" rel="" style="">{{ tag }} </a></li>
+						</div>
+						{% endfor %}
+					</ul>
+				</div>
+			{% endif %}
+
+        {% if list_tags4 %}
+				<div id="tag-extend4" class="tag-list isotope"   style="{% if otype == "nav" %}width: 990px;margin-left: -120px;{% endif %} display:none" >
+					<ul id="view-tags" class="clearfix tags" >
+						{% for tag in list_tags4 %}
+						<div class="tag-item">
+							<li><a href="/news/tagdoc/{{ tag }}/?o={{otype}}" title="" class="{{ tag }}" rel="" style="">{{ tag }} </a></li>
+						</div>
+						{% endfor %}
+					</ul>
+				</div>
+			{% endif %}
+
+			</div>
+		</div>
+{% endblock %}
+
+{% block content %}
+		<div id="castlist-box" class="clearfix"> 
+			<!--div id="list_greeting" style="font-size:10px;float:left;width:240px;margin-left: -70px;margin-top:20px;border-style:dotted;border-width:1px;border-color:#CBDEF1;padding:5px;display:none;"> 
+        {% for greeting in greetings %}
+        {% if greeting.act == "beacon_save" %}
+				<span style="color:green;">&nbsp;{{greeting.usr}}&nbsp;</span>
+				<span style="color:black;">正在建设灯塔 </span>
+				<span style="color:blue;">&nbsp;{{greeting.o}}&nbsp;</span>
+				<span style="color:black;">-&nbsp;{{greeting.tms}}&nbsp;</span> <br>
+				{% elif greeting.act == "apply" %}  
+				<span style="color:black;">欢迎新用户 </span>
+				<span style="color:green;">&nbsp;{{greeting.o}}&nbsp;</span>
+				<span style="color:black;">-&nbsp;{{greeting.tms}}&nbsp;</span> <br>
+				{% else %} 
+				{% endif %} 
+				{% endfor %}
+			</div-->
+			<div id="list_left" class="cast-list isotope" style="float:left;margin-top:10px;margin-left:100px;">
+				<!--div class="item type-1-list cast-item isotope-item" style="position: absolute; left: 0px; top: 0px; opacity: 1; -webkit-transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1); ">
+				</div-->
+			</div>
+      <!--div id="list_right" style="background:white; float:right;width: 220px;margin-right:-120px;margin-top:20px;border-style:dotted;padding:10px;border-width:2px;border-color:#7CAEE4;display:none">
+    	<img src='/site_media/static/news/logo1x.png' style=""></img> &nbsp;每日实时采集互联网新闻媒体的最新资讯信息，通过智能分析帮助您发现您关注的新闻资讯。<br><br>
+    	<span style="background:black;color:white;">&nbsp;综览 &nbsp;</span> &nbsp;每次您点击“综览”，我们将时下最新的热点新闻资讯呈现给您，您还可以选择不同的标签，浏览标签主题相关的新闻资讯。<br><br>
+    	<span style="background:black;color:white;">&nbsp;精选 &nbsp;</span> &nbsp;您在“综览”栏目选择新闻阅读后，我们会根据您的偏好，在“精选”栏目主动推荐您可能感兴趣的新闻资讯。<br><br>
+    	<span style="background:black;color:white;">&nbsp;历史 &nbsp;</span> &nbsp;所有您阅读过的新闻资讯，我们帮助您收藏。<br><br>
+    	<span style="background:#7CAEE4;color:white;border-radius: 10px;">&nbsp; &dArr; &nbsp;</span> &nbsp;默认只显示前十个最活跃的新闻资讯标签，点击下拉按钮可以获得更多新闻资讯标签。<br><br>
+    	<span style="background:black;color:white;">&nbsp;注册 &nbsp;</span> &nbsp;成为注册用户后，当您下次登陆，我们会按照您偏好，将时下最新的、你可能感兴趣的新闻资讯准备好，放在“精选”栏目。同时您还可以在综览栏目，获得今天的热点新闻资讯。<br><br>
+      </div-->
+      <div class="feedback" style="display:none">
+      	<div id="fbk-reply-box" class="fbk-reply-box">
+        	<h2>建议 ...</h2>
+        	<form class="fbk-form" action="/news/feedback/" method="get">
+        	  <textarea name="content" cols="30" rows="10" placeholder="您的意见或建议 ..."></textarea>
+        	  <input type="hidden" name="captcha" value="9d2dc1">
+        	  <div class="message"></div>
+        	  <input type="submit" name="submit" value="提交反馈" original-title=""></form>
+        	<div class="fbk-contact" style="display:none">
+        	</div>
+      	</div>
+	  </div>
+			<!--div id="list_right" class="similar-list isotope" style="float:left">
+				<div class="format account sync status" style="width:162px;margin-top:0px; display:none">
+				<div>
+             <span class="action submit-button">新浪微博</span><span class="action submit-button"><input type='checkbox'></span>
+        </div>
+        <div>
+             <span class="sina"><i></i>新浪微博</span><a href="/user/connect/sina"><span class="action submit-button"><input type='checkbox'></span></a>
+        </div>
+      	</div>
+			</div-->
+      <!--div id="aa" style="width:100px; height:100%; background-color:#222; float:left;"></div-->
+
+		</div>
+{% endblock %}
+
+{% block footer %}
+		<!--footer id="footer" style="display: none; ">
+		 <a class="cast-list-more" href="javascript:;">查看更多</a>
+		</footer-->
+{% endblock %}
+	</div>
+	<!--div id="scrollTop" style="display:none;">
+		<div class="level-2">
+		</div>
+		<div class="level-3">
+		</div>
+	</div-->
+
+	<!-- scripts concatenated and minified via ant build script-->
+	<script src="/site_media/static/news/plugins.js"></script>
+	<script src="/site_media/static/news/jquery.highlight.js"></script>
+	<script src="/site_media/static/news/jquery.fancybox.pack.js"></script>
+	<script src="/site_media/static/news/jquery.tagDynamic.js"></script>
+	<script src="/site_media/static/news/fileuploader.js"></script>
+	<script src="/site_media/static/news/script.js"></script>
+	<!-- end scripts-->
+{% block jscontent %}
+	<script>
+		/*
+	$(document).ready(function() {
+	//$('.main').hide();
+	$('.header')
+	 .addClass('clickable')
+	 .bind('click', function() {
+		var $control = $(this);
+		var $parent = $control.parents('.entry tag-1 cast-card same same-0');
+		alert($control);
+		$parent.toggleClass('expanded');
+		$parent.find('.main').slideToggle();
+		// if control has HTML5 data attributes, use to update text
+		if ($parent.hasClass('expanded')) {
+			alert('has');
+			//$control.html($control.attr('data-expanded-text'));
+		} else {
+			//alert($parent.find('.main').id);
+			$('.main').hide();
+			//$control.html($control.attr('data-text'));
+		}
+	})
+});
+
+var response = '{"result":true , "count":1}';
+var parsedJSON = eval('('+response+')');
+var result=parsedJSON.result;
+var count=parsedJSON.count;
+alert(result+":"+count);
+*/
+
+
+/*
+    	$('#view-tags a').click(function(){
+			//alert($tag_list_box.children())//devwxi
+
+		 		$tag_list_box = $('div.tag-list');
+				$tag_list_box.isotope({
+					itemSelector: '.tag-item',
+					masonry: {
+						columnWidth: 100
+					},
+					layoutMode: 'cellsByRow'
+				});//straightAcross
+				var bit = "<div class='tag-item'><li class='on'><a href='javascript:;'  title=''> 子tag</a></li></div>";
+				$tag_list_box.isotope('remove', $tag_list_box.children());
+				$tag_list_box.isotope('insert', $(bit));
+
+			var bit = "<div class='tag-item'><li class=''><a href='javascript:;'  title=''> 子tag</a></li></div>";
+			//$tag_list_box.isotope('remove', $tag_list_box.children());
+    	alert(this.href);
+			$tag_list_box.isotope('insert', $(bit));
+    });
+*/
+
+  </script>
+{% endblock %}
+	<!--[if lt IE 7 ]>
+	<script src="/public/js/libs/dd_belatedpng.js"></script>
+	<script>DD_belatedPNG.fix("img, .png_bg");</script>
+	<![endif]-->
+	<script>
+  $(function(){
+  	/*
+  	$('.feedback-btn a').click(function(){
+    	if($('.feedback').css("display")=="none")
+    		$('.feedback').css("display","block");
+    	else
+    		$('.feedback').css("display","none");
+    });
+    */ 
+    $('#showup').click(function(){
+    	// alert($(this).attr('rel'));//"︾"
+    	if($(this).attr('rel')=="up"){
+    		$(this).html("&dArr;");
+    		// $(this).addClass("down");
+    		$(this).attr('rel',"down");
+    		$(this).parent().removeClass("on");
+    		//$('#list_left').css("margin-top","0px");
+    		$('#tag-extend1').css("display","none");
+    		$('#tag-extend2').css("display","none");
+    		$('#tag-extend3').css("display","none");
+    		$('#tag-extend4').css("display","none");
+    		//$('#filter-box .container').css("height","34px")
+    	}else{
+    		$(this).html("&uArr;");
+    		// $(this).removeClass("down");
+    		$(this).parent().addClass("on");
+    		$(this).attr('rel',"up");
+    		//$('#list_left').css("margin-top","48px");
+    		$('#tag-extend1').css("display","block");
+    		$('#tag-extend2').css("display","block");
+    		$('#tag-extend3').css("display","block");
+    		$('#tag-extend4').css("display","block");
+    		//$('#tag-extend1').css("background-color","white");
+    		//$('#tag-extend2').css("background-color","white");
+    		//$('#filter-box .container').css("height","84px")
+    	}
+    });
+    readSeed.wall.init();
+  })
+/*  var browser_detect = {
+	IE: !! (window.attachEvent && !window.opera),
+	Opera: !! window.opera,
+	WebKit: navigator.userAgent.indexOf("AppleWebKit/") > -1,
+	Gecko: navigator.userAgent.indexOf("Gecko") > -1 && navigator.userAgent.indexOf("KHTML") == -1,
+	MobileSafari: !! navigator.userAgent.match(/Apple.*Mobile.*Safari/)
+};
+alert("IE:"+browser_detect.IE+";Opera:"+browser_detect.Opera+";WebKit:"+browser_detect.WebKit+";Gecko:"+browser_detect.Gecko+";MobileSafari:"+browser_detect.MobileSafari);
+
+yepnope({
+  test : browser_detect.IE,
+  yep  : '/site_media/static/news/script.js',
+  //nope : ['polyfill.js', 'wrapper.js']
+});
+  */
+    UI.global_search();
+    var uvOptions = {};
+    // !important
+    (function() {
+        initScrollTop();
+    })();
+
+  </script>
+{% block feedback %} 
+	<div class="feedback-btn">
+    <a class="fancybox fancybox.ajax zh-cn" title="用户反馈" target="_blank" href="/news/feedbackform"><i></i> 用 户 反 馈 </a>
+  </div> 
+{% endblock %}
+	<a id="anchor-temp" href=""></a>
+
+	</body>
+	</html>

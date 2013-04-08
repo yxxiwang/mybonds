@@ -1,0 +1,336 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>geeknews</title>
+<meta name="keywords" content="新闻产品,新闻趋势, ">
+<meta name="description" content="为你带来新闻热门趋势、热点产品的深度分析，发掘产品和趋势的价值。">
+<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.5;">
+<meta name="robots" content="index, follow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/site_media/static/geeknews/style.css">
+<link rel="stylesheet" href="/site_media/static/geeknews/icons.css">
+<link rel="stylesheet" href="/site_media/static/geeknews/jquery.tagDynamic.css">
+<style type="text/css">
+.flexcroll-hide-default {overflow: hidden !important;}
+</style>
+<script src="/site_media/static/geeknews/jquery-1.7.1.min.js"></script>
+<script src="/site_media/static/geeknews/modernizr-1.7.min.js"></script>
+<script src="/site_media/static/geeknews/jquery.isotope.min.js"></script>
+</head>
+<body class="seed" youdao="bind">
+<div id="container">
+	<header id="header">
+	<div class="container">
+		<h1><!--a class="png_bg" href="">HelloWorld</a><sup>2011</sup--></h1>
+		<nav class="global">
+		<ul>
+			<!--li>
+				<a href="/geeknews/loaddata/?o={{otype}}" rel="">更新推荐</a>
+			</li-->
+			<li class="{{otypes.0}}">
+			<a href="/geeknews/?o=ppl" title="综览">综览</a>
+			</li>
+			<!--li class="{{otypes.1}}">
+			<a href="/geeknews/?o=01" title="聚焦">聚焦</a>
+			</li-->
+			<li class="{{otypes.2}}">
+			<a href="/geeknews/?o=rcm" title="精选">精选</a>
+			</li>
+			<!--li class="{{otypes.3}}">
+			<a href="#" title="追踪">追踪</a>
+			</li>
+			<li class="{{otypes.4}}">
+			<a href="#" title="待读">待读</a>
+			</li-->
+			<li class="{{otypes.5}}">
+			<a href="/geeknews/?o=rdd" title="历史">历史</a>
+			</li>
+		</ul>
+		</nav>
+		<div id="searchbox"  style="display: none;">
+			<form id="search-form" name="global-search" action="/geeknews/search/all" method="post">
+				<input type="search" id="search" name="search" placeholder="搜索" autocomplete="off" class="ac_input">
+				<input type="submit" class="submit" value="">
+			</form>
+		</div>
+
+		<div class="tool-box">
+            {% if user.is_authenticated %}
+			<ul>
+				<li class="first">
+				<a>您好!&nbsp;&nbsp; </a><a href="" title="登录">"{{ user.username }}"</a>
+				</li>
+				<li>
+				<!--a href="{% url django.contrib.auth.views.password_change %}">修改密码</a>
+				<a href="{% url django.contrib.auth.views.logout %}">离开</a-->
+				<a href="/apply/logout">离开</a>
+				</li>
+			</ul>
+            {% else %}
+			<ul>
+				<li class="first">
+				<a href="/apply/login/" title="登录">登录</a>
+				</li>
+				<li>
+					<a href="/apply/" title="注册">注册</a>
+				</li>
+			</ul>
+            {% endif %}
+		</div>
+		<div id="ajaxing" style="display: none;">
+		</div>
+	</div>
+	</header>
+	<div id="main" role="main" class="container">
+		<script type="text/javascript">
+    //$('body.seed, body.cast').addClass('loading');
+		</script>
+		<div id="filter-box" class="test">
+			<div class="container">
+				<div style="display:none">
+					<nav id="view-mode">
+					<h3>查看模式</h3>
+					<ul>
+						<li class="thumbs" data-rel="thumbs">
+						<a href="javascript:void(0)">缩略图</a>
+						</li>
+						<li class="list on" data-rel="list">
+						<a href="javascript:void(0)">列表</a>
+						</li>
+					</ul>
+					</nav>
+				</div>
+				<input type="hidden" name="otype" class="otype" id="otype" value="{{otype}}">
+				<input type="hidden" name="tag_name" class="tag_name" id="tag_name" value="{{ori_tag}}">
+				<div class="tag-list isotope">
+				<ul id="view-tags" class="clearfix tags" >
+					<!--div class="tag-item">
+					{% if otype == "ppl" %}
+						<li class=""><a href="/geeknews/?o=ppl"  title=""  > 全部综览</a></li>
+					{% elif otype == "rcm" %}
+						<li class=""><a href="/geeknews/?o=rcm"  title=""  > 全部精选</a></li>
+					{% elif otype == "rcm" %}
+						<li class=""><a href="javascript:;"  title=""  > 全部追踪</a></li>
+					{% elif otype == "rdd" %}
+						<li class=""><a href="/geeknews/?o=rdd"  title=""  > 全部历史</a></li>
+					{% endif %}
+					</div-->
+					{% for tag in list_tags %}
+					<div class="tag-item">
+						<li><a href="/geeknews/tagdoc/?o={{otype}}&tag={{ tag }}" title="" class="{{ tag }}" rel="" style="">{{ tag }} </a></li>
+					</div>
+					{% endfor %}
+					<div class="showup" style="float:right">
+						<li><a href="#" id="showup" class="" rel="" style="">︾</a></li>
+					</div>
+				</ul>
+				</div>
+
+        {% if list_tags1 %}
+				<div id="tag-extend1" class="tag-list isotope" style="display:none"> 
+				<ul id="view-tags" class="clearfix tags" >
+					{% for tag in list_tags1 %}
+					<div class="tag-item">
+						<li><a href="/geeknews/tagdoc/?o={{otype}}&tag={{ tag }}" title="" class="{{ tag }}" rel="" style="">{{ tag }} </a></li>
+					</div>
+					{% endfor %}
+				</ul>
+				</div>
+				{% endif %}
+				
+        {% if list_tags2 %}
+				<div id="tag-extend2" class="tag-list isotope" style="display:none"> 
+				<ul id="view-tags" class="clearfix tags" >
+					{% for tag in list_tags2 %}
+					<div class="tag-item">
+						<li><a href="/geeknews/tagdoc/?o={{otype}}&tag={{ tag }}" title="" class="{{ tag }}" rel="" style="">{{ tag }} </a></li>
+					</div>
+					{% endfor %}
+				</ul>
+				</div>
+			{% endif %}
+			</div>
+		</div>
+		<div id="castlist-box" class="clearfix">
+			<!--div style="float:left;width: 180px;height: 800px;margin-left: -80px;margin-top: -24px; display:block ;">
+				<form id="profile-setting-form" class="format account" action="#" method="post">
+						<section  id="container1">
+						<label for="tags" style="float:top;position:relative;top:4px">灯塔</label><br><br>
+						<div class="tag_dynamic_container wrap-text-box tag_dynamic_box" id="tagid">
+							<input id="tags" name="tags" type="text" class="text" style="width: 82px">
+						</div>
+						</section>
+				</form>
+			</div-->
+			<!--div class="cast-wall isotope" style="overflow: hidden; position: relative; height: 3260px; display: none; ">
+			</div-->
+      {% if list_tags2 %}
+			<div id="list_left" class="cast-list isotope" style="float:left;">
+      {% else %}
+			<div id="list_left" class="cast-list isotope" style="float:left;">
+			{% endif %}
+				<!--div class="item type-1-list cast-item isotope-item" style="position: absolute; left: 0px; top: 0px; opacity: 1; -webkit-transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1); ">
+				</div-->
+			</div>
+      <!--div id="aa" style="width:1px;height:585px;background:gray; float:left;"></div-->
+			<div id="list_right" class="similar-list isotope" style="float:left">
+				<!--div class="item type-1-list cast-item isotope-item" style="position: absolute; left: 0px; top: 0px; opacity: 1; -webkit-transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1); ">
+				</div-->
+				<div class="format account sync status" style="width:162px;margin-top:0px; display:none">
+				<div>
+             <span class="action submit-button">新浪微博</span><span class="action submit-button"><input type='checkbox'></span>
+        </div>
+        <div>
+             <span class="sina"><i></i>新浪微博</span><a href="/user/connect/sina"><span class="action submit-button"><input type='checkbox'></span></a>
+        </div>
+      	</div>
+			</div>
+      <!--div id="aa" style="width:100px; height:100%; background-color:#222; float:left;"></div-->
+
+		</div>
+		<footer id="footer" style="display: none; ">
+		 <a class="cast-list-more" href="javascript:;">查看更多</a>
+		</footer>
+	</div>
+	<div id="scrollTop" style="display:none;">
+		<div class="level-2">
+		</div>
+		<div class="level-3">
+		</div>
+	</div>
+	<!-- scripts concatenated and minified via ant build script-->
+	<script src="/site_media/static/geeknews/fileuploader.js"></script>
+	<script src="/site_media/static/geeknews/plugins.js"></script>
+	<script src="/site_media/static/geeknews/jquery.highlight.js"></script>
+	<script src="/site_media/static/geeknews/jquery.fancybox.pack.js"></script>
+	<script src="/site_media/static/geeknews/script.js"></script>
+	<script src="/site_media/static/geeknews/jquery.tagDynamic.js"></script>
+	<!-- end scripts-->
+	<script>/*
+	$(document).ready(function() {
+	//$('.main').hide();
+	$('.header')
+	 .addClass('clickable')
+	 .bind('click', function() {
+		var $control = $(this);
+		var $parent = $control.parents('.entry tag-1 cast-card same same-0');
+		alert($control);
+		$parent.toggleClass('expanded');
+		$parent.find('.main').slideToggle();
+		// if control has HTML5 data attributes, use to update text
+		if ($parent.hasClass('expanded')) {
+			alert('has');
+			//$control.html($control.attr('data-expanded-text'));
+		} else {
+			//alert($parent.find('.main').id);
+			$('.main').hide();
+			//$control.html($control.attr('data-text'));
+		}
+	})
+});
+
+var response = '{"result":true , "count":1}';
+var parsedJSON = eval('('+response+')');
+var result=parsedJSON.result;
+var count=parsedJSON.count;
+alert(result+":"+count);
+*/
+			$(function(){
+		  		$('#tags').TagDynamic({
+		  		    container_class:"wrap-text-box tag_dynamic_box",
+      		        button_str: "添加灯塔",
+      		        //autocomplete_service: '/ajax/auto_tag/user/'  ajax load data
+      		        //autocomplete_service: [ {label:'Jenux', value:'1'}, {label:'Wang', value: '2'}, {label:'Qubenben', value:'3'} ]
+		  		});
+      		
+    			UI.tagDynamic($('#app'), {
+    			    "container_class":"wrap-text-box tag_dynamic_box",
+    			    //autocomplete_service: 'aaa',
+    			    /*
+    			      data_list: [
+    			        { value: 'aaa', label: 'aaa' },
+    			        { value: 'bbb', label: 'bbb' }
+    			    ]
+    			    */
+    			      "button_str": "添加"
+    			});
+		  })
+
+		$('#container').click(function() {
+			//$('<button class="png_bg">保存灯塔</button>').insertBefore($(this))
+			$(this).find('label').each(function() {
+
+				$(this).click(function(){
+				//alert($(this).html());
+				//$(this).html('灯塔');
+			})
+		})
+    });
+    $('#showup').click(function(){
+    	//alert(this.text); 
+    	if(this.text=="︽"){
+    		$(this).text("︾");
+    		//$('#list_left').css("margin-top","0px");
+    		$('#tag-extend1').css("display","none");
+    		$('#tag-extend2').css("display","none");
+    		//$('#filter-box .container').css("height","34px")
+    	}else{
+    		$(this).text("︽"); 
+    		//$('#list_left').css("margin-top","48px"); 
+    		$('#tag-extend1').css("display","block");
+    		$('#tag-extend2').css("display","block");
+    		//$('#tag-extend1').css("background-color","white");
+    		//$('#tag-extend2').css("background-color","white");
+    		//$('#filter-box .container').css("height","84px")
+    	}
+    });
+/*	
+    	$('#view-tags a').click(function(){
+			//alert($tag_list_box.children())//devwxi
+
+		 		$tag_list_box = $('div.tag-list');
+				$tag_list_box.isotope({
+					itemSelector: '.tag-item',
+					masonry: {
+						columnWidth: 100
+					},
+					layoutMode: 'cellsByRow'
+				});//straightAcross
+				var bit = "<div class='tag-item'><li class='on'><a href='javascript:;'  title=''> 子tag</a></li></div>";
+				$tag_list_box.isotope('remove', $tag_list_box.children());
+				$tag_list_box.isotope('insert', $(bit));
+
+			var bit = "<div class='tag-item'><li class=''><a href='javascript:;'  title=''> 子tag</a></li></div>";
+			//$tag_list_box.isotope('remove', $tag_list_box.children());
+    	alert(this.href);
+			$tag_list_box.isotope('insert', $(bit));
+    });
+*/
+  $(function(){
+    readSeed.wall.init();
+  })
+  </script>
+	<!--[if lt IE 7 ]>
+	<script src="/public/js/libs/dd_belatedpng.js"></script>
+	<script>DD_belatedPNG.fix("img, .png_bg");</script>
+	<![endif]-->
+	<script type="text/javascript">
+    UI.global_search();
+    var uvOptions = {};
+    // !important
+    (function() {
+        initScrollTop();
+    })();
+    //$('#external_links a').click(function() {
+    $('#header_links a').click(function() {
+    	//alert('You are going to visit: ' + this.href);
+      //return confirm('You are going to visit: ' + this.href);
+    });
+  </script>
+	<a id="anchor-temp" href=""></a>
+	</body>
+	</html>

@@ -1,0 +1,173 @@
+{% extends "bonds/Contact.html" %}
+
+{% load i18n %}
+
+{% block cond_banner %}
+		<div class="wrapper" id="cond_nav">
+		<li>
+			Country:<select id="country" class="select">
+			<option valuse="US">US</option>
+			<option valuse="EU">EU</option>
+			<option valuse="JP">JP</option>
+		</select></li>
+		<li>&nbsp;&nbsp;&nbsp;Currency:</li>
+		<li>
+			<select id="currency" class="select">
+			<option valuse="USD">USD</option>
+			<option valuse="EUR">EUR</option>
+			<option valuse="JPY">JPY</option>
+		</select></li>
+		<li>&nbsp;&nbsp;&nbsp;</li>
+		<li>
+			Rating:<select id="rating" class="select"  onmouseover= "this.disabled=true" onmouseout= "this.disabled=false">
+			<option valuse="AAA">AAA</option>
+			<option valuse="AA">AA</option>
+			<option valuse="A">A</option>
+		</select></li>
+		<li>&nbsp;&nbsp;&nbsp;</li>
+		<li>
+			Rating:<select id="duration" class="select"  onmouseover= "this.disabled=true" onmouseout= "this.disabled=false">
+			<option valuse="1M">1M</option>
+			<option valuse="3M">3M</option>
+			<option valuse="6M">6M</option>
+		</select></li>
+		<li>&nbsp;&nbsp;&nbsp;</li>
+		<li>Time:<strong> {{cdate}}</strong><!--input id="d453" type="text" value="{{cdate}}" readonly="true" size="8"/--></li>  
+		
+                <li id="glass" class="font-big round-medium">
+                        <strong>08:00.00</strong>
+                </li>
+                <li><button class="start round" type="button">Start </button></li>
+                <li><button class="reset round" type="button">Reset </button></li>
+                <!--li><div id="timer" class="round-big">
+                <h1>timer</h1-->
+        </div>
+		</li>
+{% endblock %}
+
+{% block main_chart %}
+		<!--img src="/site_media/static/webdata/bonds/{{picname}}" width="800" height="500" title="Daily Bond YC" alt="[I]"-->
+  <div id="mytest"> 
+  	<canvas id="myCanvas" width="978" height="500" style="border:1px solid #c3c3c3;">
+		Your browser does not support the canvas element.
+		</canvas>
+	</div>
+{% endblock %}
+ 
+
+
+{% block java_script %}
+<!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')
+</script-->
+
+<script type="text/javascript" charset="utf-8"> 
+    var milisec = 0;
+    var seconds = 0;
+    //var sec_display="00";
+    //var mins_display="08";
+    var mins = 8;
+    var hours = 0;
+    var timer;
+    var timer_ticking = false;
+    
+    var captions = {start: "Start", stop: "Stop" };
+    var classes  = {start: "start round", stop: "stop round" };
+    
+    function timer_callback(){
+        if (milisec>=9){
+            milisec=0;
+            seconds+=1;
+            //newimg("08"+sec_display);
+        }
+        else {
+            milisec+=1;
+        }
+        if (seconds>=60){
+            seconds=0;
+            mins+=1;
+        }
+        if (mins>=60){
+            mins=0;
+            hours+=1;
+            if (hours == 1) $('#glass').addClass("font-medium").removeClass("font-big");
+        }
+        displaytime();
+        timer = setTimeout("timer_callback()",100);
+    }
+    
+    function displaytime() {
+        if (seconds < 10)
+            sec_display = "0" + seconds;
+        else
+            sec_display = seconds;
+        if (mins < 10){
+            mins_display = "0" + mins;
+        }else
+            mins_display = mins;
+        if (hours < 10)
+        {
+            if (hours > 0)
+                hours_display = "0" + hours + ":";
+            else
+                hours_display = "";
+        }
+        else
+                hours_display = hours + ":";
+        $('#glass strong').html(hours_display + mins_display + ":" + sec_display);
+        //$('#glass strong').html(hours_display + mins_display + ":" + sec_display + "." + milisec+"0");
+        
+        	
+        if(mins >= 8 && mins < 19){
+        //if(mins >= 8 && mins < 19 && seconds%5==0){
+        	//alert(mins_display+sec_display);
+    			newimg(mins_display.toString()+sec_display.toString());
+    		}
+    }
+    
+    function start() {
+        timer_ticking = true;
+        timer_callback();
+        $('.start').html(captions.stop).attr("class",classes.stop);
+    }
+    
+    function stop() {
+        timer_ticking = false;
+        clearTimeout(timer);
+        $('.stop').html(captions.start).attr("class",classes.start);
+    }
+    
+    function reset() {
+        stop();
+        milisec = seconds = hours = 0;
+        mins = 8;
+        displaytime();
+    }
+    
+    $(document).ready(function() {
+        $('#glass').click(function(){
+            if(timer_ticking == true)
+                stop();
+            else
+                start();
+            });
+        $('.start').live('click',start);
+            $('.stop').live('click',stop);
+        $('.reset').click(reset);
+    	  newimg("0800");
+    });
+    
+    		var c=document.getElementById("myCanvas");
+    		var cxt=c.getContext("2d"); 
+    		var img=new Image();
+    function newimg(ctime){ 
+    		//ctime = "0800";
+    		//alert("/site_media/static/webdata/bonds/BOND_YC_USD/20120823/1M/"+ctime+".png");
+    		img.src="/site_media/static/webdata/bonds/BOND_YC_USD/20120823/1M/"+ctime+".png";
+    		cxt.drawImage(img,0,0);	
+    }
+</script>
+
+{% endblock %}
+</body>
+</html>

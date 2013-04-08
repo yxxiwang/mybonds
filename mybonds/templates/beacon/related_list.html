@@ -1,0 +1,207 @@
+
+  {% extends 'beacon/admin.html' %}
+
+{% block navbar %} 
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner" style="padding-top:5px;">
+        <div class="container-fluid row-fluid span12" style="margin-left:0px;margin-top:5px;background:white;">
+
+          <div class="span2">
+            <a class="brand" href="/news/"><img  style="margin-top:5px;" class="img-rounded" src="/site_media/static/news/logo1x.png" alt="指极星"></a> 
+            <p class="navbar-text pull-right" > 
+              <a href="/news/?o=todaynews" class="btn btn-primary" title="今闻观止"><strong>今闻观止<strong></a>
+            </p>
+          </div>
+
+          <div class="nav-collapse collapse span9" style="padding-left:30px">
+            <ul class="nav nav-pills">  
+              {% for tag in udata.tags %}
+              <li style="line-height: 24px;">
+                <span id='{{tag}}' class="badge" style="margin-right:4px;background:#222">{{tag.split|join:""}} </span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>  
+
+          <div class="span1" style="margin-left:0;">
+            {% if user.is_authenticated %}
+            <p class="navbar-text pull-left">{{user.username}}</a>&nbsp;&nbsp; <a href="/apply/logout">离开</a></p>
+            {% else %}
+            <p class="navbar-text pull-left">{{user.username}}</a>&nbsp;&nbsp; <a href="/apply/login">登录</a></p>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+{% endblock %}
+
+          <!--div class="nav-collapse collapse row-fluid" style="display:none;margin-left: 160px;margin-right: 160px;"> 
+          </div-->
+  {% block content %} 
+  <div class="container-fluid"> 
+  	<div class="row-fluid"> 
+      <div class="span12">   
+
+        <div class="row-fluid" style="margin-top:30px;"> 
+          <div class="span2" style="border-style: dotted;border-width:0px;border-color:#CBDEF1;"> 
+            <div class="row-fluid"> 
+              <!--a class="brand" href="/news/?o=todaynews"><img class="img-rounded" src="/site_media/static/news/todaynews.png" alt="今闻观止"></a>
+              <a href="/news/?o=todaynews" class="btn btn-primary" title="今闻观止" >今闻观止</a>
+             <button class="btn btn-primary" id="mybtn"><span>今闻观止</span></button-->
+              <!--a class="close" data-toggle="modal" href="#myModal"  style="float: none;" data-keyboard="true" data-backdrop="true" >用 户 反 馈 </a><a class="btn  btn-success" type="submit" rel="popover" title="推荐到射交网络" data-content="你以为我会告诉你渣浪老删帖吗？！">  推荐</a-->
+            </div>  
+            <div class="navbar navbar-fixed-bottom span2">Copyright © 2013 <br>粤ICP备12093048号</div> 
+          </div>
+            <div class="span7" >
+              {% for doc in udata.docs %}
+              <div class="span10"  style="margin-left:0px;">
+                  <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
+                  <p style="font-size: 15px;"><a class="wxi-tip" target="_blank" rel="popover" href="/news/research/?likeid={{doc.docid}}&url={{doc.url}}&title={{doc.title}}" title="{{doc.text}}" style="color:black;">{{doc.title}}<strong></strong></a>&nbsp;&nbsp;
+                  </p>
+
+                  <p id="{{doc.docid}}" name="{{doc.title}}" style="font-size: 13px;"><a href='/news/relatednews/?relatedid={{doc.docid}}&host={{doc.host}}&title={{doc.title}}' title='{{hosturl}}' >{{doc.host}}</a>&nbsp;  {{doc.create_time}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {% for tag in doc.tags %}<span id='{{tag}}' class="badge-wxi-green" style="margin-right:4px;">{{tag.split|join:""}}</span>{% endfor %}
+                  </p>
+                  </blockquote>
+              </div>
+{% if user.username == "ltb" or user.username == "wxi"  or user.username == "sj" %}
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style span2" id="{{doc.title}}" name="{{doc.host}}&nbsp;{{doc.create_time}}"><span class="jiathis_txt"></span>
+<a class="jiathis_button_tsina" data-toggle="modal" href="#myModal"  id="{{doc.text}}" name="{{doc.url}}" style="float: none;" data-keyboard="true" data-backdrop="true" >分享到微博</a><br>
+<a class="sendemail" target="_blank" href="/news/sendemailfornews?docids={{doc.docid}}">发送邮件</a>
+
+<!--a class="jiathis_button_tsina" id="{{doc.text}}" name="{{doc.url}}"></a>
+<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+<a class="jiathis_counter_style"></a-->
+</div>
+<!-- JiaThis Button END -->
+{% endif %}
+
+              {% endfor %}
+            </div>
+          <div class="span3" style="border-style: dotted;border-width:0px;border-color:#CBDEF1;">
+              <div id="list_right" class="span12" style="background:white; float:right;border-style:dotted;padding:10px;border-width:2px;border-color:#7CAEE4;display:block">
+              <img src='/site_media/static/news/logo1x.png' style=""></img> &nbsp;今闻观止，每日实时播报最新最热的财经新闻，帮助您及时、全面掌握专业财经资讯。<br><br>
+              网站主页展现的是当日最新最热的新闻资讯。用户可点击顶部的主题标签，进一步浏览各个主题的热点新闻
+<br><br>
+              进入主题标签后，显示分类主题相关的联想标签和主题分类下的热点新闻。<br><br>
+              将鼠标移到新闻标题上，您可以看到新闻内容摘要。<br><br>
+              如果您对某个新闻感兴趣，并想了解这个新闻媒体过去的相关新闻，请点击新闻标题下的新闻网站，相关新闻“一网打尽”。<br><br>
+              每个新闻标题下，我们还为您准备了与这个新闻内容高度相关的几个关联标签，请点击您感兴趣的任何一个，“关系重大”的新闻资讯都在。<br><br>
+              所有这些，都得益于最新的人工智能技术，希望能给您带来惊喜，也希望您点击页面右侧的反馈标签，非常感谢您的建议，这可以让我们做得更好。<br><br>
+
+          </div>
+            <div class="feedback-btn">
+              <a class="fancybox fancybox.ajax zh-cn" title="用户反馈" target="_blank" href="/news/feedbackform" style="color:black"><i></i> 用 户 反 馈 </a>
+            </div>
+          </div>
+        </div><!-- /row-fluid -->
+      </div><!-- /span12 --> 
+  </div> <!-- /row-fluid -->
+ </div> <!-- /container -->
+
+  <div class="modal-footer" >
+       访问 <a href="/404.html" target="_blank" title="指极星404" >指极星404页面</a> 以支持公益事业 
+  </div>
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">转发到微博 ...</h3>
+  </div>
+  <div class="modal-body" style="display:block">  
+
+  </div> 
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
+    <button id="share_btn" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">确认</button>
+  </div>
+</div>
+
+{% endblock %} 
+{% block script %} 
+
+<script type="text/javascript">
+var ttl ="";
+var txt ="";
+var url ="";
+var jiathis_config={
+  url:"http://www.9cloudx.com",
+  summary:"来自指极星的分享:"+txt,
+  title:"指极星:"+ttl,
+  hideMore:false
+}
+
+$('.jiathis_button_tsina').click(function(){
+  // alert($(this).parent().attr('class'));
+   ttl = $(this).parent().attr('id');
+   host = $(this).parent().attr('name');
+   txt = $(this).attr('id');
+   url = $(this).attr('name');
+   txt = $.trim(txt);
+   txt = "【"+ttl+"】" + host+"~~"+txt;
+   $(".modal-body").text(txt);
+  // alert(ttl);
+  /*jiathis_config={
+    url:url,
+    summary:host+"~~"+txt,
+    title:"【"+ttl+"】",
+    hideMore:false
+  }*/
+  // alert(jiathis_config["title"]);
+});
+
+  $('#share_btn').click(function(){
+    // alert('/news/beacondelete/?beaconname='+delete_beacon);
+  });
+
+</script> 
+<!--script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script-->
+
+<script > 
+  var beacons = ""
+  var delete_beacon = ""
+  var delete_id =""
+  var tag_unchk = new Array()
+  var doc_unchk = new Array()
+
+   
+  $('#{{beaconid}}').attr('class', 'label label-wxi-selected');
+
+  beacon_proc = function() {
+      $tag_list_box = $('div.beacon-container');
+      $('.badge').css('cursor', 'pointer');
+      $('.badge').click(function(){
+        if($(this).attr('class')=='badge-wxi-green'){
+          // window.location.href = '/news/relatednews/?relatedid='+$(this).parent().attr('id')+'&localtag='+$(this).attr('id');
+        }else{ 
+          $(this).attr('class', 'badge badge-selected');  
+          window.location.href = '/news/globaltag/?globaltag='+$(this).attr('id');
+        } 
+      });
+
+      $('.badge-wxi-green').css('cursor', 'pointer');
+      $('.badge-wxi-green').click(function(){
+          //alert('/news/relatednews/?relatedid='+$(this).parent().attr('id')+'&localtag='+$(this).attr('id'));
+          window.location.href = '/news/relatednews/?relatedid='+$(this).parent().attr('id')+'&localtag='+$(this).attr('id')+'&title='+$(this).parent().attr('name'); 
+      });
+  }
+ 
+  beacon_proc();
+  Feedback.init();
+</script> 
+<script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-37511171-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+</script>
+{% endblock %}

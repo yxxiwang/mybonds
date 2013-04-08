@@ -1,0 +1,122 @@
+
+  {% extends 'beacon/admin.html' %}
+
+
+  {% block content %} 
+  <div class="container-fluid"> 
+  	<div class="row-fluid"> 
+      <div class="span12">
+        <!--div class="row-fluid">
+          <div class="span2" style="border-style: dotted;border-width:0px;border-color:#CBDEF1;">
+            <button id="refresh_btn" class="btn btn-primary">全部分享</button>
+          </div>
+            <div id="beacon-container" class="beacon-container row span9" style="border-bottom-style: dotted;border-width:1px;border-color:#CBDEF1;">
+            </div> 
+        </div--><!-- /row-fluid -->
+  
+        <div class="row-fluid">
+          <div class="span2" style="border-style: dotted;border-width:1px;border-color:#CBDEF1;"><!-- 左边 灯塔入口坐标文档 -->
+            <div class="span12" style="margin-left:0px;"> 
+            </div>
+          </div>
+
+          <div class="span5"><!-- 中间灯塔-->
+            <div class="well span12" style="margin-left:0px;"> 
+             <strong> 我关注的灯塔  <span class="badge badge">{{myfllws|length}}</span></strong>
+            </div>   
+            {% for beacon in myfllws %}
+              <div class="well span6"  style="margin-left:0px;">
+                  <span id='{{beacon.id}}' class="label label-info ">{{beacon.ttl}}</span>
+                  <p>{{beacon.desc}}</p>
+                   <span class="badge"><abbr title="文章">{{beacon.cnt}}</abbr></span>
+                   <span class="badge"><abbr title="关注">{{beacon.fllw_cnt}}</abbr></span>
+                  &nbsp;<a class="heartremove" href="/news/mybeacons/?heartopt=remove&heartid={{beacon.id}}&heartusr={{beacon.crt_usr}}"  rel="tooltip" title="关注灯塔" style="float:right;"  ><button class="heart_btn" type="button">-</button></a>
+              </div>  
+            {% endfor %}     
+
+            {% if mybeacons %}
+            <div class="well span12" style="margin-left:0px;"> 
+              我的灯塔<span class="badge">{{mybeacons|length}}</span>
+            </div>   
+            {% for beacon in mybeacons %}
+              <div class="well span6"  style="margin-left:0px;"> 
+                  <span id='{{beacon.id}}' class="label label-info ">{{beacon.ttl}}</span>
+                  <p>{{beacon.desc}}</p>
+                   <span class="badge"><abbr title="文章">{{beacon.cnt}}</abbr></span>
+                   <span class="badge"><abbr title="关注">{{beacon.fllw_cnt}}</abbr></span>
+              </div>  
+            {% endfor %}     
+
+            {% endif %}   
+            </div><!-- 中间灯塔 end -->
+
+          <div class="span5"><!-- 右边  -->
+            <div class="well span12" style="margin-left:0px;"> 
+              <strong>可关注的灯塔  <span class="badge badge">{{beacons|length}}</span> </strong>
+            </div>   
+            <div class="input-append span12" style="margin-left:0px;">
+              <input class="span10" id="beaconsearch" type="text">
+              <button class="btn btn-primary" id="search_btn" type="button">搜索</button> </a>
+            </div>   
+            {% if beacon_search %}
+              {% for beacon in beacon_search %}
+              <div class="tag-item span6 well"  style="margin-left:0px;"> 
+                  <span id='{{beacon.id}}' class="label label-info span12">{{beacon.ttl}}</span>
+                  <br>
+                  <p>{{beacon.desc}}</p>
+                   <span class="badge"><abbr title="文章">{{beacon.cnt}}</abbr></span>
+                   <span class="badge"><abbr title="关注">{{beacon.fllw_cnt}}</abbr></span>
+                  &nbsp;<a class="heartadd" href="/news/mybeacons/?heartopt=add&heartid={{beacon.id}}&heartusr={{beacon.crt_usr}}"  rel="tooltip" title="关注灯塔" style="float: right;"  ><button class="heart_btn" type="button">+</button></a>
+              </div>  
+              {% endfor %}    
+            {% else %}         
+              {% for beacon in beacons %}
+              <div class="tag-item span6 well"  style="margin-left:0px;"> 
+                  <span id='{{beacon.id}}' class="label label-info ">{{beacon.ttl}}</span>
+                  <br>
+                  <p>{{beacon.desc}}</p>
+                   <span class="badge"><abbr title="文章">{{beacon.cnt}}</abbr></span>
+                   <span class="badge"><abbr title="关注">{{beacon.fllw_cnt}}</abbr></span>
+                  &nbsp;<a class="heartadd" href="/news/mybeacons/?heartopt=add&heartid={{beacon.id}}&heartusr={{beacon.crt_usr}}"  rel="tooltip" title="关注灯塔" style="float: right;"  ><button class="heart_btn" type="button">+</button></a>
+              </div>  
+              {% endfor %}  
+            {% endif %}         
+          </div>
+
+        </div><!-- /row-fluid -->
+      </div><!-- /span10 -->
+  </div> <!-- /row-fluid -->
+
+ </div> <!-- /container -->
+
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">删除灯塔</h3>
+  </div>
+  <div class="modal-body">
+    <p>是否确认删除该灯塔?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
+    <button id="delete_btn" class="btn btn-primary">确认</button>
+  </div>
+</div>
+
+{% endblock %} 
+{% block script %} 
+<script >  
+
+  $("#beaconsearch").keydown(function(event){ 
+    if(event.keyCode==13 )
+     window.location.href = encodeURI('/news/mybeacons/?beaconname='+$('#beaconsearch').val().trim());
+  })
+  
+  $('#search_btn').click(function(){
+    // if($('#beaconsearch').val()=="") return;
+    $(this).button('loading');
+    window.location.href = encodeURI('/news/mybeacons/?beaconname='+$('#beaconsearch').val().trim()); 
+  });
+</script>
+{% endblock %}

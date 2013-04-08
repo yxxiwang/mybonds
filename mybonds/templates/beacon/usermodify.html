@@ -1,0 +1,111 @@
+
+{% extends 'beacon/admin.html' %}    
+{% block content %} 
+    <div class="container"> 
+	<div class="row-fluid">
+  		<div class="span12">
+    		<!--div class="row-fluid">
+      			<div class="span10">
+				      <input id="search"  type="text" class="search-query span12" placeholder="搜索" value="{{query}}"> 
+  				  </div> 
+      			<div class="span2">
+      				<button class="btn" id="mybtn" data-loading-text="正在搜索...">搜索</button>
+      			</div>
+    		</div-->
+    		<div class="row-fluid">
+      			<div class="span2" style="display:block"></div> 
+            <div class="span7" >
+            <form class="well_wxi" style="padding-left:10px;">
+              <fieldset>
+                <legend>信息修改</legend>
+                <label>用户</label>
+                <input type="text" disabled placeholder="{{username}}" value="{{username}}">
+                <label>姓名</label>
+                <input type="text" placeholder="{{name}}"  value="{{name}}" >
+                <label>邮箱地址</label>
+                <input type="text" placeholder="{{email}}" value="{{email}}">
+                <span class="help-block"> .</span>
+                <!--label class="checkbox">
+                  <input type="checkbox"> Check me out
+                </label-->
+                <button type="submit" class="btn">保存</button>
+              </fieldset>
+            </form>
+            </div>
+            <div class="span3">
+            <div class="alert" id="alert-message" style="display:block;">
+              <a class="close" data-dismiss="alert">×</a>
+              <strong>提示:</strong> 添加联系人邮件
+            </div>
+
+            <div id="beacon-container" class="beacon-container row span12" >
+            {% for beacon in beacons %}
+              <div class="tag-item span12" style="margin-left:0px;">  
+                <span id='info' class="label label-info">{{beacon.name}}</span><a class='close' data-dismiss='tag-item' style="float: none;">×</a>
+              </div>  
+            {% endfor %}
+            </div>
+
+            <section id="beacon-box">
+              <div class="input-append" id="beacon-box">
+                <input class="span12" id="beacon_txt" type="text" placeholder="增加联系人邮件">
+                <button id="add_btn" class="btn" type="button">添加邮件</button>
+                <button id="save_btn" class="btn" type="button" >保存邮件</button>
+              </div>
+            </section> 
+          </div>
+
+    		</div>
+  		</div>
+	</div> 
+
+
+  		{% for user in user_list %}
+  		<!--p>
+  			{{ user }}
+  		</p-->
+  		{% endfor %} 
+		
+    </div> <!-- /container -->
+
+{% endblock %} 
+{% block script %} 
+<script >
+  $("#beacon_txt").keydown(function(event){ 
+    if(event.keyCode==13 )
+      beacon.add_beacon();
+  })
+
+  beacon_proc = function() {
+      $tag_list_box = $('div.beacon-container');
+      $('.label').css('cursor', 'pointer');
+      $('.label').click(function(){
+        if($(this).attr('class')=='label label-success'){
+          // $(this).attr('class', 'label label-info');
+        }else{
+          // alert($(this).hasClass('label label-info')+$(this).text());
+          $(this).attr('class', 'label label-success'); 
+          // alert('/news/listsimilar/?similarid={{similarid}}&beacon='+$(this).text()+'&title={{title}}');
+          window.location.href = '/news/listsimilar/?similarid={{similarid}}&beacon='+$(this).text() ;
+        }
+          //alert($(this).parent().parent().html());
+          //$tag_list_box.isotope('close', $(this).parent().parent());
+          //$tag_list_box.isotope('insert', "<div class='tag-item' style='display:none'></div>");
+      });
+  } 
+  beacon_proc();
+
+  $tag_list_box = $('div.beacon-container');
+  $tag_list_box.find('.close').click(function(){ 
+      // $tag_list_box.isotope('remove', $(this).parent()); 
+      $(this).parent().remove();
+      beacons += $(this).parent().find('.cbox').val()+"|-|"; 
+      checklist+= "2";
+  });
+
+  $('#add_btn').click(function(){
+      beacon.add_beacon();
+  });
+
+</script>
+{% endblock %}

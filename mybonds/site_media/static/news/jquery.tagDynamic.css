@@ -1,0 +1,107 @@
+.wrap-text-box,form.format div.wrap-text-box {
+	display: inline-block;
+	*display: inline;
+	*zoom: 1;
+	vertical-align: top;
+	margin: 0;
+}
+
+ol.tag_dynamic_list {
+	margin: 8px 0 0;
+	padding: 0;
+	overflow: hidden;
+	_zoom: 1;
+}
+
+ol.tag_dynamic_list li {
+	white-space: pre;
+	white-space: pre-wrap;
+	white-space: pre-line;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	white-space: -moz-pre-wrap;
+	white-space: -hp-pre-wrap;
+	word-wrap: break-word;
+	float: left;
+	display: inline !important;
+	list-style-type: none;
+	margin: 0 5px 5px 0;
+}
+
+ol.tag_dynamic_list li label {
+	display: inline !important;
+}
+
+.tag_dynamic_box button {
+	vertical-align: middle;
+	color: #999;
+	cursor: pointer;
+	padding: 3px 10px;
+	margin-left: 3px;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list li {
+	padding-left: 15px;
+	margin: 5px 10px 5px 0;
+	position: relative;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list label {
+	margin-left: 5px;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list input {
+	display: none;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list .remove {
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: inline-block;
+	*display: inline;
+	*zoom: 1;
+	width: 16px;
+	height: 16px;
+	line-height: 14px;
+	border-radius: 8px;
+	text-align: center;
+	background: #a3c7e7;
+	color: #fff;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list li .remove:hover {
+	color: #333;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list li {
+	padding: 0 11px 0 4px;
+	color: #989898;
+	background-color: #EFEFEF;
+	border-radius: 10px;
+	line-height: 17px;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list li:hover {
+	background-color: #666;
+	color: white;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list .remove {
+	background: url("/site_media/static/news/main_icons.png") -324px -309px no-repeat;
+	right: 5px;
+	top: 3px;
+	width: 12px;
+	height: 14px;
+	text-indent: -2999px;
+	left: auto
+}
+
+.tag_dynamic_box ol.tag_dynamic_list li:hover .remove {
+	color: #fff;
+	background-position: -292px -309px;
+}
+
+.tag_dynamic_box ol.tag_dynamic_list li:hover .remove:hover {
+	background-position: -354px -309px;
+}

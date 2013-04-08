@@ -1,0 +1,12 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Server Error" %}{% endblock %}
+
+{% block body %}
+    <header class="jumbotron subhead" id="overview">
+        <h1>系统错误</h1>
+        <p class="lead">系统中某处有错误发生,该错误已经被记录下来,我们将尽快解决</p>
+    </header>
+{% endblock %}

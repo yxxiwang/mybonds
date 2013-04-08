@@ -1,0 +1,129 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Geeknews</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Le styles -->
+    <link rel="shortcut icon" href="http://twitter.github.com/bootstrap/assets/ico/favicon.ico">
+    <link href="/site_media/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+			/*基本信息*/
+			body {font:12px Tahoma;margin:0px;text-align:center;background:#FFF;}
+			a:link,a:visited {font-size:12px;text-decoration: none;}
+			a:hover{}
+			
+			/*页面层容器*/
+			#container {width:800px;height:600px;margin:10px auto}
+			
+			/*页面头部*/
+			#header {background:url(logo.gif) no-repeat}
+			#menu {padding:20px 20px 0 0}
+			#menu ul {float:right;list-style:none;margin:0px;}
+			#menu ul li {float:left;display:block;line-height:30px;margin:0 10px}
+			#menu ul li a:link,#menu ul li a:visited {font-weight:bold;color:#666}
+			#menu ul li a:hover{}
+			.menuDiv {width:1px;height:28px;background:#999}
+			#banner {background:url(banner.jpg) 0 30px no-repeat;width:730px;margin:auto;height:240px;border-bottom:5px solid #EFEFEF;clear:both}
+			
+			/*页面主体*/
+			#pagebody {width:800px;margin:0 auto;height:400px;background:#CCFF00}
+			
+			/*页面底部*/
+			#footer {width:800px;margin:0 auto;height:50px;background:#00FFFF}
+
+    </style>
+    <link href="/site_media/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="{% url index %}">{{ site.name }}</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="{% url index %}">{% trans "Home" %}</a></li>
+              <li><a href="http://www.amazingworks.com.br">{% trans "About" %}</a></li>
+              <li><a href="mailto:yxxiwang@gmail.com">{% trans "Contact" %}</a></li>
+            </ul>
+            {% if user.is_authenticated %}
+                <ul class="nav pull-right">
+                <span class="label label-inverse">{% trans 'Hello' %} {{ user.username }},</span>
+                <li class="divider-vertical"></li>
+                <a href="{% url django.contrib.auth.views.password_change %}">{% trans "Change password" %}</a>
+                <a class="btn btn-inverse" href="{% url django.contrib.auth.views.logout %}">{% trans 'Leave' %}</a>
+                </ul>
+
+            {% else %}
+            <form class="form-inline pull-right" style="margin: 0;" action="{% url django.contrib.auth.views.login %}" method="post">
+            {% csrf_token %}
+            <input class="input-small" name="username" id="id_username" type="text" placeholder="{% trans 'Username' %}">
+            <input class="input-small" name="password" id="id_password" type="password" placeholder="{% trans 'Password' %}">
+            <button class="btn" type="submit">{% trans 'Log in' %}</button>
+            </form>
+            {% endif %}
+          </div> 
+        </div>
+      </div>
+    </div>
+
+		<div id="container">
+			<div id="header">
+				<div id="menu">
+				  <ul>
+				  <li><a href="#">首页</a></li>
+					<li class="menuDiv"></li>
+					<li><a href="#">博客</a></li>
+					<li class="menuDiv"></li>
+					<li><a href="#">设计</a></li>
+					<li class="menuDiv"></li>
+					<li><a href="#">相册</a></li>
+					<li class="menuDiv"></li>
+					<li><a href="#">论坛</a></li>
+					<li class="menuDiv"></li>
+					<li><a href="#">关于</a></li>
+				  </ul>
+				</div>
+				<div id="banner">
+				</div>
+			</div>
+			<div id="main">
+				
+			</div>
+		</div>
+
+    
+    
+    <!-- <link href="/site_media/static/css/registration.css" rel="stylesheet"> -->
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="/site_media/static/js/html5.js"></script>
+    <![endif]--> 
+    <script src="/site_media/static/js/bootstrap.min.js"></script>
+    <script src="/site_media/static/js/jquery-1.7.2.min.js"></script>
+    <script src="/site_media/static/js/prettify.js"></script>
+    <!--script src="/site_media/static/js/bootstrap-transition.js"></script>
+    <script src="/site_media/static/js/bootstrap-alert.js"></script>
+    <script src="/site_media/static/js/bootstrap-modal.js"></script>
+    <script src="/site_media/static/js/bootstrap-dropdown.js"></script>
+    <script src="/site_media/static/js/bootstrap-scrollspy.js"></script>
+    <script src="/site_media/static/js/bootstrap-tab.js"></script>
+    <script src="/site_media/static/js/bootstrap-tooltip.js"></script>
+    <script src="/site_media/static/js/bootstrap-popover.js"></script>
+    <script src="/site_media/static/js/bootstrap-button.js"></script>
+    <script src="/site_media/static/js/bootstrap-collapse.js"></script>
+    <script src="/site_media/static/js/bootstrap-carousel.js"></script>
+    <script src="/site_media/static/js/bootstrap-typeahead.js"></script-->
+
+  </body>
+</html>

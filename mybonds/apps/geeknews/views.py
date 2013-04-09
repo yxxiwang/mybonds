@@ -94,8 +94,7 @@ def feedback_reply(request):
     if quantity > QUANTITY:
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
-    userobj = request.user 
-#    username = getUserName(userobj)
+    userobj = request.user  
     username = getUserName(request) 
     userobj.username = username     
     obj = {}

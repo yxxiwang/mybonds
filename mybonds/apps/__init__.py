@@ -33,6 +33,14 @@ def getUserName(request):
 #    print "username is:"+username
     return username
 
+def to_unicode_or_bust(obj, encoding='utf-8'):
+     if obj is None:
+         return "" 
+     if isinstance(obj, basestring):
+         if not isinstance(obj, unicode):
+             obj = unicode(obj, encoding)
+     return obj
+ 
 def trace_back():
     try:
         return traceback.format_exc()

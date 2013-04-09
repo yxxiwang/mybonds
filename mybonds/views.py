@@ -457,7 +457,7 @@ def login(request):
 #            print next
 #            if next != "":
 #                return HttpResponseRedirect(next)
-            return HttpResponseRedirect('/news/')
+            return HttpResponseRedirect('/news/beaconnews')
         else:
             return render_to_response('login.html', {'err_message': "登录失败!".decode("utf8")}, context_instance=RequestContext(request))
     #    return HttpResponseRedirect('/news/')

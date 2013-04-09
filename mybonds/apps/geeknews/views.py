@@ -1275,6 +1275,8 @@ def mybeacons(request, template_name="beacon/mybeacons.html"):
 
 @login_required
 def beaconnews(request,template_name="beacon/beacon_news.html"):  
+    start = time.clock()
+    
     beaconid = request.GET.get("beaconid", "")  
     beaconname = request.GET.get("beaconname", "")  
     beaconusr = request.GET.get("beaconusr", "")  
@@ -1370,6 +1372,12 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         beaobj["id"] = mybeconid
         mybeacon_list.append(beaobj)
         
+        
+    urlstop = time.clock()  
+    diff = urlstop - start  
+    
+    print "function(%s) has taken %s" % ("beaconnews",str(diff))
+    
     if beaconid != "": 
         channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
         page = 0 

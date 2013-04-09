@@ -196,7 +196,7 @@ def apply(request):
                 auth.login(request, user)
                 log_typer(request, "apply", "none")
                 greeting_typer(username, "apply", username)
-                return HttpResponseRedirect('/news/')
+                return HttpResponseRedirect('/news/beaconnews')
             else:
                 # Return a 'disabled account' error message 
                 return render_to_response('apply.html',
@@ -457,7 +457,7 @@ def login(request):
 #            print next
 #            if next != "":
 #                return HttpResponseRedirect(next)
-            return HttpResponseRedirect('/news/beaconnews')
+            return HttpResponseRedirect('/news/beaconnews') 
         else:
             return render_to_response('login.html', {'err_message': "登录失败!".decode("utf8")}, context_instance=RequestContext(request))
     #    return HttpResponseRedirect('/news/')

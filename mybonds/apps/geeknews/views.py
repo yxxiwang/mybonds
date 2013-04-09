@@ -1392,6 +1392,10 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         udata = getAllBeaconDocsByUser(username)
         udata["simdocs"]=udata.pop("docs")
         
+    urlstop = time.clock()  
+    diff = urlstop - start   
+    print "function(%s)---end has taken %s" % ("beaconnews",str(diff))
+        
     return render_to_response(template_name, {
         'udata': udata,
         'mybeacons':mybeacon_list,

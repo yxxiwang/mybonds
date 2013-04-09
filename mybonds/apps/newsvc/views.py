@@ -41,6 +41,10 @@ def channels(request):
     return HttpResponse("channels")
 
 @login_required
-def newsdetail(request): 
-    return HttpResponse("newsdetail")
+def newsdetail(request):  
+    username = request.GET.get("u", getUserName(request)) 
+    docid=request.GET.get("docid", "") 
+    urlstr = "http://www.gxdx168.com/research/svc?docid="+docid
+    udata=getDocByUrl(urlstr)
+    return HttpResponse(json.dumps(udata), mimetype="application/json")
 

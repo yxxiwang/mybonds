@@ -68,3 +68,32 @@ def getDataByUrl(urlstr,isservice=False):
         udata["total"] = "0"
         udata["docs"] = []
     return udata
+
+def getDocByUrl(urlstr):
+    start = time.clock()
+    udata = loadFromUrl(urlstr) 
+    urlstop = time.clock()  
+    diff = urlstop - start  
+    print "loadFromUrl(%s) has taken %s" % (urlstr,str(diff))
+    docs = []
+    if udata.has_key("docs"):
+        for doc in udata["docs"]:
+            if doc is None:
+                continue
+#             if doc["validTime"]=="false" or not doc["validTime"]:
+#                 continue 
+            doc.pop("urls")
+            doc.pop("relatedDocs")
+            doc["docid"] = getHashid(doc["url"])
+            doc["title"] = doc["title"].replace(" ","") 
+            doc["copyNum"] = str(doc["copyNum"])
+            doc["validTime"] = str(doc["validTime"])
+            doc["tms"]=str(doc["create_time"])
+            doc["create_time"] = timeElaspe(doc["create_time"]) 
+            docs.append(doc)
+        udata["docs"] = docs  
+        udata["total"] = str(len(udata["docs"]) )
+    else:
+        udata["total"] = "0"
+        udata["docs"] = []
+    return doc

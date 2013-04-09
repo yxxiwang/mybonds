@@ -744,13 +744,14 @@ def load_beacons(request):
 #    rtstr = json.dumps(beacon_json).replace("\t", "").replace("\n", "")
     return HttpResponse(json.dumps(beacon_json), mimetype="application/json")
 
-@login_required
+# @login_required
 def listbeacons_service(request):
     orderby = request.GET.get("orderby", "news")
     beaconname=request.GET.get("beaconname", "")
     username = request.GET.get("u", getUserName(request))
     start = request.GET.get("start", "0")
-    num = request.GET.get("num", "5") 
+    num = request.GET.get("num", "5")
+    btype = request.GET.get("btype", "notfllw")#fllw,notfllw,all
     sharebeacons=[]
     sharebeacon_list=[]
     mybeacons=[]
@@ -770,10 +771,18 @@ def listbeacons_service(request):
 #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
         beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
-        beaobj["id"] = beaid
-        if beaconstr in mybeacons:
-#            myfllw_list.append(beaobj)
-            continue
+        beaobj["beaconid"] = beaid
+        if r.sismember("usr:"+username+":fllw",beaconstr):#频道已经被该用户关注
+            if btype == "notfllw":#选择还未被用户关注的频道
+                continue
+            beaobj["isfllw"] = "true"
+        else:#频道尚未被该用户关注
+            if btype == "fllw":#选择的是用户已经被关注的频道
+                continue
+            beaobj["isfllw"] = "false"
+#         if beaconstr in mybeacons: 
+#             continue
+        
         if not beaobj.has_key("ttl"):
             continue
         if not beaconname=="":

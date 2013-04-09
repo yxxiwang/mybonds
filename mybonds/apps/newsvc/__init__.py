@@ -62,7 +62,9 @@ def getDataByUrl(urlstr,isservice=False):
             docs.append(doc)
         udata["docs"] = docs 
 #     if udata.has_key("tags"):
-#         udata["tags"] = udata["tags"][0:40]
-
-    udata["total"] = str(len(udata["docs"]) )
+#         udata["tags"] = udata["tags"][0:40] 
+        udata["total"] = str(len(udata["docs"]) )
+    else:
+        udata["total"] = "0"
+        udata["docs"] = []
     return udata

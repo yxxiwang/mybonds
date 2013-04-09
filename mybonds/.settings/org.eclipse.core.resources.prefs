@@ -7,6 +7,7 @@ encoding//apps/geeknews/logexport.py=utf-8
 encoding//apps/geeknews/urls.py=utf-8
 encoding//apps/geeknews/views.py=utf-8
 encoding//apps/newsvc/__init__.py=utf-8
+encoding//apps/newsvc/urls.py=utf-8
 encoding//apps/newsvc/views.py=utf-8
 encoding//build/load_channel.py=utf-8
 encoding/<project>=UTF-8

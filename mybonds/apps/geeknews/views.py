@@ -16,6 +16,7 @@ from django.core import urlresolvers
 from django.contrib.auth.decorators import login_required, permission_required
 from mybonds.apps.geeknews import *
 import mybonds.apps.geeknews.daemonProcess as daemonProcess
+from django.template.defaultfilters import length
    
 def index(request): 
     # latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
@@ -842,6 +843,11 @@ def load_similars(request):
     sim_lst=[]
     lst=[]
     beacons = []
+    # modified by devwxi 临时使用..
+    if groupid==getHashid("All"):
+        groupid = ""
+        
+    
     if groupid==getHashid("All"):
         beacons = r.smembers("usr:"+username+":fllw")
         for beaconstr in beacons:#取所有关注的灯塔的相关主题文档
@@ -881,8 +887,16 @@ def load_similars(request):
             for sid in sim_lst:
                 rdoc.hset("docid:beacons",sid,username+"|-|"+beaid+"|-|"+beaconname) 
     else:#取某个灯塔的新闻
-        beaconid = request.GET.get("beaconid", "")  
-        beaconusr = request.GET.get("beaconusr", "") 
+        beaconid = request.GET.get("beaconid", "1968416984598300074")  
+        beaconusr = request.GET.get("beaconusr", "ltb")
+        
+        #modify by devwxi at 20130409
+        channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
+        channel = to_unicode_or_bust(channel) 
+        durl='/newsvc/channelnews/?u=%s&channel=%s&length=%d&start=%s&num=%s' %(username,channel,100,start,num)
+#         print durl
+        return HttpResponseRedirect(durl)
+    
         checkBeaconUptime(beaconusr, beaconid) 
         key = "bmk:" + beaconusr + ":" + beaconid
         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))
@@ -1333,9 +1347,11 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
             else:
                 beaconttl=""
             beaconname=to_unicode_or_bust(beaconname)
-            beaconttl=to_unicode_or_bust(beaconttl) 
+            beaconttl=to_unicode_or_bust(beaconttl,"utf8")
+#             beaconname = urllib2.quote(beaconname.encode("utf8"))
+#             print beaconname,beaconttl.decode("utf8"),re.search(beaconname,beaconttl.decode("utf8"))
             if re.search(beaconname,beaconttl):
-                beacon_search.append(beaobj)
+                beacon_search.append(beaobj) 
                 
     sharebeacon_list=sharebeacon_list[0:50] 
         
@@ -1346,10 +1362,16 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         beaobj["id"] = mybeconid
         mybeacon_list.append(beaobj)
         
-    if beaconid != "":
-        udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=200)
+    if beaconid != "": 
+        channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
+        page = 0 
+        length=100
+        urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
+        udata=getDataByUrl(urlstr,True) 
+#         udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=200)
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl")
-        r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["simdocs"]))
+#         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["simdocs"]))
+        r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["docs"]))
     else: 
         udata = getAllBeaconDocsByUser(username)
         udata["simdocs"]=udata.pop("docs")

@@ -12,7 +12,7 @@ from mybonds.apps.newsvc import *
 
 
 def index(request):     
-    return HttpResponse(json.dumps(beacon_json), mimetype="application/json")
+    return HttpResponse("hello index")
  
 @login_required
 def channelnews(request): 
@@ -20,19 +20,27 @@ def channelnews(request):
     channel=request.GET.get("channel", "")
     page=request.GET.get("page", "0")
     length=request.GET.get("length", "20")
+    start=request.GET.get("start", "0")
+    num=request.GET.get("num", "20")
     username = request.GET.get("u", getUserName(request)) 
     
     if channel !="":
         channel = urllib2.quote(channel.encode("utf8"))
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     
-    udata=getDataByUrl(urlstr,True) 
-    start = request.GET.get("start", "0")
-    num = request.GET.get("num", "50")
-    tagnum = request.GET.get("tagnum", "10")
-#     udata["docs"] = udata["docs"][int(start): int(start) + int(num)] 
+    udata=getDataByUrl(urlstr,True)
+    
+    udata["docs"] = udata["docs"][int(start): int(start) + int(num)] 
 #     udata["tags"] = udata["tags"][0: int(tagnum)] 
 #     udata["total"] = str(udata["total"]) 
     return HttpResponse(json.dumps(udata), mimetype="application/json")
 
+
+@login_required
+def channels(request):
+    return HttpResponse("channels")
+
+@login_required
+def newsdetail(request): 
+    return HttpResponse("newsdetail")
 

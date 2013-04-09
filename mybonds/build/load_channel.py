@@ -15,6 +15,14 @@ def getHashid(ustr):
     h = abs(h)
     return str(h)
 
+def to_unicode_or_bust(obj, encoding='utf-8'):
+     if obj is None:
+         return "" 
+     if isinstance(obj, basestring):
+         if not isinstance(obj, unicode):
+             obj = unicode(obj, encoding)
+     return obj
+
 def load_data(input):
     r.delete("bmk:doc:share")
     r.delete("bmk:doc:share:byfllw")
@@ -24,13 +32,14 @@ def load_data(input):
         if usr=="stockmarket":
             continue
 #         desc = name if desc=="" or desc is None else ""
+#         name = to_unicode_or_bust(name)
         id = getHashid(name)
         print "usr=%s ;id=%s;name=%s;desc=%s" % (usr,id,name,desc)
         r.zadd("bmk:doc:share",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:byfllw",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:bynews",time.time(),usr+"|-|"+id)
         r.sadd("usr:" + usr+":fllw",usr+"|-|"+id)
-        beaobj = r.hset("bmk:" + usr + ":" + id,"id",id) 
+        beaobj = r.hset("bmk:" + usr + ":" + id,"id",id)
         beaobj = r.hset("bmk:" + usr + ":" + id,"ttl",name) 
         beaobj = r.hset("bmk:" + usr + ":" + id,"desc",desc) 
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_usr",usr) 

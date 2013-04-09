@@ -708,11 +708,15 @@ def getDataByUrl(urlstr,isservice=False):
         for doc in udata["docs"]:
             if doc is None:
                 continue
+            if doc["validTime"]=="false" or not doc["validTime"]:
+                continue
 #            doc["id"] = getHashid(doc["url"])
             doc["docid"] = getHashid(doc["url"])
             doc["title"] = doc["title"].replace(" ","")
-            doc["tx"] = doc["text"].replace(" ","")
-            doc["text"] = subDocText(doc["text"])
+#             doc["tx"] = doc["text"].replace(" ","")
+#             doc["text"] = subDocText(doc["text"])
+            doc["copyNum"] = str(doc["copyNum"])
+            doc["validTime"] = str(doc["validTime"])
             doc["tms"]=str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"])
             if doc.has_key("tags") and isservice:

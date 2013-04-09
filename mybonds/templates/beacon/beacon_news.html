@@ -100,14 +100,14 @@
           <div class="span6"><!-- 中间灯塔similar文档 -->
             <div class="span12" style="margin-left:0px;">
             </div>
-            {% for doc in udata.simdocs %}
+            {% for doc in udata.docs %}
             <div class="span12" style="margin-left:0px;">
             <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
              <p style="font-size: 13px;"><a target="_blank" href="/news/research/?u={{username}}&likeid={{doc.docid}}&title={{doc.title}}"><strong>{{doc.title}}</strong>&nbsp;&nbsp;</a></p>
-             <p ><small>{{doc.host}}&nbsp;  {{doc.create_time}}&nbsp; <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
+             <p ><small>{{doc.domain}}&nbsp;  {{doc.create_time}}&nbsp; <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
              </small></p> 
               {{doc.text}}
-               <br><br>{{doc.tx}} <br>
+               <!--br><br>{{doc.tx}} <br-->
             </blockquote> 
             </div>
             {% endfor %}          

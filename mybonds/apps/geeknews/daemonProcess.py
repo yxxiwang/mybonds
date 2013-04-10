@@ -9,7 +9,11 @@ from sys import path
 from os import getcwd
 import os
 # path.append(getcwd())# current dir
-path.append(os.path.abspath('..\..\..'))# mybonds's parrent dir 
+if os.name =="nt":
+	path.append(os.path.abspath('..\..\..'))# mybonds's parrent dir
+else:
+	path.append(os.path.abspath('../../..'))# mybonds's parrent dir
+	
 import __init__ as lib
 # from ... import *
 class DaemonProcess(Daemon):

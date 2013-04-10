@@ -4,7 +4,7 @@ from numpy.ma.core import isMA
 
 import json, numpy, time
 import csv, string, random
-import sys
+import sys,os
 import redis
 import traceback
 import urllib2
@@ -648,7 +648,8 @@ def refreshDocs(username, beaconid):
     if not r.exists(key):
         return 
     channel = r.hget(key,"ttl")
-    channel = channel.decode("utf8")
+    if os.name =="nt":
+        channel = channel.decode("utf8")
     page = 0 
     length=100
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)

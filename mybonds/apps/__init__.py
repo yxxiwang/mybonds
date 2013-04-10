@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*- 
 import json, urllib2, urllib
 import csv, string,random
-import sys, time
+import sys, time,os
 import redis
 import numpy
 import traceback

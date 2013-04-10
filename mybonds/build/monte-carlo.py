@@ -4,7 +4,7 @@ import random
 import redis
 import numpy as np
 import timeit
-
+import mybonds.mybonds.apps
 
 r=redis.StrictRedis()
 
@@ -76,8 +76,17 @@ num = 0
 #print "pi avg is :",num/30
 #print doVolumeAVG(100)
 #first()
+def bench(func,parms=None): 
+    import time
+    start = time.clock()   
+    rt = func() if parms is None else func(parms)
+    stop = time.clock()  
+    diff = stop - start  
+    print "%s(%s) has taken %s" % (func.func_name,parms, str(diff)) 
+    return rt
 
-print(timeit.timeit("print(doNumpy())", setup="from __main__ import doNumpy", number=10))
-
-print(timeit.timeit("print(doVolumeAVG(100))", setup="from __main__ import doVolumeAVG", number=10))
+print bench(doNumpy)
+# print(timeit.timeit("print(doNumpy())", setup="from __main__ import doNumpy", number=10))
+# 
+# print(timeit.timeit("print(doVolumeAVG(100))", setup="from __main__ import doVolumeAVG", number=10))
 

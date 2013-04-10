@@ -55,14 +55,9 @@ def getDataByUrl(urlstr,isservice=False):
             doc["copyNum"] = str(doc["copyNum"])
             doc["validTime"] = str(doc["validTime"])
             doc["tms"]=str(doc["create_time"])
-            doc["create_time"] = timeElaspe(doc["create_time"])
-#             if doc.has_key("tags") and isservice:
-#                 doc["tagids"]=",".join(doc["tags"][0:2])
-#                 doc["tags"]=doc["tagids"].replace(" ","")
+            doc["create_time"] = timeElaspe(doc["create_time"]) 
             docs.append(doc)
-        udata["docs"] = docs 
-#     if udata.has_key("tags"):
-#         udata["tags"] = udata["tags"][0:40] 
+        udata["docs"] = docs  
         udata["total"] = str(len(udata["docs"]) )
     else:
         udata["total"] = "0"

@@ -3,9 +3,15 @@
 import sys, time
 from daemon import Daemon
 import json, urllib2
-import __init__ as lib
 import traceback
 
+from sys import path
+from os import getcwd
+import os
+# path.append(getcwd())# current dir
+path.append(os.path.abspath('..\..\..'))# mybonds's parrent dir 
+import __init__ as lib
+# from ... import *
 class DaemonProcess(Daemon):
 	
 	def run(self):
@@ -42,7 +48,7 @@ class DaemonProcess(Daemon):
 					rt = lib.saveTagdoc(username, otype, navtag,True) 
 				elif qtype =="beacon": 
 					beacon = qinfo["beacon"]
-					rt = lib.saveBeacon(username, beacon) 
+					rt = lib.refreshDocs(username, beacon) 
 				elif qtype =="read": 
 					rt = lib.requestUrl(url)
 				elif qtype =="sendemail":

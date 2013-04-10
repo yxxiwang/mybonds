@@ -9,12 +9,9 @@ import traceback
 import urllib2
 import datetime as dt
 from numpy.ma.core import isMA 
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379 
-REDIS_EXPIRETIME = 186400
-KEY_UPTIME = 10
-QUANTITY = 1500
-QUANTITY_DURATION = 300
+
+def id_generator(size=6, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for x in range(size))
 
 def getUserName(request):
     userobj = request.user
@@ -54,6 +51,52 @@ def isAscii(s):
             return False
     return True
 
+def bench(func,parms=None): 
+    import time
+    start = time.clock()   
+    rt = func() if parms is None else func(parms)
+    stop = time.clock()  
+    diff = stop - start  
+    print "%s(%s) has taken %s" % (func.func_name,parms, str(diff)) 
+    return rt
+
+def unique(a):
+    """ return the list with duplicate elements removed """
+    return list(set(a))
+
+def intersect(a, b):
+    """ return the intersection of two lists """
+    return list(set(a) & set(b))
+
+def union(a, b):
+    """ return the union of two lists """
+    return list(set(a) | set(b))
+ 
+def getTime(tms):
+    if type(tms).__name__ == "str":
+        if tms=="":
+            tms="0"
+        tms=float(tms)
+    tt = time.gmtime(tms+3600*8)
+    tdate = dt.date.fromtimestamp(tms).strftime('%Y-%m-%d')
+    ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec)
+    return "%s %s" %(tdate,ttime)
+
+def subString(s, start=0,end=-1):
+    us = unicode(s, 'utf-8')
+    gs = us.encode('gb2312')
+    n = int(end)
+    s = int(start)
+    t = gs[s:n]
+    while True:
+        try:
+            unicode(t, 'gbk')
+            break
+        except:
+            n -= 1
+            t = gs[s:n]
+    return t.decode('gb2312')
+
 def unescape(s):
     """
                 类似于js的unescape,将"%u6708cpi"之类的字符串转换为  "月cpi"
@@ -84,6 +127,17 @@ def getHashid(ustr):
     h = abs(h)
     return str(h)
 
+def timeDiff(create_time=None, current_time=None):
+    if create_time is None:
+        create_time = 0
+    create_time = float(create_time)
+    if current_time is None:
+        current_time = time.time()
+#    print "crt_time is %d,cur_time is %d" %(create_time,current_time)
+    diff = int(current_time - create_time)
+#    diff = int(elaspe / 60)
+    return diff
+ 
 def dayDiff(create_time):
     if create_time is None:
         create_time = 0 

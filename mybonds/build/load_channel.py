@@ -44,7 +44,7 @@ def load_data(input):
         beaobj = r.hset("bmk:" + usr + ":" + id,"desc",desc)
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_usr",usr)
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_tms",time.time())
-        beaobj = r.hset("bmk:" + usr + ":" + id,"brk_tms",time.time()) 
+        beaobj = r.hset("bmk:" + usr + ":" + id,"last_touch",time.time()) 
         beaobj = r.hset("bmk:" + usr + ":" + id,"cnt",0) 
         
 if __name__ == "__main__":

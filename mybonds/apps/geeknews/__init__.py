@@ -1,14 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from numpy.ma.core import isMA 
-REDIS_HOST = 'localhost'
-# REDIS_HOST = '124.127.250.42'
-REDIS_PORT = 6379
-# REDIS_PORT = 6381
-REDIS_EXPIRETIME = 186400
-KEY_UPTIME = 10
-QUANTITY = 1500
-QUANTITY_DURATION = 300
+from numpy.ma.core import isMA  
 
 import json, numpy, time
 import csv, string, random
@@ -16,16 +8,20 @@ import sys
 import redis
 import traceback
 import urllib2
-import datetime as dt
+import datetime as dt 
+from mybonds.apps import *
 # from django import template
 # register = template.Library()
-
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379 
+REDIS_EXPIRETIME = 186400
+KEY_UPTIME = 180
+QUANTITY = 1500
+QUANTITY_DURATION = 300
+ 
 r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1)
-
-def id_generator(size=6, chars=string.ascii_lowercase + string.digits):
-    return ''.join(random.choice(chars) for x in range(size))
-
+ 
 def emailcontent(udata):
     content = """
     <table style="margin:0;padding:0;line-height:1.8" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -97,7 +93,7 @@ def sendEmailFromUserBeacon(username,hour_before=8,otype=""):
     for beaconstr in beacons:#取所有关注的灯塔的相关主题文档
         beaconusr,beaconid = beaconstr.split("|-|")
         if hour_before < 0:#正常情况刷新灯塔,如果取截至到当前hour_before小时的新闻,则不需刷新灯塔(之前已经刷新过)
-            checkBeaconUptime(beaconusr, beaconid)
+            refreshBeacon(beaconusr, beaconid)
         key = "bmk:" + beaconusr + ":" + beaconid
         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))  
         beaconname = "" if beaconname is None  else beaconname
@@ -222,41 +218,8 @@ def sendemail(content, rcv_email,title=""):
        print "Successfully sent email"
     except SMTPException:
        print "Error: unable to send email"
-       traceback.print_exc()
-   
-def trace_back():
-    try:
-        return traceback.format_exc()
-    except:
-        return ''
-    
-def isAscii(s):
-    for c in s:
-#        if c not in string.ascii_letters and c not in string.digits:
-        if c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_':
-            return False
-    return True
-
-def unescape(s):
-    """
-                类似于js的unescape,将"%u6708cpi"之类的字符串转换为  "月cpi"
-              这里用了个不太好的处理办法 当"cpi"这样int(i,16)处理异常时当作ascii字符处理
-    """
-    tag_id = ""
-    for i in s.split('%u'):
-        if len(i) > 4: 
-                i = i[0:4] + '%u' + i[4:]
-                tag_id += unescape(i)
-        elif len(i) > 0:
-            try:
-                tag_id += unichr(int(i, 16))
-            except:
-                tag_id += i
-        else:
-            pass
-#    print tag_id
-    return tag_id
-
+       traceback.print_exc() 
+       
 def beacontran(username, beaid, docid):
     udata = {}
     beacon = r.hget("bmk:" + username + ":" + beaid, "ttl")
@@ -270,34 +233,7 @@ def beacontran(username, beaid, docid):
 #    print "bmk:" + username + ":" + beaid + ":doc"
 #    print docid
     return udata
-    
-def getUserName(request):
-    userobj = request.user
-    if userobj.is_anonymous():  # 用户未登录
-        username = request.session.get("username")
-        if username is None:
-            username = "guest" + str(random.randint(100000, 999999))
-#            username = "guest"
-            request.session.set_expiry(864000)
-            request.session["username"] = username
-#        userobj.username = username
-#        request.session["username"] = username 
-    else:
-        username = userobj.username
-#        request.session["username"] = username 
-#    print "username is:"+username
-    return username
-
-
-def dayDiff(create_time):
-    if create_time is None:
-        create_time = 0 
-    create_time = int(create_time)
-    current_time = time.time()
-    elaspe = int(current_time - create_time / 1000)
-    daybefore = int(elaspe / 86400)
-    return daybefore
-    
+ 
 def timeElaspe(create_time, real=False):
     elaspestr = ""
     create_time = int(create_time)
@@ -319,27 +255,6 @@ def timeElaspe(create_time, real=False):
     else:
         elaspestr = str(daybefore) + "天前"
     return elaspestr.decode("utf8")
-
-def timeDiff(create_time=None, current_time=None):
-    if create_time is None:
-        create_time = 0
-    create_time = float(create_time)
-    if current_time is None:
-        current_time = time.time()
-#    print "crt_time is %d,cur_time is %d" %(create_time,current_time)
-    diff = int(current_time - create_time)
-#    diff = int(elaspe / 60)
-    return diff
-
-def getHashid(ustr):
-    h = 0
-    if ustr == None:
-        return h
-#    ustr=repr(ustr)#如果传入进来的是中文tag(utf8),将其转为str再计算hashid.
-    for c in ustr:
-        h = numpy.int64(31 * h + ord(c))
-    h = abs(h)
-    return str(h)
 
 def requestUrl(url):
 #    import requests
@@ -625,77 +540,6 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None):
     qobj["id"] = getHashid(urlstr)
     r.lpush("queue:" + qtype, json.dumps(qobj))
 
-def saveBeacon(username, beaconid):
-    print "=====saveBeacon===="
-    key = "bmk:" + username + ":" + beaconid
-    if not r.exists(key):
-        return
-    sims = r.smembers(key + ":doc")  # 取得入口simid集合
-    relas = r.smembers(key + ":doc:related")  # 取得入口relateid集合
-    ltags = r.smembers(key + ":doc:localtag")  # 取得入口localtag集合
-    ltag_relas = [ltagstr.split("|-|")[0] for ltagstr in ltags ]
-    print ltag_relas
-    coords=sims | relas
-    coords=coords  | set(ltag_relas)
-    
-    doc_uncheck = r.smembers(key + ":doc:unchk")
-    coords = [sid for sid in coords if sid not in doc_uncheck]
-    print coords
-    saveDocsByIDS(coords)  # 将入口坐标simid的文档对象保存到redis
-    
-    simdocs = []
-    simdocs = saveSimilarDocs(list(sims))  # 将所有相关主题的对象保存到reids
-    
-    for relatid in relas:#将所有扩展的对象保存到reids
- #        simdocs = union(simdocs, saveSimilarDocs(simid))
-        docs = saveRelatedDocs(relatid)
-        simdocs += docs
-#        for doc in docs:
-#            simdocs.append(doc) 
-    for ltagstr in ltags:#将所有本地标签的对象保存到reids
-        relateid,localtag = ltagstr.split("|-|")
-        docs = saveLocaltagDocs(relateid, localtag)
-        simdocs += docs
-        
-    r.delete(key + ":sml")
-    r.delete(key + ":sml:tms")
-    for simid in coords:  # 将入口坐标文档本身加入到主题文档集合中去
-        r.sadd(key + ":sml", simid)
-        crt_tms = rdoc.hget("doc:" + simid, "tms") if rdoc.hget("doc:" + simid, "tms") is not None else 0
-        r.zadd(key + ":sml:tms", crt_tms, simid)
-    for sdoc in simdocs:
-        # r.sadd("doc:"+sid+":sml",sdoc["id"])
-        r.sadd(key + ":sml", sdoc["id"])
-        r.zadd(key + ":sml:tms", sdoc["tms"], sdoc["id"])
-        
-    tag_uncheck = r.smembers(key + ":tag:unchk")
-    def simidNotInTagUncheck(tags, tag_uncheck):
-        for tag in tags:
-            if getHashid(tag) in tag_uncheck:
-                return False
-        return True
-    lensimdoc = len([doc for doc in simdocs if simidNotInTagUncheck(doc["tags"],tag_uncheck)])
-#    r.hset(key, "cnt", len(simdocs) + len(coords))
-    r.zadd("bmk:doc:share:bynews", len(simdocs), username + "|-|" + beaconid)
-    print "len simdoc is :%d" % (len(simdocs) + len(sims))
-    return 0
-            
-def checkBeaconUptime(username, beaconid):
-#    key = "bmk:"+username+":"+getHashid(beaconid) 
-    key = "bmk:" + username + ":" + beaconid
-    dt = timeDiff(r.hget(key, "brk_tms"), time.time())
-    if not r.hexists(key, "brk_tms"):
-        print key + "'s 'brk_tms' is not exists,retrivedocs from backend..." 
-        if r.exists(key):
-            saveBeacon(username, beaconid)
-            r.hset(key, "brk_tms", time.time())  # 更新本操作时间  
-        else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
-            print key + "is deleted via front  so we ignore it..." 
-            
-    elif dt > KEY_UPTIME:
-        print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (username, beaconid, dt)
-        r.hset(key, "brk_tms", time.time())  # 更新本操作时间  
-        pushQueue("beacon", username, "beacon", beaconid)
 
 def getDataByUrl(urlstr,isservice=False):
     start = time.clock()
@@ -737,7 +581,7 @@ def getAllBeaconDocsByUser(username,start=0,num=300,hour_before=-1):
     for beaconstr in beacons:#取所有关注的灯塔的相关主题文档
         beaconusr,beaconid = beaconstr.split("|-|")
         if hour_before < 0:#正常情况刷新灯塔,如果取截至到当前hour_before小时的新闻,则不需刷新灯塔(之前已经刷新过)
-            checkBeaconUptime(beaconusr, beaconid)
+            refreshBeacon(beaconusr, beaconid)
         key = "bmk:" + beaconusr + ":" + beaconid
         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))  
         beaconname = "" if beaconname is None  else beaconname
@@ -797,115 +641,71 @@ def getAllBeaconDocsByUser(username,start=0,num=300,hour_before=-1):
     udata["docs"] = docs
     return udata   
     
+
+def refreshDocs(username, beaconid):
+    key = "bmk:" + username + ":" + beaconid
+    print "=====refreshDocs===="+key
+    if not r.exists(key):
+        return 
+    channel = r.hget(key,"ttl")
+    channel = channel.decode("utf8")
+    page = 0 
+    length=100
+    urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
+    udata = saveDocsByUrl(urlstr)
+    
+    if udata.has_key("docs"):
+        for doc in udata["docs"]:
+            if doc is None:
+                continue
+            if doc["validTime"]=="false" or not doc["validTime"]:
+                continue
+            r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
             
+    return 0 
+            
+def refreshBeacon(username, beaconid):
+#    key = "bmk:"+username+":"+getHashid(beaconid) 
+    key = "bmk:" + username + ":" + beaconid
+    dt = timeDiff(r.hget(key, "last_touch"), time.time())
+    if not r.hexists(key, "last_touch"):
+        print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 
+        if r.exists(key):
+            refreshDocs(username, beaconid)
+            r.hset(key, "last_touch", time.time())  # 更新本操作时间  
+        else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
+            print key + "is deleted via front  so we ignore it..." 
+            
+    elif dt > KEY_UPTIME:
+        print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (username, beaconid, dt)
+        r.hset(key, "last_touch", time.time())  # 更新本操作时间  
+        pushQueue("beacon", username, "beacon", beaconid)
+        
 def buildBeaconData(username, beaconid,start=0,end=-1):
     key = "bmk:" + username + ":" + beaconid
     if r.exists(key):
-        checkBeaconUptime(username, beaconid)
+        refreshBeacon(username, beaconid)
     else:
-        return {}
-    
+        return {} 
     udata = {}
-    docs = []
-    simdocs = []
-    tags = []
-    tagobjs = []
-    tagstr = ""
-    tag_uncheck = r.smembers(key + ":tag:unchk")
-    doc_uncheck = r.smembers(key + ":doc:unchk")
-#    doc_unchk_simids=[]#坐标文档的过滤,在saveBeacon()已经做过了
-#    if len(doc_uncheck)>0:#如果有未选中的入口坐标文档,取出所有的未选中文档的similarid
-#        doc_unchk_simids = saveSimilarDocs(doc_uncheck)
-#        doc_unchk_simids=[dus["id"] for dus in doc_unchk_simids]
-
-    doc_lst = r.smembers(key + ":doc")  # 坐标文档集合
-    relateddoc_lst = r.smembers(key + ":doc:related")  # 坐标文档集合
-    localstrs=r.smembers(key+":doc:localtag")
-    def coord_append(doc_lst,docs,issimilar=False,isrelated=False,islocaltag=False):
-        for docid in doc_lst:
-            doc = {}
-            if islocaltag:
-                docid,tag = docid.split("|-|")
-                doc["localtag"] = tag
-            if issimilar:
-                doc["issimilar"] =True
-            if isrelated:
-                doc["isrelated"] =True
-                
-            docinfo = rdoc.hgetall("doc:" + docid) 
-            if len(docinfo.keys()) == 0:
-                continue 
-            doc["create_time"] = timeElaspe(docinfo["tms"])
-#            doc["create_time"] = docinfo["crt_tms"]
-            doc["host"] = docinfo["host"]
-            doc["title"] = docinfo["ttl"]
-            doc["text"] = docinfo["tx"]
-            doc["url"] = docinfo["url"]
-    #         url = "http://www.gxdx168.com/research?u=" + username + "&likeid=" + likeid
-            doc["id"] = docid
-            doc["docid"] = docid 
-            doc["checked"] = docid not in doc_uncheck
-#            if docinfo.has_key("tags"):
-#                doc["tagids"]=docinfo["tags"].replace("|-|",",")
-#                doc["tags"]=doc["tagids"].replace(" ","")
-#            else:
-#                doc["tagids"]=""
-#                doc["tags"]=""
-            docs.append(doc)
-        return docs
-    docs = coord_append(doc_lst,docs,issimilar=True)
-    docs = coord_append(relateddoc_lst,docs,isrelated=True)
-    docs = coord_append(localstrs,docs,islocaltag =True)
-    udata["docs"] = docs
-    
-    def simidNotInTagUncheck(tagstr, tag_uncheck):
-        for tag in tagstr.split('|-|'):
-            if getHashid(tag) in tag_uncheck:
-                return False
-        return True 
-    # 坐标文档的过滤,在saveBeacon()已经做过了
-#    def simidNotInDocUncheck(simid,doc_uncheck):
-#        if len(doc_uncheck)==0:
-#            return True
-#        return simid not in doc_unchk_simids
-# #        doc_uncheck=["doc:"+docid+":sml" for docid in doc_uncheck]
-# #        return simid not in r.sunion(doc_uncheck)
-    
-    sim_lst = r.zrevrange(key + ":sml:tms", start,end)  # 主题文档集合
-    for simid in sim_lst:
-        docinfo = rdoc.hgetall("doc:" + simid) 
-        if len(docinfo.keys()) == 0:
+    docs = [] 
+    doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+    for docid in doc_lst:
+        doc = rdoc.hgetall("doc:" + docid) 
+        if len(doc.keys()) == 0:
             continue 
-        doc = {}
-        doc["create_time"] = timeElaspe(docinfo["tms"])
-#        doc["create_time"] = docinfo["crt_tms"]
-        doc["host"] = docinfo["host"]
-        doc["title"] = docinfo["ttl"]
-        doc["tx"] = docinfo["tx"]
-#        doc["text"] = docinfo["tx"]
-        doc["text"]=subDocText(docinfo["tx"])
-        doc["url"] = docinfo["url"]
-        doc["id"] = simid
-        doc["docid"] = simid
-        if docinfo.has_key("tags"):
-            tagstr = docinfo["tags"]
-            doc["tags"] = docinfo["tags"].split('|-|')
-#        tags = list(set(tagstr.split('|-|')) | set(tags))
-#        if simidNotInTagUncheck(tagstr,tag_uncheck) and simidNotInDocUncheck(simid,doc_uncheck):
-        if simidNotInTagUncheck(tagstr, tag_uncheck):
-            simdocs.append(doc)
-        tags = union(tagstr.split('|-|'), tags)
-    udata["simdocs"] = simdocs
-    r.hset(key, "cnt", len(simdocs))
-    
-    for tag in tags:
-        tagobj = {}
-        tagid = getHashid(tag)
-        tagobj["id"] = tagid
-        tagobj["checked"] = tagid not in tag_uncheck
-        tagobj["name"] = tag
-        tagobjs.append(tagobj)
-    udata["tags"] = tagobjs
+#         if doc["validTime"]=="false" or not doc["validTime"]:
+#             continue 
+        doc["text"] = subDocText(doc["text"])
+        doc["copyNum"] = str(doc["copyNum"])
+#         doc["validTime"] = str(doc["validTime"])
+        doc["tms"]=str(doc["create_time"])
+        doc["create_time"] = timeElaspe(doc["create_time"]) 
+        docs.append(doc) 
+    udata["docs"] = docs  
+    udata["total"] = str(len(udata["docs"]) )
+    print udata["total"] 
+#     r.hset(key, "cnt", len(docs))
     return udata
         
 def buildJsonData(username, docs, tags=None):
@@ -1197,195 +997,39 @@ def saveTagdoc(username, otype, tag, fromdaemon=False):
     print "saveTagDocs %s data has taken on %s; and rt is %d" % (dlen, str(diff), rt)  
     return rt
         
-def saveDocs(username, otype):
-    # return HttpResponse("You're looking at the results of poll %s." % poll_id)
-    ##################====save to redis=====##############
-#    r = redis.StrictRedis(host='localhost', port=6380, db=0)
-    if getOtype(otype) == "":
-        print "error:---error optype "
-        return 911;
-    if isinstance(username, unicode): 
-        print "username is unicode!" 
-        if otype == "nav":
-            urlstr = "http://www.gxdx168.com/research/svc?o=" + getOtype(otype) + "&page=0&length=90"
-        else:
-            urlstr = "http://www.gxdx168.com/research/svc?u=" + username.encode("utf8") + "&o=" + getOtype(otype) + "&page=0&length=90"
-    else:  # + "&page=1&length=90"
-        urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&o=" + getOtype(otype) + "&page=0&length=90"
-    start = time.clock() 
-    udata = loadFromUrl(urlstr) 
-    urlstop = time.clock()  
-    diff = urlstop - start
-    print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff)) 
-    rt = 0
-    keyid = "usr:" + username + ":" + otype
+def saveDocsByUrl(urlstr): 
+#     start = time.clock() 
+#     udata = loadFromUrl(urlstr) 
+#     urlstop = time.clock()  
+#     diff = urlstop - start
+#     print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff)) 
+    print "===saveDocsByUrl==="+urlstr
+    udata = bench(loadFromUrl,parms=urlstr)  
     try:
         pipe = r.pipeline()
-        pipedoc = rdoc.pipeline()
-        pipe.set(keyid + ":total" , udata["total"])
-        if udata.has_key("tags"):
-            tags = udata["tags"] 
-            tags.reverse()
-            r.delete(keyid + ":taglst")
-#            r.delete(keyid + ":otaglst")
-#            tags = [tag.replace(' ', '') for tag in tags]
-            for tag in tags:
-                timescore = time.time()
-#                pipe.zadd(keyid + ":tag", timescore, tag)
-                if otype == "nav":
-                    pipe.lpush(keyid + ":taglst", getNavTag(tag))
-                else:
-                    pipe.hset("tag:ori", tag.replace(' ', ''), tag)
-                    pipe.lpush(keyid + ":taglst", tag.replace(' ', ''))
-        uid = ""
-        relatestr = ""
-        docs = []
-        relatedocs = []
-        docmap = {}
-        if udata.has_key("docs"):
-            docs = udata["docs"]
-            docs.reverse() 
-            pipe.delete(keyid + ":lst")
-#            pipe.delete(keyid + ":zset")
-        for doc in docs:
-            if doc is None: 
-                continue
-            timescore = int(time.time())
-            hashid = getHashid(doc["url"]) 
-#            if doc.has_key("tag"):
-#                r.delete("doc:" + hashid + ":tag")  
-#                tags = doc["tag"]              
-#                tags = [tag.replace(' ', '') for tag in tags]
-#                for tag in tags:
-#                    pipe.sadd("doc:" + hashid + ":tag", tag)
-#                    pipe.sadd("tag:" + getHashid(tag), hashid)
-            ukey = "doc:" + hashid
-            if not rdoc.exists(ukey) :  # 如果是新贴,将该贴加入总的docs池中,并更新文章时间信息
-                docmap["ttl"] = doc["title"]
-                docmap["host"] = doc["host"]
-                docmap["tx"] = doc["text"]
-                docmap["url"] = doc["url"]
-                docmap["crt_tms"] = doc["create_time"]
-#                docmap["rel_cnt"] = doc["relatedCount"]
-#                docmap["sml_cnt"] = doc["similarCount"]
-                pipedoc.hmset(ukey, docmap)
-#                pipe.hset(ukey, "ttl", doc["title"])
-#                pipe.hset(ukey, "host", doc["host"])
-#                pipe.hset(ukey, "tx", doc["text"])
-#                pipe.hset(ukey, "url", doc["url"]) 
-#                pipe.hset(ukey, "crt_tms", doc["create_time"])
-#                pipe.hset(ukey, "rel_cnt", doc["relatedCount"])
-#                pipe.hset(ukey, "sml_cnt", doc["similarCount"])
-                pipe.zadd(keyid + ":tms", timescore, hashid)  # 更新用户的最新文章时间
-                if otype == "rcm":  # 对于个人推荐,需要特别处理
-                    pipe.zadd(keyid + ":frst", timescore, hashid) 
-                    pipe.zincrby(keyid + ":cnt", hashid, 1) 
-            else:  # 否则,则是旧帖 (或被重复推荐)
-                pipe.zadd(keyid + ":tms", timescore, hashid)  # 更新用户的被推荐最新文章时间
-                if rdoc.hget(ukey, "tx") == "":
-                    pipedoc.hset(ukey, "tx", doc["text"])
-                if otype == "rcm":  # rcm 个人推荐类型的处理
-                    pipe.zincrby(keyid + ":cnt", hashid, 1)  
-            pipe.sadd(keyid, hashid)  # 用户&文章关联
-#            if otype == "ppl":  # 对于综览,按照时间排序(使用sort set)
-#                pipe.zadd(keyid + ":zset", doc["create_time"], hashid)
-#            else:
-            pipe.lpush(keyid + ":lst", hashid)  # 用户&文章关联
-        pipe.set(keyid + ":uptms", time.time())
-        pipe.execute()
-        pipedoc.execute()
-#        print trace_back()
+        pipedoc = rdoc.pipeline()  
+        if udata.has_key("docs"): 
+            for doc in udata["docs"]: 
+                if doc is None: 
+                    continue
+                if doc["validTime"]=="false" or not doc["validTime"]:
+                    continue 
+                docid = getHashid(doc["url"]) 
+                pipedoc.hset("doc:"+docid,"docid",docid)
+                pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ",""))
+#                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
+                pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
+                pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
+                pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
+                pipedoc.hset("doc:"+docid,"url",doc["url"] )       
+                pipedoc.hset("doc:"+docid,"host",doc["host"] )  
+                pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
+        pipedoc.execute() 
     except Exception, e:
          traceback.print_exc()
-         print "error------la---"
-         rt = 2 
-    savestop = time.clock()  
-    diff = savestop - urlstop  
-    print "saveDocs %s data has taken on %s;and rt is %d" % (udata["total"], str(diff), rt)  
-#        if doc.has_key("relatedDoc"):
-#            relatedocs = doc["relatedDoc"]
-#        for relatedoc in relatedocs:
-#            relateid = getHashid((relatedoc["url"]))
-#            rkey = "docs:relate:" + str(relateid)
-# #            relatestr += str(relateid)
-# #            relatestr += ","
-#            if not r.exists(rkey):  # 如果是新贴,将该贴加入总的relatedocs池中
-#                pipe.hset(rkey, "title", relatedoc["title"])
-#                pipe.hset(rkey, "url", relatedoc["url"])
-#                pipe.hset(rkey, "create_time", relatedoc["create_time"])
-#                pipe.hset(rkey, "relatedCount", relatedoc["relatedCount"])
-#                pipe.hset(rkey, "similarCount", relatedoc["similarCount"])
-#                pipe.lpush("related:"+hashid,relateid)
-# #        pipe.hset(ukey, "related", relatestr)  # 增加doc与relatedoc的关联关系
-
-
-
-    # #print udata
-    # head_list = ['Duration','CURRENT YLD','PREV YLD','CHANGE','1 WK YLD','1 MO YLD','6 MO YLD'];
-    # response_data = {}
-    # response_data['result'] = 'failed'
-    # response_data['message'] = 'You messed up'
-    # return HttpResponse(json.dumps(udata), mimetype="application/json")
-    # response = HttpResponse(head_list, mimetype = "application/json")
-    return 0
-
-def bench(desc): 
-    start = time.clock()   
-    desc()  
-    stop = time.clock()  
-    diff = stop - start  
-    print "%s has taken %s" % (desc.func_name, str(diff)) 
-    
-def unique(a):
-    """ return the list with duplicate elements removed """
-    return list(set(a))
-
-def intersect(a, b):
-    """ return the intersection of two lists """
-    return list(set(a) & set(b))
-
-def union(a, b):
-    """ return the union of two lists """
-    return list(set(a) | set(b))
-# def procDoc(doc):
-#    doc["id"]=getHashid(doc["url"])
-#    doc["create_time"] = timeElaspe(doc["create_time"])
-# @register.filter(name='fromunix')
-# def fromunix(value):
-#    return datetime.datetime.fromtimestamp(int(value))
-def to_unicode_or_bust(obj, encoding='utf-8'):
-     if obj is None:
-         return "" 
-     if isinstance(obj, basestring):
-         if not isinstance(obj, unicode):
-             obj = unicode(obj, encoding)
-     return obj
-
-def getTime(tms):
-    if type(tms).__name__ == "str":
-        if tms=="":
-            tms="0"
-        tms=float(tms)
-    tt = time.gmtime(tms+3600*8)
-    tdate = dt.date.fromtimestamp(tms).strftime('%Y-%m-%d')
-    ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec)
-    return "%s %s" %(tdate,ttime)
-
-def subString(s, start=0,end=-1):
-    us = unicode(s, 'utf-8')
-    gs = us.encode('gb2312')
-    n = int(end)
-    s = int(start)
-    t = gs[s:n]
-    while True:
-        try:
-            unicode(t, 'gbk')
-            break
-        except:
-            n -= 1
-            t = gs[s:n]
-    return t.decode('gb2312')
-
+         print "error------la---" 
+    return udata
+ 
 def subDocText(s):
 #    us=unicode(s,"utf8")
 #    return s
@@ -1409,4 +1053,4 @@ def subDocText(s):
             return (dot.join(slst[0:-1]+[""])+comma.join(clst[0:-1]+[""] ) ).encode("utf8")
     return s
         
-
+print "hello"

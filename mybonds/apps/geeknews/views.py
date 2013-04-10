@@ -19,6 +19,7 @@ import mybonds.apps.geeknews.daemonProcess as daemonProcess
 from django.template.defaultfilters import length
    
 def index(request): 
+    return HttpResponseRedirect("/news/beaconews/") 
     # latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
     otype = request.GET.get("o", "todaynews")
     print "geeknews/index"
@@ -898,12 +899,14 @@ def load_similars(request):
         beaconid = request.GET.get("beaconid", "1968416984598300074")  
         beaconusr = request.GET.get("beaconusr", "ltb")
         
-        #modify by devwxi at 20130409
-        channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
-        channel = to_unicode_or_bust(channel) 
-        durl='/newsvc/channelnews/?u=%s&channel=%s&length=%d&start=%s&num=%s' %(username,channel,100,start,num)
-#         print durl
-        return HttpResponseRedirect(durl)
+        udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=100) 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+#         #modify by devwxi at 20130409
+#         channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
+#         channel = to_unicode_or_bust(channel) 
+#         durl='/newsvc/channelnews/?u=%s&channel=%s&length=%d&start=%s&num=%s' %(username,channel,100,start,num)
+# #         print durl
+#         return HttpResponseRedirect(durl)
     
         checkBeaconUptime(beaconusr, beaconid) 
         key = "bmk:" + beaconusr + ":" + beaconid
@@ -1379,12 +1382,12 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
     print "function(%s) has taken %s" % ("beaconnews",str(diff))
     
     if beaconid != "": 
-        channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
-        page = 0 
-        length=100
-        urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
-        udata=getDataByUrl(urlstr,True) 
-#         udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=200)
+#         channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
+#         page = 0 
+#         length=100
+#         urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
+#         udata=getDataByUrl(urlstr,True) 
+        udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=100) 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl")
 #         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["simdocs"]))
         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["docs"]))

@@ -15,6 +15,7 @@ from mybonds.apps import *
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379 
 REDIS_EXPIRETIME = 186400
+DOC_EXPIRETIME = 86400*7
 KEY_UPTIME = 180
 QUANTITY = 1500
 QUANTITY_DURATION = 300
@@ -622,12 +623,12 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1):
         doc["text"]=subDocText(docinfo["tx"])
         doc["url"] = docinfo["url"]
         doc["docid"] = getHashid(docinfo["url"])
-        if docinfo.has_key("tags"):
-            doc["tagids"]=docinfo["tags"].replace("|-|",",")
-            doc["tags"]=doc["tagids"].replace(" ","")
-        else:
-            doc["tagids"]=""
-            doc["tags"]=""
+#         if docinfo.has_key("tags"):
+#             doc["tagids"]=docinfo["tags"].replace("|-|",",")
+#             doc["tags"]=doc["tagids"].replace(" ","")
+#         else:
+#             doc["tagids"]=""
+#             doc["tags"]=""
         beaconstr = rdoc.hget("docid:beacons",simid)
         beaconusr,beaconid,beaconttl = beaconstr.split("|-|") 
         doc["beaconusr"] = beaconusr
@@ -656,12 +657,14 @@ def refreshDocs(username, beaconid):
     udata = saveDocsByUrl(urlstr)
     
     if udata.has_key("docs"):
+        r.delete(key+":doc:tms")
         for doc in udata["docs"]:
             if doc is None:
                 continue
             if doc["validTime"]=="false" or not doc["validTime"]:
                 continue
             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
+        r.expire(key+":doc:tms",DOC_EXPIRETIME)
             
     return 0 
             
@@ -669,7 +672,7 @@ def refreshBeacon(username, beaconid):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
     key = "bmk:" + username + ":" + beaconid
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
-    if not r.hexists(key, "last_touch"):
+    if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
         print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 
         if r.exists(key):
             refreshDocs(username, beaconid)
@@ -677,7 +680,9 @@ def refreshBeacon(username, beaconid):
         else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             print key + "is deleted via front  so we ignore it..." 
             
-    elif dt > KEY_UPTIME:
+    elif r.exists("bmk:"+username+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
+        refreshDocs(username, beaconid)
+    elif dt > KEY_UPTIME:#如果上次更新时间过久,则重新刷新数据
         print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (username, beaconid, dt)
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         pushQueue("beacon", username, "beacon", beaconid)
@@ -1025,6 +1030,7 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"url",doc["url"] )       
                 pipedoc.hset("doc:"+docid,"host",doc["host"] )  
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
+                pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
         pipedoc.execute() 
     except Exception, e:
          traceback.print_exc()

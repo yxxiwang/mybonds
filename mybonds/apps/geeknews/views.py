@@ -854,7 +854,8 @@ def load_similars(request):
     beacons = []
     # modified by devwxi 临时使用..
     if groupid==getHashid("All"):
-        groupid = ""
+        udata = getAllBeaconDocsByUser(username,start=start ,num=num,newscnt=1) 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
         
     
     if groupid==getHashid("All"):
@@ -899,7 +900,7 @@ def load_similars(request):
         beaconid = request.GET.get("beaconid", "1968416984598300074")  
         beaconusr = request.GET.get("beaconusr", "ltb")
         
-        udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=100) 
+        udata = buildBeaconData(beaconusr, beaconid,start=start ,end=num) 
         return HttpResponse(json.dumps(udata), mimetype="application/json")
 #         #modify by devwxi at 20130409
 #         channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
@@ -1391,10 +1392,9 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl")
 #         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["simdocs"]))
         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["docs"]))
-    else: 
-        print "i m here"
-        udata = getAllBeaconDocsByUser(username)
-        udata["simdocs"]=udata.pop("docs")
+    else:  
+        udata = getAllBeaconDocsByUser(username,newscnt=10)
+#         udata["simdocs"]=udata.pop("docs")
         
     urlstop = time.clock()  
     diff = urlstop - start   

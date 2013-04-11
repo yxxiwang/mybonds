@@ -574,7 +574,8 @@ def getDataByUrl(urlstr,isservice=False):
     return udata
 
 
-def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1):
+def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
+    print "=getAllBeaconDocsByUser="+username
 #    hour_before=8
     beacons = r.smembers("usr:"+username+":fllw")
     sim_lst=[]
@@ -586,50 +587,30 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1):
         key = "bmk:" + beaconusr + ":" + beaconid
         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))  
         beaconname = "" if beaconname is None  else beaconname
-        lst = r.zrevrange(key+":doc:tms",0,10)
+        lst = r.zrevrange(key+":doc:tms",0,newscnt)
         sim_lst += lst
         for sid in lst:
             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)  
-#     mybeaconids = r.smembers("bmk:" + username)
-#     for beaid in mybeaconids:  #取所有自己创建的灯塔的相关主题文档
-#         key = "bmk:" + username + ":" + beaid
-#         beaconname = to_unicode_or_bust(r.hget(key,"ttl")) 
-#         beaconname = "" if beaconname is None  else beaconname
-#         lst = r.zrevrange(key+":sml:tms",0,30)
-#         sim_lst += lst
-#         for sid in lst:
-#             rdoc.hset("docid:beacons",sid,username+"|-|"+beaid+"|-|"+beaconname)
+ 
     udata = {}
     docs = []
     
     sim_lst = list(set(sim_lst))#去除重复新闻
     crt_time=time.time()
-    for simid in sim_lst:
-        docinfo = rdoc.hgetall("doc:" + simid) 
-        if len(docinfo.keys()) == 0:
-            continue 
-        doc = {}
-        doc["tms"] = docinfo["tms"]
+    for docid in sim_lst: 
+        doc = rdoc.hgetall("doc:" + docid) 
+        if len(doc.keys()) == 0:
+            continue  
+        doc["tms"]=str(doc["create_time"])
         elaspe = int(crt_time- int(doc["tms"])/ 1000)
 #        print elaspe
         if hour_before>0 and elaspe > hour_before*3600:#取hour_before小时之内的新闻
             continue
+        doc["text"] = subDocText(doc["text"])
+        doc["copyNum"] = str(doc["copyNum"]) 
+        doc["create_time"] = timeElaspe(doc["create_time"])   
         
-        doc["create_time"] = timeElaspe(docinfo["tms"])
-#        doc["create_time"] = docinfo["crt_tms"] 
-        doc["host"] = docinfo["host"]
-        doc["title"] = docinfo["ttl"]
-        doc["tx"] = docinfo["tx"]
-        doc["text"]=subDocText(docinfo["tx"])
-        doc["url"] = docinfo["url"]
-        doc["docid"] = getHashid(docinfo["url"])
-#         if docinfo.has_key("tags"):
-#             doc["tagids"]=docinfo["tags"].replace("|-|",",")
-#             doc["tags"]=doc["tagids"].replace(" ","")
-#         else:
-#             doc["tagids"]=""
-#             doc["tags"]=""
-        beaconstr = rdoc.hget("docid:beacons",simid)
+        beaconstr = rdoc.hget("docid:beacons",docid)
         beaconusr,beaconid,beaconttl = beaconstr.split("|-|") 
         doc["beaconusr"] = beaconusr
         doc["beaconid"] = beaconid
@@ -664,7 +645,7 @@ def refreshDocs(username, beaconid):
             if doc["validTime"]=="false" or not doc["validTime"]:
                 continue
             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
-        r.expire(key+":doc:tms",DOC_EXPIRETIME)
+#         r.expire(key+":doc:tms",DOC_EXPIRETIME)
             
     return 0 
             
@@ -680,12 +661,14 @@ def refreshBeacon(username, beaconid):
         else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             print key + "is deleted via front  so we ignore it..." 
             
-    elif r.exists("bmk:"+username+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
+    elif not r.exists("bmk:"+username+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
         refreshDocs(username, beaconid)
     elif dt > KEY_UPTIME:#如果上次更新时间过久,则重新刷新数据
         print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (username, beaconid, dt)
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         pushQueue("beacon", username, "beacon", beaconid)
+    else:
+        print "Attembrough: oh,refreshBeacon....but i have nothing to do .."
         
 def buildBeaconData(username, beaconid,start=0,end=-1):
     key = "bmk:" + username + ":" + beaconid
@@ -710,7 +693,6 @@ def buildBeaconData(username, beaconid,start=0,end=-1):
         docs.append(doc) 
     udata["docs"] = docs  
     udata["total"] = str(len(udata["docs"]) )
-    print udata["total"] 
 #     r.hset(key, "cnt", len(docs))
     return udata
         
@@ -1059,5 +1041,4 @@ def subDocText(s):
             clst=slst[-1].split(comma)
             return (dot.join(slst[0:-1]+[""])+comma.join(clst[0:-1]+[""] ) ).encode("utf8")
     return s
-        
-print "hello"
+         

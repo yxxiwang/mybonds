@@ -19,7 +19,7 @@ import mybonds.apps.geeknews.daemonProcess as daemonProcess
 from django.template.defaultfilters import length
    
 def index(request): 
-    return HttpResponseRedirect("/news/beaconews/") 
+    return HttpResponseRedirect("/news/beaconnews/") 
     # latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
     otype = request.GET.get("o", "todaynews")
     print "geeknews/index"

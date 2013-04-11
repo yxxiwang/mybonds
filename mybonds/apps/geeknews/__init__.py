@@ -685,6 +685,7 @@ def buildBeaconData(username, beaconid,start=0,end=-1):
             continue 
 #         if doc["validTime"]=="false" or not doc["validTime"]:
 #             continue 
+#         doc["tx"] = doc["text"]
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"])
 #         doc["validTime"] = str(doc["validTime"])

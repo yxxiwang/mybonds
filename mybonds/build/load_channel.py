@@ -24,16 +24,21 @@ def to_unicode_or_bust(obj, encoding='utf-8'):
      return obj
 
 def load_data(input):
-    r.delete("bmk:doc:share")
-    r.delete("bmk:doc:share:byfllw")
-    r.delete("bmk:doc:share:bynews")
+#     r.delete("bmk:doc:share")
+#     r.delete("bmk:doc:share:byfllw")
+#     r.delete("bmk:doc:share:bynews")
     for line in open(input):
-        (usr,name,desc) = line.split(",")
-        if usr=="stockmarket":
+        if line.startswith("#"):
             continue
+        dlist = line.split(",")
+        (usr,name,desc) = dlist[0],dlist[1],dlist[2]
+        #if usr=="stockmarket":
+        #    continue
 #         desc = name if desc=="" or desc is None else ""
 #         name = to_unicode_or_bust(name)
         id = getHashid(name)
+        if r.zscore("bmk:doc:share",usr+"|-|"+id):
+            continue
         print "usr=%s ;id=%s;name=%s;desc=%s" % (usr,id,name,desc)
         r.zadd("bmk:doc:share",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:byfllw",time.time(),usr+"|-|"+id)

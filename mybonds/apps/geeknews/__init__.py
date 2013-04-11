@@ -573,7 +573,7 @@ def getDataByUrl(urlstr,isservice=False):
     return udata
 
 
-def getAllBeaconDocsByUser(username,start=0,num=300,hour_before=-1):
+def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1):
 #    hour_before=8
     beacons = r.smembers("usr:"+username+":fllw")
     sim_lst=[]
@@ -585,19 +585,19 @@ def getAllBeaconDocsByUser(username,start=0,num=300,hour_before=-1):
         key = "bmk:" + beaconusr + ":" + beaconid
         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))  
         beaconname = "" if beaconname is None  else beaconname
-        lst = r.zrevrange(key+":sml:tms",0,30)
+        lst = r.zrevrange(key+":doc:tms",0,10)
         sim_lst += lst
         for sid in lst:
             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)  
-    mybeaconids = r.smembers("bmk:" + username)
-    for beaid in mybeaconids:  #取所有自己创建的灯塔的相关主题文档
-        key = "bmk:" + username + ":" + beaid
-        beaconname = to_unicode_or_bust(r.hget(key,"ttl")) 
-        beaconname = "" if beaconname is None  else beaconname
-        lst = r.zrevrange(key+":sml:tms",0,30)
-        sim_lst += lst
-        for sid in lst:
-            rdoc.hset("docid:beacons",sid,username+"|-|"+beaid+"|-|"+beaconname)
+#     mybeaconids = r.smembers("bmk:" + username)
+#     for beaid in mybeaconids:  #取所有自己创建的灯塔的相关主题文档
+#         key = "bmk:" + username + ":" + beaid
+#         beaconname = to_unicode_or_bust(r.hget(key,"ttl")) 
+#         beaconname = "" if beaconname is None  else beaconname
+#         lst = r.zrevrange(key+":sml:tms",0,30)
+#         sim_lst += lst
+#         for sid in lst:
+#             rdoc.hset("docid:beacons",sid,username+"|-|"+beaid+"|-|"+beaconname)
     udata = {}
     docs = []
     

@@ -1392,6 +1392,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
 #         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["simdocs"]))
         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["docs"]))
     else: 
+        print "i m here"
         udata = getAllBeaconDocsByUser(username)
         udata["simdocs"]=udata.pop("docs")
         

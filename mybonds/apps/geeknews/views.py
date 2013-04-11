@@ -562,6 +562,7 @@ def searchs(request, template_name="beacon/search_list.html"):
         "query":query,
     }, context_instance=RequestContext(request)) 
 
+@login_required
 def globaltag(request, template_name="beacon/related_list.html"):
     globaltag = request.GET.get("globaltag", "") 
     quantity = log_typer(request, "globaltag", globaltag)
@@ -588,6 +589,7 @@ def globaltag(request, template_name="beacon/related_list.html"):
         "user": request.user,
     }, context_instance=RequestContext(request)) 
     
+@login_required
 def todaynews(request, template_name="beacon/related_list.html"):
     otype = request.GET.get("o", "")
     quantity = log_typer(request, "todaynews", "今闻观止")
@@ -626,6 +628,7 @@ def todaynews(request, template_name="beacon/related_list.html"):
         "user": request.user,
     }, context_instance=RequestContext(request)) 
 
+@login_required
 def relatednews(request, template_name="beacon/related_list.html"):
     relatedid = request.GET.get("relatedid", "") 
     localtag = request.GET.get("localtag", "")

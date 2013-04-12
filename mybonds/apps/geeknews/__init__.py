@@ -526,7 +526,7 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None):
             urlstr = "http://http://www.gxdx168.com.com/research/svc?u=%s&o=%s&tag=%s" % (username, getOtype(otype), tag.decode("utf8"))
         qobj[qtype] = tag 
     elif qtype == "beacon":
-        urlstr = "http://www.gxdx168.com/research/svc?similarid=getsimilarids(%s)" % (tag)
+        urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
         qobj[qtype] = tag 
     elif qtype in ["ppl", "rdd", "rcm", "nav"]:
         urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&o=" + getOtype(otype)
@@ -633,7 +633,7 @@ def refreshDocs(username, beaconid):
     if os.name =="nt":
         channel = channel.decode("utf8")
     page = 0 
-    length=100
+    length=50
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
     
@@ -985,7 +985,20 @@ def saveTagdoc(username, otype, tag, fromdaemon=False):
     diff = savestop - urlstop  
     print "saveTagDocs %s data has taken on %s; and rt is %d" % (dlen, str(diff), rt)  
     return rt
-        
+
+def saveFulltextById(id):
+    print "===saveFulltextById==="+id
+    if id is None or id =="":
+        return
+    urlstr = "http://www.gxdx168.com/research/svc?docid="+id
+    udata = bench(loadFromUrl,parms=urlstr)
+    if udata.has_key("docs"):
+        if udata["docs"][0].has_key("fulltext"):
+            rdoc.set("ftx:"+id,json.dumps(udata["docs"][0]["fulltext"]))
+#         if udata["docs"].has_key("relatedDocs"):
+#             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
+
+
 def saveDocsByUrl(urlstr): 
 #     start = time.clock() 
 #     udata = loadFromUrl(urlstr) 
@@ -1014,7 +1027,11 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"host",doc["host"] )  
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
-        pipedoc.execute() 
+                if not rdoc.exists("ftx:"+docid):
+                    saveFulltextById(docid)
+                else:
+                    print rdoc.get("ftx:"+docid)
+        pipedoc.execute()
     except Exception, e:
          traceback.print_exc()
          print "error------la---" 

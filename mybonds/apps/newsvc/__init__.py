@@ -12,6 +12,16 @@ from numpy.ma.core import isMA
 
 from mybonds.apps import *
 
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379 
+REDIS_EXPIRETIME = 186400
+DOC_EXPIRETIME = 86400*7
+KEY_UPTIME = 1800
+QUANTITY = 1500
+QUANTITY_DURATION = 300
+r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
+rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1)
+ 
 def timeElaspe(create_time, real=False):
     elaspestr = ""
     create_time = int(create_time)

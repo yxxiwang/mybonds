@@ -44,7 +44,26 @@ def channels(request):
 def newsdetail(request):  
     username = request.GET.get("u", getUserName(request)) 
     docid=request.GET.get("docid", "") 
-    urlstr = "http://www.gxdx168.com/research/svc?docid="+docid
-    udata=getDocByUrl(urlstr)
-    return HttpResponse(json.dumps(udata), mimetype="application/json")
+    udata={}
+    doc ={}
+    if docid =="":
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    if rdoc.exists("doc:"+docid) and rdoc.exists("ftx:"+docid):
+        doc = rdoc.hgetall("doc:"+docid)
+        ftx = rdoc.get("ftx:"+docid)
+        doc["fulltext"] = ftx
+        doc["text"] = subDocText(doc["text"])
+        doc["copyNum"] = str(doc["copyNum"]) 
+        doc["tms"]=str(doc["create_time"])
+        doc["create_time"] = timeElaspe(doc["create_time"])
+    else:
+        urlstr = "http://www.gxdx168.com/research/svc?docid="+docid
+        udata=getDocByUrl(urlstr)
+        if udata.has_key("docs"):
+            doc = udata["docs"][0]  
+            doc["text"] = subDocText(doc["text"])
+            doc["copyNum"] = str(doc["copyNum"]) 
+            doc["tms"]=str(doc["create_time"])
+            doc["create_time"] = timeElaspe(doc["create_time"])
+    return HttpResponse(json.dumps(doc), mimetype="application/json")
 

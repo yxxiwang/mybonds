@@ -606,7 +606,7 @@ def refreshDocs(username, beaconid):
     if os.name =="nt":
         channel = channel.decode("utf8")
     page = 0 
-    length=30
+    length=20
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
@@ -1002,11 +1002,11 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
                 
-#                 if not rdoc.exists("ftx:"+docid):
-#                     saveFulltextById(docid)
-#                 else:
-#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
-#                     print rdoc.get("ftx:"+docid)
+                if not rdoc.exists("ftx:"+docid):
+                    saveFulltextById(docid)
+                else:
+                    print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
+                    print rdoc.get("ftx:"+docid)
         pipedoc.execute()
     except Exception, e:
          traceback.print_exc()

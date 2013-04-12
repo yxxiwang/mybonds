@@ -16,7 +16,7 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379 
 REDIS_EXPIRETIME = 186400
 DOC_EXPIRETIME = 86400*7
-KEY_UPTIME = 180
+KEY_UPTIME = 300
 QUANTITY = 1500
 QUANTITY_DURATION = 300
  
@@ -279,39 +279,6 @@ def requestUrl(url):
         return 0
     return response.status
     
-def loadFromUrl(url):
-    import urllib2
-    import json
-    import httplib2 as http
-    try:
-        from urlparse import urlparse
-    except ImportError:
-        from urllib.parse import urlparse
-    headers = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json; charset=UTF-8'
-    } 
-    target = urlparse(url)
-    method = 'GET'
-    body = ''
-    h = http.Http()
-    # # If you need authentication some example:
-    # if auth:
-    #    h.add_credentials(auth.user, auth.password)
-    udata = {}
-    try:
-        response, content = h.request(target.geturl(), method, body, headers)
-        if content is not None and content!="":
-            udata = json.loads(content)
-        else:
-            print "Error: (%s) return content is null!!" % (url)
-    except: 
-#        traceback.print_stack()
-        traceback.print_exc()
-        return {}
-#    except Exception, e:
-#         traceback.print_exc()
-    return udata
 
 def getFlagName(type):
     flagname = ""
@@ -629,6 +596,12 @@ def refreshDocs(username, beaconid):
     print "=====refreshDocs===="+key
     if not r.exists(key):
         return 
+    if r.hexists(key, "last_update"):#
+        dt = timeDiff(r.hget(key, "last_update"), time.time())
+        if dt < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
+            print "attembrough: i have nothing to do .bcz current last_update less than %d second, " % KEY_UPTIME
+            return
+            
     channel = r.hget(key,"ttl")
     if os.name =="nt":
         channel = channel.decode("utf8")
@@ -636,6 +609,7 @@ def refreshDocs(username, beaconid):
     length=50
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
+    r.hset(key, "last_update", time.time())  # 更新本操作时间  
     
     if udata.has_key("docs"):
         r.delete(key+":doc:tms")
@@ -995,6 +969,7 @@ def saveFulltextById(id):
     if udata.has_key("docs"):
         if udata["docs"][0].has_key("fulltext"):
             rdoc.set("ftx:"+id,json.dumps(udata["docs"][0]["fulltext"]))
+            rdoc.expire("ftx:"+id,DOC_EXPIRETIME)
 #         if udata["docs"].has_key("relatedDocs"):
 #             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
 
@@ -1030,7 +1005,8 @@ def saveDocsByUrl(urlstr):
                 if not rdoc.exists("ftx:"+docid):
                     saveFulltextById(docid)
                 else:
-                    print rdoc.get("ftx:"+docid)
+                    print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
+#                     print rdoc.get("ftx:"+docid)
         pipedoc.execute()
     except Exception, e:
          traceback.print_exc()

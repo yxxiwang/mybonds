@@ -16,7 +16,7 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379 
 REDIS_EXPIRETIME = 186400
 DOC_EXPIRETIME = 86400*7
-KEY_UPTIME = 300
+KEY_UPTIME = 1800
 QUANTITY = 1500
 QUANTITY_DURATION = 300
  
@@ -620,7 +620,7 @@ def refreshDocs(username, beaconid):
                 continue
             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)
-    return 0 
+    return 0
             
 def refreshBeacon(username, beaconid):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 

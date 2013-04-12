@@ -642,7 +642,7 @@ def refreshBeacon(username, beaconid):
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         pushQueue("beacon", username, "beacon", beaconid)
     else:
-        print "Attembrough: oh,refreshBeacon....but i have nothing to do .."
+        print "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d" % dt
         
 def buildBeaconData(username, beaconid,start=0,end=-1):
     key = "bmk:" + username + ":" + beaconid
@@ -1002,14 +1002,16 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"host",doc["host"] )  
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
-                if not rdoc.exists("ftx:"+docid):
-                    saveFulltextById(docid)
-                else:
-                    print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
+                
+#                 if not rdoc.exists("ftx:"+docid):
+#                     saveFulltextById(docid)
+#                 else:
+#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
 #                     print rdoc.get("ftx:"+docid)
         pipedoc.execute()
     except Exception, e:
          traceback.print_exc()
+         pipedoc.execute()
          print "error------la---" 
     return udata
  

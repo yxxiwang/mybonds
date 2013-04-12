@@ -1001,13 +1001,18 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"host",doc["host"] )  
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
+            pipedoc.execute()
                 
+            for doc in udata["docs"]: 
+                if doc is None: 
+                    continue
+                if doc["validTime"]=="false" or not doc["validTime"]:
+                    continue 
                 if not rdoc.exists("ftx:"+docid):
                     saveFulltextById(docid)
                 else:
                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
-                    print rdoc.get("ftx:"+docid)
-        pipedoc.execute()
+#                     print rdoc.get("ftx:"+docid)
     except Exception, e:
          traceback.print_exc()
          pipedoc.execute()

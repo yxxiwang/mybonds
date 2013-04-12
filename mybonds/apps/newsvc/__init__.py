@@ -5,8 +5,7 @@ import csv, string,random
 import sys, time
 import redis
 import numpy
-import traceback
-import urllib2
+import traceback 
 import datetime as dt
 from numpy.ma.core import isMA   
 

@@ -595,18 +595,18 @@ def refreshDocs(username, beaconid):
     key = "bmk:" + username + ":" + beaconid
     print "=====refreshDocs===="+key
     if not r.exists(key):
-        return 
+        return 0
     if r.hexists(key, "last_update"):#
         dt = timeDiff(r.hget(key, "last_update"), time.time())
         if dt < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
-            print "attembrough: i have nothing to do .bcz current last_update less than %d second, " % KEY_UPTIME
-            return
+            print "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % dt
+            return 0
             
     channel = r.hget(key,"ttl")
     if os.name =="nt":
         channel = channel.decode("utf8")
     page = 0 
-    length=50
+    length=30
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
@@ -620,7 +620,6 @@ def refreshDocs(username, beaconid):
                 continue
             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)
-            
     return 0 
             
 def refreshBeacon(username, beaconid):

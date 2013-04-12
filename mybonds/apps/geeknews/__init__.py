@@ -1008,6 +1008,7 @@ def saveDocsByUrl(urlstr):
                     continue
                 if doc["validTime"]=="false" or not doc["validTime"]:
                     continue 
+                docid = getHashid(doc["url"]) 
                 if not rdoc.exists("ftx:"+docid):
                     saveFulltextById(docid)
                 else:

@@ -8,11 +8,12 @@ import traceback
 from sys import path
 from os import getcwd
 import os
-# path.append(getcwd())# current dir
+path.append(getcwd())# current dir
 if os.name =="nt":
 	path.append(os.path.abspath('..\..\..'))# mybonds's parrent dir
 else:#os.name=="posix"
 	path.append(os.path.abspath('../../..'))# mybonds's parrent dir
+	path.append("/root")
 	
 import __init__ as lib
 # from ... import *

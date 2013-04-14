@@ -595,7 +595,8 @@ def refreshDocs(username, beaconid):
     key = "bmk:" + username + ":" + beaconid
     print "=====refreshDocs===="+key
     if not r.exists(key):
-        return 0
+        print "attembrough: i have nothing to do .key:%s is not exists " % key
+        return -1
     if r.hexists(key, "last_update"):#
         dt = timeDiff(r.hget(key, "last_update"), time.time())
         if dt < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
@@ -990,7 +991,12 @@ def saveDocsByUrl(urlstr):
                     continue
                 if doc["validTime"]=="false" or not doc["validTime"]:
                     continue 
-                docid = getHashid(doc["url"]) 
+                docid = getHashid(doc["url"])  
+                if not rdoc.exists("ftx:"+docid):
+                    saveFulltextById(docid)
+                else:
+                    print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
+                    
                 pipedoc.hset("doc:"+docid,"docid",docid)
                 pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ",""))
 #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
@@ -1003,17 +1009,16 @@ def saveDocsByUrl(urlstr):
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
             pipedoc.execute()
                 
-            for doc in udata["docs"]: 
-                if doc is None: 
-                    continue
-                if doc["validTime"]=="false" or not doc["validTime"]:
-                    continue 
-                docid = getHashid(doc["url"]) 
-                if not rdoc.exists("ftx:"+docid):
-                    saveFulltextById(docid)
-                else:
-                    print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
-#                     print rdoc.get("ftx:"+docid)
+#             for doc in udata["docs"]: 
+#                 if doc is None: 
+#                     continue
+#                 if doc["validTime"]=="false" or not doc["validTime"]:
+#                     continue 
+#                 docid = getHashid(doc["url"]) 
+#                 if not rdoc.exists("ftx:"+docid):
+#                     saveFulltextById(docid)
+#                 else:
+#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
     except Exception, e:
          traceback.print_exc()
          pipedoc.execute()

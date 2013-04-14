@@ -172,7 +172,7 @@ def loadFromUrl(url):
             udata = json.loads(content)
         else:
             print "Error: (%s) return content is null!!" % (url)
-    except: 
+    except:
 #        traceback.print_stack()
         traceback.print_exc()
         return {}

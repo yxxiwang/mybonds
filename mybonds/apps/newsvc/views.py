@@ -55,7 +55,9 @@ def newsdetail(request):
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"]) 
         doc["tms"]=str(doc["create_time"])
-        doc["create_time"] = timeElaspe(doc["create_time"])
+        doc["create_time"] = timeElaspe(doc["create_time"]) 
+        doc["success"] = "true"
+        doc["message"] = "success return data" 
     else:
         urlstr = "http://www.gxdx168.com/research/svc?docid="+docid
         udata=getDocByUrl(urlstr)
@@ -65,5 +67,10 @@ def newsdetail(request):
             doc["copyNum"] = str(doc["copyNum"]) 
             doc["tms"]=str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"])
+            doc["success"] = "true"
+            doc["message"] = "success return data" 
+        else:
+            doc["success"] = "false"
+            doc["message"] = "can't retrive data" 
     return HttpResponse(json.dumps(doc), mimetype="application/json")
 

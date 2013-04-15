@@ -857,7 +857,14 @@ def load_similars(request):
     beacons = []
     # modified by devwxi 临时使用..
     if groupid==getHashid("All"):
-        udata = getAllBeaconDocsByUser(username,start=start ,num=num,newscnt=1) 
+        udata = getAllBeaconDocsByUser(username,start=start ,num=num,newscnt=1)
+        udata["success"] = "true"
+        udata["message"] = "success return data"
+        if udata.has_key("docs"):
+            udata["total"] = str(len(udata["docs"]))
+        else:
+            udata["total"] = "0" 
+        
         return HttpResponse(json.dumps(udata), mimetype="application/json")
         
     
@@ -904,6 +911,14 @@ def load_similars(request):
         beaconusr = request.GET.get("beaconusr", "ltb")
         
         udata = buildBeaconData(beaconusr, beaconid,start=start ,end=num) 
+        if udata.has_key("docs"):
+            udata["success"] = "true"
+            udata["message"] = "success retrive data"
+        else:
+            udata["success"] = "false"
+            udata["message"] = "no data"
+            
+            
         return HttpResponse(json.dumps(udata), mimetype="application/json")
 #         #modify by devwxi at 20130409
 #         channel = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")

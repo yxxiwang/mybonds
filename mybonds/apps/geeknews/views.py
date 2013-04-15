@@ -1629,7 +1629,7 @@ def sendemailfornews(request):
             robj["message"] = "send email to:"+usr_email
         if groupname !="": 
             robj["group"] = groupname
-        robj["success"] = 'success'
+        robj["success"] = 'true'
         robj["docid"] = docids
         return HttpResponse(json.dumps(robj), mimetype="application/json")
     

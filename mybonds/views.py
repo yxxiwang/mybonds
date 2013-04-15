@@ -91,7 +91,7 @@ def apply_service(request):
     user = auth.authenticate(username=username, password=password)
     if user is not None and user.is_active:
         auth.login(request, user)
-        robj["success"] = 'success'
+        robj["success"] = 'true'
         robj["message"] = "apply is success" 
         robj["data"] = r.hgetall("usr:" + username)
         greeting_typer(username, "apply", username)
@@ -224,7 +224,7 @@ def buddyhold(request):
                 email_list.append(emailobj)
             robj["emails"] = email_list
             robj["group"] = groupname
-            robj["success"] = 'success'
+            robj["success"] = 'true'
             robj["message"] = "list email is success"
             return HttpResponse(json.dumps(robj), mimetype="application/json")
         elif acttype == "add":
@@ -238,7 +238,7 @@ def buddyhold(request):
                 email_list.append(emailobj)
             robj["emails"] = email_list
             robj["group"] = groupname
-            robj["success"] = 'success'
+            robj["success"] = 'true'
             robj["message"] = "add email is success"
             return HttpResponse(json.dumps(robj), mimetype="application/json")
         elif acttype == "delete":
@@ -252,7 +252,7 @@ def buddyhold(request):
                 email_list.append(emailobj)
             robj["emails"] = email_list
             robj["group"] = groupname
-            robj["success"] = 'success'
+            robj["success"] = 'true'
             robj["message"] = "delete email is success"
             return HttpResponse(json.dumps(robj), mimetype="application/json")
         elif acctype == "relative":
@@ -288,7 +288,7 @@ def groupmanage(request):
                 group_list.append(groupobj)
 #            group_list.append({"groupid":"all","groupname":"all"})
             robj["groups"] = group_list
-            robj["success"] = 'success'
+            robj["success"] = 'true'
             robj["message"] = "list group is success"
             return HttpResponse(json.dumps(robj), mimetype="application/json")
         elif acttype == "add": 
@@ -300,7 +300,7 @@ def groupmanage(request):
                 robj["groupid"]=groupid 
             robj["groupname"]=groupname  
             robj["groupid"]=groupid  
-            robj["success"] = 'success'
+            robj["success"] = 'true'
             robj["message"] = "add group is success"
             return HttpResponse(json.dumps(robj), mimetype="application/json")
         elif acttype == "delete":
@@ -313,7 +313,7 @@ def groupmanage(request):
                 r.delete("usr:"+username+":buddy:"+groupid)
             robj["groupid"]=groupid
             robj["groupname"]=groupname
-            robj["success"] = 'success'
+            robj["success"] = 'true'
             robj["message"] = "delete group is success"
             return HttpResponse(json.dumps(robj), mimetype="application/json")
             
@@ -358,7 +358,7 @@ def user_modify(request,template_name="beacon/usermodify.html"):
                     r.srem("rssuser",username)
             robj = r.hgetall("usr:" + username)
             robj["rssuser"]= "1" if r.sismember("rssuser",username) else "0"
-            robj["success"] = 'success'
+            robj["success"] = 'true'
             robj["message"] = "user modify is success"
             return HttpResponse(json.dumps(robj), mimetype="application/json")
         else:
@@ -408,7 +408,7 @@ def login_service(request):
     if user is not None and user.is_active: 
         auth.login(request, user)
         robj = r.hgetall("usr:" + username)
-        robj["success"] = 'success'
+        robj["success"] = 'true'
         robj["message"] = "apply is success" 
     else:
         robj["success"] = 'false'

@@ -48,27 +48,29 @@ def newsdetail(request):
     doc ={}
     if docid =="":
         return HttpResponse(json.dumps(udata), mimetype="application/json")
+    print rdoc.exists("doc:"+docid)
+    print rdoc.exists("ftx:"+docid)
     if rdoc.exists("doc:"+docid) and rdoc.exists("ftx:"+docid):
         doc = rdoc.hgetall("doc:"+docid)
-        ftx = "\r\n".join(rdoc.get("ftx:"+docid))
+#         ftxdic= json.loads(rdoc.get("ftx:"+docid))
+#         print rdoc.get("ftx:"+docid)
+        ftx = "\r\n".join(json.loads(rdoc.get("ftx:"+docid)))
         doc["fulltext"] = ftx
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"]) 
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         doc["success"] = "true"
-        doc["message"] = "success return data" 
+        doc["message"] = "success return data"
     else:
         urlstr = "http://www.gxdx168.com/research/svc?docid="+docid
-        udata=getDocByUrl(urlstr)
-        if udata.has_key("docs"):
-            doc = udata["docs"][0]
-#             ftx = doc["fulltext"]
+        doc=getDocByUrl(urlstr)
+#         print udata 
+        if doc.has_key("fulltext"):
+#             doc = udata["docs"][0] 
             doc["fulltext"] = "\r\n".join(doc["fulltext"])
-            doc["text"] = subDocText(doc["text"])
-            doc["copyNum"] = str(doc["copyNum"]) 
-            doc["tms"]=str(doc["create_time"])
-            doc["create_time"] = timeElaspe(doc["create_time"])
+            rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) 
+            
             doc["success"] = "true"
             doc["message"] = "success return data" 
         else:

@@ -161,7 +161,7 @@ def loadFromUrl(url):
     target = urlparse(url)
     method = 'GET'
     body = ''
-    h = http.Http()
+    h = http.Http(timeout=30)
     # # If you need authentication some example:
     # if auth:
     #    h.add_credentials(auth.user, auth.password)

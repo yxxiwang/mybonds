@@ -554,7 +554,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
         key = "bmk:" + beaconusr + ":" + beaconid
         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))  
         beaconname = "" if beaconname is None  else beaconname
-        lst = r.zrevrange(key+":doc:tms",0,newscnt)
+        lst = r.zrevrange(key+":doc:tms",0,newscnt-1)
         sim_lst += lst
         for sid in lst:
             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)  

@@ -844,14 +844,18 @@ def fllowbeacon_service(request):
 
 @login_required
 def load_similars(request):
-    quantity = log_typer(request, "load_similars", "None") 
+    groupid = request.GET.get("groupid", "") 
+    beaconid = request.GET.get("beaconid", "1968416984598300074")  
+    beaconusr = request.GET.get("beaconusr", "ltb")
+    obj= groupid if groupid!="" else beaconusr+"|-|"+beaconid
+    quantity = log_typer(request, "load_similars", obj) 
     if quantity > QUANTITY:
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
      
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5") 
-    groupid = request.GET.get("groupid", "") 
     username = request.GET.get("u", getUserName(request))
+    
     sim_lst=[]
     lst=[]
     beacons = []
@@ -907,9 +911,6 @@ def load_similars(request):
             for sid in sim_lst:
                 rdoc.hset("docid:beacons",sid,username+"|-|"+beaid+"|-|"+beaconname) 
     else:#取某个灯塔的新闻
-        beaconid = request.GET.get("beaconid", "1968416984598300074")  
-        beaconusr = request.GET.get("beaconusr", "ltb")
-        
         udata = buildBeaconData(beaconusr, beaconid,start=start ,end=num) 
         if udata.has_key("docs"):
             udata["success"] = "true"

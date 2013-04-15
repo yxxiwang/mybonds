@@ -13,10 +13,10 @@ from mybonds.apps import *
 # from django import template
 # register = template.Library()
 REDIS_HOST = 'localhost'
-REDIS_PORT = 6379 
+REDIS_PORT = 6379
 REDIS_EXPIRETIME = 186400
 DOC_EXPIRETIME = 86400*7
-KEY_UPTIME = 1800
+KEY_UPTIME = 500
 QUANTITY = 1500
 QUANTITY_DURATION = 300
  

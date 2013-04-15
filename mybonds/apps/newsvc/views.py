@@ -50,7 +50,7 @@ def newsdetail(request):
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     if rdoc.exists("doc:"+docid) and rdoc.exists("ftx:"+docid):
         doc = rdoc.hgetall("doc:"+docid)
-        ftx = rdoc.get("ftx:"+docid)
+        ftx = "\r\n".join(rdoc.get("ftx:"+docid))
         doc["fulltext"] = ftx
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"]) 
@@ -62,7 +62,9 @@ def newsdetail(request):
         urlstr = "http://www.gxdx168.com/research/svc?docid="+docid
         udata=getDocByUrl(urlstr)
         if udata.has_key("docs"):
-            doc = udata["docs"][0]  
+            doc = udata["docs"][0]
+#             ftx = doc["fulltext"]
+            doc["fulltext"] = "\r\n".join(doc["fulltext"])
             doc["text"] = subDocText(doc["text"])
             doc["copyNum"] = str(doc["copyNum"]) 
             doc["tms"]=str(doc["create_time"])

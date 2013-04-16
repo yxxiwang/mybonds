@@ -1614,9 +1614,14 @@ def sendemailfornews(request):
 #        username = request.GET.get("u", "")
         
     usr_email = r.hget("usr:"+username,"email")
-    groupname = request.GET.get("group", "")
+    groupname = request.GET.get("group", "all")
     groupemail = ",".join(r.zrevrange("usr:"+username+":buddy:"+groupname,0,-1))
-    emails = request.GET.get("emails", groupemail) 
+    emails = request.GET.get("emails", "")
+    
+    if emails== "":
+        robj["message"] ="email must be not null !"
+        robj["success"] ="failed"
+        return HttpResponse(json.dumps(robj), mimetype="application/json")
     
     docids = request.GET.get("docids", "") 
     otype = request.GET.get("o", "")

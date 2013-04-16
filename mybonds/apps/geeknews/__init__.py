@@ -168,7 +168,7 @@ def sendemailbydocid(emails,docids,otype=""):
             url = to_unicode_or_bust(doc["url"])
 #             url += "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
             if rdoc.exists("ftx:"+docid):
-                ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
+                ftx = "&nbsp;<br><br>&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
             else:
                 ftx = doc["text"] 
             content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(ftx)
@@ -965,16 +965,18 @@ def saveTagdoc(username, otype, tag, fromdaemon=False):
     print "saveTagDocs %s data has taken on %s; and rt is %d" % (dlen, str(diff), rt)  
     return rt
 
-def saveFulltextById(id):
-    print "===saveFulltextById==="+id
-    if id is None or id =="":
+def saveFulltextById(ids):
+    print "===saveFulltextById==="+ids
+    if ids is None or ids =="":
         return
-    urlstr = "http://www.gxdx168.com/research/svc?docid="+id
+    urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):
-        if udata["docs"][0].has_key("fulltext"):
-            rdoc.set("ftx:"+id,json.dumps(udata["docs"][0]["fulltext"]))
-            rdoc.expire("ftx:"+id,DOC_EXPIRETIME)
+        for doc in udata["docs"]:
+            if doc.has_key("fulltext"):
+                id = getHashid(doc["url"])
+                rdoc.set("ftx:"+id,json.dumps(doc["fulltext"]))
+                rdoc.expire("ftx:"+id,DOC_EXPIRETIME)
 #         if udata["docs"].has_key("relatedDocs"):
 #             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
 
@@ -989,7 +991,8 @@ def saveDocsByUrl(urlstr):
     udata = bench(loadFromUrl,parms=urlstr)  
     try:
         pipe = r.pipeline()
-        pipedoc = rdoc.pipeline()  
+        pipedoc = rdoc.pipeline()
+        ids=""
         if udata.has_key("docs"): 
             for doc in udata["docs"]: 
                 if doc is None: 
@@ -998,7 +1001,7 @@ def saveDocsByUrl(urlstr):
                     continue 
                 docid = getHashid(doc["url"])  
                 if not rdoc.exists("ftx:"+docid):
-                    saveFulltextById(docid)
+                    ids+=docid+";"
                 else:
                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
                     
@@ -1012,6 +1015,8 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"host",doc["host"] )  
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
+            
+            saveFulltextById(ids)
             pipedoc.execute()
                 
 #             for doc in udata["docs"]: 

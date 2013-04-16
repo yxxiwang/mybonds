@@ -159,8 +159,8 @@ def sendemailbydocid(emails,docids,otype=""):
 #    usr_email = r.hget("usr:"+username,"email")
     for usr_email in emails.split(","):
         content_list =[]
-        title_list=[]
-        for docid in docids:
+        title_list=[] 
+        for docid in docids.split(";"):
             if not rdoc.exists("doc:"+docid):
                 continue
             doc = rdoc.hgetall("doc:"+docid)
@@ -173,7 +173,7 @@ def sendemailbydocid(emails,docids,otype=""):
                 ftx = doc["text"] 
             content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(ftx)
             title_list.append(title)
-            content_list.append(content)
+            content_list.append(content) 
             sendemail("<br><br>".join(content_list),usr_email,title_list[0])
     return 0
             

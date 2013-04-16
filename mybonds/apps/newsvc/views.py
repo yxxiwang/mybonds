@@ -54,7 +54,7 @@ def newsdetail(request):
         doc = rdoc.hgetall("doc:"+docid)
 #         ftxdic= json.loads(rdoc.get("ftx:"+docid))
 #         print rdoc.get("ftx:"+docid)
-        ftx = " \r\n  ".join(json.loads(rdoc.get("ftx:"+docid)))
+        ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
         doc["fulltext"] = ftx
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"]) 
@@ -68,7 +68,7 @@ def newsdetail(request):
 #         print udata 
         if doc.has_key("fulltext"):
 #             doc = udata["docs"][0] 
-            doc["fulltext"] = " \r\n  ".join(doc["fulltext"])
+            doc["fulltext"] = " \r\n    ".join(doc["fulltext"])
             rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) 
             
             doc["success"] = "true"

@@ -847,7 +847,7 @@ def load_similars(request):
     groupid = request.GET.get("groupid", "") 
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "ltb")
-    obj= groupid if groupid!="" else beaconusr+"|-|"+beaconid
+    obj= "all" if groupid !="" else beaconusr+"|-|"+beaconid
     quantity = log_typer(request, "load_similars", obj) 
     if quantity > QUANTITY:
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')

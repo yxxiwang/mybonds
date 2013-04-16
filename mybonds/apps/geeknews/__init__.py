@@ -16,7 +16,7 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_EXPIRETIME = 186400
 DOC_EXPIRETIME = 86400*7
-KEY_UPTIME = 500
+KEY_UPTIME = 300
 QUANTITY = 1500
 QUANTITY_DURATION = 300
  
@@ -154,21 +154,26 @@ def sendEmailFromUserBeacon(username,hour_before=8,otype=""):
 def sendemailbydocid(emails,docids,otype=""): 
     print "================sendemailbydocid============================"
 #    docids = docids.replace(",",";")
-    urlstr = "http://www.gxdx168.com/research/svc?docid=" + docids.replace(",",";")
-    udata=getDataByUrl(urlstr)
+#     urlstr = "http://www.gxdx168.com/research/svc?docid=" + docids.replace(",",";")
+#     udata=getDataByUrl(urlstr)
 #    usr_email = r.hget("usr:"+username,"email")
     for usr_email in emails.split(","):
         content_list =[]
         title_list=[]
-        if udata.has_key("docs"):
-            for doc in udata["docs"]:
-                title = to_unicode_or_bust(doc["title"])
-                url = to_unicode_or_bust(doc["url"])
-                url += "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
-                content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(doc["text"])
-    #            content+="\r\n\r\n"+ "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
-                title_list.append(title)
-                content_list.append(content)
+        for docid in docids:
+            if not rdoc.exists("doc:"+docid):
+                continue
+            doc = rdoc.hgetall("doc:"+docid)
+            title = to_unicode_or_bust(doc["title"])
+            url = to_unicode_or_bust(doc["url"])
+#             url += "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
+            if rdoc.exists("ftx:"+docid):
+                ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
+            else:
+                ftx = doc["text"] 
+            content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(ftx)
+            title_list.append(title)
+            content_list.append(content)
             sendemail("<br><br>".join(content_list),usr_email,title_list[0])
     return 0
             

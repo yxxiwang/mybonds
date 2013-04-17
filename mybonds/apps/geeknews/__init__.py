@@ -186,8 +186,8 @@ def sendemail(content, rcv_email,title=""):
     from email.mime.multipart import MIMEMultipart
     from email.Header import Header
     from email.mime.image import MIMEImage
-#     sender = 'admin@zhijixing.com'
-    sender = '蓝海资讯'
+    sender = 'admin@zhijixing.com'
+#     sender = '蓝海资讯'
     if rcv_email == "":
         rcv_email = 'yxxiwang@gmail.com'
     receivers = [rcv_email]

@@ -72,7 +72,27 @@ def getDataByUrl(urlstr,isservice=False):
         udata["total"] = "0"
         udata["docs"] = []
     return udata
-
+    
+def log_typer(request, act, obj):
+    quantity = 0 
+    client_address = request.META['REMOTE_ADDR']
+#    print "client_address===:" + client_address
+    quantity = r.incr("quantity:" + client_address, 1)
+    if quantity > QUANTITY:
+        return quantity
+    r.expire("quantity:" + client_address, QUANTITY_DURATION)
+    username = getUserName(request)
+    logobj = {}
+    logobj["usr"] = username
+    logobj["ip"] = client_address
+    logobj["act"] = act
+    logobj["o"] = obj
+    logobj["url"] = request.get_full_path()
+    logobj["tms"]=time.time()
+    r.zadd("log", time.time(), json.dumps(logobj))
+    r.hset("usrlst", username, json.dumps(logobj))
+    return quantity
+    
 def getDocByUrl(urlstr):
     start = time.clock()
     udata = loadFromUrl(urlstr) 

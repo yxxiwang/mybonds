@@ -48,6 +48,9 @@ def newsdetail(request):
     doc ={}
     if docid =="":
         return HttpResponse(json.dumps(udata), mimetype="application/json")
+    
+    quantity = log_typer(request, "newsFullText", docid)
+    
     def list2dict(lst,key):
         rtlst=[]
         for el in lst:
@@ -87,22 +90,37 @@ def newsdetail(request):
 
 def removeDocFromChannel(request):
     print "===removeDocFromChannel==="
-    username = request.GET.get("u", getUserName(request)) 
+#     username = request.GET.get("u", getUserName(request))
+    username = getUserName(request)
     docid = request.GET.get("docid", "") 
+    beaconusr = request.GET.get("beaconusr", "") 
+    beaconid = request.GET.get("beaconid", "") 
     udata={}
     if username!="ltb":
         udata["message"]="only ltb have this magic power!"
         udata["success"] = "false"
         return HttpResponse(json.dumps(udata), mimetype="application/json")
-    if docid=="":
-        udata["message"]="docid must be not null"
+    if docid=="" or beaconusr == "" or beaconid == "":
+        udata["message"]="docid and channel info must be not null"
         udata["success"] = "false"
-        return HttpResponse(json.dumps(udata), mimetype="application/json") 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+     
     
-    urlstr="http://www.gxdx168.com/research/svc?u=ltb&o=2&likeid=-"+docid 
-    udata = bench(loadFromUrl,parms=urlstr)  
-    udata["message"]="success remove doc[%s] in channel" % docid
-    udata["success"] = "false"
+    key = "bmk:" + beaconusr + ":" + beaconid
+    channel = r.hget(key,"ttl")
+    if os.name =="nt":
+        channel = channel.decode("utf8")
+        
+    quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+channel)
+        
+    urlstr="http://www.gxdx168.com/research/svc?u=%s&o=2&likeid=-%s" %(channel,docid)
+    udata = bench(loadFromUrl,parms=urlstr)
+    if udata=={}: 
+        udata["message"]="somethings error occured docid[%s] in channel" % docid
+        udata["success"] = "false"
+    else:
+        udata["message"]="success remove docid[%s] in channel" % docid
+        udata["success"] = "true"
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     
     

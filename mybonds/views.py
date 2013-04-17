@@ -208,7 +208,7 @@ def apply(request):
 
 @login_required
 def buddyhold(request):
-    optype = request.GET.get("o", "")
+    optype = request.GET.get("o", "service")
     acttype = request.GET.get("a", "list")
     groupname = request.GET.get("group", "all")
     username = getUserName(request)
@@ -261,6 +261,11 @@ def buddyhold(request):
             group_list=[]
 #            for groupid in groups:
 #                if r.zscore("usr:"+username+":buddy:"+groupid,email) is None:
+        else:
+            robj["success"] = 'false'
+            robj["message"] = "unknow action type."
+            return HttpResponse(json.dumps(robj), mimetype="application/json")
+            
     else:
         return HttpResponse("ok")
         

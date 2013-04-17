@@ -560,7 +560,12 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
         if hour_before < 0:#正常情况刷新灯塔,如果取截至到当前hour_before小时的新闻,则不需刷新灯塔(之前已经刷新过)
             refreshBeacon(beaconusr, beaconid)
         key = "bmk:" + beaconusr + ":" + beaconid
-        beaconname = to_unicode_or_bust(r.hget(key,"ttl"))  
+        
+        beaconname = r.hget(key,"ttl")
+#         if os.name =="nt":
+#             beaconname = beaconname.decode("utf8")
+#         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))
+        
         beaconname = "" if beaconname is None  else beaconname
         lst = r.zrevrange(key+":doc:tms",0,newscnt-1)
         sim_lst += lst
@@ -612,10 +617,10 @@ def refreshDocs(username, beaconid):
             return 0
             
     channel = r.hget(key,"ttl")
-    if os.name =="nt":
-        channel = channel.decode("utf8")
+#     if os.name =="nt":
+#         channel = channel.decode("utf8")
     page = 0 
-    length=20
+    length=40
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
@@ -1018,7 +1023,7 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"host",doc["host"] )  
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
-            print ids
+#             print ids
             saveFulltextById(ids)
             pipedoc.execute()
                 

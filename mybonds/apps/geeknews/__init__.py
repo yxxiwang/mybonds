@@ -168,7 +168,7 @@ def sendemailbydocid(emails,docids,otype=""):
             url = to_unicode_or_bust(doc["url"])
 #             url += "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
             if rdoc.exists("ftx:"+docid):
-                ftx = "&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
+                ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
             else:
                 ftx = doc["text"] 
 #             content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(ftx)
@@ -179,6 +179,7 @@ def sendemailbydocid(emails,docids,otype=""):
     return 0
             
 def sendemail(content, rcv_email,title=""):
+    from django.core.mail import send_mail
     print "================sendemail============================"
     import smtplib, mimetypes
     from smtplib import SMTPException
@@ -193,7 +194,7 @@ def sendemail(content, rcv_email,title=""):
     receivers = [rcv_email]
 
     msg = MIMEMultipart()
-    msg['From'] = "zhijixing2012lsw@gmail.com"
+    msg['From'] = "蓝海资讯"
     msg['To'] = rcv_email
     if title!="":
         msg['Subject'] = Header(title, charset='UTF-8')  # 中文主题 

@@ -54,8 +54,8 @@ def newsdetail(request):
         doc = rdoc.hgetall("doc:"+docid)
 #         ftxdic= json.loads(rdoc.get("ftx:"+docid))
 #         print rdoc.get("ftx:"+docid)
-        ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
-        doc["fulltext"] = ftx
+#         ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
+        doc["fulltext"] = json.loads(rdoc.get("ftx:"+docid))
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"]) 
         doc["tms"]=str(doc["create_time"])
@@ -68,7 +68,7 @@ def newsdetail(request):
 #         print udata 
         if doc.has_key("fulltext"):
 #             doc = udata["docs"][0] 
-            doc["fulltext"] = " \r\n    ".join(doc["fulltext"])
+#             doc["fulltext"] = " \r\n    ".join(doc["fulltext"])
             rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) 
             
             doc["success"] = "true"
@@ -78,3 +78,29 @@ def newsdetail(request):
             doc["message"] = "can't retrive data" 
     return HttpResponse(json.dumps(doc), mimetype="application/json")
 
+def removeDocFromChannel(request):
+    print "===removeDocFromChannel==="
+    username = request.GET.get("u", getUserName(request)) 
+    docid = request.GET.get("docid", "") 
+    udata={}
+    if username!="ltb":
+        udata["message"]="only ltb have this magic power!"
+        udata["success"] = "false"
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    if docid=="":
+        udata["message"]="docid must be not null"
+        udata["success"] = "false"
+        return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    
+    urlstr="http://www.gxdx168.com/research/svc?u=ltb&o=2&likeid=-"+docid 
+    udata = bench(loadFromUrl,parms=urlstr)  
+    udata["message"]="success remove doc[%s] in channel" % docid
+    udata["success"] = "false"
+    return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    
+    
+    
+    
+    
+    
+    

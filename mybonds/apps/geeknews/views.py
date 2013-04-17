@@ -1169,46 +1169,6 @@ def beaconRelate(request, template_name="beacon_news.html"):
 #    return HttpResponseRedirect("/news/beaconinit/?similarid=" + similarid + "&title=" + title) 
 
 @login_required
-def beaconinit(request, template_name="beacon/beacon_init.html"):
-    otype = request.GET.get("otype", "similar") 
-    similarid = request.GET.get("similarid", "")
-    relatedid = request.GET.get("relatedid", "")
-    localtag = request.GET.get("localtag", "") 
-    userobj = request.user
-    username = getUserName(request) 
-    
-    objectid =""
-    udata = {}
-    if otype=="similar":
-        urlstr = "http://www.gxdx168.comcom/research/svc?length=1100&similarid=" + similarid
-        objectid=similarid 
-    elif otype =="related": 
-        urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&relatedid=" + relatedid
-        objectid = relatedid
-        similarid = relatedid
-    elif otype =="localtag":
-#        localtag = urllib2.quote(localtag.encode("utf8"))
-        urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&relatedid="+relatedid+"&localtag=" + urllib2.quote(localtag.encode("utf8"))
-        objectid=relatedid+"|-|"+localtag
-        similarid = relatedid
-        
-    udata=getDataByUrl(urlstr) 
-    beacons = r.smembers("bmk:" + username)
-    # [{"name":"beaconA","hasdoc":"true"},{"name":"beaconB","hasdoc":"false"}]
-    beacons = [beacontran(username, beaid, similarid) for beaid in beacons ]
-#    udata["docs"] = [procDoc(doc) for doc in udata["docs"] ]  
-#    print objectid
-    return render_to_response(template_name, {
-        'current_path': request.get_full_path(),
-#        'udata': udata["docs"][0]["title"],  
-        'udata': udata,
-        'beacons':beacons,
-        'objectid':objectid,
-        'otype':otype,
-        "user": userobj,
-    }, context_instance=RequestContext(request)) 
-
-@login_required
 def mybeacons(request, template_name="beacon/mybeacons.html"): 
     beaconname = request.GET.get("beaconname", "")
     heartopt = request.GET.get("heartopt", "")
@@ -1713,3 +1673,43 @@ def captchalist(request, template_name="beacon/captcha.html"):
 #    daemon = daemonProcess.DaemonProcess('/tmp/daemon-example.pid')
 #    daemon.restart()
 #    return HttpResponse("daemon is restart....")  
+ 
+# @login_required
+# def beaconinit(request, template_name="beacon/beacon_init.html"):
+#     otype = request.GET.get("otype", "similar") 
+#     similarid = request.GET.get("similarid", "")
+#     relatedid = request.GET.get("relatedid", "")
+#     localtag = request.GET.get("localtag", "") 
+#     userobj = request.user
+#     username = getUserName(request) 
+#     
+#     objectid =""
+#     udata = {}
+#     if otype=="similar":
+#         urlstr = "http://www.gxdx168.comcom/research/svc?length=1100&similarid=" + similarid
+#         objectid=similarid 
+#     elif otype =="related": 
+#         urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&relatedid=" + relatedid
+#         objectid = relatedid
+#         similarid = relatedid
+#     elif otype =="localtag":
+# #        localtag = urllib2.quote(localtag.encode("utf8"))
+#         urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&relatedid="+relatedid+"&localtag=" + urllib2.quote(localtag.encode("utf8"))
+#         objectid=relatedid+"|-|"+localtag
+#         similarid = relatedid
+#         
+#     udata=getDataByUrl(urlstr) 
+#     beacons = r.smembers("bmk:" + username)
+#     # [{"name":"beaconA","hasdoc":"true"},{"name":"beaconB","hasdoc":"false"}]
+#     beacons = [beacontran(username, beaid, similarid) for beaid in beacons ]
+# #    udata["docs"] = [procDoc(doc) for doc in udata["docs"] ]  
+# #    print objectid
+#     return render_to_response(template_name, {
+#         'current_path': request.get_full_path(),
+# #        'udata': udata["docs"][0]["title"],  
+#         'udata': udata,
+#         'beacons':beacons,
+#         'objectid':objectid,
+#         'otype':otype,
+#         "user": userobj,
+#     }, context_instance=RequestContext(request)) 

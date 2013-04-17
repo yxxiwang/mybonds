@@ -1618,6 +1618,7 @@ def sendemailfornews(request):
     groupemail = ",".join(r.zrevrange("usr:"+username+":buddy:"+groupname,0,-1))
     emails = request.GET.get("emails", "")
     
+    robj = {}
     if emails== "":
         robj["message"] ="email must be not null !"
         robj["success"] ="failed"
@@ -1626,7 +1627,6 @@ def sendemailfornews(request):
     docids = request.GET.get("docids", "") 
     otype = request.GET.get("o", "")
     if otype=="service":
-        robj = {}
         if emails != "":
             pushQueue("sendemail", username, "byemail", tag=emails, similarid=docids.replace(",",";"))
             robj["message"] = "send email to:"+emails 

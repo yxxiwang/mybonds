@@ -168,10 +168,11 @@ def sendemailbydocid(emails,docids,otype=""):
             url = to_unicode_or_bust(doc["url"])
 #             url += "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
             if rdoc.exists("ftx:"+docid):
-                ftx = "&nbsp;<br><br>&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
+                ftx = "&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
             else:
                 ftx = doc["text"] 
-            content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(ftx)
+#             content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(ftx)
+            content= to_unicode_or_bust(ftx)
             title_list.append(title)
             content_list.append(content) 
             sendemail("<br><br>".join(content_list),usr_email,title_list[0])
@@ -185,7 +186,8 @@ def sendemail(content, rcv_email,title=""):
     from email.mime.multipart import MIMEMultipart
     from email.Header import Header
     from email.mime.image import MIMEImage
-    sender = 'admin@zhijixing.com'
+#     sender = 'admin@zhijixing.com'
+    sender = '蓝海资讯'
     if rcv_email == "":
         rcv_email = 'yxxiwang@gmail.com'
     receivers = [rcv_email]
@@ -1015,7 +1017,7 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"host",doc["host"] )  
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
-            
+            print ids
             saveFulltextById(ids)
             pipedoc.execute()
                 

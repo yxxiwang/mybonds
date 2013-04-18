@@ -8,7 +8,10 @@ import sys,os
 import redis
 import traceback
 import urllib2
-import datetime as dt 
+import datetime as dt
+
+from sys import path
+path.append("/root")
 from mybonds.apps import *
 # from django import template
 # register = template.Library()

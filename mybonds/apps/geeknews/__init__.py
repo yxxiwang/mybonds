@@ -1002,6 +1002,8 @@ def saveDocsByUrl(urlstr):
         pipe = r.pipeline()
         pipedoc = rdoc.pipeline()
         ids=""
+        ids_lst=[]
+        cnt=0
         if udata.has_key("docs"): 
             for doc in udata["docs"]: 
                 if doc is None: 
@@ -1011,6 +1013,11 @@ def saveDocsByUrl(urlstr):
                 docid = getHashid(doc["url"])  
                 if not rdoc.exists("ftx:"+docid):
                     ids+=docid+";"
+                    cnt = cnt+1
+                    if cnt == 10:
+                        ids_lst.append(ids)
+                        ids=""
+                        cnt = 0
                 else:
                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
                     
@@ -1025,7 +1032,8 @@ def saveDocsByUrl(urlstr):
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
                 pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
 #             print ids
-            saveFulltextById(ids)
+            for tids in ids_lst:
+                saveFulltextById(tids)
             pipedoc.execute()
                 
 #             for doc in udata["docs"]: 

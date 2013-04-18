@@ -8,9 +8,7 @@ import numpy
 import traceback 
 import datetime as dt
 from numpy.ma.core import isMA   
-
-from sys import path
-path.append("/root")
+ 
 from mybonds.apps import *
 
 REDIS_HOST = 'localhost'

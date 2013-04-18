@@ -1064,7 +1064,8 @@ def subDocText(s):
     dot="。".decode("utf8")
     comma = "，".decode("utf8")
     ellipsis=" ......".decode("utf8")
-    if lc == dot or lc ==".": #从尾部判断，如果最后一个字符是"。"或者"." 则返回原始文本
+#     if lc == dot or lc ==".": #从尾部判断，如果最后一个字符是"。"或者"." 则返回原始文本
+    if lc == dot: #从尾部判断，如果最后一个字符是"。"或者"." 则返回原始文本
         return s
     else:#否则开始进行截取
         slst=us.split(dot)

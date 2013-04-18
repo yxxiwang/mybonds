@@ -114,10 +114,11 @@ def removeDocFromChannel(request):
     
     key = "bmk:" + beaconusr + ":" + beaconid
     channel = r.hget(key,"ttl")
+    channel = to_unicode_or_bust(channel)
     if os.name =="nt":
         channel = channel.decode("utf8")
         
-    quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+to_unicode_or_bust(channel))
+    quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+channel)
         
     urlstr="http://www.gxdx168.com/research/svc?u=%s&o=2&likeid=-%s" %(channel,docid)
     udata = bench(loadFromUrl,parms=urlstr)

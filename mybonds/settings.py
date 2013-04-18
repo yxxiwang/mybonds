@@ -184,7 +184,8 @@ INSTALLED_APPS = [
     # project
     "bonds",
     "geeknews",
-    "mybonds",
+    "newsvc",
+#     "mybonds",
 ]
 #AUTHENTICATION_BACKENDS = (
 #    'emailusernames.backends.EmailAuthBackend',

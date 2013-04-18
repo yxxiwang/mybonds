@@ -620,8 +620,8 @@ def refreshDocs(username, beaconid):
     channel = r.hget(key,"ttl")
 #     if os.name =="nt":
 #         channel = channel.decode("utf8")
-    page = 0 
-    length=40
+    page = 0
+    length=200
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  

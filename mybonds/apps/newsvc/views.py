@@ -120,7 +120,7 @@ def removeDocFromChannel(request):
         
     quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+to_unicode_or_bust(channel))
         
-    urlstr="http://www.gxdx168.com/research/svc?u=%s&o=2&likeid=-%s" %(channel,docid)
+    urlstr="http://www.gxdx168.com/research/svc?u="+channel+"&o=2&likeid=-%s" %(docid,)
     udata = bench(loadFromUrl,parms=urlstr)
     if udata=={}: 
         udata["message"]="somethings error occured docid[%s] in channel" % docid

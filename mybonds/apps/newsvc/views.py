@@ -9,6 +9,7 @@ from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required, permission_required
 
 from mybonds.apps.newsvc import *
+from mybonds.apps import *
 
 
 def index(request):     

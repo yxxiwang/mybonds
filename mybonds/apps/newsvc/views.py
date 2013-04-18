@@ -117,7 +117,7 @@ def removeDocFromChannel(request):
     if os.name =="nt":
         channel = channel.decode("utf8")
         
-    quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+channel)
+    quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+to_unicode_or_bust(channel))
         
     urlstr="http://www.gxdx168.com/research/svc?u=%s&o=2&likeid=-%s" %(channel,docid)
     udata = bench(loadFromUrl,parms=urlstr)

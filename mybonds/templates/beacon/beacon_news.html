@@ -103,7 +103,14 @@
             {% for doc in udata.docs %}
             <div class="span12" style="margin-left:0px;">
             <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
-             <p style="font-size: 13px;"><a target="_blank" href="{{doc.url}}"><strong>{{doc.title}}</strong>&nbsp;&nbsp;</a></p>
+             <p style="font-size: 13px;"><a target="_blank" href="{{doc.url}}"><strong>{{doc.title}}</strong>&nbsp;&nbsp;</a>
+              {% if username == "ltb" %}
+              {% if beaconid %}
+              <a class="docremove" href="/newsvc/removedocfromchannel/?o=page&beaconid={{beaconid}}&beaconusr={{beaconusr}}"  rel="tooltip" title="移除文档" style="float:right;"  >
+                <button class="badge badge-info" type="button">-</button>
+              </a>
+              {% endif %}
+              {% endif %}</p>
              <p ><small>{{doc.domain}}&nbsp;  {{doc.create_time}}&nbsp; <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
              </small></p> 
               {{doc.text}}

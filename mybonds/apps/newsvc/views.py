@@ -92,9 +92,15 @@ def removeDocFromChannel(request):
     print "===removeDocFromChannel==="
 #     username = request.GET.get("u", getUserName(request))
     username = getUserName(request)
+    op = request.GET.get("o", "service") 
     docid = request.GET.get("docid", "") 
     beaconusr = request.GET.get("beaconusr", "") 
     beaconid = request.GET.get("beaconid", "") 
+    
+#     beaconusr= "ltb"
+#     beaconid = "1968416984598300074"
+#     docid = "1664429281334879208"
+    
     udata={}
     if username!="ltb":
         udata["message"]="only ltb have this magic power!"
@@ -121,6 +127,10 @@ def removeDocFromChannel(request):
     else:
         udata["message"]="success remove docid[%s] in channel" % docid
         udata["success"] = "true"
+    
+    if op == "page":
+        return HttpResponseRedirect('/news/beaconnews/?orderby=tms&beaconid=%s&beaconusr=%s' %(beaconid,beaconusr))
+    
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     
     

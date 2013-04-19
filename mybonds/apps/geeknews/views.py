@@ -1278,7 +1278,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
     elif not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询)
         beaconname=to_unicode_or_bust(beaconname)
         logobj = "query : "+beaconname
-    else : 
+    else :
         logobj="all"
     
     quantity = log_typer(request, "beaconnews", logobj)

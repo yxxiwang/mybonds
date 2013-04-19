@@ -1019,7 +1019,8 @@ def saveDocsByUrl(urlstr):
                         ids=""
                         cnt = 0
                 else:
-                    print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
+                    pass
+#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
                     
                 pipedoc.hset("doc:"+docid,"docid",docid)
                 pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ",""))

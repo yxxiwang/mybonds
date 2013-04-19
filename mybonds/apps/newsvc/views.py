@@ -106,6 +106,7 @@ def removeDocFromChannel(request):
         udata["message"]="docid and channel info must be not null"
         udata["success"] = "false"
         return HttpResponse(json.dumps(udata), mimetype="application/json")
+    
     if username!=beaconusr:
         udata["message"]="only channel user himself have this magic power!"
         udata["success"] = "false"
@@ -129,6 +130,7 @@ def removeDocFromChannel(request):
     else:
         udata["message"]="success remove docid[%s] in channel" % docid
         udata["success"] = "true"
+        r.zrem(key+":doc:tms",docid)
     
     if op == "page":
         return HttpResponseRedirect('/news/beaconnews/?orderby=tms&beaconid=%s&beaconusr=%s' %(beaconid,beaconusr))

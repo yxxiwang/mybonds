@@ -65,6 +65,7 @@ def newsdetail(request):
 #         print rdoc.get("ftx:"+docid)
 #         ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
         doc["fulltext"] = list2dict(json.loads(rdoc.get("ftx:"+docid)),"txt")
+#         doc["fulltext"] = json.loads(rdoc.get("ftx:"+docid))
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"]) 
         doc["tms"]=str(doc["create_time"])
@@ -77,8 +78,8 @@ def newsdetail(request):
 #         print udata 
         if doc!=None and doc.has_key("fulltext"):
 #             doc = udata["docs"][0] 
-            doc["fulltext"] = list2dict(doc["fulltext"],"txt")
             rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) 
+            doc["fulltext"] = list2dict(doc["fulltext"],"txt")
             
             doc["success"] = "true"
             doc["message"] = "success return data" 

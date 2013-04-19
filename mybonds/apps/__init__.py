@@ -168,14 +168,15 @@ def loadFromUrl(url):
     udata = {}
     try:
         response, content = h.request(target.geturl(), method, body, headers)
-        if content is not None and content!="":
-            udata = json.loads(content)
-        else:
-            print "Error: (%s) return content is null!!" % (url)
     except:
 #        traceback.print_stack()
         traceback.print_exc()
         return {}
+    else:
+        if content is not None and content!="":
+            udata = json.loads(content)
+        else:
+            print "Error: (%s) return content is null!!" % (url) 
 #    except Exception, e:
 #         traceback.print_exc()
     return udata

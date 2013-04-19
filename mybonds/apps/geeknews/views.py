@@ -15,7 +15,7 @@ import numpy
 from django.core import urlresolvers
 from django.contrib.auth.decorators import login_required, permission_required
 from mybonds.apps.geeknews import *
-import mybonds.apps.geeknews.daemonProcess as daemonProcess
+#import mybonds.apps.geeknews.daemonProcess as daemonProcess
 from django.template.defaultfilters import length
    
 def index(request): 

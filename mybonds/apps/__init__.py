@@ -171,6 +171,7 @@ def loadFromUrl(url):
     except:
 #        traceback.print_stack()
         traceback.print_exc()
+        print "Error: (%s) return content is null!!" % (url) 
         return {}
     else:
         if content is not None and content!="":

@@ -78,7 +78,7 @@ def newsdetail(request):
 #         print udata 
         if doc!=None and doc.has_key("fulltext"):
 #             doc = udata["docs"][0] 
-            rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) 
+            rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) # 这个必须要在后面那行前面....否则下次取的数据不对
             doc["fulltext"] = list2dict(doc["fulltext"],"txt")
             
             doc["success"] = "true"

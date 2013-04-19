@@ -1014,7 +1014,7 @@ def saveDocsByUrl(urlstr):
                 if not rdoc.exists("ftx:"+docid):
                     ids+=docid+";"
                     cnt = cnt+1
-                    if cnt == 10:
+                    if cnt == 20:
                         ids_lst.append(ids)
                         ids=""
                         cnt = 0

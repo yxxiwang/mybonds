@@ -102,12 +102,12 @@ def removeDocFromChannel(request):
 #     docid = "1664429281334879208"
     
     udata={}
-    if username!=beaconusr:
-        udata["message"]="only user himself have this magic power!"
-        udata["success"] = "false"
-        return HttpResponse(json.dumps(udata), mimetype="application/json")
     if docid=="" or beaconusr == "" or beaconid == "":
         udata["message"]="docid and channel info must be not null"
+        udata["success"] = "false"
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    if username!=beaconusr:
+        udata["message"]="only channel user himself have this magic power!"
         udata["success"] = "false"
         return HttpResponse(json.dumps(udata), mimetype="application/json")
      

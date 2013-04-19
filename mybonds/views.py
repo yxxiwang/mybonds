@@ -127,7 +127,7 @@ def apply(request):
         password = request.POST.get("password", "");
         email = request.POST.get("email", "yxxiwang@gmail.com");
         captcha = request.POST.get("captcha", "111111");
-        if username == "" or password == "" or email == "" or captcha == "" or len(username)>10: 
+        if username == "" or password == "" or email == "" or captcha == "" or len(username)>20: 
             return render_to_response('apply.html',
                                       {'err_message': err_message,
                                         'username': username, 

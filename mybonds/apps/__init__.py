@@ -170,8 +170,8 @@ def loadFromUrl(url):
         response, content = h.request(target.geturl(), method, body, headers)
     except:
 #        traceback.print_stack()
-        traceback.print_exc()
         print "Error: (%s) return content is null!!" % (url) 
+        traceback.print_exc()
         return {}
     else:
         if content is not None and content!="":

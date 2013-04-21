@@ -82,15 +82,15 @@ def channelDocs(beaconusr,beaconid):
     key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
     if udata.has_key("docs"): 
         saveData(udata,key)
-        r.hset("bmk:" + username + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
-        r.hset("bmk:" + username + ":" + beaconid, "last_update", time.time())  # 更新操作时间  
+        r.hset("bmk:" + beaconusr + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
+        r.hset("bmk:" + beaconusr + ":" + beaconid, "last_update", time.time())  # 更新操作时间  
     else:
         print "%s:%s udata haven't key docs ! do it again.." %(beaconusr,beaconid)
         udata = bench(loadFromUrl,parms=urlstr)
         if udata.has_key("docs"):
             saveData(udata,key)
-            r.hset("bmk:" + username + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
-            r.hset("bmk:" + username + ":" + beaconid, "last_update", time.time())  # 更新操作时间  
+            r.hset("bmk:" + beaconusr + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
+            r.hset("bmk:" + beaconusr + ":" + beaconid, "last_update", time.time())  # 更新操作时间  
         else:
              print "=============== %s:%s ===============" %(beaconusr,beaconid)
 

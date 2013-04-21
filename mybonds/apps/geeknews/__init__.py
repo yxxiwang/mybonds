@@ -998,8 +998,7 @@ def saveDocsByUrl(urlstr):
 #     print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff)) 
     print "===saveDocsByUrl==="+urlstr
     udata = bench(loadFromUrl,parms=urlstr)  
-    try:
-        pipe = r.pipeline()
+    try: 
         pipedoc = rdoc.pipeline()
         ids=""
         ids_lst=[]

@@ -23,20 +23,58 @@ from mybonds.apps import *
 from mybonds.apps.newspubfunc import *
 import argparse
 
+num = 0
+def saveFulltextById(ids):
+    print "===saveFulltextById==="+ids
+    if ids is None or ids =="":
+        return {}
+    urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
+    def fetchAndSave(docs):
+       for doc in docs:
+           if doc.has_key("fulltext"):
+               id = getHashid(doc["url"])
+               rdoc.set("ftx:"+id,json.dumps(doc["fulltext"]))
+               rdoc.expire("ftx:"+id,DOC_EXPIRETIME)  
+    udata = bench(loadFromUrl,parms=urlstr)
+    if udata.has_key("docs"):
+        fetchAndSave(udata["docs"])
+    else:
+        print "==%s udata haven't key docs ! do it again.." %(urlstr)
+        udata = bench(loadFromUrl,parms=urlstr)
+        fetchAndSave(udata["docs"])
+        
+    return udata
+        
+                
 def saveData(udata,key):
+    pipedoc = rdoc.pipeline()
+    ids=""
     for doc in udata["docs"]:
         if not doc["validTime"]:
             continue
         docid = getHashid(doc["url"])
         tms = doc["create_time"]
         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+        if not rdoc.exists("ftx:"+docid): 
+            ids+=docid+";"
+        pipedoc.hset("doc:"+docid,"docid",docid)
+        pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ","")) 
+        pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
+        pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
+        pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
+        pipedoc.hset("doc:"+docid,"url",doc["url"] )       
+        pipedoc.hset("doc:"+docid,"host",doc["host"] )  
+        pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
+        pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
+    pipedoc.execute()
+    saveFulltextById(ids)
     
 def channelDocs(beaconusr,beaconid): 
     channel = getchannelByid(beaconusr,beaconid)
     if channel is None: 
         print "%s:%s haven't channel !" %(beaconusr,beaconid)
         return
-    urlstr="http://www.gxdx168.com/research/svc?channelid="+urllib2.quote(channel) +"&length=2000"  
+    urlstr="http://www.gxdx168.com/research/svc?channelid="+urllib2.quote(channel) +"&length="+str(num)
     udata = bench(loadFromUrl,parms=urlstr)
     key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
     if udata.has_key("docs"): 
@@ -44,7 +82,7 @@ def channelDocs(beaconusr,beaconid):
     else:
         print "%s:%s udata haven't key docs ! do it again.." %(beaconusr,beaconid)
         udata = bench(loadFromUrl,parms=urlstr)
-        if udata.has_key("docs"): 
+        if udata.has_key("docs"):
             saveData(udata,key)
         else:
              print "=============== %s:%s ===============" %(beaconusr,beaconid)
@@ -52,9 +90,18 @@ def channelDocs(beaconusr,beaconid):
 def channels():
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
         beaconusr,beaconid = beaconstr.split("|-|")
-        print "proc %s:%s" %(beaconusr,beaconid)
+        print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
         channelDocs(beaconusr,beaconid)
         
+def initProc(codes):
+        if codes[0]=="all":
+            channels()
+        else:
+            for code in codes:
+                beaconusr,beaconid = code.split(":")
+                print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
+                channelDocs(beaconusr,beaconid)
+    
 
 if __name__ == "__main__":  
     usage = """usage: %prog [options] {load|import|meta|print}
@@ -66,6 +113,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process stock,bond,etc codes.')
     parser.add_argument("-c", "--code", default=[], type=str, nargs='+',
                     help="The code to be processed.")
+    
+    parser.add_argument("-a", "--auto", dest="auto",default=0,type=int,
+                    help="auto process every other second.")
+    
+    parser.add_argument("-n", "--num", dest="num",default=20,type=int,
+                    help="fetchdata length from backend (use in urls).")
     
     parser.add_argument("-s", "--start", dest="sdate",default="20130101",
                       help="begin date default is 20100101")
@@ -94,14 +147,16 @@ if __name__ == "__main__":
         loglevel = options.loglevel
         start_date = options.sdate
         end_date = options.edate
+        auto = options.auto
+        num = options.num
         print "reading cods  %s..." % options.code
-        if codes[0]=="all":
-            channels()
+        if auto!=0:
+           while True:
+               initProc(codes)
+               time.sleep(auto)
         else:
-            for code in codes:
-                beaconusr,beaconid = code.split(":")
-                print "proc %s:%s" %(beaconusr,beaconid)
-                channelDocs(beaconusr,beaconid)
+            initProc(codes)
+            
         
         
 #     action =sys.argv[0]

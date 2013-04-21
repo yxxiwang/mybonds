@@ -41,7 +41,10 @@ def saveFulltextById(ids):
     else:
         print "==%s udata haven't key docs ! do it again.." %(urlstr)
         udata = bench(loadFromUrl,parms=urlstr)
-        fetchAndSave(udata["docs"])
+        if udata.has_key("docs"):
+            fetchAndSave(udata["docs"])
+        else:
+            print "====failed again..===="
         
     return udata
         

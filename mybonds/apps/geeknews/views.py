@@ -761,12 +761,13 @@ def listbeacons_service(request):
     robj={}
     beaobj={}
     
-    if orderby=="tms":
-        sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
-    elif orderby=="fllw":
-        sharebeacons = r.zrevrange("bmk:doc:share:byfllw",0,-1)
-    elif orderby=="news":
-        sharebeacons = r.zrevrange("bmk:doc:share:bynews",0,-1) 
+#     if orderby=="tms":
+#         sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
+#     elif orderby=="fllw":
+#         sharebeacons = r.zrevrange("bmk:doc:share:byfllw",0,-1)
+#     elif orderby=="news":
+#         sharebeacons = r.zrevrange("bmk:doc:share:bynews",0,-1) 
+    sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
         
     mybeacons = r.smembers("usr:" + username+":fllw")
     for beaconstr in sharebeacons:

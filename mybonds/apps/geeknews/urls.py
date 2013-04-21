@@ -27,7 +27,7 @@ urlpatterns = patterns('geeknews.views',
     url(r'^captchalist/$', 'captchalist', name="captchalist"),
     
     url(r'^beaconrelate/$', 'beaconRelate', name="beaconRelate"),
-    url(r'^beaconinit/$', 'beaconinit', name="beaconinit"),
+#     url(r'^beaconinit/$', 'beaconinit', name="beaconinit"),
     url(r'^beaconlist/$', 'beaconlist', name="beaconlist"),
     url(r'^beaconsave/$', 'beaconsave', name="beaconsave"),
     url(r'^beaconfilter/$', 'beaconfilter', name="beaconfilter"),

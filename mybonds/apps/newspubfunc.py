@@ -146,5 +146,6 @@ def subDocText(s):
     return s
 
 def getchannelByid(beaconusr,beaconid): 
-    return r.hget("bmk:" + beaconusr + ":" + beaconid,"ttl")
+    return r.hget("bmk:" + beaconusr + ":" + beaconid,"ttl") 
+    # if r.exists("bmk:" + beaconusr + ":" + beaconid) else ""
 

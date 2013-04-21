@@ -23,13 +23,13 @@ from mybonds.apps import *
 from mybonds.apps.newspubfunc import *
 import argparse
 
-def saveData(udata):
+def saveData(udata,key):
     for doc in udata["docs"]:
         if not doc["validTime"]:
             continue
         docid = getHashid(doc["url"])
         tms = doc["create_time"]
-        r.zadd("channel:"+beaconusr+":"+beaconid+":doc_cts",int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+        r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
     
 def channelDocs(beaconusr,beaconid): 
     channel = getchannelByid(beaconusr,beaconid)
@@ -38,13 +38,14 @@ def channelDocs(beaconusr,beaconid):
         return
     urlstr="http://www.gxdx168.com/research/svc?channelid="+urllib2.quote(channel) +"&length=2000"  
     udata = bench(loadFromUrl,parms=urlstr)
+    key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
     if udata.has_key("docs"): 
-        saveData(udata)
+        saveData(udata,key)
     else:
         print "%s:%s udata haven't key docs ! do it again.." %(beaconusr,beaconid)
         udata = bench(loadFromUrl,parms=urlstr)
         if udata.has_key("docs"): 
-            saveData(udata)
+            saveData(udata,key)
         else:
              print "=============== %s:%s ===============" %(beaconusr,beaconid)
 

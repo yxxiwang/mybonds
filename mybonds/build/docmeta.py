@@ -23,17 +23,30 @@ from mybonds.apps import *
 from mybonds.apps.newspubfunc import *
 import argparse
 
-def channelDocs(beaconusr,beaconid): 
-    channel = getchannelByid(beaconusr,beaconid)
-    urlstr="http://www.gxdx168.com/research/svc?channelid="+urllib2.quote(channel) +"&length=2000"  
-    udata = bench(loadFromUrl,parms=urlstr)
-    if not udata.has_key("docs"): 
-        print "%s:%s udata haven't key docs !" %(beaconusr,beaconid)
-        return
+def saveData(udata):
     for doc in udata["docs"]:
+        if not doc["validTime"]:
+            continue
         docid = getHashid(doc["url"])
         tms = doc["create_time"]
-        r.zadd("channel:"+beaconusr+":"+beaconid+":doc_cts",int(tms),docid)
+        r.zadd("channel:"+beaconusr+":"+beaconid+":doc_cts",int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+    
+def channelDocs(beaconusr,beaconid): 
+    channel = getchannelByid(beaconusr,beaconid)
+    if channel is None: 
+        print "%s:%s haven't channel !" %(beaconusr,beaconid)
+        return
+    urlstr="http://www.gxdx168.com/research/svc?channelid="+urllib2.quote(channel) +"&length=2000"  
+    udata = bench(loadFromUrl,parms=urlstr)
+    if udata.has_key("docs"): 
+        saveData(udata)
+    else:
+        print "%s:%s udata haven't key docs ! do it again.." %(beaconusr,beaconid)
+        udata = bench(loadFromUrl,parms=urlstr)
+        if udata.has_key("docs"): 
+            saveData(udata)
+        else:
+             print "=============== %s:%s ===============" %(beaconusr,beaconid)
 
 def channels():
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
@@ -43,7 +56,7 @@ def channels():
         
 
 if __name__ == "__main__":  
-    usage = """usage: %prog [options] {dataload|import|meta|print}
+    usage = """usage: %prog [options] {load|import|meta|print}
                eg:  
                    %prog meta -u=all -d=3 -m=model1 -s=all
                    %prog print 
@@ -68,6 +81,30 @@ if __name__ == "__main__":
                       help="don't print status messages to stdout")
     
     options = parser.parse_args()
-    print options
-    print sys.argv
+#     print options
+#     print sys.argv
+#     parser.print_usage()
+    if len(sys.argv) < 2:  
+        parser.print_usage()
+        sys.exit(2)
+    
+    if options.verbose: 
+        codes = options.code
+        loglevel = options.loglevel
+        start_date = options.sdate
+        end_date = options.edate
+        print "reading cods  %s..." % options.code
+        if codes[0]=="all":
+            channels()
+        else:
+            for code in codes:
+                beaconusr,beaconid = code.split(":")
+                print "proc %s:%s" %(beaconusr,beaconid)
+                channelDocs(beaconusr,beaconid)
+        
+        
+#     action =sys.argv[0]
+#     print action
+#     if 'dateload' == action:
+#         dateload(filename,output=output)
 

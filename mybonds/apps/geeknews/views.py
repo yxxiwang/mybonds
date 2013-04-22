@@ -771,28 +771,27 @@ def listbeacons_service(request):
         
 #     mybeacons = r.smembers("usr:" + username+":fllw")
     mybeacons = r.zrevrange("usr:" + username+":fllw",0,-1)
+    for beaconstr in mybeacons:
+        beausr,beaid = beaconstr.split("|-|")
+        beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
+        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
+        beaobj["beaconid"] = beaid 
+        beaobj["isfllw"] = "true" 
+        if not beaobj.has_key("ttl"):
+            continue
+        sharebeacon_list.append(beaobj)
+        
+    sharebeacons =  listsub(sharebeacons,mybeacons)
     for beaconstr in sharebeacons:
         beausr,beaid = beaconstr.split("|-|")
 #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
         beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
         beaobj["beaconid"] = beaid
-#         if r.sismember("usr:"+username+":fllw",beaconstr):#频道已经被该用户关注
-        if r.zcard("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
-            if btype == "notfllw":#选择还未被用户关注的频道
-                continue
-            beaobj["isfllw"] = "true"
-        else:#频道尚未被该用户关注
-            if btype == "fllw":#选择的是用户已经被关注的频道
-                continue
-            beaobj["isfllw"] = "false"
-#         if beaconstr in mybeacons: 
-#             continue
-        
+        beaobj["isfllw"] = "false"
         if not beaobj.has_key("ttl"):
             continue
-        if not beaconname=="":
-            import re
+        if not beaconname=="": 
             if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询) 
                 beaconttl = beaobj["ttl"] 
                 beaconname=to_unicode_or_bust(beaconname)
@@ -801,6 +800,18 @@ def listbeacons_service(request):
                     sharebeacon_list.append(beaobj)
         else:
             sharebeacon_list.append(beaobj)
+#         if r.sismember("usr:"+username+":fllw",beaconstr):#频道已经被该用户关注
+#         if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
+#             if btype == "notfllw":#选择还未被用户关注的频道
+#                 continue
+#             beaobj["isfllw"] = "true"
+#         else:#频道尚未被该用户关注
+#             if btype == "fllw":#选择的是用户已经被关注的频道
+#                 continue
+#             beaobj["isfllw"] = "false"
+#         if beaconstr in mybeacons: 
+#             continue
+        
 
     sharebeacon_list = sharebeacon_list[int(start): int(start) + int(num)]
     robj["success"] = 'true'

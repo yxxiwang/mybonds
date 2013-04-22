@@ -1225,7 +1225,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
     sharebeacons = r.zrevrange("bmk:doc:share",0,-1) 
 #     mybeacons = r.smembers("usr:" + username+":fllw") 
     mybeacons = r.zrevrange("usr:" + username+":fllw",0,-1)
-     
+    
     for beaconstr in mybeacons:
         beausr,beaid = beaconstr.split("|-|") 
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 

@@ -25,7 +25,7 @@ import argparse
 
 num = 0
 def saveFulltextById(ids):
-    print "===saveFulltextById==="+ids
+    print "%s===saveFulltextById===%s" %(getTime(time.time()),ids)
     if ids is None or ids =="":
         return {}
     urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
@@ -50,6 +50,7 @@ def saveFulltextById(ids):
         
                 
 def saveData(udata,key):
+    print "%s===saveData===%s" %(getTime(time.time()),key)
     pipedoc = rdoc.pipeline()
     ids=""
     for doc in udata["docs"]:

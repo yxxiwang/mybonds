@@ -54,7 +54,7 @@ def bench(func,parms=None):
     rt = func() if parms is None else func(parms)
     stop = time.clock()  
     diff = stop - start  
-    print "%s(%s) has taken %s" % (func.func_name,parms, str(diff)) 
+    print "%s==%s(%s) has taken %s" % (getTime(time.time()),func.func_name,parms, str(diff)) 
     return rt
 
 def unique(a):
@@ -84,7 +84,8 @@ def getTime(tms):
         tms=float(tms)
     tt = time.gmtime(tms+3600*8)
     tdate = dt.date.fromtimestamp(tms).strftime('%Y-%m-%d')
-    ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec)
+    ttime = "%.2d:%.2d:%.2d" %(tt.tm_hour,tt.tm_min,tt.tm_sec)
+#     ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec)
     return "%s %s" %(tdate,ttime)
 
 def subString(s, start=0,end=-1):

@@ -49,18 +49,12 @@ if __name__ == "__main__":
                eg:  
                   python %prog convUsrFllw 
             """
-    
     if len(sys.argv) >= 2:
-        func = sys.argv[1]
-#         if 'convUsrFllw' ==func: 
-#             print "func is %s" % func
-#             bench(convUsrFllw)
-#         else:
+        func = sys.argv[1] 
         reflect(func)
     else:
         print usage.replace("%prog", sys.argv[0])
-
-            
+ 
     
     
     

@@ -1235,7 +1235,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
             continue
         myfllw_list.append(beaobj)
     
-    sharebeacons = listsub(sharebeacons,mybeacon_list) 
+    sharebeacons = listsub(sharebeacons,mybeacons) 
     for beaconstr in sharebeacons:
         beausr,beaid = beaconstr.split("|-|")
 #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))

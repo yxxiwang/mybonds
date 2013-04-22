@@ -553,7 +553,8 @@ def getDataByUrl(urlstr,isservice=False):
 def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     print "=getAllBeaconDocsByUser="+username
 #    hour_before=8
-    beacons = r.smembers("usr:"+username+":fllw")
+#     beacons = r.smembers("usr:"+username+":fllw")
+    beacons = r.zrevrange("usr:"+username+":fllw",0,-1)
     sim_lst=[]
     lst=[]
     for beaconstr in beacons:#取所有关注的灯塔的相关主题文档
@@ -673,7 +674,7 @@ def buildBeaconData(username, beaconid,start=0,end=-1):
             continue 
 #         if doc["validTime"]=="false" or not doc["validTime"]:
 #             continue 
-        doc["tx"] = doc["text"]
+#         doc["tx"] = doc["text"]
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"])
 #         doc["validTime"] = str(doc["validTime"])

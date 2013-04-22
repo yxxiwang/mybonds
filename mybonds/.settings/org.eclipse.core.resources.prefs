@@ -10,6 +10,7 @@ encoding//apps/newspubfunc.py=utf-8
 encoding//apps/newsvc/__init__.py=utf-8
 encoding//apps/newsvc/urls.py=utf-8
 encoding//apps/newsvc/views.py=utf-8
+encoding//build/__init__.py=utf-8
 encoding//build/docmeta.py=utf-8
 encoding//build/load_channel.py=utf-8
 encoding//build/testemail.py=utf-8

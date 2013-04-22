@@ -63,18 +63,7 @@
                   &nbsp;<a class="heartremove" href="/news/beaconnews/?orderby={{orderby}}&heartopt=remove&heartid={{beacon.id}}&heartusr={{beacon.crt_usr}}"  rel="tooltip" title="取消收集" style="float:right;"  ><button class="badge badge-info" type="button">-</button></a>
               </div>  
             {% endfor %}  
-            {% if mybeacons %}
-            <div class="span12" style="margin-left:0px;">
-             <strong> 我发现的灯塔  <span class="badge-wxi">{{mybeacons|length}}</span></strong>
-            </div> 
-            {% for beacon in mybeacons %}
-              <div class="well_wxi span12"  style="margin-left:0px;">
-                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi" style="font-size: 13px;">{{beacon.ttl}}</span>
-                   <span class="badge-wxi"><abbr title="文章数">{{beacon.cnt}}</abbr></span>
-                   <span class="badge-wxi-green"><abbr title="建设者">{{beacon.crt_usr}}</abbr></span>
-              </div>  
-            {% endfor %}    
-            {% endif %} 
+ 
         <div class="span12 ">  
         </div> 
 
@@ -104,7 +93,7 @@
             <div class="span12" style="margin-left:0px;">
             <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
              <p style="font-size: 13px;"><a target="_blank" href="{{doc.url}}"><strong>{{doc.title}}</strong>&nbsp;&nbsp;</a>
-              {% if username == "ltb" %}
+              {% if username == beaconusr %}
               {% if beaconid %}
               <a class="docremove" href="/newsvc/removedocfromchannel/?o=page&docid={{doc.docid}}&beaconid={{beaconid}}&beaconusr={{beaconusr}}"  rel="tooltip" title="移除文档" style="float:right;"  >
                 <button class="badge badge-info" type="button">-</button>

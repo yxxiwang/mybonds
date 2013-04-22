@@ -3,8 +3,7 @@
 import json, urllib2, urllib
 import csv, string,random
 import sys, time,os
-import redis
-import numpy
+import redis,numpy
 import traceback 
 import datetime as dt
 from numpy.ma.core import isMA 
@@ -50,8 +49,7 @@ def isAscii(s):
             return False
     return True
 
-def bench(func,parms=None): 
-    import time
+def bench(func,parms=None):
     start = time.clock()   
     rt = func() if parms is None else func(parms)
     stop = time.clock()  
@@ -70,8 +68,16 @@ def intersect(a, b):
 def union(a, b):
     """ return the union of two lists """
     return list(set(a) | set(b))
+
+def revintersect(a,b):
+    """ return the not intersection of two lists """
+    return set(union(a,b))-set(intersect(a, b))
+
+def listsub(a,b):
+    return list(set(a)-set(b))
  
 def getTime(tms):
+    """ return the current date & time 'yyyy-mm-dd hh:mm:ss' """
     if type(tms).__name__ == "str":
         if tms=="":
             tms="0"

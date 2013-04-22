@@ -69,8 +69,8 @@ def saveData(udata,key):
         pipedoc.hset("doc:"+docid,"host",doc["host"] )  
         pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
         pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
-    pipedoc.execute()
     saveFulltextById(ids)
+    pipedoc.execute()
     
 def channelDocs(beaconusr,beaconid): 
     channel = getchannelByid(beaconusr,beaconid)

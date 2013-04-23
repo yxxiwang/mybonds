@@ -23,6 +23,9 @@ from mybonds.apps.newspubfunc import *
 import argparse
  
 def convUsrFllw():
+    """ 将  用户关注的key 由 set 类型换成 zset 类型.
+                            该函数已经被执行过,即可以宣布作废(现在应该已经用不上了)
+    """
     keys = r.keys("usr:*:fllw")
     for key in keys:
         print "proc key %s" % key

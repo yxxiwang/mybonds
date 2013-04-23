@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from numpy.ma.core import isMA  
-
 import json, numpy, time
 import csv, string, random
 import sys,os
@@ -20,7 +19,7 @@ DOC_EXPIRETIME = 86400*5
 KEY_UPTIME = 300
 QUANTITY = 1500
 QUANTITY_DURATION = 300
- 
+
 r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1)
  
@@ -152,31 +151,42 @@ def sendEmailFromUserBeacon(username,hour_before=8,otype=""):
 #        content_list.append(content)
 #    sendemail("<br>".join(title_list)+"<br>"+"<br><br>".join(content_list),usr_email,title)
         
-def sendemailbydocid(emails,docids,otype=""): 
-    print "================sendemailbydocid============================"
-#    docids = docids.replace(",",";")
-#     urlstr = "http://www.gxdx168.com/research/svc?docid=" + docids.replace(",",";")
-#     udata=getDataByUrl(urlstr)
-#    usr_email = r.hget("usr:"+username,"email")
-    for usr_email in emails.split(","):
-        content_list =[]
-        title_list=[] 
-        for docid in docids.split(";"):
-            if not rdoc.exists("doc:"+docid):
-                continue
-            doc = rdoc.hgetall("doc:"+docid)
-            title = to_unicode_or_bust(doc["title"])
-            url = to_unicode_or_bust(doc["url"])
-#             url += "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
-            if rdoc.exists("ftx:"+docid):
-                ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
-            else:
-                ftx = doc["text"] 
-#             content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(ftx)
-            content= to_unicode_or_bust(ftx)
-            title_list.append(title)
-            content_list.append(content) 
-            sendemail("<br><br>".join(content_list),usr_email,title_list[0])
+def sendemailbydocid(email,docid,otype=""): 
+    print "%s==sendemailbydocid====" % getTime(time.time())
+    if not rdoc.exists("doc:"+docid):
+        print "==error:: document is not exsit!!! doc:%" % docid
+        return -1
+    doc = rdoc.hgetall("doc:"+docid)
+    title = to_unicode_or_bust(doc["title"])
+    url = to_unicode_or_bust(doc["url"]) 
+    if rdoc.exists("ftx:"+docid):
+        ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
+    else:
+        ftx = doc["text"]  
+    content= to_unicode_or_bust(ftx)
+#     title_list.append(title)
+#     content_list.append(content) 
+    return sendemail(content,email,title)
+    
+#     for usr_email in emails.split(","):
+#         content_list =[]
+#         title_list=[] 
+#         for docid in docids.split(";"):
+#             if not rdoc.exists("doc:"+docid):
+#                 continue
+#             doc = rdoc.hgetall("doc:"+docid)
+#             title = to_unicode_or_bust(doc["title"])
+#             url = to_unicode_or_bust(doc["url"])
+# #             url += "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
+#             if rdoc.exists("ftx:"+docid):
+#                 ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
+#             else:
+#                 ftx = doc["text"] 
+# #             content= "<a href='"+url+"'>"+title+"</a><br><br>"+to_unicode_or_bust(ftx)
+#             content= to_unicode_or_bust(ftx)
+#             title_list.append(title)
+#             content_list.append(content) 
+#             sendemail("<br><br>".join(content_list),usr_email,title_list[0])
     return 0
             
 def sendemail(content, rcv_email,title=""):
@@ -195,7 +205,7 @@ def sendemail(content, rcv_email,title=""):
     receivers = [rcv_email]
 
     msg = MIMEMultipart()
-    msg['From'] = "蓝海资讯"
+    msg['From'] = "灯塔阅读"
     msg['To'] = rcv_email
     if title!="":
         msg['Subject'] = Header(title, charset='UTF-8')  # 中文主题 
@@ -217,18 +227,26 @@ def sendemail(content, rcv_email,title=""):
 #      "hi,我是测试邮件".decode("utf8"),
 #      ])
     try:
-        
 #       message = MIMEText(message,_subtype='plain',_charset='gb2312')
        smtpObj = smtplib.SMTP('smtp.gmail.com')
        smtpObj.ehlo()
        smtpObj.starttls()
        smtpObj.login('admin@zhijixing.com', 'software91') 
-       smtpObj.sendmail(sender, receivers, msg.as_string())         
-       smtpObj.quit()
+       smtpObj.sendmail(sender, receivers, msg.as_string())      
        print "Successfully sent email"
+       return 0
     except SMTPException:
        print "Error: unable to send email"
-       traceback.print_exc() 
+       traceback.print_exc()
+       return 8
+    else:
+       pass
+#        print "sent email again.."
+#        smtpObj.sendmail(sender, receivers, msg.as_string())
+    finally:
+       smtpObj.quit() 
+        
+    return 8
        
 def beacontran(username, beaid, docid):
     udata = {}

@@ -11,25 +11,31 @@ import os
 path.append(getcwd())# current dir
 if os.name =="nt":
 	path.append(os.path.abspath('..\..\..'))# mybonds's parrent dir
+	path.append("C:\Users\wangxi\git\mybonds")
 else:#os.name=="posix"
 	path.append(os.path.abspath('../../..'))# mybonds's parrent dir
 	path.append("/root")
 	
 import __init__ as lib
-# from ... import *
+from mybonds.apps import *
+
 class DaemonProcess(Daemon):
 	
 	def run(self):
 		while True:
 # 			sys.stdout.write("=run====\n")
 			# retrive
- 			for qtype in ("rcm", "ppl" , "nav" ,"beacon","tag","navtag", "rdd","read","sendemail"):
+ 			for qtype in ( "beacon", "sendemail"):
+ 				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
+ 					qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
+ 					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
+ 					
  			 	for i in range(lib.r.llen("queue:" + qtype)): 
  			 	 	self.retriveData(qtype) 
 			time.sleep(1)
 			
 	def retriveData(self, qtype):
-		qobj = lib.r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":done")
+		qobj = lib.r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")
 		qinfo = {}
 		tag = ""
 		url=""
@@ -48,14 +54,14 @@ class DaemonProcess(Daemon):
 				if qtype == "tag":
 					tag = qinfo["tag"]
 					rt = lib.saveTagdoc(username, otype, tag,True) 
-				elif qtype =="navtag": 
-					navtag = qinfo["navtag"]
-					rt = lib.saveTagdoc(username, otype, navtag,True) 
+# 				elif qtype =="navtag": 
+# 					navtag = qinfo["navtag"]
+# 					rt = lib.saveTagdoc(username, otype, navtag,True) 
+# 				elif qtype =="read": 
+# 					rt = lib.requestUrl(url)
 				elif qtype =="beacon": 
 					beacon = qinfo["beacon"]
 					rt = lib.refreshDocs(username, beacon) 
-				elif qtype =="read": 
-					rt = lib.requestUrl(url)
 				elif qtype =="sendemail":
 					if otype=="bybeacon":
 						hourbefore = qinfo["sendemail"]
@@ -64,7 +70,9 @@ class DaemonProcess(Daemon):
 						email = qinfo["sendemail"]
 						rt = lib.sendemailbydocid(email,qinfo["docid"],otype)
 				else:
-					rt = lib.saveDocs(username, otype)
+# 					rt = lib.saveDocs(username, otype)
+					print "error qtype %s " % qtype
+					rt = 0 
 # 			else: 
 # 				sys.stdout.write("is nothing to do....\n") 
 		except:
@@ -73,9 +81,24 @@ class DaemonProcess(Daemon):
 #			exc_type, exc_value, exc_traceback = sys.exc_info()
 #			traceback.print_exception(exc_type, exc_value, exc_traceback,
 #                              limit=2)
-		if not rt == 0:
-			qobj = lib.r.rpoplpush("queue:" + qtype + ":done", "queue:" + qtype + ":error")
-		urlstop = time.clock()  
+		if rt == SUCCESS: # SUCCESS=0
+			qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype + ":done")
+		elif rt == SYSERROR: # SYSERROR=-1
+ 			qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype + ":error")
+		else:# COMMUNICATERROR=6 ,WARNNING=8
+# 			qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype)
+			qobj = lib.r.rpop("queue:" + qtype + ":processing")
+			qinfo = json.loads(qobj)
+			cnt = qinfo["cnt"] if qinfo.has_key("cnt") else 0
+			qinfo["cnt"]=cnt+1
+			if qinfo["cnt"] < RETRYCOUNT:
+				print "process it again"
+				lib.r.lpush("queue:" + qtype,json.dumps(qinfo))
+			else:
+				print "it's rearch the maxsim count of RETRYCOUNT"
+				lib.r.lpush("queue:" + qtype+":error",json.dumps(qinfo)) 
+			
+		urlstop = time.clock()
 		diff = urlstop - start  
 		print "retriveData(%s) has taken on %s;and rt is %d" % (url,str(diff),rt) 
 		return rt
@@ -84,7 +107,11 @@ def runserver(daemon):
 	print "-------is running----------"
 	while True: 
 		qtype = "retirveRCM" 
-		for qtype in ("rcm", "ppl" ,"nav","beacon","tag","navtag", "rdd","read","sendemail"):
+		for qtype in ( "beacon", "sendemail"):
+			for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
+				qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
+				print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
+				
 		 	for i in range(lib.r.llen("queue:" + qtype)): 
 		 	 	daemon.retriveData(qtype) 
 		time.sleep(1)

@@ -8,6 +8,12 @@ import traceback
 import datetime as dt
 from numpy.ma.core import isMA 
 
+SYSERROR = -1
+COMMUNICATERROR = 6
+SUCCESS = 0
+WARNNING=8
+RETRYCOUNT=3
+
 def id_generator(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 

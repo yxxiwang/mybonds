@@ -1472,6 +1472,9 @@ def sendemailfornews(request):
     groupname = request.GET.get("group", "all")
     groupemail = ",".join(r.zrevrange("usr:"+username+":buddy:"+groupname,0,-1))
     emails = request.GET.get("emails", "")
+    docids = request.GET.get("docids", "")
+    otype = request.GET.get("o", "")
+     
     
     robj = {}
     if emails== "":
@@ -1479,19 +1482,21 @@ def sendemailfornews(request):
         robj["success"] ="failed"
         return HttpResponse(json.dumps(robj), mimetype="application/json")
     
-    docids = request.GET.get("docids", "") 
-    otype = request.GET.get("o", "")
-     
     quantity = log_typer(request, "sendemailfornews", emails+"->"+docids)
 #     if quantity > QUANTITY:
 #         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-    
+    def pushqueue(emails,docids):
+        for email,docid in zip( emails.split(","),docids.split(";") ):
+            pushQueue("sendemail", username, "byemail", tag=email, similarid=docid)
+            
     if otype=="service":
         if emails != "":
-            pushQueue("sendemail", username, "byemail", tag=emails, similarid=docids.replace(",",";"))
+#             pushQueue("sendemail", username, "byemail", tag=emails, similarid=docids.replace(",",";"))
+            pushqueue(emails,docids.replace(",",";"))
             robj["message"] = "send email to:"+emails 
         else:
-            pushQueue("sendemail", username, "byemail", tag=usr_email, similarid=docids.replace(",",";"))
+#             pushQueue("sendemail", username, "byemail", tag=usr_email, similarid=docids.replace(",",";"))
+            pushqueue(usr_email,docids.replace(",",";"))   
             robj["message"] = "send email to:"+usr_email
         if groupname !="": 
             robj["group"] = groupname

@@ -43,7 +43,8 @@ def channels(request):
 @login_required
 def newsdetail(request):  
     username = request.GET.get("u", getUserName(request)) 
-    docid=request.GET.get("docid", "") 
+    docid=request.GET.get("docid", "")
+    rtype=request.GET.get("rtype", "string")
     udata={}
     doc ={}
     if docid =="":
@@ -64,10 +65,13 @@ def newsdetail(request):
 #         ftxdic= json.loads(rdoc.get("ftx:"+docid))
 #         print rdoc.get("ftx:"+docid)
 #         ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
-        doc["fulltext"] = list2dict(json.loads(rdoc.get("ftx:"+docid)),"txt")
-#         doc["fulltext"] = json.loads(rdoc.get("ftx:"+docid))
+        if rtype =="string":
+            ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
+            doc["fulltext"] = list2dict([ftx],"txt")
+        else:
+            doc["fulltext"] = list2dict(json.loads(rdoc.get("ftx:"+docid)),"txt")
         doc["text"] = subDocText(doc["text"])
-        doc["copyNum"] = str(doc["copyNum"]) 
+        doc["copyNum"] = str(doc["copyNum"])
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         doc["success"] = "true"
@@ -76,10 +80,13 @@ def newsdetail(request):
         urlstr = "http://www.gxdx168.com/research/svc?docid="+docid
         doc=getDocByUrl(urlstr)
 #         print udata 
-        if doc!=None and doc.has_key("fulltext"):
-#             doc = udata["docs"][0] 
+        if doc!=None and doc.has_key("fulltext"): 
             rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) # 这个必须要在后面那行前面....否则下次取的数据不对
-            doc["fulltext"] = list2dict(doc["fulltext"],"txt")
+            if rtype =="string":
+                ftx = " \r\n    ".join(doc["fulltext"])
+                doc["fulltext"] = list2dict([ftx],"txt")
+            else:
+                doc["fulltext"] = list2dict(doc["fulltext"],"txt")
             
             doc["success"] = "true"
             doc["message"] = "success return data" 

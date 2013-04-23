@@ -25,7 +25,7 @@ class DaemonProcess(Daemon):
 		while True:
 # 			sys.stdout.write("=run====\n")
 			# retrive
- 			for qtype in ( "beacon", "sendemail"):
+ 			for qtype in ("sendemail","beacon"):
  				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
  					qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
  					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
@@ -107,7 +107,7 @@ def runserver(daemon):
 	print "-------is running----------"
 	while True: 
 		qtype = "retirveRCM" 
-		for qtype in ( "beacon", "sendemail"):
+		for qtype in ("sendemail","beacon"):
 			for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
 				qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
 				print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)

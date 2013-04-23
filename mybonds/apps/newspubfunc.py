@@ -93,7 +93,7 @@ def log_typer(request, act, obj):
     r.hset("usrlst", username, json.dumps(logobj))
     return quantity
     
-def getDocByUrl(urlstr):
+def getFullDocByUrl(urlstr):
     start = time.clock()
     udata = loadFromUrl(urlstr) 
     urlstop = time.clock()  
@@ -117,10 +117,11 @@ def getDocByUrl(urlstr):
             docs.append(doc)
         udata["docs"] = docs  
         udata["total"] = str(len(udata["docs"]) )
+        return doc
     else:
         udata["total"] = "0"
         udata["docs"] = []
-    return doc
+    return {}
 
 def subDocText(s):
 #    us=unicode(s,"utf8")

@@ -575,6 +575,9 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     beacons = r.zrevrange("usr:"+username+":fllw",0,-1)
     sim_lst=[]
     lst=[]
+    udata = {}
+    docs = []
+    
     for beaconstr in beacons:#取所有关注的灯塔的相关主题文档
         beaconusr,beaconid = beaconstr.split("|-|")
         if hour_before < 0:#正常情况刷新灯塔,如果取截至到当前hour_before小时的新闻,则不需刷新灯塔(之前已经刷新过)
@@ -588,44 +591,58 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
         
         beaconname = "" if beaconname is None  else beaconname
         lst = r.zrevrange(key+":doc:tms",0,newscnt-1)
-        sim_lst += lst
-        for sid in lst:
-            rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)  
- 
-    udata = {}
-    docs = []
-    
-    sim_lst = list(set(sim_lst))#去除重复新闻
-    crt_time=time.time()
-    for docid in sim_lst: 
-        doc = rdoc.hgetall("doc:" + docid) 
-        if len(doc.keys()) == 0:
-            continue  
-        doc["tms"]=str(doc["create_time"])
-        elaspe = int(crt_time- int(doc["tms"])/ 1000)
-#        print elaspe
-        if hour_before>0 and elaspe > hour_before*3600:#取hour_before小时之内的新闻
-            continue
-        doc["text"] = subDocText(doc["text"])
-        doc["copyNum"] = str(doc["copyNum"]) 
-        doc["create_time"] = timeElaspe(doc["create_time"])   
-        
-        beaconstr = rdoc.hget("docid:beacons",docid)
-        beaconusr,beaconid,beaconttl = beaconstr.split("|-|") 
-        doc["beaconusr"] = beaconusr
-        doc["beaconid"] = beaconid
-        doc["beaconttl"] = beaconttl 
-        docs.append(doc)
-        
-#    docs = sorted(docs,key=lambda l:(l["beaconttl"],l["tms"]),reverse = True)
-    docs = sorted(docs,key=lambda l:(l["tms"]),reverse = True)
-#    docs = docs[int(start): int(start) + int(num)]
+#         sim_lst += lst
+        for docid in lst:
+            doc = rdoc.hgetall("doc:" + docid)  
+            if len(doc.keys()) == 0:
+                continue 
+    #         if doc["validTime"]=="false" or not doc["validTime"]:
+    #             continue 
+    #         doc["tx"] = doc["text"]
+            doc["text"] = subDocText(doc["text"])
+            doc["copyNum"] = str(doc["copyNum"])
+    #         doc["validTime"] = str(doc["validTime"])
+            doc["tms"]=str(doc["create_time"])
+            doc["create_time"] = timeElaspe(doc["create_time"]) 
+            doc["beaconusr"] = beaconusr
+            doc["beaconid"] = beaconid
+            doc["beaconttl"] = beaconname 
+            docs.append(doc) 
+#             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)
     udata["docs"] = docs
     return udata   
+#   
+#     sim_lst = list(set(sim_lst))#去除重复新闻
+#     crt_time=time.time()
+#     for docid in sim_lst: 
+#         doc = rdoc.hgetall("doc:" + docid) 
+#         if len(doc.keys()) == 0:
+#             continue  
+#         doc["tms"]=str(doc["create_time"])
+#         elaspe = int(crt_time- int(doc["tms"])/ 1000)
+# #        print elaspe
+#         if hour_before>0 and elaspe > hour_before*3600:#取hour_before小时之内的新闻
+#             continue
+#         doc["text"] = subDocText(doc["text"])
+#         doc["copyNum"] = str(doc["copyNum"]) 
+#         doc["create_time"] = timeElaspe(doc["create_time"])   
+#         
+#         beaconstr = rdoc.hget("docid:beacons",docid)
+#         beaconusr,beaconid,beaconttl = beaconstr.split("|-|") 
+#         doc["beaconusr"] = beaconusr
+#         doc["beaconid"] = beaconid
+#         doc["beaconttl"] = beaconttl 
+#         docs.append(doc) 
+# #    docs = sorted(docs,key=lambda l:(l["beaconttl"],l["tms"]),reverse = True)
+# #     docs = sorted(docs,key=lambda l:(l["tms"]),reverse = True)
+# #    docs = docs[int(start): int(start) + int(num)]
+#     udata["docs"] = docs
+#     return udata   
     
 
-def refreshDocs(username, beaconid):
-    key = "bmk:" + username + ":" + beaconid
+def refreshDocs(beaconusr, beaconid):
+    """更新频道内容,该方法也会被异步调用"""
+    key = "bmk:" + beaconusr + ":" + beaconid
     print "=====refreshDocs===="+key
     if not r.exists(key):
         print "attembrough: i have nothing to do .key:%s is not exists " % key
@@ -654,33 +671,35 @@ def refreshDocs(username, beaconid):
                 continue
             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)
-    return 0
+    else:
+        return COMMUNICATERROR
+    return SUCCESS
             
-def refreshBeacon(username, beaconid):
+def refreshBeacon(beaconusr, beaconid):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
-    key = "bmk:" + username + ":" + beaconid
+    key = "bmk:" + beaconusr + ":" + beaconid
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
     if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
         print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 
         if r.exists(key):
-            refreshDocs(username, beaconid)
+            refreshDocs(beaconusr, beaconid)
             r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             print key + "is deleted via front  so we ignore it..." 
             
-    elif not r.exists("bmk:"+username+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
-        refreshDocs(username, beaconid)
+    elif not r.exists("bmk:"+beaconusr+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
+        refreshDocs(beaconusr, beaconid)
     elif dt > KEY_UPTIME:#如果上次更新时间过久,则重新刷新数据
-        print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (username, beaconid, dt)
+        print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt)
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
-        pushQueue("beacon", username, "beacon", beaconid)
+        pushQueue("beacon", beaconusr, "beacon", beaconid)
     else:
         print "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d" % dt
         
-def buildBeaconData(username, beaconid,start=0,end=-1):
-    key = "bmk:" + username + ":" + beaconid
+def buildBeaconData(beaconusr, beaconid,start=0,end=-1):
+    key = "bmk:" + beaconusr + ":" + beaconid
     if r.exists(key):
-        refreshBeacon(username, beaconid)
+        refreshBeacon(beaconusr, beaconid)
     else:
         return {} 
     udata = {}
@@ -1017,44 +1036,42 @@ def saveDocsByUrl(urlstr):
 #     print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff)) 
     print "===saveDocsByUrl==="+urlstr
     udata = bench(loadFromUrl,parms=urlstr)  
-    try: 
-        pipedoc = rdoc.pipeline()
-        ids=""
-        ids_lst=[]
-        cnt=0
-        if udata.has_key("docs"): 
-            for doc in udata["docs"]: 
-                if doc is None: 
-                    continue
-                if doc["validTime"]=="false" or not doc["validTime"]:
-                    continue 
-                docid = getHashid(doc["url"])  
-                if not rdoc.exists("ftx:"+docid):
-                    ids+=docid+";"
-                    cnt = cnt+1
-                    if cnt == 20:
-                        ids_lst.append(ids)
-                        ids=""
-                        cnt = 0
-                else:
-                    pass
-#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
-                    
-                pipedoc.hset("doc:"+docid,"docid",docid)
-                pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ",""))
+    pipedoc = rdoc.pipeline()
+    ids=""
+    ids_lst=[]
+    cnt=0
+    if udata.has_key("docs"): 
+        for doc in udata["docs"]: 
+            if doc is None: 
+                continue
+            if doc["validTime"]=="false" or not doc["validTime"]:
+                continue 
+            docid = getHashid(doc["url"])  
+            if not rdoc.exists("ftx:"+docid):
+                ids+=docid+";"
+                cnt = cnt+1
+                if cnt == 20:
+                    ids_lst.append(ids)
+                    ids=""
+                    cnt = 0
+            else:
+                pass
+#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
+            pipedoc.hset("doc:"+docid,"docid",docid)
+            pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ",""))
 #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
-                pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
-                pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
-                pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
-                pipedoc.hset("doc:"+docid,"url",doc["url"] )       
-                pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-                pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
-                pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
+            pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
+            pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
+            pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
+            pipedoc.hset("doc:"+docid,"url",doc["url"] )       
+            pipedoc.hset("doc:"+docid,"host",doc["host"] )  
+            pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
+            pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
 #             print ids
-            for tids in ids_lst:
-                saveFulltextById(tids)
-            pipedoc.execute()
-                
+        for tids in ids_lst:
+            saveFulltextById(tids)
+        pipedoc.execute()
+            
 #             for doc in udata["docs"]: 
 #                 if doc is None: 
 #                     continue
@@ -1064,11 +1081,12 @@ def saveDocsByUrl(urlstr):
 #                 if not rdoc.exists("ftx:"+docid):
 #                     saveFulltextById(docid)
 #                 else:
-#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
-    except Exception, e:
-         traceback.print_exc()
-         pipedoc.execute()
-         print "error------la---" 
+#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
+#     try:  
+#     except Exception, e:
+#          traceback.print_exc()
+#          pipedoc.execute()
+#          print "error------la---" 
     return udata
  
 def subDocText(s):

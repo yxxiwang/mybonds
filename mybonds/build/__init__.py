@@ -40,8 +40,19 @@ def convUsrFllw():
         r.rename(key+":z",key) 
     return 0
 #     r.srem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
-def test():
-    print "hello world!"
+
+def makeDocDateCnt():
+    for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
+        beaconusr,beaconid = beaconstr.split("|-|")
+        print "proc %s:%s " %(beaconusr,beaconid)
+#         channelDocs(beaconusr,beaconid)
+        doc_cts_key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
+        doc_dcnt_key = "channel:"+beaconusr+":"+beaconid+":doc_dcnt"
+        doc_dnum_key = "channel:"+beaconusr+":"+beaconid+":doc_dnum"
+        for tms,docstr in r.zrevrangebyscore(doc_cts_key,0 -1,withscores=True):
+            tdate = dt.date.fromtimestamp(tms).strftime('%Y%m%d')
+            r.zadd(doc_dcnt_key,)
+            
     
 def reflect(functionname):
     function = globals()[functionname]

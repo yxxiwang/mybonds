@@ -886,7 +886,8 @@ def load_similars(request):
             udata["total"] = "0"  
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     else:#取某个灯塔的新闻
-        udata = buildBeaconData(beaconusr, beaconid,start=start ,end=num) 
+        udata = buildBeaconData(beaconusr, beaconid,start=start ,end=num)
+        r.hset("usr:"+username,beaconusr+":"+beaconid,time.time())
         if udata.has_key("docs"):
             udata["success"] = "true"
             udata["message"] = "success retrive data"
@@ -1270,9 +1271,10 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
     if beaconid != "":  
         udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=100) 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
+        r.hset("usr:"+username,beaconusr+":"+beaconid,time.time())#增加用户关于该频道的最后跟新时间
         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["docs"]))
     else:  
-        udata = getAllBeaconDocsByUser(username,newscnt=10)
+        udata = getAllBeaconDocsByUser(username,newscnt=5)
 #         udata["simdocs"]=udata.pop("docs") 
         
     return render_to_response(template_name, {

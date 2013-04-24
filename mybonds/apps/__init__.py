@@ -94,6 +94,10 @@ def getTime(tms):
 #     ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec)
     return "%s %s" %(tdate,ttime)
 
+def getUnixTimestamp(tstr):
+    """return unix timestamp input mustbe yyyymmdd"""
+    return time.mktime(dt.datetime.strptime(s, "%Y%m%d").timetuple())
+
 def subString(s, start=0,end=-1):
     us = unicode(s, 'utf-8')
     gs = us.encode('gb2312')

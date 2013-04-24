@@ -870,7 +870,8 @@ def load_similars(request):
      
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5") 
-    username = request.GET.get("u", getUserName(request))
+    username = getUserName(request)
+#     username = request.GET.get("u", getUserName(request))
     
     sim_lst=[]
     lst=[]
@@ -1243,6 +1244,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
         beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid+":fllw")
         beaobj["id"] = beaid
+        beaobj["new_cnt"] = getBeaconNewsCnt(username,beausr,beaid)
         if not beaobj.has_key("ttl"):#如果该灯塔已经被删除了(脏数据)
             continue
         myfllw_list.append(beaobj)
@@ -1253,6 +1255,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
 #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
         beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid+":fllw")
+        beaobj["new_cnt"] = getBeaconNewsCnt(username,beausr,beaid)
         beaobj["id"] = beaid
         if not beaobj.has_key("ttl"):#如果该灯塔已经被删除了(脏数据)
             continue

@@ -567,7 +567,20 @@ def getDataByUrl(urlstr,isservice=False):
         udata["tags"] = udata["tags"][0:40]
     return udata
 
-
+def getBeaconNewsCnt(username,beaconusr,beaconid):
+    last_touch_tms = r.hget("usr:"+username, beaconusr+":"+beaconid)
+    last_touch_tms = 0 if last_touch_tms is None else last_touch_tms
+    now_tms = time.time()
+    
+    if os.name =="posix":
+        last_touch_tms=last_touch_tms*1000
+        now_tms = now_tms*1000
+    print last_touch_tms
+    print time.time()
+    print r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
+    return r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
+    
+        
 def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     print "=getAllBeaconDocsByUser="+username
 #    hour_before=8
@@ -577,6 +590,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     lst=[]
     udata = {}
     docs = []
+#     newcnts = []
     
     for beaconstr in beacons:#取所有关注的灯塔的相关主题文档
         beaconusr,beaconid = beaconstr.split("|-|")
@@ -592,6 +606,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
         beaconname = "" if beaconname is None  else beaconname
         lst = r.zrevrange(key+":doc:tms",0,newscnt-1)
 #         sim_lst += lst
+        newcnt = getBeaconNewsCnt(username,beaconusr,beaconid)
         for docid in lst:
             doc = rdoc.hgetall("doc:" + docid)  
             if len(doc.keys()) == 0:
@@ -607,6 +622,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
             doc["beaconusr"] = beaconusr
             doc["beaconid"] = beaconid
             doc["beaconttl"] = beaconname 
+            doc["newscnt"] = newscnt 
             docs.append(doc) 
 #             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)
     udata["docs"] = docs
@@ -657,7 +673,11 @@ def refreshDocs(beaconusr, beaconid):
 #     if os.name =="nt":
 #         channel = channel.decode("utf8")
     page = 0
-    length=200
+    
+    if os.name =="posix":
+        length=200
+    else:
+        length = 20
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  

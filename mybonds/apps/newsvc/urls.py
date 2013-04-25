@@ -10,4 +10,3 @@ urlpatterns = patterns('newsvc.views',
     url(r'^removedocfromchannel/$', 'removeDocFromChannel', name="removeDocFromChannel"), 
     # upload lswdata 
 )
- 

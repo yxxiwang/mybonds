@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*- 
 from django.http import HttpResponse
 from django.template import Context, loader
-from django.template import RequestContext 
+from django.template import RequestContext
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect
-from django.http import HttpResponseNotFound  
+from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required, permission_required
+from django.template.defaultfilters import length
 
 from mybonds.apps.newspubfunc import *
+from newspubfunc import *
 from mybonds.apps.newsvc import *
 
 
@@ -133,7 +136,7 @@ def removeDocFromChannel(request):
         
     quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+to_unicode_or_bust(channel))
 #     urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(docid)
-#     pushQueue("removedoc", beaconusr, "removedoc",tag=channel, beaconid)
+    pushQueue("removedoc", beaconusr, "removedoc",tag=channel, similarid =beaconid)
     
     r.zrem(key+":doc:tms",docid)
     udata["message"]="success remove docid[%s] in channel" % docid

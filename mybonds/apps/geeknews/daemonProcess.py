@@ -64,11 +64,12 @@ class DaemonProcess(Daemon):
 					rt = lib.refreshDocs(username, beacon) 
 				elif qtype =="removedoc": 
 # 					urlstr = qinfo["url"]
-					key = "bmk:" + username + ":" + qinfo["docid"]
+					docid = qinfo["docid"]
+					key = "bmk:" + username + ":" + docid
 					channel = lib.r.hget(key,"ttl")
-					if os.name =="nt":
-						channel = channel.decode("utf8")
-					urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(qinfo["docid"])
+# 					if os.name =="nt":
+# 						channel = channel.decode("utf8")
+					urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" % docid
 					udata = lib.bench(loadFromUrl,parms=urlstr)
 					rt= WARNNING if udata=={} else SUCCESS
 					

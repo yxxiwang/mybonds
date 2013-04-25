@@ -577,6 +577,9 @@ def getBeaconNewsCnt(username,beaconusr,beaconid):
     if os.name =="posix":
         last_touch_tms = float(last_touch_tms)*1000
         now_tms = float(now_tms)*1000
+    else:
+        last_touch_tms = float(last_touch_tms)
+        now_tms = float(now_tms)
 #     print last_touch_tms
 #     print time.time()
 #     print r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)

@@ -66,7 +66,7 @@ def newsdetail(request):
 #         print rdoc.get("ftx:"+docid)
 #         ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
         if rtype =="string":
-            ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
+            ftx = " \r\n        ".join(json.loads(rdoc.get("ftx:"+docid)))
             doc["fulltext"] = list2dict([ftx],"txt")
         else:
             doc["fulltext"] = list2dict(json.loads(rdoc.get("ftx:"+docid)),"txt")
@@ -85,7 +85,7 @@ def newsdetail(request):
         if doc!=None and doc.has_key("fulltext"): 
             rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) # 这个必须要在后面那行前面....否则下次取的数据不对
             if rtype =="string":
-                ftx = " \r\n    ".join(doc["fulltext"])
+                ftx = " \r\n        ".join(doc["fulltext"])
                 doc["fulltext"] = list2dict([ftx],"txt")
             else:
                 doc["fulltext"] = list2dict(doc["fulltext"],"txt")

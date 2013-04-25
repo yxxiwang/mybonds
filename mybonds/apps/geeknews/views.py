@@ -782,13 +782,12 @@ def listbeacons_service(request):
         beaobj["isfllw"] = "true" 
         if not beaobj.has_key("ttl"):
             continue
-        if not beaconname=="":
-            if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询) 
-                beaconttl = beaobj["ttl"]
-                beaconname=to_unicode_or_bust(beaconname)
-                beaconttl=to_unicode_or_bust(beaconttl)  
-                if re.search(beaconname,beaconttl): 
-                    sharebeacon_list.append(beaobj)
+        if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询) 
+            beaconttl = beaobj["ttl"]
+            beaconname=to_unicode_or_bust(beaconname)
+            beaconttl=to_unicode_or_bust(beaconttl)  
+            if re.search(beaconname,beaconttl): 
+                sharebeacon_list.append(beaobj)
         else:
             sharebeacon_list.append(beaobj)
         
@@ -802,17 +801,16 @@ def listbeacons_service(request):
         beaobj["isfllw"] = "false"
         if not beaobj.has_key("ttl"):
             continue
-        if not beaconname=="":
-            if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询) 
-                beaconttl = beaobj["ttl"] 
+        if not beaconname=="":#根据beaconid取所有同名的灯塔(如果是查询)  
+            beaconttl = beaobj["ttl"] 
 #                 print isinstance( beaconname, unicode )
 #                 print isinstance( beaconttl, unicode )
-                beaconname=to_unicode_or_bust(beaconname)
-                beaconttl=to_unicode_or_bust(beaconttl) 
+            beaconname=to_unicode_or_bust(beaconname)
+            beaconttl=to_unicode_or_bust(beaconttl) 
 #                 print beaconname.encode("gbk"),":",beaconttl.encode("gbk")
-                if re.search(beaconname,beaconttl):
+            if re.search(beaconname,beaconttl):
 #                     print beaconname,"==",beaconttl
-                    sharebeacon_list.append(beaobj)
+                sharebeacon_list.append(beaobj)
         else:
             sharebeacon_list.append(beaobj)
 #         if r.sismember("usr:"+username+":fllw",beaconstr):#频道已经被该用户关注

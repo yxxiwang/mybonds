@@ -25,7 +25,7 @@ class DaemonProcess(Daemon):
 		while True:
 # 			sys.stdout.write("=run====\n")
 			# retrive
- 			for qtype in ("sendemail","beacon"):
+ 			for qtype in ("sendemail","beacon","removedoc"):
  				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
  					qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
  					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
@@ -51,17 +51,27 @@ class DaemonProcess(Daemon):
 				username = qinfo["usr"]
 				otype = qinfo["o"]
 				url = qinfo["url"]
-				if qtype == "tag":
-					tag = qinfo["tag"]
-					rt = lib.saveTagdoc(username, otype, tag,True) 
+# 				if qtype == "tag":
+# 					tag = qinfo["tag"]
+# 					rt = lib.saveTagdoc(username, otype, tag,True) 
 # 				elif qtype =="navtag": 
 # 					navtag = qinfo["navtag"]
 # 					rt = lib.saveTagdoc(username, otype, navtag,True) 
-# 				elif qtype =="read": 
-# 					rt = lib.requestUrl(url)
+ 				if qtype =="read": 
+ 					rt = lib.requestUrl(url)
 				elif qtype =="beacon": 
 					beacon = qinfo["beacon"]
 					rt = lib.refreshDocs(username, beacon) 
+				elif qtype =="removedoc": 
+# 					urlstr = qinfo["url"]
+					key = "bmk:" + username + ":" + qinfo["docid"]
+					channel = lib.r.hget(key,"ttl")
+					if os.name =="nt":
+						channel = channel.decode("utf8")
+					urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(qinfo["docid"])
+					udata = lib.bench(loadFromUrl,parms=urlstr)
+					rt= WARNNING if udata=={} else SUCCESS
+					
 				elif qtype =="sendemail":
 					if otype=="bybeacon":
 						hourbefore = qinfo["sendemail"]
@@ -107,7 +117,7 @@ def runserver(daemon):
 	print "-------is running----------"
 	while True: 
 		qtype = "retirveRCM" 
-		for qtype in ("sendemail","beacon"):
+		for qtype in ("sendemail","beacon","removedoc"):
 			for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
 				qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
 				print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)

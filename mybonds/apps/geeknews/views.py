@@ -14,10 +14,13 @@ import redis
 import numpy
 from django.core import urlresolvers
 from django.contrib.auth.decorators import login_required, permission_required
-from mybonds.apps.geeknews import *
 #import mybonds.apps.geeknews.daemonProcess as daemonProcess
 from django.template.defaultfilters import length
-   
+
+from mybonds.apps.newspubfunc import *
+from mybonds.apps.geeknews import *
+
+
 def index(request): 
     return HttpResponseRedirect("/news/beaconnews/") 
     # latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
@@ -779,7 +782,15 @@ def listbeacons_service(request):
         beaobj["isfllw"] = "true" 
         if not beaobj.has_key("ttl"):
             continue
-        sharebeacon_list.append(beaobj)
+        if not beaconname=="":
+            if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询) 
+                beaconttl = beaobj["ttl"]
+                beaconname=to_unicode_or_bust(beaconname)
+                beaconttl=to_unicode_or_bust(beaconttl)  
+                if re.search(beaconname,beaconttl): 
+                    sharebeacon_list.append(beaobj)
+        else:
+            sharebeacon_list.append(beaobj)
         
     sharebeacons =  listsub(sharebeacons,mybeacons)
     for beaconstr in sharebeacons:
@@ -791,12 +802,16 @@ def listbeacons_service(request):
         beaobj["isfllw"] = "false"
         if not beaobj.has_key("ttl"):
             continue
-        if not beaconname=="": 
+        if not beaconname=="":
             if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询) 
                 beaconttl = beaobj["ttl"] 
+#                 print isinstance( beaconname, unicode )
+#                 print isinstance( beaconttl, unicode )
                 beaconname=to_unicode_or_bust(beaconname)
                 beaconttl=to_unicode_or_bust(beaconttl) 
+#                 print beaconname.encode("gbk"),":",beaconttl.encode("gbk")
                 if re.search(beaconname,beaconttl):
+#                     print beaconname,"==",beaconttl
                     sharebeacon_list.append(beaobj)
         else:
             sharebeacon_list.append(beaobj)

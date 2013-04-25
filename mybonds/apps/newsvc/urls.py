@@ -1,4 +1,5 @@
-# coding: utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*- 
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('newsvc.views',
@@ -9,7 +10,4 @@ urlpatterns = patterns('newsvc.views',
     url(r'^removedocfromchannel/$', 'removeDocFromChannel', name="removeDocFromChannel"), 
     # upload lswdata 
 )
-
-urlpatterns += patterns('',
-#    url(r'^lswdata/gateway/', 'lswdata.amfgateway.appGateway',name='lswdata_gate'), 
-)
+ 

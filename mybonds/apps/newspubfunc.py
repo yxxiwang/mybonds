@@ -150,3 +150,40 @@ def getchannelByid(beaconusr,beaconid):
     return r.hget("bmk:" + beaconusr + ":" + beaconid,"ttl") 
     # if r.exists("bmk:" + beaconusr + ":" + beaconid) else ""
 
+def pushQueue(qtype, username, otype, tag=None, similarid=None):
+#    if isinstance(username, unicode): 
+#        print "--pushQueue-[qtype=%s;username=%s;otype=%s;]" % (qtype, username, otype)
+#    else:
+#        print "--pushQueue-[qtype=%s;username=%s;otype=%s;]" % (qtype, username.decode("utf8"), otype)
+    qobj = {}
+    qobj["usr"] = username
+    qobj["o"] = otype
+    qobj["tms"] = time.time()
+    qobj["type"] = qtype 
+#     if qtype in ["tag", "navtag"]:
+#         if isinstance(tag, unicode): 
+#             urlstr = "http://www.gxdx168.com/research/svc?u=%s&o=%s&tag=%s" % (username, getOtype(otype), tag)
+#         else:
+#             urlstr = "http://http://www.gxdx168.com.com/research/svc?u=%s&o=%s&tag=%s" % (username, getOtype(otype), tag.decode("utf8"))
+#         qobj[qtype] = tag 
+#     elif qtype in ["ppl", "rdd", "rcm", "nav"]:
+#         urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&o=" + getOtype(otype)
+    if qtype == "read":
+        urlstr = "http://www.gxdx168.com/research?u=" + username + "&likeid=" + similarid
+    elif qtype == "beacon":
+        urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
+        qobj[qtype] = tag 
+    elif qtype == "sendemail":
+        urlstr = "http://www.gxdx168.com/research?u=" + username + "&docid=" + similarid
+        qobj["docid"] = similarid
+        qobj[qtype] = tag 
+    elif qtype == "removedoc":
+        urlstr="http://www.gxdx168.com/research/svc?u="+tag+"&o=2&likeid=-%s" %(similarid)
+        qobj["docid"] = similarid
+        qobj[qtype] = tag 
+
+    qobj["url"] = urlstr
+    qobj["id"] = getHashid(urlstr)
+    r.lpush("queue:" + qtype, json.dumps(qobj))
+    
+

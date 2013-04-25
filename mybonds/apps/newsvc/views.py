@@ -9,6 +9,7 @@ from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required, permission_required
 
 from mybonds.apps.newspubfunc import *
+from mybonds.apps.newsvc import *
 
 
 def index(request):     
@@ -131,16 +132,20 @@ def removeDocFromChannel(request):
         channel = channel.decode("utf8")
         
     quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+to_unicode_or_bust(channel))
-        
-    urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(docid,)
-    udata = bench(loadFromUrl,parms=urlstr)
-    if udata=={}: 
-        udata["message"]="somethings error occured docid[%s] in channel" % docid
-        udata["success"] = "false"
-    else:
-        udata["message"]="success remove docid[%s] in channel" % docid
-        udata["success"] = "true"
-        r.zrem(key+":doc:tms",docid)
+#     urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(docid)
+#     pushQueue("removedoc", beaconusr, "removedoc",tag=channel, beaconid)
+    
+    r.zrem(key+":doc:tms",docid)
+    udata["message"]="success remove docid[%s] in channel" % docid
+    udata["success"] = "true"
+# #     udata = bench(loadFromUrl,parms=urlstr)
+#     if udata=={}: 
+#         udata["message"]="somethings error occured docid[%s] in channel" % docid
+#         udata["success"] = "false"
+#     else:
+#         udata["message"]="success remove docid[%s] in channel" % docid
+#         udata["success"] = "true"
+#         r.zrem(key+":doc:tms",docid)
     
     if op == "page":
         return HttpResponseRedirect('/news/beaconnews/?orderby=tms&beaconid=%s&beaconusr=%s' %(beaconid,beaconusr))

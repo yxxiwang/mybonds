@@ -49,9 +49,13 @@ def makeDocDateCnt():
         doc_cts_key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
         doc_dcnt_key = "channel:"+beaconusr+":"+beaconid+":doc_dcnt"
         doc_dnum_key = "channel:"+beaconusr+":"+beaconid+":doc_dnum"
-        for tms,docstr in r.zrevrangebyscore(doc_cts_key,0 -1,withscores=True):
-            tdate = dt.date.fromtimestamp(tms).strftime('%Y%m%d')
-            r.zadd(doc_dcnt_key,)
+        for docstr,tms in r.zrevrangebyscore(doc_cts_key,(time.time()+8*3600)*1000,0,withscores=True):
+            print docstr,tms,doc_cts_key
+            tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
+            num = int(json.loads(docstr)["num"])
+            print "%s incr 1 ,num:%d" %(tdate,num)
+            r.hincrby(doc_dcnt_key,tdate,1)
+            r.hincrby(doc_dnum_key,tdate,num)
             
     
 def reflect(functionname):

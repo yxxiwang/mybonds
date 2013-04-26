@@ -49,6 +49,7 @@ def newsdetail(request):
     username = request.GET.get("u", getUserName(request)) 
     docid=request.GET.get("docid", "")
     rtype=request.GET.get("rtype", "string")
+    print request
     udata={}
     doc ={}
     if docid =="":
@@ -105,6 +106,7 @@ def newsdetail(request):
             doc["message"] = "can't retrive data" 
     return HttpResponse(json.dumps(doc), mimetype="application/json")
 
+@login_required
 def removeDocFromChannel(request):
     print "===removeDocFromChannel==="
 #     username = request.GET.get("u", getUserName(request))
@@ -158,9 +160,26 @@ def removeDocFromChannel(request):
     
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     
+def countDocs(request):
+    username = getUserName(request)
+    startdate = request.GET.get("startdate", "197906013") 
+    enddate = request.GET.get("enddate", "20571231")
+    beaconid = request.GET.get("beaconid", "")
+    beaconusr = request.GET.get("beaconusr", "")
+    withopynum = request.GET.get("copynum", "false")
     
     
-    
-    
+    starttms = getUnixTimestamp(startdate) *1000
+    endtms =  (getUnixTimestamp(startdate)+86400) * 1000
+    doc_cts_key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
+#     docstr_lst =r.zrevrangebyscore(doc_cts_key,endtms,starttms)
+#     cnt_lst = [ json.load(docstr)["num"] for docstr in docstr_lst ]
+#     import numpy as np
+#     sumcnt = np.sum(cnt_lst) 
+    cnt_lst=[]
+    for docstr,tms in r.zrevrangebyscore(doc_cts_key,endtms,starttms,withscores=True):
+        cntobj = json.loads(docstr)
+        
+
     
     

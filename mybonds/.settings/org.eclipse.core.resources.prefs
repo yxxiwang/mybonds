@@ -13,6 +13,7 @@ encoding//build/__init__.py=utf-8
 encoding//build/docmeta.py=utf-8
 encoding//build/load_channel.py=utf-8
 encoding//build/logexport.py=utf-8
+encoding//build/monte-carlo.py=utf-8
 encoding//build/testemail.py=utf-8
 encoding/<project>=UTF-8
 encoding/__init__.py=utf-8

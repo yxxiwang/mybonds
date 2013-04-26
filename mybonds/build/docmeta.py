@@ -44,8 +44,7 @@ def saveFulltextById(ids):
         if udata.has_key("docs"):
             fetchAndSave(udata["docs"])
         else:
-            print "====failed again..===="
-        
+            print "====failed again..====" 
     return udata
         
                 
@@ -112,12 +111,8 @@ def initProc(codes):
     
 
 if __name__ == "__main__":  
-    usage = """usage: %prog [options] {load|import|meta|print}
-               eg:  
-                   %prog meta -u=all -d=3 -m=model1 -s=all
-                   %prog print 
-            Try '%prog -h' or '%prog --help' for more information.
-            """
+    usage = """ eg: %s -c all -a 3600 -n 200
+            """  % sys.argv[0]
     parser = argparse.ArgumentParser(description='Process stock,bond,etc codes.')
     parser.add_argument("-c", "--code", default=[], type=str, nargs='+',
                     help="The code to be processed.")
@@ -148,6 +143,7 @@ if __name__ == "__main__":
 #     parser.print_usage()
     if len(sys.argv) < 2:  
         parser.print_usage()
+        print usage
         sys.exit(2)
     
     if options.verbose: 

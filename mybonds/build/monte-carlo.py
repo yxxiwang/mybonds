@@ -1,4 +1,5 @@
-from __future__ import division
+#!/usr/bin/python
+# -*- coding: utf-8 -*- 
 import math
 import random
 import redis

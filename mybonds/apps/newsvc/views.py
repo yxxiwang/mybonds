@@ -70,11 +70,12 @@ def newsdetail(request):
 #         print rdoc.get("ftx:"+docid)
 #         ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
         if rtype =="string":
-            ftx = "\u3000\r\n\u3000\u3000".join(json.loads(rdoc.get("ftx:"+docid)))
+            ftx = "\r\n".join(json.loads(rdoc.get("ftx:"+docid).replace(""", \"""",""", \"\\u3000""") ))
             doc["fulltext"] = list2dict([ftx],"txt")
         else:
             doc["fulltext"] = list2dict(json.loads(rdoc.get("ftx:"+docid)),"txt")
-        doc["text"] = subDocText(doc["text"])
+#         doc["text"] = subDocText(doc["text"])
+        doc["text"] = ""
         doc["copyNum"] = str(doc["copyNum"])
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 

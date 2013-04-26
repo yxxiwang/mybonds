@@ -52,12 +52,21 @@ def saveData(udata,key):
     print "%s===saveData===%s" %(getTime(time.time()),key)
     pipedoc = rdoc.pipeline()
     ids=""
+    doc_dcnt_key = key.replace("doc_cts",":doc_dcnt")
+    doc_dnum_key = key.replace("doc_cts",":doc_dnum") 
     for doc in udata["docs"]:
         if not doc["validTime"]:
             continue
         docid = getHashid(doc["url"])
         tms = doc["create_time"]
         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+        tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
+#         num = int(json.loads(docstr)["num"])
+        if not rdoc.exists("doc:"+docid):
+            print "%s incr 1 ,num:%d ,key: doc:%s" %(tdate,doc["copyNum"],docid)
+            r.hincrby(doc_dcnt_key,tdate,1)
+            r.hincrby(doc_dnum_key,tdate,doc["copyNum"])
+        
         if not rdoc.exists("ftx:"+docid): 
             ids+=docid+";"
         pipedoc.hset("doc:"+docid,"docid",docid)
@@ -67,7 +76,9 @@ def saveData(udata,key):
         pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
         pipedoc.hset("doc:"+docid,"url",doc["url"] )       
         pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-        pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
+        pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
+        
+        
         pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
     saveFulltextById(ids)
     pipedoc.execute()

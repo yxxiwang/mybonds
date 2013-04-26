@@ -51,6 +51,8 @@ def makeDocDateCnt():
         doc_dnum_key = "channel:"+beaconusr+":"+beaconid+":doc_dnum"
         for docstr,tms in r.zrevrangebyscore(doc_cts_key,(time.time()+8*3600)*1000,0,withscores=True):
             print docstr,tms,doc_cts_key
+            if tms==0:
+                continue
             tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
             num = int(json.loads(docstr)["num"])
             print "%s incr 1 ,num:%d" %(tdate,num)

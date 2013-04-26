@@ -70,7 +70,9 @@ def newsdetail(request):
 #         print rdoc.get("ftx:"+docid)
 #         ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
         if rtype =="string":
-            ftx = "\r\n".join(json.loads(rdoc.get("ftx:"+docid).replace(""", \"""",""", \"\\u3000\\u3000""") ))
+            #在每个段落之前插入两个中文全角空格: \u3000
+            txstr = rdoc.get("ftx:"+docid).replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")
+            ftx = "\r\n".join(json.loads(txstr))
             doc["fulltext"] = list2dict([ftx],"txt")
         else:
             doc["fulltext"] = list2dict(json.loads(rdoc.get("ftx:"+docid)),"txt")

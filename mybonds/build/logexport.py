@@ -13,8 +13,8 @@ logs = r.zrevrange("log",0,-1,withscores=True)
 #f = open("log.csv","w")
 infos = ""
 tms=time.time()
-tt = time.gmtime(tms)
-tdate = dt.date.fromtimestamp(tms).strftime('%Y%m%d')
+tt = time.gmtime(tms+8*3600)
+tdate = dt.date.fromtimestamp(tms+8*3600).strftime('%Y%m%d')
 ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec) 
 
 f = codecs.open( "log.csv"+tdate+"_"+ttime, "w")

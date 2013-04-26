@@ -15,9 +15,9 @@ infos = ""
 tms=time.time()
 tt = time.gmtime(tms+8*3600)
 tdate = dt.date.fromtimestamp(tms+8*3600).strftime('%Y%m%d')
-ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec) 
+ttime = str(tt.tm_hour)+"-"+str(tt.tm_min)+"-"+str(tt.tm_sec) 
 
-f = codecs.open( "log.csv"+tdate+"_"+ttime, "w")
+f = codecs.open( "log_"+tdate+"_"+ttime+".csv", "w")
 f.write( codecs.BOM_UTF8 )
 #f.write( unicodeString.encode( "utf-8" ) )
 for log,tms in logs:

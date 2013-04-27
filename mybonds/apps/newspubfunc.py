@@ -139,7 +139,7 @@ def subDocText(s):
         return s
     else:#否则开始进行截取
         slst=us.split(dot)
-        if len(slst[-1]) <35:#如果最后一段在"。"之后文本长度小于35,则截断之
+        if len(slst[-1]) <55:#如果最后一段在"。"之后文本长度小于35,则截断之
             return dot.join(slst[0:-1]+[""]).encode("utf8")
         else:#如果 最后一段文字数大于35个，则从尾部开始，截断到最近一个标点符合，包括，
             clst=slst[-1].split(comma)

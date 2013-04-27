@@ -726,7 +726,7 @@ def refreshBeacon(beaconusr, beaconid):
     else:
         print "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d" % dt
         
-def buildBeaconData(beaconusr, beaconid,start=0,end=-1):
+def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.exists(key):
         refreshBeacon(beaconusr, beaconid)
@@ -741,7 +741,8 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1):
             continue 
 #         if doc["validTime"]=="false" or not doc["validTime"]:
 #             continue 
-#         doc["tx"] = doc["text"]
+        if not isapi:
+            doc["tx"] = doc["text"]
         doc["text"] = subDocText(doc["text"])
         doc["copyNum"] = str(doc["copyNum"])
 #         doc["validTime"] = str(doc["validTime"])

@@ -900,7 +900,7 @@ def load_similars(request):
             udata["total"] = "0"  
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     else:#取某个灯塔的新闻
-        udata = buildBeaconData(beaconusr, beaconid,start=start ,end=num)
+        udata = buildBeaconData(beaconusr, beaconid,start=start ,end=num,isapi=True)
         r.hset("usr:"+username,beaconusr+":"+beaconid,time.time())
         if udata.has_key("docs"):
             udata["success"] = "true"

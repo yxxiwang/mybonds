@@ -49,7 +49,7 @@ def newsdetail(request):
     username = request.GET.get("u", getUserName(request)) 
     docid=request.GET.get("docid", "")
     rtype=request.GET.get("rtype", "string")
-    print request
+#     print request
     udata={}
     doc ={}
     if docid =="":

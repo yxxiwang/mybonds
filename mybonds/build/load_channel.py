@@ -43,7 +43,7 @@ def load_data(input):
         r.zadd("bmk:doc:share",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:byfllw",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:bynews",time.time(),usr+"|-|"+id)
-        r.sadd("usr:" + usr+":fllw",usr+"|-|"+id)
+        r.zadd("usr:" + usr+":fllw",time.time(),usr+"|-|"+id)
         beaobj = r.hset("bmk:" + usr + ":" + id,"id",id)
         beaobj = r.hset("bmk:" + usr + ":" + id,"ttl",name)
         beaobj = r.hset("bmk:" + usr + ":" + id,"desc",desc)

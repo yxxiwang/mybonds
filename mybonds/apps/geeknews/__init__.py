@@ -687,7 +687,7 @@ def refreshDocs(beaconusr, beaconid):
     if os.name =="posix":
         length=200
     else:
-        length = 20
+        length = 10
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
@@ -1076,12 +1076,12 @@ def saveDocsByUrl(urlstr):
             if doc is None: 
                 continue
             if doc["validTime"]=="false" or not doc["validTime"]:
-                continue 
+                continue
             docid = getHashid(doc["url"])  
             if not rdoc.exists("ftx:"+docid):
                 ids+=docid+";"
                 cnt = cnt+1
-                if cnt == 20:
+                if cnt == 10:
                     ids_lst.append(ids)
                     ids=""
                     cnt = 0
@@ -1099,8 +1099,11 @@ def saveDocsByUrl(urlstr):
             pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
             pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
 #             print ids
-        for tids in ids_lst:
-            saveFulltextById(tids)
+        if len(ids_lst) > 0:
+            for tids in ids_lst:
+                saveFulltextById(tids)
+        else:
+            saveFulltextById(ids)
         pipedoc.execute()
             
 #             for doc in udata["docs"]: 

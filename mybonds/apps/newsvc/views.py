@@ -144,6 +144,7 @@ def removeDocFromChannel(request):
     pushQueue("removedoc", beaconusr, "removedoc",tag=urllib2.quote(channel), similarid =docid)
     
     r.zrem(key+":doc:tms",docid)
+    rdoc.delete("ftx:"+docid)
     udata["message"]="success remove docid[%s] in channel" % docid
     udata["success"] = "true"
 # #     udata = bench(loadFromUrl,parms=urlstr)

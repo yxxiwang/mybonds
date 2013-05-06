@@ -141,7 +141,7 @@ def removeDocFromChannel(request):
         
     quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+to_unicode_or_bust(channel))
 #     urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(docid)
-    pushQueue("removedoc", beaconusr, "removedoc",tag=urllib2.quote(channel), similarid =beaconid)
+    pushQueue("removedoc", beaconusr, "removedoc",tag=urllib2.quote(channel), similarid =docid)
     
     r.zrem(key+":doc:tms",docid)
     udata["message"]="success remove docid[%s] in channel" % docid

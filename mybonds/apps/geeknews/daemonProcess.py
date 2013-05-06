@@ -63,14 +63,14 @@ class DaemonProcess(Daemon):
 					beacon = qinfo["beacon"]
 					rt = lib.refreshDocs(username, beacon) 
 				elif qtype =="removedoc": 
-# 					urlstr = qinfo["url"]
-					docid = qinfo["docid"]
-					key = "bmk:" + username + ":" + docid
-					channel = lib.r.hget(key,"ttl")
+#  					urlstr = qinfo["url"]
+# 					docid = qinfo["docid"]
+# 					key = "bmk:" + username + ":" + docid
+# 					channel = lib.r.hget(key,"ttl")
 # 					if os.name =="nt":
 # 						channel = channel.decode("utf8")
-					urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-"+docid
-					udata = lib.bench(loadFromUrl,parms=urlstr)
+# 					urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-"+docid
+					udata = lib.bench(loadFromUrl,parms=url)
 					rt= WARNNING if udata=={} else SUCCESS
 					
 				elif qtype =="sendemail":

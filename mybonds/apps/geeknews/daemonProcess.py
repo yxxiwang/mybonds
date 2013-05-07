@@ -35,7 +35,7 @@ class DaemonProcess(Daemon):
 			time.sleep(1)
 			
 #remove from class DaemonProcess		
-def retriveData(self, qtype):
+def retriveData(qtype):
 	qobj = lib.r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")
 	if qobj is None:
 		return

@@ -122,16 +122,19 @@ def runserver(daemon,type):
 	while True: 
 		qtype = "retirveRCM" 
 		if type != "all":
+			for i in range(lib.r.llen("queue:" + type+":processing")):#先处理遗留的队列
+				qobj=lib.r.rpoplpush( "queue:" + type + ":processing","queue:" + type)
+				print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,type,type)
 			for i in range(lib.r.llen("queue:" + type)): 
 		 	 	daemon.retriveData(type) 
-		
-		for qtype in ("sendemail","removedoc","beacon"):
-			for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
-				qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
-				print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
-				
-		 	for i in range(lib.r.llen("queue:" + qtype)): 
-		 	 	daemon.retriveData(qtype) 
+		else:
+			for qtype in ("sendemail","removedoc","beacon"):
+				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
+					qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
+					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
+					
+			 	for i in range(lib.r.llen("queue:" + qtype)): 
+			 	 	daemon.retriveData(qtype) 
 		time.sleep(1)
 		
 def print_info(op,pid,stdout,stderr): 

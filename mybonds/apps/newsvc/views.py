@@ -145,6 +145,7 @@ def removeDocFromChannel(request):
     
     r.zrem(key+":doc:tms",docid)
     rdoc.delete("ftx:"+docid)
+    rdoc.delete("doc:"+docid)
     udata["message"]="success remove docid[%s] in channel" % docid
     udata["success"] = "true"
 # #     udata = bench(loadFromUrl,parms=urlstr)

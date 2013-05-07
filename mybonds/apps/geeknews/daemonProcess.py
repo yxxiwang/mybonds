@@ -173,7 +173,7 @@ if __name__ == "__main__":
 			print_info("run",pid,stdout,stderr)	
 			if len(sys.argv) >= 3:
 				type =sys.argv[2]
-			runserver(daemon,type)
+			runserver(type)
 		else:
 			print "Unknown command"
 			sys.exit(2)

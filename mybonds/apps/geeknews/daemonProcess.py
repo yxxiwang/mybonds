@@ -36,6 +36,9 @@ class DaemonProcess(Daemon):
 			
 	def retriveData(self, qtype):
 		qobj = lib.r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")
+		if qobj is None:
+			return
+		
 		qinfo = {}
 		tag = ""
 		url=""
@@ -43,26 +46,26 @@ class DaemonProcess(Daemon):
 # 		print "retriveData...qtype is :"+qtype
 		start = time.clock()  
 		try:
-			if not qobj is None:
+# 			if not qobj is None:
 			# 	    	urlstr = qobj["url"] 
-				sys.stdout.write("processing data:\n")
-				sys.stdout.write(qobj)
-				qinfo = json.loads(qobj) 
-				username = qinfo["usr"]
-				otype = qinfo["o"]
-				url = qinfo["url"]
+			sys.stdout.write("processing data:\n")
+			sys.stdout.write(qobj)
+			qinfo = json.loads(qobj) 
+			username = qinfo["usr"]
+			otype = qinfo["o"]
+			url = qinfo["url"]
 # 				if qtype == "tag":
 # 					tag = qinfo["tag"]
 # 					rt = lib.saveTagdoc(username, otype, tag,True) 
 # 				elif qtype =="navtag": 
 # 					navtag = qinfo["navtag"]
 # 					rt = lib.saveTagdoc(username, otype, navtag,True) 
- 				if qtype =="read": 
- 					rt = lib.requestUrl(url)
-				elif qtype =="beacon": 
-					beacon = qinfo["beacon"]
-					rt = lib.refreshDocs(username, beacon) 
-				elif qtype =="removedoc": 
+			if qtype =="read": 
+					rt = lib.requestUrl(url)
+			elif qtype =="beacon": 
+				beacon = qinfo["beacon"]
+				rt = lib.refreshDocs(username, beacon) 
+			elif qtype =="removedoc": 
 #  					urlstr = qinfo["url"]
 # 					docid = qinfo["docid"]
 # 					key = "bmk:" + username + ":" + docid
@@ -70,20 +73,20 @@ class DaemonProcess(Daemon):
 # 					if os.name =="nt":
 # 						channel = channel.decode("utf8")
 # 					urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-"+docid
-					udata = lib.bench(loadFromUrl,parms=url)
-					rt= WARNNING if udata=={} else SUCCESS
-					
-				elif qtype =="sendemail":
-					if otype=="bybeacon":
-						hourbefore = qinfo["sendemail"]
-						rt = lib.sendEmailFromUserBeacon(username,hourbefore,otype)
-					else:
-						email = qinfo["sendemail"]
-						rt = lib.sendemailbydocid(email,qinfo["docid"],otype)
+				udata = lib.bench(loadFromUrl,parms=url)
+				rt= WARNNING if udata=={} else SUCCESS
+				
+			elif qtype =="sendemail":
+				if otype=="bybeacon":
+					hourbefore = qinfo["sendemail"]
+					rt = lib.sendEmailFromUserBeacon(username,hourbefore,otype)
 				else:
+					email = qinfo["sendemail"]
+					rt = lib.sendemailbydocid(email,qinfo["docid"],otype)
+			else:
 # 					rt = lib.saveDocs(username, otype)
-					print "error qtype %s " % qtype
-					rt = 0 
+				print "error qtype %s " % qtype
+				rt = 0 
 # 			else: 
 # 				sys.stdout.write("is nothing to do....\n") 
 		except:
@@ -114,10 +117,14 @@ class DaemonProcess(Daemon):
 		print "retriveData(%s) has taken on %s;and rt is %d" % (url,str(diff),rt) 
 		return rt
 			
-def runserver(daemon):
+def runserver(daemon,type):
 	print "-------is running----------"
 	while True: 
 		qtype = "retirveRCM" 
+		if type != "all":
+			for i in range(lib.r.llen("queue:" + type)): 
+		 	 	daemon.retriveData(type) 
+		
 		for qtype in ("sendemail","beacon","removedoc"):
 			for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
 				qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
@@ -139,6 +146,7 @@ if __name__ == "__main__":
 	stdout = '/root/mybonds/daemon.out'
 	stderr = '/root/mybonds/daemon.error'
 	pid = '/tmp/daemon.pid'
+	type = "all"
 #	daemon = DaemonProcess(pid, stdout=stdout, stderr=stderr)
 	if len(sys.argv) > 2:
 		pid =sys.argv[2]
@@ -158,8 +166,9 @@ if __name__ == "__main__":
 			print_info("restart",pid,stdout,stderr)		
 			daemon.restart()
 		elif 'run' == sys.argv[1]:
-			print_info("run",pid,stdout,stderr)			
-			runserver(daemon)
+			print_info("run",pid,stdout,stderr)		
+			type =sys.argv[2]	
+			runserver(daemon,type)
 		else:
 			print "Unknown command"
 			sys.exit(2)

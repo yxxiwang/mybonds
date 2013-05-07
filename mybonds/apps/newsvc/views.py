@@ -143,6 +143,8 @@ def removeDocFromChannel(request):
 #     urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(docid)
     pushQueue("removedoc", beaconusr, "removedoc",tag=urllib2.quote(channel), similarid =docid)
     
+    r.hincrby(key,"removecnt",1)
+    
     r.zrem(key+":doc:tms",docid)
     rdoc.delete("ftx:"+docid)
     rdoc.delete("doc:"+docid)

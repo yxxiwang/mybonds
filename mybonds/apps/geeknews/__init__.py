@@ -17,7 +17,9 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_EXPIRETIME = 186400
 DOC_EXPIRETIME = 86400*3
-KEY_UPTIME = 300
+KEY_UPTIME = 600
+REMOVE_KEYUPTIME = 1800
+REMOVE_CNT = 3
 QUANTITY = 1500
 QUANTITY_DURATION = 300
 
@@ -673,9 +675,16 @@ def refreshDocs(beaconusr, beaconid):
     if not r.exists(key):
         print "attembrough: i have nothing to do .key:%s is not exists " % key
         return -1
+    removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     if r.hexists(key, "last_update"):#
         dt = timeDiff(r.hget(key, "last_update"), time.time())
-        if dt < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
+        if removecnt > REMOVE_CNT:#如果删除新闻数目大于指定值 ,按照 REMOVE_KEYUPTIME 判断似乎否需要刷新
+            if dt < REMOVE_KEYUPTIME :
+                print "attembrough: i have nothing to do .bcz current last_update diff is %d second,and removecnt is %d " % (dt,removecnt)
+                return 0
+            else:
+                print "attembrough: needs refresh data ... diff is %d second,and removecnt is %d " % (dt,removecnt)
+        elif dt < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
             print "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % dt
             return 0
             
@@ -683,7 +692,6 @@ def refreshDocs(beaconusr, beaconid):
 #     if os.name =="nt":
 #         channel = channel.decode("utf8")
     page = 0
-    
     if os.name =="posix":
         length=300
     else:
@@ -709,6 +717,7 @@ def refreshBeacon(beaconusr, beaconid):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
     key = "bmk:" + beaconusr + ":" + beaconid
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
+    removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
         print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 
         if r.exists(key):
@@ -719,6 +728,10 @@ def refreshBeacon(beaconusr, beaconid):
             
     elif not r.exists("bmk:"+beaconusr+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
         refreshDocs(beaconusr, beaconid)
+    elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
+        print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt)
+        r.hset(key, "last_touch", time.time())  # 更新本操作时间  
+        pushQueue("beacon", beaconusr, "beacon", beaconid)
     elif dt > KEY_UPTIME:#如果上次更新时间过久,则重新刷新数据
         print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt)
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  

@@ -34,38 +34,39 @@ class DaemonProcess(Daemon):
  			 	 	self.retriveData(qtype) 
 			time.sleep(1)
 			
-	def retriveData(self, qtype):
-		qobj = lib.r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")
-		if qobj is None:
-			return
-		
-		qinfo = {}
-		tag = ""
-		url=""
-		rt = 6
+#remove from class DaemonProcess		
+def retriveData(self, qtype):
+	qobj = lib.r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")
+	if qobj is None:
+		return
+	
+	qinfo = {}
+	tag = ""
+	url=""
+	rt = 6
 # 		print "retriveData...qtype is :"+qtype
-		start = time.clock()  
-		try:
+	start = time.clock()  
+	try:
 # 			if not qobj is None:
-			# 	    	urlstr = qobj["url"] 
-			sys.stdout.write("processing data:\n")
-			sys.stdout.write(qobj)
-			qinfo = json.loads(qobj) 
-			username = qinfo["usr"]
-			otype = qinfo["o"]
-			url = qinfo["url"]
+		# 	    	urlstr = qobj["url"] 
+		sys.stdout.write("processing data:\n")
+		sys.stdout.write(qobj)
+		qinfo = json.loads(qobj) 
+		username = qinfo["usr"]
+		otype = qinfo["o"]
+		url = qinfo["url"]
 # 				if qtype == "tag":
 # 					tag = qinfo["tag"]
 # 					rt = lib.saveTagdoc(username, otype, tag,True) 
 # 				elif qtype =="navtag": 
 # 					navtag = qinfo["navtag"]
 # 					rt = lib.saveTagdoc(username, otype, navtag,True) 
-			if qtype =="read": 
-					rt = lib.requestUrl(url)
-			elif qtype =="beacon": 
-				beacon = qinfo["beacon"]
-				rt = lib.refreshDocs(username, beacon) 
-			elif qtype =="removedoc": 
+		if qtype =="read": 
+				rt = lib.requestUrl(url)
+		elif qtype =="beacon": 
+			beacon = qinfo["beacon"]
+			rt = lib.refreshDocs(username, beacon) 
+		elif qtype =="removedoc": 
 #  					urlstr = qinfo["url"]
 # 					docid = qinfo["docid"]
 # 					key = "bmk:" + username + ":" + docid
@@ -73,51 +74,51 @@ class DaemonProcess(Daemon):
 # 					if os.name =="nt":
 # 						channel = channel.decode("utf8")
 # 					urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-"+docid
-				udata = lib.bench(loadFromUrl,parms=url)
-				rt= WARNNING if udata=={} else SUCCESS
-				
-			elif qtype =="sendemail":
-				if otype=="bybeacon":
-					hourbefore = qinfo["sendemail"]
-					rt = lib.sendEmailFromUserBeacon(username,hourbefore,otype)
-				else:
-					email = qinfo["sendemail"]
-					rt = lib.sendemailbydocid(email,qinfo["docid"],otype)
+			udata = lib.bench(loadFromUrl,parms=url)
+			rt= WARNNING if udata=={} else SUCCESS
+			
+		elif qtype =="sendemail":
+			if otype=="bybeacon":
+				hourbefore = qinfo["sendemail"]
+				rt = lib.sendEmailFromUserBeacon(username,hourbefore,otype)
 			else:
+				email = qinfo["sendemail"]
+				rt = lib.sendemailbydocid(email,qinfo["docid"],otype)
+		else:
 # 					rt = lib.saveDocs(username, otype)
-				print "error qtype %s " % qtype
-				rt = 0 
+			print "error qtype %s " % qtype
+			rt = 0 
 # 			else:
 # 				sys.stdout.write("is nothing to do....\n") 
-		except:
-			traceback.print_exc()
+	except:
+		traceback.print_exc()
 #			traceback.print_exc(file=sys.stdout)
 #			exc_type, exc_value, exc_traceback = sys.exc_info()
 #			traceback.print_exception(exc_type, exc_value, exc_traceback,
 #                              limit=2)
-		if rt == SUCCESS: # SUCCESS=0
-			qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype + ":done")
-		elif rt == SYSERROR: # SYSERROR=-1
- 			qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype + ":error")
-		else:# COMMUNICATERROR=6 ,WARNNING=8
+	if rt == SUCCESS: # SUCCESS=0
+		qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype + ":done")
+	elif rt == SYSERROR: # SYSERROR=-1
+			qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype + ":error")
+	else:# COMMUNICATERROR=6 ,WARNNING=8
 # 			qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype)
-			qobj = lib.r.rpop("queue:" + qtype + ":processing")
-			qinfo = json.loads(qobj)
-			cnt = qinfo["cnt"] if qinfo.has_key("cnt") else 0
-			qinfo["cnt"]=cnt+1
-			if qinfo["cnt"] < RETRYCOUNT:
-				print "process it again"
-				lib.r.lpush("queue:" + qtype,json.dumps(qinfo))
-			else:
-				print "it's rearch the maxsim count of RETRYCOUNT"
-				lib.r.lpush("queue:" + qtype+":error",json.dumps(qinfo)) 
+		qobj = lib.r.rpop("queue:" + qtype + ":processing")
+		qinfo = json.loads(qobj)
+		cnt = qinfo["cnt"] if qinfo.has_key("cnt") else 0
+		qinfo["cnt"]=cnt+1
+		if qinfo["cnt"] < RETRYCOUNT:
+			print "process it again"
+			lib.r.lpush("queue:" + qtype,json.dumps(qinfo))
+		else:
+			print "it's rearch the maxsim count of RETRYCOUNT"
+			lib.r.lpush("queue:" + qtype+":error",json.dumps(qinfo)) 
+		
+	urlstop = time.clock()
+	diff = urlstop - start  
+	print "retriveData(%s) has taken on %s;and rt is %d" % (url,str(diff),rt) 
+	return rt
 			
-		urlstop = time.clock()
-		diff = urlstop - start  
-		print "retriveData(%s) has taken on %s;and rt is %d" % (url,str(diff),rt) 
-		return rt
-			
-def runserver(daemon,type):
+def runserver(type):
 	print "-------is running----------"
 	while True: 
 		qtype = "retirveRCM" 
@@ -126,7 +127,7 @@ def runserver(daemon,type):
 				qobj=lib.r.rpoplpush( "queue:" + type + ":processing","queue:" + type)
 				print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,type,type)
 			for i in range(lib.r.llen("queue:" + type)): 
-		 	 	daemon.retriveData(type) 
+		 	 	retriveData(type) 
 		else:
 			for qtype in ("sendemail","removedoc","beacon"):
 				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
@@ -134,7 +135,7 @@ def runserver(daemon,type):
 					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
 					
 			 	for i in range(lib.r.llen("queue:" + qtype)): 
-			 	 	daemon.retriveData(qtype) 
+			 	 	retriveData(qtype) 
 		time.sleep(1)
 		
 def print_info(op,pid,stdout,stderr): 
@@ -151,7 +152,7 @@ if __name__ == "__main__":
 	pid = '/tmp/daemon.pid'
 	type = "all"
 #	daemon = DaemonProcess(pid, stdout=stdout, stderr=stderr)
-	if len(sys.argv) > 2:
+	if len(sys.argv) > 4:
 		pid =sys.argv[2]
 		stdout =sys.argv[3]
 		stderr =sys.argv[4]

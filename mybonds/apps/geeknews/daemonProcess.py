@@ -25,7 +25,7 @@ class DaemonProcess(Daemon):
 		while True:
 # 			sys.stdout.write("=run====\n")
 			# retrive
- 			for qtype in ("sendemail","beacon","removedoc"):
+ 			for qtype in ("sendemail","removedoc","beacon"):
  				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
  					qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
  					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
@@ -87,7 +87,7 @@ class DaemonProcess(Daemon):
 # 					rt = lib.saveDocs(username, otype)
 				print "error qtype %s " % qtype
 				rt = 0 
-# 			else: 
+# 			else:
 # 				sys.stdout.write("is nothing to do....\n") 
 		except:
 			traceback.print_exc()
@@ -125,7 +125,7 @@ def runserver(daemon,type):
 			for i in range(lib.r.llen("queue:" + type)): 
 		 	 	daemon.retriveData(type) 
 		
-		for qtype in ("sendemail","beacon","removedoc"):
+		for qtype in ("sendemail","removedoc","beacon"):
 			for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
 				qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
 				print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)

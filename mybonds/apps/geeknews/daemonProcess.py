@@ -166,8 +166,9 @@ if __name__ == "__main__":
 			print_info("restart",pid,stdout,stderr)		
 			daemon.restart()
 		elif 'run' == sys.argv[1]:
-			print_info("run",pid,stdout,stderr)		
-			type =sys.argv[2]	
+			print_info("run",pid,stdout,stderr)	
+			if len(sys.argv) >= 3:
+				type =sys.argv[2]
 			runserver(daemon,type)
 		else:
 			print "Unknown command"

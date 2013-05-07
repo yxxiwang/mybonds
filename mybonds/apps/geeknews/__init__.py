@@ -685,7 +685,7 @@ def refreshDocs(beaconusr, beaconid):
     page = 0
     
     if os.name =="posix":
-        length=200
+        length=300
     else:
         length = 10
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)

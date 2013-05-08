@@ -21,8 +21,9 @@
             {% for beacon in beacons %}
               <div class="tag-item span12"  style="margin-left:0px;">
                 <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-info">{{beacon.ttl}}
-                <!--span class="badge ">{{beacon.cnt}}</span></span>
-                <a class='close' data-dismiss='tag-item' style="float: none;">×</a-->
+                <!--span class="badge ">{{beacon.cnt}}</span-->
+                </span>
+                <!--a class='close' data-dismiss='tag-item' style="float: none;">×</a-->
                 <a class="close" data-toggle="modal" href="#myModal"  style="float: none;" data-keyboard="true" data-backdrop="true" >×</a>
               </div>  
             {% endfor %}
@@ -134,9 +135,9 @@
       // $tag_list_box.isotope('remove', $(this).parent()); 
       // $(this).parent().remove(); 
       // alert()
-      delete_beacon = $(this).parent().parent().find('span').text();
-      delete_id = $(this).parent().parent().find('span').attr('id');
-      beaconusr = $(this).parent().parent().find('span').attr('name');
+      delete_beacon = $(this).parent().find('span').text();
+      delete_id = $(this).parent().find('span').attr('id');
+      beaconusr = $(this).parent().find('span').attr('name');
       // alert($(this).html());
       $('#myModal').on('show', function () {
         $('#myModal').find('#myModalLabel').text("删除灯塔: "+delete_beacon);

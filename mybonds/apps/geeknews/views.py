@@ -971,6 +971,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         return HttpResponseRedirect("/news/beaconlist/")
     username = getUserName(request)
     
+    beaconname = beaconname.replace(" ","")
     key = "bmk:"+beaconkey
     if beaconkey == "":# new add 
         beaconid = getHashid(beaconname)
@@ -980,8 +981,8 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.hset(key, "desc", desc)
         r.hset(key, "crt_usr", beaconusr)
         r.hset(key, "crt_tms", time.time())
-        r.hset(key, "last_touch",time.time()) 
-        r.hset(key, "last_update",time.time()) 
+        r.hset(key, "last_touch",0) 
+        r.hset(key, "last_update",0) 
         r.hset(key, "cnt",0) 
         
         r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)

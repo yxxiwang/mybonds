@@ -180,6 +180,7 @@
       alert("灯塔名称不能为空"); 
       return ;
     }
+    // alert('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beaconusr='+beacon_usr);
     window.location.href = encodeURI('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beaconusr='+beacon_usr);
     // $('#beacon_id').val("");
     // $('#beacon_name').val("");
@@ -197,7 +198,7 @@
       return ;
     }
     
-    alert('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key);
+    // alert('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key);
     window.location.href = encodeURI('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key);
   });
 

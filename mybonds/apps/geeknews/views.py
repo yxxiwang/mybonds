@@ -974,7 +974,7 @@ def beaconsave(request, template_name="beacon_list.html"):
     key = "bmk:"+beaconkey
     if beaconkey == "":# new add 
         beaconid = getHashid(beaconname)
-    #     key = "bmk:" + beaconusr + ":" + beaconid
+        key = "bmk:" + beaconusr + ":" + beaconid
         r.hset(key, "id", beaconid)
         r.hset(key, "ttl", beaconname)
         r.hset(key, "desc", desc)

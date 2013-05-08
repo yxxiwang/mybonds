@@ -725,8 +725,9 @@ def refreshBeacon(beaconusr, beaconid):
     if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
         print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 
         if r.exists(key):
-            refreshDocs(beaconusr, beaconid)
-            r.hset(key, "last_touch", time.time())  # 更新本操作时间  
+#             refreshDocs(beaconusr, beaconid)
+#             r.hset(key, "last_touch", time.time())  # 更新本操作时间  
+            pushQueue("beacon", beaconusr, "beacon", beaconid)
         else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             print key + "is deleted via front  so we ignore it..." 
             

@@ -816,38 +816,22 @@ def getNavUrl(tag):
     urlstr = r.hget("navi", tag) 
     return urlstr if urlstr is not None else tag
 
-def beaconChangeName(username, srcid, dstid): 
-    srckey = "bmk:" + username + ":" + srcid
-    dstkey = "bmk:" + username + ":" + dstid
+def beaconChangeName(key, beaconusr, beaconid): 
+    srckey = "bmk:" + key
+    dstkey = "bmk:" + beaconusr + ":" + beaconid
     if r.exists(srckey):
         r.rename(srckey, dstkey)
-    r.zrem("bmk:doc:share", username + "|-|" + srcid)
-    r.zadd("bmk:doc:share", time.time(), username + "|-|" + dstid) 
-    r.zrem("bmk:doc:share:byfllw", username + "|-|" + srcid)
-    r.zadd("bmk:doc:share:byfllw", time.time(), username + "|-|" + dstid) 
-    r.zrem("bmk:doc:share:bynews", username + "|-|" + srcid)
-    r.zadd("bmk:doc:share:bynews", time.time(), username + "|-|" + dstid) 
-    r.srem("bmk:" + username, srcid)
-    r.sadd("bmk:" + username, dstid)
+    r.zrem("bmk:doc:share", key.replace(":","|-|"))
+    r.zadd("bmk:doc:share", time.time(), beaconusr + "|-|" + beaconid)
+    r.zrem("bmk:doc:share:byfllw", key.replace(":","|-|"))
+    r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
+    r.zrem("bmk:doc:share:bynews", key.replace(":","|-|"))
+    r.zadd("bmk:doc:share:bynews", time.time(), beaconusr + "|-|" + beaconid)
+    r.zrem("usr:"+key.split(":")[0]+":fllw", key.replace(":","|-|"))
+    r.zadd("usr:"+beaconusr+":fllw", time.time(), beaconusr + "|-|" + beaconid)
     
-    if r.exists(srckey + ":doc"):
-        r.rename(srckey + ":doc", dstkey + ":doc")
-    if r.exists(srckey + ":doc:related"):
-        r.rename(srckey + ":doc:related", dstkey + ":doc:related")
-    if r.exists(srckey + ":doc:localtag"):
-        r.rename(srckey + ":doc:localtag", dstkey + ":doc:localtag")
     if r.exists(srckey + ":doc:tms"):
-        r.rename(srckey + ":doc:tms", dstkey + ":doc:tms")
-    if r.exists(srckey + ":sml"):
-        r.rename(srckey + ":sml", dstkey + ":sml") 
-    if r.exists(srckey + ":sml:tms"):
-        r.rename(srckey + ":sml:tms", dstkey + ":sml:tms")
-    if r.exists(srckey + ":doc:unchk"):
-        r.rename(srckey + ":doc:unchk", dstkey + ":doc:unchk")
-    if r.exists(srckey + ":tag:unchk"):
-        r.rename(srckey + ":tag:unchk", dstkey + ":tag:unchk")
-    if r.exists(srckey + ":fllw"):
-        r.rename(srckey + ":fllw", dstkey + ":fllw")
+        r.rename(srckey + ":doc:tms", dstkey + ":doc:tms") 
 
 def getTag(displayTag):
     if isinstance(displayTag, unicode): 

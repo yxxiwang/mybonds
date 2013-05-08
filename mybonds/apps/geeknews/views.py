@@ -962,6 +962,8 @@ def beaconfilter(request, template_name="beacon_list.html"):
 @login_required
 def beaconsave(request, template_name="beacon_list.html"):
     beaconid = request.GET.get("beaconid", "")
+    beaconusr = request.GET.get("beaconusr", "")
+    beaconkey = request.GET.get("beaconkey", "")
     desc = request.GET.get("desc", "")
     beaconname = request.GET.get("beaconname", "")
     share = request.GET.get("share", "")
@@ -969,31 +971,49 @@ def beaconsave(request, template_name="beacon_list.html"):
         return HttpResponseRedirect("/news/beaconlist/")
     username = getUserName(request)
     
-    if beaconid != "" and beaconid !=getHashid(beaconname):  
-        beaconChangeName(username, beaconid, getHashid(beaconname))
-#        r.rename()
-    beaconid = getHashid(beaconname)
-    key = "bmk:" + username + ":" + beaconid
-    r.hset(key, "ttl", beaconname)
-    r.hset(key, "desc", desc)
-    r.hset(key, "crt_usr", username)
-    r.hset(key, "crt_tms", time.time())
-    r.sadd("bmk:" + username, beaconid)
-    
-    if share == "1":
-        fllwcnt = r.scard(key+":fllw") if r.scard(key+":fllw") is not None else 0
-        newscnt = r.hget(key,"cnt") if r.hget(key,"cnt") is not None else 0
-        r.zadd("bmk:doc:share", time.time(), username + "|-|" + beaconid)
-        r.zadd("bmk:doc:share:byfllw", fllwcnt, username + "|-|" + beaconid)
-        r.zadd("bmk:doc:share:bynews",newscnt , username + "|-|" + beaconid)
-        greeting_typer(username, "beacon_share", beaconname)  # 保存信息到动态欢迎日志
-    elif share == "0":
-        print username + "|-|" + beaconid
-        r.zrem("bmk:doc:share", username + "|-|" + beaconid)
-        r.zrem("bmk:doc:share:bynews", username + "|-|" + beaconid)
-        r.zrem("bmk:doc:share:byfllw", username + "|-|" + beaconid)
-#    return HttpResponse("a")
-    return HttpResponseRedirect("/news/beaconlist/?beaconid="+beaconid)
+    key = "bmk:"+beaconkey
+    if beaconkey == "":# new add 
+        beaconid = getHashid(beaconname)
+    #     key = "bmk:" + beaconusr + ":" + beaconid
+        r.hset(key, "id", beaconid)
+        r.hset(key, "ttl", beaconname)
+        r.hset(key, "desc", desc)
+        r.hset(key, "crt_usr", beaconusr)
+        r.hset(key, "crt_tms", time.time())
+        r.hset(key, "last_touch",time.time()) 
+        r.hset(key, "last_update",time.time()) 
+        r.hset(key, "cnt",0) 
+        
+        r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)
+        r.zadd("bmk:doc:share", time.time(), beaconusr + "|-|" + beaconid)
+        r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
+        r.zadd("bmk:doc:share:bynews",time.time() , beaconusr + "|-|" + beaconid) 
+    else:
+        if beaconkey != beaconusr+":"+getHashid(beaconname):# modifykeys
+#             print beaconkey,beaconusr+":"+getHashid(beaconname)
+            beaconid = getHashid(beaconname) 
+            beaconChangeName(beaconkey,beaconusr,beaconid)
+            key = "bmk:" + beaconusr + ":" + beaconid
+            r.hset(key, "id", beaconid)
+            r.hset(key, "ttl", beaconname)
+            r.hset(key, "desc", desc)
+        else:#modify desc and so on
+            r.hset(key, "desc", desc)
+            
+#     if share == "1":
+# #         fllwcnt = r.scard(key+":fllw") if r.scard(key+":fllw") is not None else 0
+# #         newscnt = r.hget(key,"cnt") if r.hget(key,"cnt") is not None else 0
+#         r.zadd("bmk:doc:share", time.time(), beaconusr + "|-|" + beaconid)
+#         r.zadd("bmk:doc:share:byfllw", fllwcnt, beaconusr + "|-|" + beaconid)
+#         r.zadd("bmk:doc:share:bynews",newscnt , beaconusr + "|-|" + beaconid)
+#         greeting_typer(username, "beacon_share", beaconusr)  # 保存信息到动态欢迎日志
+#     elif share == "0":
+#         print beaconusr + "|-|" + beaconid
+#         r.zrem("bmk:doc:share", beaconusr + "|-|" + beaconid)
+#         r.zrem("bmk:doc:share:bynews", beaconusr + "|-|" + beaconid)
+#         r.zrem("bmk:doc:share:byfllw", beaconusr + "|-|" + beaconid)
+# #    return HttpResponse("a")
+    return HttpResponseRedirect("/news/beaconlist/?beaconid="+beaconid+"&beaconusr="+beaconusr)
     
 @login_required
 def beaconRelate(request, template_name="beacon_news.html"):
@@ -1311,6 +1331,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
 @login_required
 def beaconlist(request, template_name="beacon/beacon_list.html"): 
     beaconid = request.GET.get("beaconid", "")  
+    beaconusr = request.GET.get("beaconusr", "")
     userobj = request.user
     if userobj.is_anonymous():  # 用户未登录
         return HttpResponse('<h1>只有登录用户才能访问该功能..</h1>')
@@ -1320,27 +1341,24 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
     
     udata = {}
     beacondesc = ""
-    beaconname = ""
-    shared = ""
-    if beaconid != "":
-        beaconusr = request.GET.get("beaconusr", "")  
-        if beaconusr =="":
-            beaconusr = username
+    beaconname = "" 
+    if beaconid != "":  
         udata = buildBeaconData(beaconusr, beaconid)
         beacondesc = r.hget("bmk:" + beaconusr + ":" + beaconid, "desc") 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
-        shared = False if r.zrank("bmk:doc:share", beaconusr + "|-|" + beaconid) is None else True
-        r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["simdocs"]))
+#         shared = False if r.zrank("bmk:doc:share", beaconusr + "|-|" + beaconid) is None else True
+#         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["docs"]))
 
-    beacons = r.smembers("bmk:" + username)
-    for beaid in beacons:
-        beaobj = r.hgetall("bmk:" + username + ":" + beaid)
-        beaobj["news_cnt"] = "1"
-        beaobj["fllw_cnt"] = "2" 
-        beaobj["id"] = beaid
-        beaobj["shared"] = False if r.zrank("bmk:doc:share", username + "|-|" + beaid) is None else True
+#     beacons = r.smembers("bmk:" + username)
+    beacons = r.zrevrange("bmk:doc:share",0 ,-1)
+#     print beacons
+    for beaconstr in beacons:
+        busr,bid = beaconstr.split("|-|")
+        beaobj = r.hgetall("bmk:" + busr + ":" + bid) 
+        beaobj["id"] = bid
+        beaobj["crt_usr"] = busr
+#         beaobj["shared"] = False if r.zrank("bmk:doc:share", beaconusr + "|-|" + beaconid) is None else True
         beacon_list.append(beaobj)   
-        
     return render_to_response(template_name, {
         'current_path': request.get_full_path(),
         'udata': udata,
@@ -1348,39 +1366,26 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         'beaconid':beaconid,#当前灯塔的ID
         'beacondesc':beacondesc,#当前灯塔的备注
         'beaconname':beaconname,#当前灯塔的名称 
-        'shared':shared,
+        'beaconusr':beaconusr,#当前灯塔的名称  
         "user": userobj,
     }, context_instance=RequestContext(request)) 
 
 @login_required
-def beacondelete(request, template_name="beacon/beacon_list.html"): 
-#    bkeys = r.keys("bmk:*:doc")
-#    for key in bkeys:
-#        print key
-#        bmk,username,beaid,doc = key.split(":")
-#        r.zadd("bmk:doc:share",time.time(),username+"|-|"+beaid)
-    username = getUserName(request) 
-#    beaconname = request.GET.get("beaconname", "")
-    bid = request.GET.get("beaconid", "")
-    fllwusrs=[]
-    if bid != "":
-        key = "bmk:"+username+":"+bid
-        r.delete(key + ":doc")
-        r.delete(key + ":doc:related")
-        r.delete(key + ":doc:localtag")
-        r.delete(key + ":doc:tms")
-        r.delete(key + ":sml")
-        r.delete(key + ":sml:tms")
-        r.zrem("bmk:doc:share",username + "|-|" + bid)
-        r.zrem("bmk:doc:share:byfllw",username + "|-|" + bid)
-        r.zrem("bmk:doc:share:bynews",username + "|-|" + bid)
-        r.srem("bmk:" + username, bid)#从用户标签总的集合中删除该标签
-        r.delete(key+":doc:unchk")
-        r.delete(key+":tag:unchk")
-        fllwusrs=r.smembers(key+":fllw")
-        for usr in fllwusrs:
-            r.srem("usr:"+usr+":fllw",username+"|-|"+bid)
-        r.delete(key+":fllw")
+def beacondelete(request, template_name="beacon/beacon_list.html"):  
+    username = getUserName(request)  
+    beaconusr = request.GET.get("beaconusr", "")
+    beaconid = request.GET.get("beaconid", "")
+    print beaconusr,beaconid
+    r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid) 
+    r.zrem("bmk:doc:share:byfllw",beaconusr+"|-|"+beaconid) 
+    r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid)
+    r.zrem("usr:" + beaconusr+":fllw",beaconusr+"|-|"+beaconid)
+    key = "bmk:"+beaconusr+":"+beaconid
+    for usr in r.smembers(key+":fllw"):
+        r.zrem("usr:" + usr+":fllw",beaconusr+"|-|"+beaconid)
+    r.delete(key + ":doc:tms")
+    r.delete(key + ":fllw")
+    
     return HttpResponseRedirect("/news/beaconlist/")
         
 @login_required

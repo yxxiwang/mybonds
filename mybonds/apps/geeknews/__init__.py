@@ -699,6 +699,7 @@ def refreshDocs(beaconusr, beaconid):
     urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
+    r.hset(key, "removecnt", 0)  # 更新本操作时间  
     
     if udata.has_key("docs"):
         r.delete(key+":doc:tms")
@@ -717,6 +718,9 @@ def refreshBeacon(beaconusr, beaconid):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
     key = "bmk:" + beaconusr + ":" + beaconid
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
+    updt = timeDiff(r.hget(key, "last_update"), time.time())
+    dt = dt if dt<updt else updt 
+    
     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
         print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 

@@ -597,7 +597,8 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     print "=getAllBeaconDocsByUser="+username
 #    hour_before=8
 #     beacons = r.smembers("usr:"+username+":fllw")
-    beacons = r.zrevrange("usr:"+username+":fllw",0,-1)
+#     beacons = r.zrevrange("usr:"+username+":fllw",0,-1)
+    beacons = r.zrange("usr:"+username+":fllw",0,-1)
     sim_lst=[]
     lst=[]
     udata = {}

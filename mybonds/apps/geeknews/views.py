@@ -1334,9 +1334,11 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
     beaconid = request.GET.get("beaconid", "")  
     beaconusr = request.GET.get("beaconusr", "")
     userobj = request.user
-    if userobj.is_anonymous():  # 用户未登录
-        return HttpResponse('<h1>只有登录用户才能访问该功能..</h1>')
+#     if userobj.is_anonymous():  # 用户未登录
+#         return HttpResponse('<h1>只有登录用户才能访问该功能..</h1>')
     username = getUserName(request)
+    if username not in ["ltb","wxi","sj"] :  
+        return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
     beacon_json = {}
     beacon_list = []
     

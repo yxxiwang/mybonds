@@ -15,7 +15,7 @@ SUCCESS = 0
 WARNNING=8
 RETRYCOUNT=3
 
-def id_generator(size=6, chars=string.ascii_lowercase + string.digits):
+def id_generator(size=6, chars=string.ascii_lowercase + string.digits+string.ascii_uppercase):
     return ''.join(random.choice(chars) for x in range(size))
 
 def getUserName(request):

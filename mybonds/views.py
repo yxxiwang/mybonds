@@ -473,6 +473,59 @@ def logout(request):
 #    return render_to_response('login.html', context_instance=RequestContext(request))
     return HttpResponseRedirect('/apply/login/')
 
+def lostkey(request):
+    user = auth.logout(request)
+    if  request.method == 'GET': 
+        return render_to_response('lostkey.html',
+                                  {'action': request.get_full_path()},
+                                   context_instance=RequestContext(request)) 
+    if  request.method == 'POST':
+        username = request.POST.get("username", "");
+        email = request.POST.get("email", "");
+        if not re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
+            return render_to_response('lostkey.html', {'err_message': "错误的email格式!".decode("utf8")}, context_instance=RequestContext(request))
+        if email != r.hget("usr:"+username,"email"):
+            return render_to_response('setnewpassword.html', {'err_message': "无此用户,或者用户名与邮箱不匹配".decode("utf8")}, context_instance=RequestContext(request))
+        token = id_generator(32)
+        url= "http://"+request.META['HTTP_HOST']+"/apply/setnewpassword?token="+token
+#        content=username+""",您好!\r\n欢迎您的注册,在访问过程中有任何疑问及建议可以给我们邮件或者在网站中提交建议,\r\n
+#        现在,您可以邀请您的朋友们通过以下链接来指极星注册:\r\n  """.decode("utf8")+url
+        content="用户您好,已经收到了你的密码重置请求，请您点击此链接重新设置密码（链接将在 24 小时后失效）: \r\n\r\n"
+        content+=url
+#         content+=to_unicode_or_bust("\r\n\r\n这是一封系统邮件，请不要直接回复。")
+        sendemail(content,email,to_unicode_or_bust("指极星:设置新密码"))
+        r.set("lostkey:"+token,username)
+        r.expire("lostkey:"+token,86400)
+        
+    return render_to_response('lostkey.html', {'err_message': "密码重置请求已经发送至邮箱!".decode("utf8")}, context_instance=RequestContext(request))
+
+def setnewpassword(request):
+    if  request.method == 'GET': 
+        token = request.GET.get("token", "");
+        username = r.get("lostkey:"+token)
+        if username is None:
+            return render_to_response('setnewpassword.html', {'err_message': "错误的token或者token已过期,请重新申请密码重置!".decode("utf8")}, context_instance=RequestContext(request))
+        return render_to_response('setnewpassword.html',
+                                  {'action': request.get_full_path(),
+                                  'token': token},
+                                   context_instance=RequestContext(request)) 
+    if  request.method == 'POST':
+        password = request.POST.get("password", "");
+        token = request.POST.get("token", "");
+#         print token
+        username = r.get("lostkey:"+token)
+        if username is None:
+            return render_to_response('setnewpassword.html', {'err_message': "错误的token或者token已过期,请重新申请密码重置!".decode("utf8")}, context_instance=RequestContext(request))
+        user = User.objects.get(username=username)
+#         print user
+        if user is None:
+            return render_to_response('setnewpassword.html', {'err_message': "无此用户,是否邮箱未注册?".decode("utf8")}, context_instance=RequestContext(request))
+#         user = users[0]
+#         print user.username,"=====",password,"====="
+        user.set_password(password)
+        user.save()
+        return render_to_response('login.html', {'err_message': "密码设置已成功,请登录".decode("utf8")}, context_instance=RequestContext(request))
+
 def username_present(username):
     if User.objects.filter(username=username).count():
         return True

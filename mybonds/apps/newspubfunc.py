@@ -21,6 +21,65 @@ QUANTITY_DURATION = 300
 r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1)
  
+def sendemail(content, rcv_email,title=""):
+    from django.core.mail import send_mail
+    print "================sendemail============================"
+    import smtplib, mimetypes
+    from smtplib import SMTPException
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.Header import Header
+    from email.mime.image import MIMEImage
+    sender = 'admin@zhijixing.com'
+#     sender = '蓝海资讯'
+    if rcv_email == "":
+        rcv_email = 'yxxiwang@gmail.com'
+    receivers = [rcv_email]
+
+    msg = MIMEMultipart()
+    msg['From'] = "灯塔阅读"
+    msg['To'] = rcv_email
+    if title!="":
+        msg['Subject'] = Header(title, charset='UTF-8')  # 中文主题 
+    else:
+        msg['Subject'] = Header('欢迎来到指极星', charset='UTF-8')  # 中文主题 
+        
+    txt = MIMEText(content, _subtype='html', _charset='UTF-8') 
+#    txt = MIMEText(content, _subtype='plain', _charset='UTF-8') 
+    # 添加html的邮件内容
+    # txt = MIMEText("<a href='http://blog.plotcup.com'>Chronos的博客</a>", _subtype='html',  _charset='UTF-8')
+#
+    msg.attach(txt)
+#    msg.attach(urltxt)
+#    message = "\r\n".join([
+#      "From: zhijixing2012lsw@gmail.com",
+#      "To: yxxiwang@gmail.com",
+#      "Subject: Just a message,这是一封测试邮件".decode("utf8"),
+#      "",
+#      "hi,我是测试邮件".decode("utf8"),
+#      ])
+    try:
+#       message = MIMEText(message,_subtype='plain',_charset='gb2312')
+       smtpObj = smtplib.SMTP('smtp.gmail.com')
+       smtpObj.ehlo()
+       smtpObj.starttls()
+       smtpObj.login('admin@zhijixing.com', 'software91') 
+       smtpObj.sendmail(sender, receivers, msg.as_string())      
+       print "Successfully sent email"
+       return 0
+    except SMTPException:
+       print "Error: unable to send email"
+       traceback.print_exc()
+       return 8
+    else:
+       pass
+#        print "sent email again.."
+#        smtpObj.sendmail(sender, receivers, msg.as_string())
+    finally:
+       smtpObj.quit() 
+        
+    return 8
+
 def timeElaspe(create_time, real=False):
     elaspestr = ""
     create_time = int(create_time)

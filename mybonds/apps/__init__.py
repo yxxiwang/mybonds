@@ -61,7 +61,7 @@ def bench(func,parms=None):
     rt = func() if parms is None else func(parms)
     stop = time.clock()  
     diff = stop - start  
-    print "%s==%s(%s) has taken %s" % (getTime(time.time()),func.func_name,parms, str(diff)) 
+    print "%s==%s(%s) has taken %s" % (dt.datetime.now(),func.func_name,parms, str(diff)) 
     return rt
 
 def unique(a):

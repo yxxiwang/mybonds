@@ -209,7 +209,7 @@ def getchannelByid(beaconusr,beaconid):
     return r.hget("bmk:" + beaconusr + ":" + beaconid,"ttl") 
     # if r.exists("bmk:" + beaconusr + ":" + beaconid) else ""
 
-def pushQueue(qtype, username, otype, tag=None, similarid=None):
+def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
 #    if isinstance(username, unicode): 
 #        print "--pushQueue-[qtype=%s;username=%s;otype=%s;]" % (qtype, username, otype)
 #    else:
@@ -232,10 +232,10 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None):
     elif qtype == "beacon":
         urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
         qobj[qtype] = tag 
-    elif qtype == "sendemail":
-        urlstr = "http://www.gxdx168.com/research?u=" + username + "&docid=" + similarid
+    elif qtype == "sendemail": 
         qobj["docid"] = similarid
-        qobj[qtype] = tag 
+        qobj["email"] = tag 
+#         qobj[qtype] = tag
     elif qtype == "removedoc":
         urlstr="http://www.gxdx168.com/research/svc?u="+tag+"&o=2&likeid=-%s" %(similarid)
         qobj["docid"] = similarid

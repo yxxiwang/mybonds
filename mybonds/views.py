@@ -490,14 +490,15 @@ def lostkey(request):
         url= "http://"+request.META['HTTP_HOST']+"/apply/setnewpassword?token="+token
 #        content=username+""",您好!\r\n欢迎您的注册,在访问过程中有任何疑问及建议可以给我们邮件或者在网站中提交建议,\r\n
 #        现在,您可以邀请您的朋友们通过以下链接来指极星注册:\r\n  """.decode("utf8")+url
-        content="用户您好,已经收到了你的密码重置请求，请您点击此链接重新设置密码（链接将在 24 小时后失效）: \r\n\r\n"
-        content+=url
-#         content+=to_unicode_or_bust("\r\n\r\n这是一封系统邮件，请不要直接回复。")
-        sendemail(content,email,to_unicode_or_bust("指极星:设置新密码"))
+#         content="用户您好,已经收到了你的密码重置请求<br>\r\n\r\n请您点击此链接重新设置密码（链接将在 24 小时后失效）: <br><br>\r\n\r\n\r\n\r\n"
+#         content+=url
+#         content+="\r\n\r\n<br><br><br>这是一封系统邮件，请不要直接回复。"
+#         sendemail(content,email,to_unicode_or_bust("指极星:设置新密码"))
+        pushQueue("sendemail", username, "lostkey", tag=email, similarid="",urlstr=url)
         r.set("lostkey:"+token,username)
         r.expire("lostkey:"+token,86400)
         
-    return render_to_response('lostkey.html', {'err_message': "密码重置请求已经发送至邮箱!".decode("utf8")}, context_instance=RequestContext(request))
+    return render_to_response('login.html', {'err_message': "密码重置请求已经发送至邮箱,请在重设密码后登录".decode("utf8")}, context_instance=RequestContext(request))
 
 def setnewpassword(request):
     if  request.method == 'GET': 

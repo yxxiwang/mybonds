@@ -485,7 +485,7 @@ def lostkey(request):
         if not re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
             return render_to_response('lostkey.html', {'err_message': "错误的email格式!".decode("utf8")}, context_instance=RequestContext(request))
         if email != r.hget("usr:"+username,"email"):
-            return render_to_response('setnewpassword.html', {'err_message': "无此用户,或者用户名与邮箱不匹配".decode("utf8")}, context_instance=RequestContext(request))
+            return render_to_response('lostkey.html', {'err_message': "无此用户,或者用户名与邮箱不匹配".decode("utf8")}, context_instance=RequestContext(request))
         token = id_generator(32)
         url= "http://"+request.META['HTTP_HOST']+"/apply/setnewpassword?token="+token
 #        content=username+""",您好!\r\n欢迎您的注册,在访问过程中有任何疑问及建议可以给我们邮件或者在网站中提交建议,\r\n

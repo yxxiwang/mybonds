@@ -998,9 +998,11 @@ def saveTagdoc(username, otype, tag, fromdaemon=False):
     print "saveTagDocs %s data has taken on %s; and rt is %d" % (dlen, str(diff), rt)  
     return rt
 
-def saveFulltextById(ids):
+def saveFulltextById(ids,retrycnt=0):
     print "===saveFulltextById==="+ids
     if ids is None or ids =="":
+        return
+    if retrycnt >=2:
         return
     urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
     udata = bench(loadFromUrl,parms=urlstr)
@@ -1010,6 +1012,9 @@ def saveFulltextById(ids):
                 id = getHashid(doc["url"])
                 rdoc.set("ftx:"+id,json.dumps(doc["fulltext"]))
                 rdoc.expire("ftx:"+id,DOC_EXPIRETIME)
+    else:
+        print "udata is empty..."
+        saveFulltextById(ids,retrycnt+1)
 #         if udata["docs"].has_key("relatedDocs"):
 #             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
 

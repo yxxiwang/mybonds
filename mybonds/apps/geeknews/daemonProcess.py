@@ -79,13 +79,13 @@ def retriveData(qtype):
 			
 		elif qtype =="sendemail":
 			if otype=="bybeacon":
-				hourbefore = qinfo["sendemail"]
+				hourbefore = qinfo["email"]
 				rt = lib.sendEmailFromUserBeacon(username,hourbefore,otype)
 			elif otype=="lostkey":
 				email = qinfo["email"]
 				rt = lib.sendEmailFindKey(username,email,url)
 			else:
-				email = qinfo["sendemail"]
+				email = qinfo["email"]
 				rt = lib.sendemailbydocid(email,qinfo["docid"],otype)
 		else:
 # 					rt = lib.saveDocs(username, otype)

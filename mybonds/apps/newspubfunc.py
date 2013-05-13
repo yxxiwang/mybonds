@@ -217,7 +217,7 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     qobj = {}
     qobj["usr"] = username
     qobj["o"] = otype
-    qobj["tms"] = time.time()
+    qobj["tms"] = "%s" % dt.datetime.now()
     qobj["type"] = qtype 
 #     if qtype in ["tag", "navtag"]:
 #         if isinstance(tag, unicode): 

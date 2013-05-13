@@ -1013,7 +1013,7 @@ def saveFulltextById(ids,retrycnt=0):
                 rdoc.set("ftx:"+id,json.dumps(doc["fulltext"]))
                 rdoc.expire("ftx:"+id,DOC_EXPIRETIME)
     else:
-        print "udata is empty..."
+        print "udata is empty...retrycntis %d" % retrycnt
         saveFulltextById(ids,retrycnt+1)
 #         if udata["docs"].has_key("relatedDocs"):
 #             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 

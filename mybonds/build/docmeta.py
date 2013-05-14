@@ -24,27 +24,28 @@ from mybonds.apps.newspubfunc import *
 import argparse
 
 num = 0
-def saveFulltextById(ids):
+def saveFulltextById(ids,retrycnt=0):
     print "%s===saveFulltextById===%s" %(getTime(time.time()),ids)
     if ids is None or ids =="":
+        return {}
+    if retrycnt>=2:
         return {}
     urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
     def fetchAndSave(docs):
        for doc in docs:
            if doc.has_key("fulltext"):
-               id = getHashid(doc["url"])
-               rdoc.set("ftx:"+id,json.dumps(doc["fulltext"]))
-               rdoc.expire("ftx:"+id,DOC_EXPIRETIME)  
+                docid = getHashid(doc["url"])
+                rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
+                rdoc.expire("ftx:"+docid,DOC_EXPIRETIME)
+                rdoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")["1"])       
+                rdoc.hset("doc:"+docid,"host",doc["host"] )  
+                rdoc.hset("doc:"+docid,"domain",doc["domain"] )
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):
         fetchAndSave(udata["docs"])
     else:
-        print "==%s udata haven't key docs ! do it again.." %(urlstr)
-        udata = bench(loadFromUrl,parms=urlstr)
-        if udata.has_key("docs"):
-            fetchAndSave(udata["docs"])
-        else:
-            print "====failed again..====" 
+        print "==%s udata haven't key docs ! do it again..retrycnt is %d" %(urlstr, retrycnt)
+        saveFulltextById(ids,retrycnt+1)
     return udata
         
                 
@@ -57,7 +58,8 @@ def saveData(udata,key):
     for doc in udata["docs"]:
         if not doc["validTime"]:
             continue
-        docid = getHashid(doc["url"])
+#         docid = getHashid(doc["url"])
+        docid= doc["docId"]
         tms = doc["create_time"]
         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
@@ -74,9 +76,9 @@ def saveData(udata,key):
         pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
         pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
         pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
-        pipedoc.hset("doc:"+docid,"url",doc["url"] )       
-        pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-        pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
+#         pipedoc.hset("doc:"+docid,"url",doc["url"] )       
+#         pipedoc.hset("doc:"+docid,"host",doc["host"] )  
+#         pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
         
         
         pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)

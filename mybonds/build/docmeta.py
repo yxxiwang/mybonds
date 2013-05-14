@@ -34,7 +34,8 @@ def saveFulltextById(ids,retrycnt=0):
     def fetchAndSave(docs):
        for doc in docs:
            if doc.has_key("fulltext"):
-                docid = getHashid(doc["url"])
+#                 docid = getHashid(doc["url"])
+                docid = str(doc["docId"])
                 rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
                 rdoc.expire("ftx:"+docid,DOC_EXPIRETIME)
                 rdoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")["1"])       
@@ -59,7 +60,7 @@ def saveData(udata,key):
         if not doc["validTime"]:
             continue
 #         docid = getHashid(doc["url"])
-        docid= doc["docId"]
+        docid= str(doc["docId"])
         tms = doc["create_time"]
         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')

@@ -1011,7 +1011,7 @@ def saveFulltextById(ids,retrycnt=0):
         for doc in udata["docs"]:
             if doc.has_key("fulltext"):
 #                 id = getHashid(doc["url"])
-                docid = doc["docId"]
+                docid = str(doc["docId"])
                 pipedoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
                 pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
                 pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")["1"] )
@@ -1044,7 +1044,7 @@ def saveDocsByUrl(urlstr):
             if doc["validTime"]=="false" or not doc["validTime"]:
                 continue
 #             docid = getHashid(doc["url"]) 
-            docid = doc["docId"]
+            docid = str(doc["docId"])
             if not rdoc.exists("ftx:"+docid):
                 ids+=docid+";"
                 cnt = cnt+1

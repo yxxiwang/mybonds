@@ -1007,11 +1007,17 @@ def saveFulltextById(ids,retrycnt=0):
     urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):
+        pipedoc = rdoc.pipeline()
         for doc in udata["docs"]:
             if doc.has_key("fulltext"):
-                id = getHashid(doc["url"])
-                rdoc.set("ftx:"+id,json.dumps(doc["fulltext"]))
-                rdoc.expire("ftx:"+id,DOC_EXPIRETIME)
+#                 id = getHashid(doc["url"])
+                docid = doc["docId"]
+                pipedoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
+                pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
+                pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")["1"] )
+                pipedoc.hset("doc:"+docid,"host",doc["host"] )  
+                pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
+        pipedoc.execute()
     else:
         print "udata is empty...retrycntis %d" % retrycnt
         saveFulltextById(ids,retrycnt+1)
@@ -1026,7 +1032,7 @@ def saveDocsByUrl(urlstr):
 #     diff = urlstop - start
 #     print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff)) 
     print "===saveDocsByUrl==="+urlstr
-    udata = bench(loadFromUrl,parms=urlstr)  
+    udata = bench(loadFromUrl,parms=urlstr)
     pipedoc = rdoc.pipeline()
     ids=""
     ids_lst=[]
@@ -1037,7 +1043,8 @@ def saveDocsByUrl(urlstr):
                 continue
             if doc["validTime"]=="false" or not doc["validTime"]:
                 continue
-            docid = getHashid(doc["url"])  
+#             docid = getHashid(doc["url"]) 
+            docid = doc["docId"]
             if not rdoc.exists("ftx:"+docid):
                 ids+=docid+";"
                 cnt = cnt+1
@@ -1054,9 +1061,9 @@ def saveDocsByUrl(urlstr):
             pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
-            pipedoc.hset("doc:"+docid,"url",doc["url"] )       
-            pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-            pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
+#             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
+#             pipedoc.hset("doc:"+docid,"host",doc["host"] )  
+#             pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
             pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
 #             print ids
         if len(ids_lst) > 0:

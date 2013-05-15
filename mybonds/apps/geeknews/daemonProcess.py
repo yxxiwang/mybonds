@@ -5,6 +5,8 @@ from daemon import Daemon
 import json, urllib2
 import traceback
 
+from django.utils.encoding import smart_str
+
 from sys import path
 from os import getcwd
 import os
@@ -117,8 +119,9 @@ def retriveData(qtype):
 			lib.r.lpush("queue:" + qtype+":error",json.dumps(qinfo)) 
 		
 	urlstop = time.clock()
-	diff = urlstop - start  
-	print "retriveData(%s) has taken on %s;and rt is %d" % (to_unicode_or_bust(url),str(diff),rt) 
+	diff = urlstop - start
+# 	content = smart_str(content)  
+	print "retriveData(%s) has taken on %s;and rt is %d" % (smart_str(url),str(diff),rt) 
 	return rt
 			
 def runserver(type):

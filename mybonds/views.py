@@ -16,6 +16,7 @@ from django.http import Http404
 from django.contrib import *
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
+from django.utils.encoding import smart_str
 from mybonds.apps.geeknews import * 
 
 # def staticpage11(request, page_name):
@@ -353,7 +354,7 @@ def user_modify(request,template_name="beacon/usermodify.html"):
                     robj["message"] = "login failed" 
                     return HttpResponse(json.dumps(robj), mimetype="application/json")
             if displayname !="":
-                r.hset("usr:" + username, "displayname", displayname)
+                r.hset("usr:" + username, "displayname", smart_str(displayname))
             if email !="":
                 r.hset("usr:" + username, "email", email) 
             if rssuser !="":
@@ -369,7 +370,7 @@ def user_modify(request,template_name="beacon/usermodify.html"):
         else:
             email = r.hget("usr:"+username,"email")
             name = r.hget("usr:"+username,"name")
-            displayname = r.hget("usr:"+username,"displayname")
+            displayname = smart_str(r.hget("usr:"+username,"displayname"))
             return render_to_response(template_name, {
                 'username':username,
                 'displayname':displayname,
@@ -390,7 +391,7 @@ def user_modify(request,template_name="beacon/usermodify.html"):
                 return render_to_response(template_name, {'err_message': "无此用户,是否邮箱未注册?".decode("utf8")}, context_instance=RequestContext(request))
             user.set_password(password)
             user.save()
-        print username,displayname,email
+#         print username,displayname,email
         return render_to_response(template_name, {
             'err_message': "用户信息保存成功".decode("utf8"),
             'username':username,

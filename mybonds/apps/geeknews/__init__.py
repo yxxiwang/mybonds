@@ -508,7 +508,8 @@ def getDataByUrl(urlstr,isservice=False):
             if doc["validTime"]=="false" or not doc["validTime"]:
                 continue
 #            doc["id"] = getHashid(doc["url"])
-            doc["docid"] = getHashid(doc["url"])
+#             doc["docid"] = getHashid(doc["url"])
+            doc["docid"] = str(doc["docId"])
             doc["title"] = doc["title"].replace(" ","")
             doc["tx"] = doc["text"].replace(" ","")
             doc["text"] = subDocText(doc["text"])
@@ -661,7 +662,8 @@ def refreshDocs(beaconusr, beaconid):
                 continue
             if doc["validTime"]=="false" or not doc["validTime"]:
                 continue
-            r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
+#             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
+            r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)
     else:
         return COMMUNICATERROR

@@ -118,7 +118,7 @@ def retriveData(qtype):
 		
 	urlstop = time.clock()
 	diff = urlstop - start  
-	print "retriveData(%s) has taken on %s;and rt is %d" % (url,str(diff),rt) 
+	print "retriveData(%s) has taken on %s;and rt is %d" % (to_unicode_or_bust(url),str(diff),rt) 
 	return rt
 			
 def runserver(type):

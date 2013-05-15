@@ -964,6 +964,7 @@ def beaconsave(request, template_name="beacon_list.html"):
     beaconid = request.GET.get("beaconid", "")
     beaconusr = request.GET.get("beaconusr", "")
     beaconkey = request.GET.get("beaconkey", "")
+    beaconmindoc = request.GET.get("beaconmindoc", "")
     desc = request.GET.get("desc", "")
     beaconname = request.GET.get("beaconname", "")
     share = request.GET.get("share", "")
@@ -972,6 +973,7 @@ def beaconsave(request, template_name="beacon_list.html"):
     username = getUserName(request)
     
     beaconname = beaconname.replace(" ","")
+    beaconmindoc = 0 if beaconmindoc=="" else beaconmindoc
     key = "bmk:"+beaconkey
     if beaconkey == "":# new add 
         beaconid = getHashid(beaconname)
@@ -984,6 +986,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.hset(key, "last_touch",0) 
         r.hset(key, "last_update",0) 
         r.hset(key, "cnt",0) 
+        r.hset(key, "mindoc",beaconmindoc) 
         
         r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)
         r.zadd("bmk:doc:share", time.time(), beaconusr + "|-|" + beaconid)
@@ -998,8 +1001,10 @@ def beaconsave(request, template_name="beacon_list.html"):
             r.hset(key, "id", beaconid)
             r.hset(key, "ttl", beaconname)
             r.hset(key, "desc", desc)
+            r.hset(key, "mindoc",beaconmindoc) 
         else:#modify desc and so on
             r.hset(key, "desc", desc)
+            r.hset(key, "mindoc",beaconmindoc) 
             
 #     if share == "1":
 # #         fllwcnt = r.scard(key+":fllw") if r.scard(key+":fllw") is not None else 0
@@ -1350,6 +1355,8 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         udata = buildBeaconData(beaconusr, beaconid)
         beacondesc = r.hget("bmk:" + beaconusr + ":" + beaconid, "desc") 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
+        beaconmindoc = r.hget("bmk:" + beaconusr + ":" + beaconid, "mindoc") 
+        beaconmindoc = 0 if beaconmindoc is None else beaconmindoc
 #         shared = False if r.zrank("bmk:doc:share", beaconusr + "|-|" + beaconid) is None else True
 #         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["docs"]))
 
@@ -1371,6 +1378,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         'beacondesc':beacondesc,#当前灯塔的备注
         'beaconname':beaconname,#当前灯塔的名称 
         'beaconusr':beaconusr,#当前灯塔的名称  
+        'beaconmindoc':beaconmindoc,
         "user": userobj,
     }, context_instance=RequestContext(request)) 
 

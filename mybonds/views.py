@@ -333,7 +333,7 @@ def user_modify(request,template_name="beacon/usermodify.html"):
     username = getUserName(request)
     password = request.GET.get("pwd", "");
     newpwd = request.GET.get("newpwd", "");
-    displayname = request.GET.get("name", "");
+    displayname = request.GET.get("displayname", "");
     email = request.GET.get("email", "");
     rssuser = request.GET.get("rssuser", "");
     robj={}
@@ -353,7 +353,7 @@ def user_modify(request,template_name="beacon/usermodify.html"):
                     robj["message"] = "login failed" 
                     return HttpResponse(json.dumps(robj), mimetype="application/json")
             if displayname !="":
-                r.hset("usr:" + username, "name", displayname)
+                r.hset("usr:" + username, "displayname", displayname)
             if email !="":
                 r.hset("usr:" + username, "email", email) 
             if rssuser !="":
@@ -369,15 +369,37 @@ def user_modify(request,template_name="beacon/usermodify.html"):
         else:
             email = r.hget("usr:"+username,"email")
             name = r.hget("usr:"+username,"name")
+            displayname = r.hget("usr:"+username,"displayname")
             return render_to_response(template_name, {
                 'username':username,
+                'displayname':displayname,
                 'email':email,
                 'current_path': request.get_full_path(),
             }, context_instance=RequestContext(request))
     if  request.method == 'POST':
-        displayname = request.POST.get("username", "");
+        displayname = request.POST.get("displayname", "");
         password = request.POST.get("password", "");
         email = request.POST.get("email", "");
+        if email !="":
+            r.hset("usr:"+username,"email",email)
+        if displayname !="":
+            r.hset("usr:"+username,"displayname",displayname)
+        if password !="":
+            user = User.objects.get(username=username)
+            if user is None:
+                return render_to_response(template_name, {'err_message': "无此用户,是否邮箱未注册?".decode("utf8")}, context_instance=RequestContext(request))
+            user.set_password(password)
+            user.save()
+        print username,displayname,email
+        return render_to_response(template_name, {
+            'err_message': "用户信息保存成功".decode("utf8"),
+            'username':username,
+            'displayname':displayname,
+            'email':email,
+            'current_path': request.get_full_path(),
+        }, context_instance=RequestContext(request)) 
+
+             
         
 def character(request, template_name="beacon/suggestion.html"): 
     otype = request.GET.get("o", "")

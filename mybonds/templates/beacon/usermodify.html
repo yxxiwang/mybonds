@@ -1,5 +1,28 @@
 
 {% extends 'beacon/admin.html' %}    
+{% block navbar %} 
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/news/">
+            <img class="img-rounded" src="/site_media/static/news/logo1x.png" alt="指极星"></a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="/usermodify/" title="用户信息">用户</a></li> 
+              <!--li><a href="/news/mybeacons">我的灯塔</a></li> 
+              <li><a href="/news/beaconnews">灯塔阅读</a></li--> 
+            </ul><a href="/usermodify/"><p class="navbar-text pull-right">{{user.username}}</a>&nbsp;&nbsp; <a href="/apply/logout">离开</a></p> 
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
 {% block content %} 
     <div class="container"> 
 	<div class="row-fluid">
@@ -14,17 +37,20 @@
     		</div-->
     		<div class="row-fluid">
       			<div class="span2" style="display:block"></div> 
-            <div class="span7" >
-            <form class="well_wxi" style="padding-left:10px;">
+            <div class="span7" > 
+            <form class="well_wxi" method="post" action="/usermodify/" id="usermodify" style="padding-left:10px;"> 
+              {% csrf_token %} 
               <fieldset>
-                <legend>信息修改</legend>
+                <legend>基本信息修改</legend>
                 <label>用户</label>
                 <input type="text" disabled placeholder="{{username}}" value="{{username}}">
-                <label>姓名</label>
-                <input type="text" placeholder="{{name}}"  value="{{name}}" >
+                <label>姓名(昵称)</label>
+                <input type="text" id="displayname" name="displayname" placeholder="{{displayname}}"  value="{{displayname}}" >
                 <label>邮箱地址</label>
-                <input type="text" placeholder="{{email}}" value="{{email}}">
-                <span class="help-block"> .</span>
+                <input type="text" id="email" name="email" placeholder="{{email}}" value="{{email}}">
+                <label>密码</label>
+                <input class="text" id="password" name="password" placeholder="重置密码" type="password" tabindex="2" value="">
+                <span class="help-block"> </span>
                 <!--label class="checkbox">
                   <input type="checkbox"> Check me out
                 </label-->
@@ -33,27 +59,29 @@
             </form>
             </div>
             <div class="span3">
-            <div class="alert" id="alert-message" style="display:block;">
-              <a class="close" data-dismiss="alert">×</a>
-              <strong>提示:</strong> 添加联系人邮件
-            </div>
-
-            <div id="beacon-container" class="beacon-container row span12" >
-            {% for beacon in beacons %}
-              <div class="tag-item span12" style="margin-left:0px;">  
-                <span id='info' class="label label-info">{{beacon.name}}</span><a class='close' data-dismiss='tag-item' style="float: none;">×</a>
-              </div>  
-            {% endfor %}
-            </div>
-
-            <section id="beacon-box">
-              <div class="input-append" id="beacon-box">
-                <input class="span12" id="beacon_txt" type="text" placeholder="增加联系人邮件">
-                <button id="add_btn" class="btn" type="button">添加邮件</button>
-                <button id="save_btn" class="btn" type="button" >保存邮件</button>
+              <div class="alert" id="alert-message" style="display:block;">
+                <a class="close" data-dismiss="alert">×</a>
+                <strong>提示:</strong> {% if err_message %}<br>{{err_message}} {% else %}
+                <br>如果不需要重置密码<br>密码栏位请留空 !{% endif %}
               </div>
-            </section> 
-          </div>
+
+              <!--div id="beacon-container" class="beacon-container row span12" >
+              {% for beacon in beacons %}
+                <div class="tag-item span12" style="margin-left:0px;">  
+                  <span id='info' class="label label-info">{{beacon.name}}</span><a class='close' data-dismiss='tag-item' style="float: none;">×</a>
+                </div>  
+              {% endfor %}
+              </div>
+
+              <section id="beacon-box">
+                <div class="input-append" id="beacon-box">
+                  <input class="span12" id="beacon_txt" type="text" placeholder="增加联系人邮件">
+                  <button id="add_btn" class="btn" type="button">添加邮件</button>
+                  <button id="save_btn" class="btn" type="button" >保存邮件</button>
+                </div>
+              </section--> 
+
+            </div>
 
     		</div>
   		</div>

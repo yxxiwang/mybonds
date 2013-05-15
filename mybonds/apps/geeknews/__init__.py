@@ -622,6 +622,25 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
 #     return udata   
     
 
+def beaconUrl(beaconusr, beaconid):
+    """
+                        根据频道所属用户及频道id生成从后台取频道的请求地址
+    """
+    page = 0
+    if os.name =="posix":
+        length=300
+    else:
+        length = 10 
+    key = "bmk:" + beaconusr + ":" + beaconid
+    channel = r.hget(key,"ttl")
+    mindoc = r.hget(key,"mindoc") 
+    mindoc = 0 if mindoc is None else mindoc
+    if int(mindoc) <= 0 :
+        urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
+    else:
+        urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s&mindoc=%s" %(page,length,mindoc)
+    return urlstr
+
 def refreshDocs(beaconusr, beaconid):
     """更新频道内容,该方法也会被异步调用"""
     key = "bmk:" + beaconusr + ":" + beaconid
@@ -640,17 +659,10 @@ def refreshDocs(beaconusr, beaconid):
                 print "attembrough: needs refresh data ... diff is %d second,and removecnt is %d " % (dt,removecnt)
         elif dt < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
             print "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % dt
-            return 0
-            
-    channel = r.hget(key,"ttl")
-#     if os.name =="nt":
-#         channel = channel.decode("utf8")
-    page = 0
-    if os.name =="posix":
-        length=300
-    else:
-        length = 10
-    urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
+            return 0 
+    
+    urlstr = beaconUrl(beaconusr, beaconid)
+    
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
     r.hset(key, "removecnt", 0)  # 更新本操作时间  
@@ -669,6 +681,7 @@ def refreshDocs(beaconusr, beaconid):
         return COMMUNICATERROR
     return SUCCESS
             
+
 def refreshBeacon(beaconusr, beaconid):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
     key = "bmk:" + beaconusr + ":" + beaconid
@@ -678,15 +691,7 @@ def refreshBeacon(beaconusr, beaconid):
     
     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     
-    page = 0
-    if os.name =="posix":
-        length=300
-    else:
-        length = 10
-        
-    key = "bmk:" + beaconusr + ":" + beaconid
-    channel = r.hget(key,"ttl")
-    urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
+    urlstr = beaconUrl(beaconusr, beaconid)
     
     if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
         print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 

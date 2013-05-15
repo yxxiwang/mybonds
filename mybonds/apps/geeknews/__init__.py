@@ -1018,7 +1018,7 @@ def saveFulltextById(ids,retrycnt=0):
                 pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
                 pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
                 pipedoc.hset("doc:"+docid,"host","")
-                pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
+                pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
         pipedoc.execute()
     else:
         print "udata is empty...retrycntis %d" % retrycnt

@@ -39,7 +39,7 @@ def saveFulltextById(ids,retrycnt=0):
                 rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
                 rdoc.expire("ftx:"+docid,DOC_EXPIRETIME)
                 rdoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1])       
-                rdoc.hset("doc:"+docid,"host",doc["host"] )  
+#                 rdoc.hset("doc:"+docid,"host",doc["host"] )  
                 rdoc.hset("doc:"+docid,"domain",doc["domain"] )
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):

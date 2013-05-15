@@ -1017,7 +1017,7 @@ def saveFulltextById(ids,retrycnt=0):
                 pipedoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
                 pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
                 pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
-                pipedoc.hset("doc:"+docid,"host",doc["host"] )  
+                pipedoc.hset("doc:"+docid,"host","")
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
         pipedoc.execute()
     else:

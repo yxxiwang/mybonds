@@ -677,12 +677,23 @@ def refreshBeacon(beaconusr, beaconid):
     dt = dt if dt<updt else updt 
     
     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
+    
+    page = 0
+    if os.name =="posix":
+        length=300
+    else:
+        length = 10
+        
+    key = "bmk:" + beaconusr + ":" + beaconid
+    channel = r.hget(key,"ttl")
+    urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
+    
     if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
         print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 
         if r.exists(key):
 #             refreshDocs(beaconusr, beaconid)
 #             r.hset(key, "last_touch", time.time())  # 更新本操作时间  
-            pushQueue("beacon", beaconusr, "beacon", beaconid)
+            pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
         else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             print key + "is deleted via front  so we ignore it..." 
             
@@ -691,11 +702,11 @@ def refreshBeacon(beaconusr, beaconid):
     elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
         print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt)
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
-        pushQueue("beacon", beaconusr, "beacon", beaconid)
+        pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
     elif dt > KEY_UPTIME:#如果上次更新时间过久,则重新刷新数据
         print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt)
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
-        pushQueue("beacon", beaconusr, "beacon", beaconid)
+        pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
     else:
         print "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d" % dt
         

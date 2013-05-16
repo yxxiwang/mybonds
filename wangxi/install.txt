@@ -1,5 +1,5 @@
 强行pull到本地
-#git reset --hard HEAD
+#git reset --hard origin/master
 git checkout  xxxxfile
 git pull
 

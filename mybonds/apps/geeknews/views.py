@@ -972,6 +972,8 @@ def beaconsave(request, template_name="beacon_list.html"):
         return HttpResponseRedirect("/news/beaconlist/")
     username = getUserName(request)
     
+    quantity = log_typer(request, "beaconsave", beaconusr+":"+beaconid)
+    
     beaconname = beaconname.replace(" ","")
     beaconmindoc = 0 if beaconmindoc=="" else beaconmindoc
     key = "bmk:"+beaconkey

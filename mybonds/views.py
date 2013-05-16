@@ -371,6 +371,7 @@ def user_modify(request,template_name="beacon/usermodify.html"):
             email = r.hget("usr:"+username,"email")
             name = r.hget("usr:"+username,"name")
             displayname = smart_str(r.hget("usr:"+username,"displayname"))
+                
             return render_to_response(template_name, {
                 'username':username,
                 'displayname':displayname,
@@ -378,9 +379,19 @@ def user_modify(request,template_name="beacon/usermodify.html"):
                 'current_path': request.get_full_path(),
             }, context_instance=RequestContext(request))
     if  request.method == 'POST':
+        quantity = log_typer(request, "user_modify", username)
+        
         displayname = request.POST.get("displayname", "");
         password = request.POST.get("password", "");
         email = request.POST.get("email", "");
+        if not re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
+            return render_to_response(template_name, {
+                'err_message': "邮箱格式有误.".decode("utf8"),
+                'username':username,
+                'displayname':displayname,
+                'email':email,
+                'current_path': request.get_full_path(),
+            }, context_instance=RequestContext(request)) 
         if email !="":
             r.hset("usr:"+username,"email",email)
         if displayname !="":
@@ -538,6 +549,8 @@ def setnewpassword(request):
         token = request.POST.get("token", "");
 #         print token
         username = r.get("lostkey:"+token)
+        quantity = log_typer(request, "setnewpassword", username)
+        
         if username is None:
             return render_to_response('setnewpassword.html', {'err_message': "错误的token或者token已过期,请重新申请密码重置!".decode("utf8")}, context_instance=RequestContext(request))
         user = User.objects.get(username=username)

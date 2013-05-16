@@ -1353,6 +1353,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
     udata = {}
     beacondesc = ""
     beaconname = "" 
+    beaconmindoc = 0
     if beaconid != "":  
         udata = buildBeaconData(beaconusr, beaconid)
         beacondesc = r.hget("bmk:" + beaconusr + ":" + beaconid, "desc") 

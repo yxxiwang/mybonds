@@ -1,0 +1,125 @@
+强行pull到本地
+#git reset --hard HEAD
+git checkout  xxxxfile
+git pull
+
+阿里云主机
+fdisk /dev/xvdb
+n 
+p 
+1 
+2048 
+[回车]
+[回车]
+w 
+
+格式化磁盘
+mkfs.xfs -f -i size=1024 /dev/xvdb1
+
+追加文件 /etc/fstab
+/dev/xvdb1 /data xfs defaults 0 0 
+
+vi /etc/yum.conf
+把 exclude=kernel*  删掉
+yum -y update
+yum install gcc make dstat
+
+修改 /etc/ssh/sshd_config 文件为以下内容
+GSSAPIAuthentication no
+#GSSAPIAuthentication yes
+
+
+wget http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+rpm -ivh nginx-release-centos-6-0.el6.ngx.noarch.rpm                  
+yum -y install nginx
+
+yum -y install pcre-devel dstat tcl
+yum -y install pcre-static
+yum -y install python-setuptools python-devel python-simplejson python-config
+yum -y install libevent-devel 
+yum -y install readline-devel 
+
+easy_install pip
+pip install ipython
+easy_install django
+pip install Pinax
+pip install django-debug_toolbar
+pip install django-compressor
+pip install django-staticfiles
+pip install pinax_theme_bootstrap
+
+pip install supervisor
+pip install apscheduler
+
+pip install httplib2
+pip install ez-setup
+pip install numpy 
+pip install redis
+pip install requests
+
+pip install uwsgi
+pip install hiredis  ;#(easy_install hiredis)
+
+
+cd /root/redis
+cd /root/redis/redis-2.6.0
+make
+make test
+make install
+cd /root/redis/redis-py
+python setup.py install
+
+
+django-admin.py startproject mysite
+ 
+python manage.py syncdb 
+
+
+cat >>/root/.bash_profile  <<EOF 
+export PYTHONPATH=/root/mybonds
+EOF
+
+wget http://www.lua.org/ftp/lua-5.2.1.tar.gz
+tar -xvf lua-5.2.1.tar.gz         
+cd lua-5.2.1       
+make linux
+make linux install
+
+
+yum -y install zlib zlib-devel 
+./configure --add-module=/root/lua-nginx-module-0.7.16 --add-module=/root/ngx_devel_kit-0.2.18
+
+ldd /usr/local/nginx/sbin/nginx
+echo "/usr/local/lib" > /etc/ld.so.conf.d/usr_local_lib.conf
+ldconfig
+
+need module belows:
+https://github.com/agentzh/lua-resty-redis
+http://www.kyne.com.au/~mark/software/lua-cjson-manual.html
+
+http://openresty.org/cn/index.html
+
+ --with-luajit --with-http_iconv_module
+ 
+ 
+ 
+yum install mysql
+yum install mysql-server
+yum install mysql-devel
+chgrp -R mysql /var/lib/mysql
+chmod -R 770 /var/lib/mysql
+service mysqld start 
+mysql
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('secret_password');
+
+收工！
+
+更新
+
+如要其他机器能访问，在mysql.user中添加一个Host为'%'的user,然后flush priviledges;，最后防火墙加一句类似这样的语句即可(开通3306端口)：
+
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+
+如果要reboot自启动：
+
+chkconfig --levels 345 mysqld on

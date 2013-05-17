@@ -1059,8 +1059,8 @@ def saveDocsByUrl(urlstr):
     udata = bench(loadFromUrl,parms=urlstr)
     pipedoc = rdoc.pipeline()
     ids_lst=[]
-    cnt=0
     def saveText(doc,isheadline=False):
+        cnt=0
         ids=""
         if doc is None: 
             return 

@@ -667,18 +667,24 @@ def refreshDocs(beaconusr, beaconid):
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
     r.hset(key, "removecnt", 0)  # 更新本操作时间  
     
+    
     if udata.has_key("docs"):
-        r.delete(key+":doc:tms")
-        for doc in udata["docs"]:
-            if doc is None:
-                continue
-            if doc["validTime"]=="false" or not doc["validTime"]:
-                continue
-#             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
-            r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
-#         r.expire(key+":doc:tms",DOC_EXPIRETIME)
+        docs =  udata["docs"]
+    elif udata.has_key("headlines"):
+        docs =  udata["headlines"]
     else:
         return COMMUNICATERROR
+     
+#      if len(docs) >0:   
+    r.delete(key+":doc:tms")
+    for doc in docs:
+        if doc is None:
+            continue
+        if doc["validTime"]=="false" or not doc["validTime"]:
+            continue
+#             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
+        r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
+#         r.expire(key+":doc:tms",DOC_EXPIRETIME)
     return SUCCESS
             
 
@@ -1055,41 +1061,52 @@ def saveDocsByUrl(urlstr):
     ids=""
     ids_lst=[]
     cnt=0
-    if udata.has_key("docs"): 
-        for doc in udata["docs"]: 
-            if doc is None: 
-                continue
-            if doc["validTime"]=="false" or not doc["validTime"]:
-                continue
+    def saveText(doc,isheadline=False):
+        if doc is None: 
+            continue
+        if doc["validTime"]=="false" or not doc["validTime"]:
+            continue
 #             docid = getHashid(doc["url"]) 
-            docid = str(doc["docId"])
-            if not rdoc.exists("ftx:"+docid):
-                ids+=docid+";"
-                cnt = cnt+1
-                if cnt == 20:
-                    ids_lst.append(ids)
-                    ids=""
-                    cnt = 0
-            else:
-                pass
+        docid = str(doc["docId"])
+        if not rdoc.exists("ftx:"+docid):
+            ids+=docid+";"
+            cnt = cnt+1
+            if cnt == 20:
+                ids_lst.append(ids)
+                ids=""
+                cnt = 0
+        else:
+            pass
 #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
-            pipedoc.hset("doc:"+docid,"docid",docid)
-            pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ",""))
+        pipedoc.hset("doc:"+docid,"docid",docid)
+        pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ",""))
 #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
-            pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
-            pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
-            pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
+        pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
+        pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
+        pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
 #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
 #             pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-#             pipedoc.hset("doc:"+docid,"domain",doc["domain"] )  
-            pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
-#             print ids
+#             pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
+        if isheadline:
+            pipedoc.hset("doc:"+docid,"isheadline","1")
+        else:
+            pipedoc.hset("doc:"+docid,"isheadline","0")
+            
+        pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
         if len(ids_lst) > 0:
             for tids in ids_lst:
                 saveFulltextById(tids)
         else:
             saveFulltextById(ids)
         pipedoc.execute()
+        
+    if udata.has_key("docs"):
+        for doc in udata["docs"]: 
+            saveText(doc,isheadline=False)
+            
+    if udata.has_key("headlines"):
+        for doc in udata["headlines"]:
+            saveText(doc,isheadline=True)
             
 #             for doc in udata["docs"]: 
 #                 if doc is None: 

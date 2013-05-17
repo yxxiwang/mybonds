@@ -1063,9 +1063,9 @@ def saveDocsByUrl(urlstr):
     cnt=0
     def saveText(doc,isheadline=False):
         if doc is None: 
-            continue
+            return 
         if doc["validTime"]=="false" or not doc["validTime"]:
-            continue
+            return
 #             docid = getHashid(doc["url"]) 
         docid = str(doc["docId"])
         if not rdoc.exists("ftx:"+docid):

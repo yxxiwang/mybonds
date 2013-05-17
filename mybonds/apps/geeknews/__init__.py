@@ -1058,10 +1058,10 @@ def saveDocsByUrl(urlstr):
     print "===saveDocsByUrl==="+urlstr
     udata = bench(loadFromUrl,parms=urlstr)
     pipedoc = rdoc.pipeline()
-    ids=""
     ids_lst=[]
     cnt=0
     def saveText(doc,isheadline=False):
+        ids=""
         if doc is None: 
             return 
         if doc["validTime"]=="false" or not doc["validTime"]:

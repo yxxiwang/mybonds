@@ -17,8 +17,8 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_EXPIRETIME = 186400
 DOC_EXPIRETIME = 86400*2
-KEY_UPTIME = 300
-REMOVE_KEYUPTIME = 900
+KEY_UPTIME = 180
+REMOVE_KEYUPTIME = 300
 REMOVE_CNT = 3
 QUANTITY = 1500
 QUANTITY_DURATION = 300
@@ -707,7 +707,7 @@ def refreshBeacon(beaconusr, beaconid):
 #             r.hset(key, "last_touch", time.time())  # 更新本操作时间  
             pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
         else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
-            print key + "is deleted via front  so we ignore it..." 
+            print key + " maybe deleted via front  so we ignore it..." 
             
     elif not r.exists("bmk:"+beaconusr+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
         refreshDocs(beaconusr, beaconid)

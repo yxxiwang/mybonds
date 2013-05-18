@@ -1024,16 +1024,19 @@ def saveTagdoc(username, otype, tag, fromdaemon=False):
     print "saveTagDocs %s data has taken on %s; and rt is %d" % (dlen, str(diff), rt)  
     return rt
 
-def saveFulltextById(ids,retrycnt=0):
-    print "===saveFulltextById==="+ids
-    if ids is None or ids =="":
-        return
-    urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
+def saveFulltextById(ids,retrycnt=0,url=""):
+    print "===saveFulltextById==="+url
     udata={}
+    if url=="" :
+        if ids is None or ids =="":
+            return udata
+        urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
+    else:
+        urlstr = url
     if retrycnt >=2:
         print "Attembrough: it's failed again..retrycnt is %d" % retrycnt
         pushQueue("fulltext", "", "fulltext", "",urlstr=urlstr)
-        return
+        return udata
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):
         pipedoc = rdoc.pipeline()

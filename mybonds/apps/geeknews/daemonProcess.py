@@ -70,7 +70,7 @@ def retriveData(qtype):
 			rt = lib.refreshDocs(username, beacon) 
 		elif qtype =="fulltext": 
 			ids = qinfo["fulltext"]
-			udata = lib.saveFulltextById(ids) 
+			udata = lib.saveFulltextById(url) 
 			rt= WARNNING if udata=={} else SUCCESS
 		elif qtype =="removedoc": 
 #  					urlstr = qinfo["url"]

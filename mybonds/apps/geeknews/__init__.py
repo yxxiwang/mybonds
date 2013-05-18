@@ -667,15 +667,17 @@ def refreshDocs(beaconusr, beaconid):
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
     r.hset(key, "removecnt", 0)  # 更新本操作时间  
+    headlineonly = r.hget(key, "headlineonly")
+    headlineonly = "0" if headlineonly is None else headlineonly
     
-    if udata.has_key("docs"):
+    if headlineonly=="0" and udata.has_key("docs"):
         docs =  udata["docs"]
-    elif udata.has_key("headlines"):
+    elif headlineonly=="1" and udata.has_key("headlines"):
         docs =  udata["headlines"]
     else:
         return COMMUNICATERROR
      
-#      if len(docs) >0:   
+#      if len(docs) >0:
     r.delete(key+":doc:tms")
     for doc in docs:
         if doc is None:

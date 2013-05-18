@@ -990,6 +990,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.hset(key, "last_update",0) 
         r.hset(key, "cnt",0) 
         r.hset(key, "mindoc",beaconmindoc) 
+        r.hset(key, "headlineonly",headlineonly) 
         
         r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)
         r.zadd("bmk:doc:share", time.time(), beaconusr + "|-|" + beaconid)
@@ -1396,7 +1397,10 @@ def beacondelete(request, template_name="beacon/beacon_list.html"):
     username = getUserName(request)  
     beaconusr = request.GET.get("beaconusr", "")
     beaconid = request.GET.get("beaconid", "")
-    print beaconusr,beaconid
+#     print beaconusr,beaconid
+    key = "bmk:" + beaconusr + ":" + beaconid
+    channel = r.hget(key,"ttl")
+    quantity = log_typer(request, "beacondelete", to_unicode_or_bust(channel))
     r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid) 
     r.zrem("bmk:doc:share:byfllw",beaconusr+"|-|"+beaconid) 
     r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid)

@@ -1041,7 +1041,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
     if udata.has_key("docs"):
         pipedoc = rdoc.pipeline()
         for doc in udata["docs"]:
-            if doc.has_key("fulltext"):
+            if doc is not None and doc.has_key("fulltext"):
 #                 id = getHashid(doc["url"])
                 docid = str(doc["docId"])
                 pipedoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))

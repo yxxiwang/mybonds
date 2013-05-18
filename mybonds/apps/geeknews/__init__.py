@@ -682,8 +682,8 @@ def refreshDocs(beaconusr, beaconid):
     for doc in docs:
         if doc is None:
             continue
-        if doc["validTime"]=="false" or not doc["validTime"]:
-            continue
+#         if doc["validTime"]=="false" or not doc["validTime"]:
+#             continue
 #             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
         r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)

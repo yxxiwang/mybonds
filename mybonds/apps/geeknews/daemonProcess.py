@@ -68,6 +68,10 @@ def retriveData(qtype):
 		elif qtype =="beacon": 
 			beacon = qinfo["beacon"]
 			rt = lib.refreshDocs(username, beacon) 
+		elif qtype =="fulltext": 
+			ids = qinfo["fulltext"]
+			udata = lib.saveFulltextById(ids) 
+			rt= WARNNING if udata=={} else SUCCESS
 		elif qtype =="removedoc": 
 #  					urlstr = qinfo["url"]
 # 					docid = qinfo["docid"]
@@ -135,7 +139,7 @@ def runserver(type):
 			for i in range(lib.r.llen("queue:" + type)): 
 		 	 	retriveData(type) 
 		else:
-			for qtype in ("sendemail","removedoc","beacon"):
+			for qtype in ("sendemail","removedoc","beacon","fulltext"):
 				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
 					qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
 					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)

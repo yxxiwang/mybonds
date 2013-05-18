@@ -232,6 +232,10 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     elif qtype == "beacon":
 #         urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
         qobj[qtype] = tag 
+    elif qtype == "fulltext":
+#         urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
+#         qobj[qtype] = tag 
+        qobj[qtype] = tag 
     elif qtype == "sendemail": 
         qobj["docid"] = similarid
         qobj["email"] = tag 

@@ -505,8 +505,8 @@ def getDataByUrl(urlstr,isservice=False):
         for doc in udata["docs"]:
             if doc is None:
                 continue
-            if doc["validTime"]=="false" or not doc["validTime"]:
-                continue
+#             if doc["validTime"]=="false" or not doc["validTime"]:
+#                 continue
 #            doc["id"] = getHashid(doc["url"])
 #             doc["docid"] = getHashid(doc["url"])
             doc["docid"] = str(doc["docId"])
@@ -1028,9 +1028,12 @@ def saveFulltextById(ids,retrycnt=0):
     print "===saveFulltextById==="+ids
     if ids is None or ids =="":
         return
-    if retrycnt >=2:
-        return
     urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
+    udata={}
+    if retrycnt >=2:
+        print "Attembrough: it's failed again..retrycnt is %d" % retrycnt
+        pushQueue("fulltext", "", "fulltext", "",urlstr=urlstr)
+        return
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):
         pipedoc = rdoc.pipeline()
@@ -1046,7 +1049,8 @@ def saveFulltextById(ids,retrycnt=0):
         pipedoc.execute()
     else:
         print "udata is empty...retrycntis %d" % retrycnt
-        saveFulltextById(ids,retrycnt+1)
+        udata = saveFulltextById(ids,retrycnt+1)
+    return udata
 #         if udata["docs"].has_key("relatedDocs"):
 #             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
 

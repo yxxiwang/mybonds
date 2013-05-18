@@ -17,8 +17,8 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_EXPIRETIME = 186400
 DOC_EXPIRETIME = 86400*2
-KEY_UPTIME = 180
-REMOVE_KEYUPTIME = 300
+KEY_UPTIME = 60*30
+REMOVE_KEYUPTIME = 60*5
 REMOVE_CNT = 3
 QUANTITY = 1500
 QUANTITY_DURATION = 300
@@ -1089,7 +1089,7 @@ def saveDocsByUrl(urlstr):
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
     #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
     #             pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-    #             pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
+            pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
             if isheadline:
                 pipedoc.hset("doc:"+docid,"isheadline","1")
             else:

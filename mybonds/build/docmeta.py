@@ -79,7 +79,7 @@ def saveData(udata,key):
         pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
 #         pipedoc.hset("doc:"+docid,"url",doc["url"] )       
 #         pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-#         pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
+        pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
         
         
         pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)

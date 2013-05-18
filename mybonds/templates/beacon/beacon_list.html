@@ -57,8 +57,9 @@
             <input id="beacon_id"  type="hidden" class="uneditable-input" placeholder="灯塔..." value="{{beaconid}}"> 
             所属用户<br><input id="beacon_usr"  type="text" class="" placeholder="灯塔所属用户" value="{{beaconusr}}"> 
             <br>灯塔名称<br><input id="beacon_name"  type="text" class="" placeholder="灯塔名称..." value="{{beaconname}}"> 
-            <br>描述<br><textarea id="beacon_desc" rows="3"  placeholder="灯塔描述..." >{{beacondesc}}</textarea> 
             <br>新闻长度<br><input id="beacon_mindoc"  type="text" class="" placeholder="灯塔文章长度" value="{{beaconmindoc}}"> 
+            <br>只看热点&nbsp;&nbsp;<input id="headlineonly" class='cbox' type="checkbox" value="{{headlineonly}}" {% if headlineonly == "1" %} checked {% endif %}>
+            <br>描述<br><textarea id="beacon_desc" rows="3"  placeholder="灯塔描述..." >{{beacondesc}}</textarea> 
             <button id="add_btn" class="btn btn-warning">新增灯塔</button>
             <button id="save_btn" class="btn btn-primary">修改保存灯塔</button>
             <!--button id="backup_btn" class="btn btn-primary">备份灯塔</button> 
@@ -179,12 +180,17 @@
     beacon_name = $('#beacon_name').val();
     beacon_desc = $('#beacon_desc').val();
     beacon_mindoc = $('#beacon_mindoc').val();
+    headlineonly = "0";
     if(beacon_name==""){
       alert("灯塔名称不能为空"); 
       return ;
+    } 
+    if($("#isheadline").is(':checked')){
+        headlineonly= "1"; 
     }
+
     // alert('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beaconusr='+beacon_usr);
-    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beaconusr='+beacon_usr+'&beaconmindoc='+beacon_mindoc);
+    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beaconusr='+beacon_usr+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly);
     // $('#beacon_id').val("");
     // $('#beacon_name').val("");
     // $('#beacon_desc').val(""); 
@@ -197,13 +203,17 @@
     beacon_usr = $('#beacon_usr').val();
     beacon_desc = $('#beacon_desc').val();
     beacon_mindoc = $('#beacon_mindoc').val();
+    headlineonly = "0";
     if(beacon_name==""){
       alert("灯塔名称不能为空"); 
       return ;
     }
+    if($("#headlineonly").is(':checked')){
+        headlineonly= "1"; 
+    }
     
     // alert('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key);
-    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key+'&beaconmindoc='+beacon_mindoc);
+    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly);
   });
 
 </script>

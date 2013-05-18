@@ -668,7 +668,6 @@ def refreshDocs(beaconusr, beaconid):
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
     r.hset(key, "removecnt", 0)  # 更新本操作时间  
     
-    
     if udata.has_key("docs"):
         docs =  udata["docs"]
     elif udata.has_key("headlines"):
@@ -1066,8 +1065,8 @@ def saveDocsByUrl(urlstr):
         for doc in docs:
             if doc is None: 
                 continue 
-            if doc["validTime"]=="false" or not doc["validTime"]:
-                continue
+#             if doc["validTime"]=="false" or not doc["validTime"]:
+#                 continue
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
             if not rdoc.exists("ftx:"+docid):

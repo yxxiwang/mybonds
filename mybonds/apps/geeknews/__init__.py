@@ -1040,15 +1040,23 @@ def saveFulltextById(ids,retrycnt=0,url=""):
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):
         pipedoc = rdoc.pipeline()
+        txt=""
         for doc in udata["docs"]:
-            if doc is not None and doc.has_key("fulltext"):
+            if doc is None :
+                continue
+            if doc.has_key("fulltext"):
+                txt = doc["fulltext"]
+            else:
+                continue
+#             elif doc.has_key("text"):
+#                 txt = doc["text"]
 #                 id = getHashid(doc["url"])
-                docid = str(doc["docId"])
-                pipedoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
-                pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
-                pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
-                pipedoc.hset("doc:"+docid,"host","")
-                pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
+            docid = str(doc["docId"])
+            pipedoc.set("ftx:"+docid,json.dumps(txt))
+            pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
+            pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
+            pipedoc.hset("doc:"+docid,"host","")
+            pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
         pipedoc.execute()
     else:
         print "udata is empty...retrycntis %d" % retrycnt

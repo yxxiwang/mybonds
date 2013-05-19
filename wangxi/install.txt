@@ -34,7 +34,7 @@ rpm -ivh nginx-release-centos-6-0.el6.ngx.noarch.rpm
 yum -y install nginx
 
 yum -y install pcre-devel dstat tcl
-yum -y install pcre-static
+yum -y install pcre-static git
 yum -y install python-setuptools python-devel python-simplejson python-config
 yum -y install libevent-devel 
 yum -y install readline-devel 
@@ -50,6 +50,7 @@ pip install pinax_theme_bootstrap
 
 pip install supervisor
 pip install apscheduler
+pip install argparse
 
 pip install httplib2
 pip install ez-setup
@@ -70,7 +71,7 @@ cd /root/redis/redis-py
 python setup.py install
 
 
-django-admin.py startproject mysite
+django-admin.py startproject mybonds
  
 python manage.py syncdb 
 

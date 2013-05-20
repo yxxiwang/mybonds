@@ -88,6 +88,7 @@ def newsdetail(request):
     else: 
         doc = rdoc.hgetall("doc:"+docid)
         ftx = doc["text"]
+        doc["text"] = ""
         if rtype =="string":
             doc["fulltext"] = list2dict([ftx],"txt")
         else:

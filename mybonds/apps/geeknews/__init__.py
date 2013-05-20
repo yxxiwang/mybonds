@@ -17,15 +17,15 @@ from mybonds.apps.newspubfunc import *
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 if r.exists("sysparms"):
-    REDIS_EXPIRETIME = r.hget("sysparms", "redis_expire")
-    DOC_EXPIRETIME = r.hget("sysparms", "doc_expire")
-    KEY_UPTIME = r.hget("sysparms", "beacon_interval")
-    REMOVE_KEYUPTIME = r.hget("sysparms", "beacon_interval_remove")
-    REMOVE_CNT = r.hget("sysparms", "beacon_interval_remove_cnt")
-    CHANNEL_NEWS_NUM = r.hget("sysparms", "beacon_news_num")
-    QUANTITY = r.hget("sysparms", "quantity")
-    QUANTITY_DURATION = r.hget("sysparms", "quantity_duration")
-    RETRY_TIMES = r.hget("sysparms", "failed_retry_times")
+    REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire"))
+    DOC_EXPIRETIME = int(r.hget("sysparms", "doc_expire") )
+    KEY_UPTIME = int(r.hget("sysparms", "beacon_interval"))
+    REMOVE_KEYUPTIME = int(r.hget("sysparms", "beacon_interval_remove"))
+    REMOVE_CNT = int(r.hget("sysparms", "beacon_interval_remove_cnt"))
+    CHANNEL_NEWS_NUM = int(r.hget("sysparms", "beacon_news_num"))
+    QUANTITY = int(r.hget("sysparms", "quantity"))
+    QUANTITY_DURATION = int(r.hget("sysparms", "quantity_duration"))
+    RETRY_TIMES = int(r.hget("sysparms", "failed_retry_times"))
 else:
     REDIS_EXPIRETIME = 186400
     DOC_EXPIRETIME = 86400*2
@@ -737,7 +737,7 @@ def refreshBeacon(beaconusr, beaconid):
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
     else:
-        print "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d" % dt
+        print "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt,KEY_UPTIME)
         
 def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     key = "bmk:" + beaconusr + ":" + beaconid

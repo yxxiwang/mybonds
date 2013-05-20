@@ -1359,6 +1359,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
     udata = {}
     beacondesc = ""
     beaconname = "" 
+    beacondisplayname =""
     beaconmindoc = 0
     headlineonly = "0"
     if beaconid != "":  

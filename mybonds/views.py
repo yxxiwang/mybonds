@@ -331,6 +331,14 @@ def queuelist(request,template_name="beacon/queue_list.html"):
     username = getUserName(request)
     if username not in ["ltb","wxi","sj"] :  
         return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
+    delete = request.GET.get("delete", "")
+    if delete == "beacon":
+        r.delete("queue:beacon")
+    elif  delete == "removedoc":
+        r.delete("queue:removedoc")
+    elif  delete == "sendemail":
+        r.delete("queue:sendemail")
+    
     def loadbeacon(obj,type='beacon'):
         if type == "beacon":
             bobj = json.loads(obj) 

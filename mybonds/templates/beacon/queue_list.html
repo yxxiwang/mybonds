@@ -42,7 +42,7 @@
                 {% endfor %}
               </tbody>
             </table>  <table class="table table-hover table-striped table-bordered table-condensed">
-              <caption>频道新闻待处理队列 (最后50条: {{ beaconqueues|length }}+)</caption>
+              <caption>频道新闻待处理队列 (最后50条: {{ beaconqueues|length }}+) <a href="/queuelist?delete=beacon" >一键清空</a></caption>
               <thead>
                 <tr>
                   <th>time</th>
@@ -83,7 +83,7 @@
               </tbody>
             </table>  
             <table class="table table-hover table-striped table-bordered table-condensed">
-              <caption>移除新闻待处理队列 (最后50条: {{ removeqs|length }} +)</caption>
+              <caption>移除新闻待处理队列 (最后50条: {{ removeqs|length }} +) <a href="/queuelist?delete=removedoc" >一键清空</a></caption>
               <thead>
                 <tr>
                   <th>time</th>
@@ -105,7 +105,7 @@
 
           <div class="tab-pane" id="tab3">
             <table class="table table-hover table-striped table-bordered table-condensed">
-              <caption>移除新闻待处理队列 (最后50条: {{ beaconqueues|length }}+)</caption>
+              <caption>发送邮件待处理 (最后50条: {{ beaconqueues|length }}+) <a href="/queuelist?delete=sendemail" >一键清空</a></caption>
               <thead>
                 <tr>
                   <th>time</th>

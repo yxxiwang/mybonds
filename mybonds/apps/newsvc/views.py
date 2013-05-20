@@ -87,7 +87,11 @@ def newsdetail(request):
         doc["message"] = "success return data"
     else: 
         doc = rdoc.hgetall("doc:"+docid)
-        doc["fulltext"] = doc["text"]
+        ftx = doc["text"]
+        if rtype =="string":
+            doc["fulltext"] = list2dict([ftx],"txt")
+        else:
+            doc["fulltext"] = list2dict([ftx],"txt")
         doc["copyNum"] = str(doc["copyNum"])
         doc["tms"]=str(doc["create_time"]) 
         doc["create_time"] = timeElaspe(doc["create_time"]) 

@@ -1012,6 +1012,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         else:#modify desc and so on
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc",beaconmindoc) 
+            r.hset(key, "name", beacondisplayname)
             r.hset(key, "headlineonly",headlineonly) 
             
 #     if share == "1":

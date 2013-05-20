@@ -63,12 +63,12 @@ def saveData(udata,key):
         docid= str(doc["docId"])
         tms = doc["create_time"]
         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
-        tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
+#         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
 #         num = int(json.loads(docstr)["num"])
-        if not rdoc.exists("doc:"+docid):
-            print "%s incr 1 ,num:%d ,key: doc:%s" %(tdate,doc["copyNum"],docid)
-            r.hincrby(doc_dcnt_key,tdate,1)
-            r.hincrby(doc_dnum_key,tdate,doc["copyNum"])
+#         if not rdoc.exists("doc:"+docid):
+#             print "%s incr 1 ,num:%d ,key: doc:%s" %(tdate,doc["copyNum"],docid)
+#             r.hincrby(doc_dcnt_key,tdate,1)
+#             r.hincrby(doc_dnum_key,tdate,doc["copyNum"])
         
         if not rdoc.exists("ftx:"+docid): 
             ids+=docid+";"
@@ -107,6 +107,9 @@ def channelDocs(beaconusr,beaconid):
             r.hset("bmk:" + beaconusr + ":" + beaconid, "last_update", time.time())  # 更新操作时间  
         else:
              print "=============== %s:%s ===============" %(beaconusr,beaconid)
+
+def doSum():
+    pass
 
 def channels():
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):

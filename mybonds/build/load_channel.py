@@ -46,6 +46,7 @@ def load_data(input):
         r.zadd("usr:" + usr+":fllw",time.time(),usr+"|-|"+id)
         beaobj = r.hset("bmk:" + usr + ":" + id,"id",id)
         beaobj = r.hset("bmk:" + usr + ":" + id,"ttl",name)
+        beaobj = r.hset("bmk:" + usr + ":" + id,"nm",desc)
         beaobj = r.hset("bmk:" + usr + ":" + id,"desc",desc)
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_usr",usr)
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_tms",time.time())

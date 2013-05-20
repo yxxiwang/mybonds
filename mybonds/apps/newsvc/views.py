@@ -84,26 +84,14 @@ def newsdetail(request):
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         doc["success"] = "true"
         doc["message"] = "success return data"
-    else:
-#         urlstr = "http://www.gxdx168.com/research/svc?docid="+docid
-#         doc=getFullDocByUrl(urlstr) 
-# #         if udata.has_key("docs"):
-# #             doc=udata["docs"][0]
-# #         print doc 
-#         if doc!=None and doc.has_key("fulltext"): 
-#             rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"])) # 这个必须要在后面那行前面....否则下次取的数据不对
-#             if rtype =="string":
-#                 ftx = " \r\n      ".join(doc["fulltext"])
-#                 doc["fulltext"] = list2dict([ftx],"txt")
-#             else:
-#                 doc["fulltext"] = list2dict(doc["fulltext"],"txt")
-#             
-#             doc["success"] = "true"
-#             doc["message"] = "success return data" 
-#         else:
-            doc={}
-            doc["success"] = "false"
-            doc["message"] = "can't retrive data" 
+    else: 
+        doc = rdoc.hgetall("doc:"+docid)
+        doc["fulltext"] = doc["text"]
+        doc["copyNum"] = str(doc["copyNum"])
+        doc["tms"]=str(doc["create_time"]) 
+        doc["create_time"] = timeElaspe(doc["create_time"]) 
+        doc["success"] = "true"
+        doc["message"] = "success return data"
     return HttpResponse(json.dumps(doc), mimetype="application/json")
 
 @login_required

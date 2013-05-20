@@ -346,24 +346,39 @@ def queuelist(request,template_name="beacon/queue_list.html"):
             bobj["name"] = r.hget("bmk:"+bobj["usr"]+":"+bobj["beacon"],"name")
         elif type=="remove": 
             bobj = json.loads(obj) 
-#             bobj["name"] = r.hget("bmk:"+bobj["usr"]+":"+bobj["beacon"],"name")
+            bobj["name"] = r.hget("bmk:"+bobj["usr"],"name")
         return bobj
-    beaconqueue_list = r.lrange("queue:beacon",0,50)
+    beaconqueue_list = r.lrange("queue:beacon",0,20)
+    bqcnt= r.llen("queue:beacon")
     beaconqueue_done_list = r.lrange("queue:beacon:done",0,5)
     beaconqueue_list = [loadbeacon(obj) for obj in beaconqueue_list]
     beaconqueue_done_list = [loadbeacon(obj) for obj in beaconqueue_done_list]
     
-    removeq_list = r.lrange("queue:removedoc",0,50)
+    removeq_list = r.lrange("queue:removedoc",0,20)
+    rqcnt= r.llen("queue:removedoc")
     removeq_done_list = r.lrange("queue:removedoc:done",0,5)
-    removeq_list = [json.loads(obj)  for obj in removeq_list]
-    removeq_done_list = [json.loads(obj)  for obj in removeq_done_list]
+    removeq_list = [loadbeacon(obj,"remove")  for obj in removeq_list]
+    removeq_done_list = [loadbeacon(obj,"remove")  for obj in removeq_done_list]
+    
+    sendemail_list = r.lrange("queue:sendemail",0,20)
+    sqcnt= r.llen("queue:sendemail")
+    sendemail_done_list = r.lrange("queue:sendemail:done",0,5)
+    sendemail_list = [json.loads(obj)  for obj in sendemail_list]
+    sendemail_done_list = [json.loads(obj)  for obj in sendemail_done_list]
     
     return render_to_response(template_name, { 
         'username':username, 
         'beaconqueues':beaconqueue_list,
         'beaconqueuedones':beaconqueue_done_list,
+        'bqcnt':bqcnt,
+        
         'removeqs':removeq_list,
         'removeqdones':removeq_done_list,
+        'rqcnt':rqcnt,
+        
+        'sendemailqs':sendemail_list,
+        'sendemailqdones':sendemail_done_list,
+        'sqcnt':sqcnt,
         'current_path': request.get_full_path(),
     }, context_instance=RequestContext(request)) 
 

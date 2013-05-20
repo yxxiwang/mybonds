@@ -42,7 +42,7 @@
                 {% endfor %}
               </tbody>
             </table>  <table class="table table-hover table-striped table-bordered table-condensed">
-              <caption>频道新闻待处理队列 (最后50条: {{ beaconqueues|length }}+) <a href="/queuelist?delete=beacon" >一键清空</a></caption>
+              <caption>频道新闻待处理队列 (最后: {{ beaconqueues|length }} 条,共: {{bqcnt}} 条) <a href="/queuelist?delete=beacon" >一键清空</a></caption>
               <thead>
                 <tr>
                   <th>time</th>
@@ -77,13 +77,13 @@
                 <tr class="info">
                   <td>{{rq.tms}}</td>
                   <td>{{rq.docid}}</td>
-                  <td>{{rq.usr}}</td>
+                  <td>{{rq.name}}</td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>  
             <table class="table table-hover table-striped table-bordered table-condensed">
-              <caption>移除新闻待处理队列 (最后50条: {{ removeqs|length }} +) <a href="/queuelist?delete=removedoc" >一键清空</a></caption>
+              <caption>移除新闻待处理队列 (最后: {{ removeqs|length }} 条,共: {{rqcnt}} 条 ) <a href="/queuelist?delete=removedoc" >一键清空</a></caption>
               <thead>
                 <tr>
                   <th>time</th>
@@ -96,7 +96,7 @@
                 <tr class="info">
                   <td>{{rq.tms}}</td>
                   <td>{{rq.docid}}</td>
-                  <td>{{rq.usr}}</td>
+                  <td>{{rq.name}}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -105,20 +105,39 @@
 
           <div class="tab-pane" id="tab3">
             <table class="table table-hover table-striped table-bordered table-condensed">
-              <caption>发送邮件待处理 (最后50条: {{ beaconqueues|length }}+) <a href="/queuelist?delete=sendemail" >一键清空</a></caption>
+              <caption>发送邮件已处理队列(最后5条)</caption>
               <thead>
                 <tr>
                   <th>time</th>
-                  <th>user</th>
-                  <th>text</th>
+                  <th>id</th>
+                  <th>email</th>
                 </tr>
               </thead>
               <tbody>
-                {% for rq in removeqs %} 
+                {% for rq in sendemailqdones %} 
                 <tr class="info">
                   <td>{{rq.tms}}</td>
                   <td>{{rq.docid}}</td>
-                  <td>{{rq}}</td>
+                  <td>{{rq.email}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>  
+            <table class="table table-hover table-striped table-bordered table-condensed">
+              <caption>发送邮件待处理 (最后: {{ sendemailqs|length }} 条,共: {{sqcnt}} 条 )<a href="/queuelist?delete=sendemail" >一键清空</a></caption>
+              <thead>
+                <tr>
+                  <th>time</th>
+                  <th>id</th>
+                  <th>email</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rq in sendemailqs %} 
+                <tr class="info">
+                  <td>{{rq.tms}}</td>
+                  <td>{{rq.docid}}</td>
+                  <td>{{rq.email}}</td>
                 </tr>
                 {% endfor %}
               </tbody>

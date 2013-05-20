@@ -727,7 +727,8 @@ def refreshBeacon(beaconusr, beaconid):
             print key + " maybe deleted via front  so we ignore it..." 
             
     elif not r.exists("bmk:"+beaconusr+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
-        refreshDocs(beaconusr, beaconid)
+#         refreshDocs(beaconusr, beaconid)
+        pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
     elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
         print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt)
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  

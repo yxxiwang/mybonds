@@ -565,6 +565,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
         key = "bmk:" + beaconusr + ":" + beaconid
         
         beaconname = r.hget(key,"ttl")
+        beacondisplayname = r.hget(key,"name")
 #         if os.name =="nt":
 #             beaconname = beaconname.decode("utf8")
 #         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))
@@ -588,6 +589,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
             doc["beaconusr"] = beaconusr
             doc["beaconid"] = beaconid
             doc["beaconttl"] = beaconname 
+            doc["beaconname"] = beacondisplayname 
             doc["newscnt"] = newscnt 
             docs.append(doc) 
 #             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)

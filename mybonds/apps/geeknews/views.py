@@ -968,6 +968,7 @@ def beaconsave(request, template_name="beacon_list.html"):
     headlineonly = request.GET.get("headlineonly", "0")
     desc = request.GET.get("desc", "")
     beaconname = request.GET.get("beaconname", "")
+    beacondisplayname = request.GET.get("beacondisplayname", "")
     share = request.GET.get("share", "")
     if beaconname == "" :
         return HttpResponseRedirect("/news/beaconlist/")
@@ -983,6 +984,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         key = "bmk:" + beaconusr + ":" + beaconid
         r.hset(key, "id", beaconid)
         r.hset(key, "ttl", beaconname)
+        r.hset(key, "name", beacondisplayname)
         r.hset(key, "desc", desc)
         r.hset(key, "crt_usr", beaconusr)
         r.hset(key, "crt_tms", time.time())
@@ -1004,6 +1006,7 @@ def beaconsave(request, template_name="beacon_list.html"):
             key = "bmk:" + beaconusr + ":" + beaconid
             r.hset(key, "id", beaconid)
             r.hset(key, "ttl", beaconname)
+            r.hset(key, "name", beacondisplayname)
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc",beaconmindoc) 
         else:#modify desc and so on
@@ -1362,6 +1365,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         udata = buildBeaconData(beaconusr, beaconid)
         beacondesc = r.hget("bmk:" + beaconusr + ":" + beaconid, "desc") 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
+        beacondisplayname = r.hget("bmk:" + beaconusr + ":" + beaconid, "name")
         beaconmindoc = r.hget("bmk:" + beaconusr + ":" + beaconid, "mindoc") 
         beaconmindoc = 0 if beaconmindoc is None else beaconmindoc
         headlineonly = r.hget("bmk:" + beaconusr + ":" + beaconid, "headlineonly") 
@@ -1386,6 +1390,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         'beaconid':beaconid,#当前灯塔的ID
         'beacondesc':beacondesc,#当前灯塔的备注
         'beaconname':beaconname,#当前灯塔的名称 
+        'beacondisplayname':beacondisplayname,#当前灯塔的名称
         'beaconusr':beaconusr,#当前灯塔的名称  
         'beaconmindoc':beaconmindoc,
         'headlineonly':headlineonly,
@@ -1410,6 +1415,7 @@ def beacondelete(request, template_name="beacon/beacon_list.html"):
         r.zrem("usr:" + usr+":fllw",beaconusr+"|-|"+beaconid)
     r.delete(key + ":doc:tms")
     r.delete(key + ":fllw")
+    r.delete(key)
     
     return HttpResponseRedirect("/news/beaconlist/")
         

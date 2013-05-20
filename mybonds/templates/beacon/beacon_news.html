@@ -145,7 +145,7 @@
             {% else %}
               {% for beacon in sharebeacons %}
               <div class="well_wxi span12 "  style="margin-left:0px;"> 
-                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi"  style="font-size: 13px;">{{beacon.ttl}}</span>
+                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi"  style="font-size: 13px;">{{beacon.name}}</span>
                   <!--p style="font-size: 12px;">{{beacon.desc}}</p-->
                    <span class="badge-wxi"><abbr title="文章数">{{beacon.cnt}}</abbr></span>
                    <span class="badge-wxi-green"><abbr title="建设者">{{beacon.crt_usr}}</abbr></span>

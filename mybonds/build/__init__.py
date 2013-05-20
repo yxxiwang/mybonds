@@ -42,6 +42,9 @@ def convUsrFllw():
 #     r.srem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
 
 def makeDocDateCnt():
+    """
+                根据初始数据 生成  每日新闻条数 统计数据
+    """
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
         beaconusr,beaconid = beaconstr.split("|-|")
         print "proc %s:%s " %(beaconusr,beaconid)
@@ -59,6 +62,14 @@ def makeDocDateCnt():
             r.hincrby(doc_dcnt_key,tdate,1)
             r.hincrby(doc_dnum_key,tdate,num)
             
+def initBeaconDisplayName():
+    """初始化频道的 显示名称 为频道名称"""
+    for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
+        beaconusr,beaconid = beaconstr.split("|-|")
+        print "proc %s:%s " %(beaconusr,beaconid)
+        key = "bmk:%s:%s" % (beaconusr,beaconid)
+        r.hset(key,"name",r.hget(key,"ttl"))
+        
     
 def reflect(functionname):
     function = globals()[functionname]

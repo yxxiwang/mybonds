@@ -327,6 +327,40 @@ def groupmanage(request):
         return HttpResponse("ok")
         
 @login_required
+def queuelist(request,template_name="beacon/queue_list.html"):
+    username = getUserName(request)
+    if username not in ["ltb","wxi","sj"] :  
+        return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
+    def loadbeacon(obj,type='beacon'):
+        if type == "beacon":
+            bobj = json.loads(obj) 
+    #         bobj["tms"] = bobj["tms"][0:19] 
+            bobj["name"] = r.hget("bmk:"+bobj["usr"]+":"+bobj["beacon"],"name")
+        elif type=="remove": 
+            bobj = json.loads(obj) 
+#             bobj["name"] = r.hget("bmk:"+bobj["usr"]+":"+bobj["beacon"],"name")
+        return bobj
+    beaconqueue_list = r.lrange("queue:beacon",0,50)
+    beaconqueue_done_list = r.lrange("queue:beacon:done",0,5)
+    beaconqueue_list = [loadbeacon(obj) for obj in beaconqueue_list]
+    beaconqueue_done_list = [loadbeacon(obj) for obj in beaconqueue_done_list]
+    
+    removeq_list = r.lrange("queue:removedoc",0,50)
+    removeq_done_list = r.lrange("queue:removedoc:done",0,5)
+    removeq_list = [json.loads(obj)  for obj in removeq_list]
+    removeq_done_list = [json.loads(obj)  for obj in removeq_done_list]
+    
+    return render_to_response(template_name, { 
+        'username':username, 
+        'beaconqueues':beaconqueue_list,
+        'beaconqueuedones':beaconqueue_done_list,
+        'removeqs':removeq_list,
+        'removeqdones':removeq_done_list,
+        'current_path': request.get_full_path(),
+    }, context_instance=RequestContext(request)) 
+
+    
+@login_required
 def sysparms(request,template_name="beacon/sysparms.html"):
     username = getUserName(request)
     if username not in ["ltb","wxi","sj"] :  

@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required, permission_required
 from django.template.defaultfilters import length
+from django.utils.encoding import smart_str
 
 from mybonds.apps.newspubfunc import *
 from newspubfunc import *
@@ -125,11 +126,11 @@ def removeDocFromChannel(request):
 #     channel = to_unicode_or_bust(channel)
     
     if os.name =="nt":
-        channel = channel.decode("utf8")
-        
+        channel = smart_str(channel)
+    
     quantity = log_typer(request, "removeDocFromChannel", "remove "+docid+" from "+to_unicode_or_bust(channel))
 #     urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(docid)
-    pushQueue("removedoc", beaconusr, "removedoc",tag=urllib2.quote(channel), similarid =docid)
+    pushQueue("removedoc", key, "removedoc",tag=urllib2.quote(channel), similarid =docid)
     
     r.hincrby(key,"removecnt",1)
     

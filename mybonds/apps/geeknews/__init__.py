@@ -13,15 +13,29 @@ from mybonds.apps import *
 from mybonds.apps.newspubfunc import *
 # from django import template
 # register = template.Library()
+
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
-REDIS_EXPIRETIME = 186400
-DOC_EXPIRETIME = 86400*2
-KEY_UPTIME = 60*15
-REMOVE_KEYUPTIME = 60*5
-REMOVE_CNT = 3
-QUANTITY = 1500
-QUANTITY_DURATION = 300
+if r.exists("sysparms"):
+    REDIS_EXPIRETIME = r.hget("sysparms", "redis_expire")
+    DOC_EXPIRETIME = r.hget("sysparms", "doc_expire")
+    KEY_UPTIME = r.hget("sysparms", "beacon_interval")
+    REMOVE_KEYUPTIME = r.hget("sysparms", "beacon_interval_remove")
+    REMOVE_CNT = r.hget("sysparms", "beacon_interval_remove_cnt")
+    CHANNEL_NEWS_NUM = r.hget("sysparms", "beacon_news_num")
+    QUANTITY = r.hget("sysparms", "quantity")
+    QUANTITY_DURATION = r.hget("sysparms", "quantity_duration")
+    RETRY_TIMES = r.hget("sysparms", "failed_retry_times")
+else:
+    REDIS_EXPIRETIME = 186400
+    DOC_EXPIRETIME = 86400*2
+    KEY_UPTIME = 60*15
+    REMOVE_KEYUPTIME = 60*5
+    REMOVE_CNT = 3
+    QUANTITY = 1500
+    QUANTITY_DURATION = 300
+    CHANNEL_NEWS_NUM = 300
+    RETRY_TIMES = 3
 
 r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1)
@@ -630,7 +644,7 @@ def beaconUrl(beaconusr, beaconid):
     """
     page = 0
     if os.name =="posix":
-        length=300
+        length=CHANNEL_NEWS_NUM
     else:
         length = 10 
     key = "bmk:" + beaconusr + ":" + beaconid
@@ -1035,7 +1049,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
         urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
     else:
         urlstr = url
-    if retrycnt >=2:
+    if retrycnt >=RETRY_TIMES:
         print "Attembrough: it's failed again..retrycnt is %d" % retrycnt
         pushQueue("fulltext", "", "fulltext", "",urlstr=urlstr)
         return udata

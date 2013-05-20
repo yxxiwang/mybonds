@@ -961,6 +961,9 @@ def beaconfilter(request, template_name="beacon_list.html"):
     
 @login_required
 def beaconsave(request, template_name="beacon_list.html"):
+    username = getUserName(request)
+    if username not in ["ltb","wxi","sj"] :  
+        return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
     beaconid = request.GET.get("beaconid", "")
     beaconusr = request.GET.get("beaconusr", "")
     beaconkey = request.GET.get("beaconkey", "")
@@ -972,7 +975,6 @@ def beaconsave(request, template_name="beacon_list.html"):
     share = request.GET.get("share", "")
     if beaconname == "" :
         return HttpResponseRedirect("/news/beaconlist/")
-    username = getUserName(request)
     
     quantity = log_typer(request, "beaconsave", beaconusr+":"+beaconid)
     
@@ -1402,6 +1404,8 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
 @login_required
 def beacondelete(request, template_name="beacon/beacon_list.html"):  
     username = getUserName(request)  
+    if username not in ["ltb","wxi","sj"] :  
+        return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
     beaconusr = request.GET.get("beaconusr", "")
     beaconid = request.GET.get("beaconid", "")
 #     print beaconusr,beaconid

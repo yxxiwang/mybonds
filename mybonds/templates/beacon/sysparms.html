@@ -1,0 +1,127 @@
+
+{% extends 'beacon/admin.html' %}     
+
+{% block content %} 
+    <div class="container"> 
+	<div class="row-fluid">
+  		<div class="span12">
+    		<!--div class="row-fluid">
+      			<div class="span10">
+				      <input id="search"  type="text" class="search-query span12" placeholder="搜索" value="{{query}}"> 
+  				  </div> 
+      			<div class="span2">
+      				<button class="btn" id="mybtn" data-loading-text="正在搜索...">搜索</button>
+      			</div>
+    		</div-->
+    		<div class="row-fluid">
+      			<div class="span2" style="display:block"></div> 
+            <div class="span7" > 
+            <form class="well_wxi" method="post" action="/sysparms/" id="sysparms" style="padding-left:10px;"> 
+              {% csrf_token %} 
+              <fieldset>
+                <legend>系统参数信息修改</legend>
+                <label>系统超时时间(秒)</label>
+                <input type="text" id="redis_expire" name="redis_expire" disabled placeholder="系统超时时间(秒)" value="{{sysparmsobj.redis_expire}}">
+                <label>新闻自动过期时间(秒)</label>
+                <input type="text" id="doc_expire" name="doc_expire" placeholder="新闻自动过期时间(秒)"  value="{{sysparmsobj.doc_expire}}" >
+                <label>频道更新间隔时间(秒)</label>
+                <input type="text" id="beacon_interval" name="beacon_interval" placeholder="频道更新间隔时间(秒)" value="{{sysparmsobj.beacon_interval}}">
+                <label>频道更新间隔时间-当有新闻从频道中移除(秒)</label>
+                <input type="text" id="beacon_interval_remove" name="beacon_interval_remove" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.beacon_interval_remove}}">
+                <label>频道更新间隔时间-当有新闻从频道中移除条数(移除数目)</label>
+                <input type="text" id="beacon_interval_remove_cnt" name="beacon_interval_remove_cnt" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.beacon_interval_remove_cnt}}">
+                <label>频道从后台取新闻条数</label>
+                <input type="text" id="beacon_news_num" name="beacon_news_num" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.beacon_news_num}}">
+                <label>流量阀(请求数)</label>
+                <input type="text" id="quantity" name="quantity" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.quantity}}">
+                <label>流量阀限制时间段(秒)</label>
+                <input type="text" id="quantity_duration" name="quantity_duration" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.quantity_duration}}">
+                <label>异步处理失败重试次数</label>
+                <input type="text" id="failed_retry_times" name="failed_retry_times" placeholder="异步处理失败重试次数" tabindex="2" value="{{sysparmsobj.failed_retry_times}}">
+                <span class="help-block"> </span>
+                <!--label class="checkbox">
+                  <input type="checkbox"> Check me out
+                </label-->
+                <button type="submit" class="btn">保存</button>
+              </fieldset>
+            </form>
+            </div>
+            <div class="span3">
+              <div class="alert" id="alert-message" style="display:block;">
+                <a class="close" data-dismiss="alert">×</a>
+                <strong>提示:</strong> {% if err_message %}<br>{{err_message}} {% else %}
+                <br>各个栏位请填入数字<br>!{% endif %}
+              </div>
+
+              <!--div id="beacon-container" class="beacon-container row span12" >
+              {% for beacon in beacons %}
+                <div class="tag-item span12" style="margin-left:0px;">  
+                  <span id='info' class="label label-info">{{beacon.name}}</span><a class='close' data-dismiss='tag-item' style="float: none;">×</a>
+                </div>  
+              {% endfor %}
+              </div>
+
+              <section id="beacon-box">
+                <div class="input-append" id="beacon-box">
+                  <input class="span12" id="beacon_txt" type="text" placeholder="增加联系人邮件">
+                  <button id="add_btn" class="btn" type="button">添加邮件</button>
+                  <button id="save_btn" class="btn" type="button" >保存邮件</button>
+                </div>
+              </section--> 
+
+            </div>
+
+    		</div>
+  		</div>
+	</div> 
+
+
+  		{% for user in user_list %}
+  		<!--p>
+  			{{ user }}
+  		</p-->
+  		{% endfor %} 
+		
+    </div> <!-- /container -->
+
+{% endblock %} 
+{% block script %} 
+<script >
+  $("#beacon_txt").keydown(function(event){ 
+    if(event.keyCode==13 )
+      beacon.add_beacon();
+  })
+
+  beacon_proc = function() {
+      $tag_list_box = $('div.beacon-container');
+      $('.label').css('cursor', 'pointer');
+      $('.label').click(function(){
+        if($(this).attr('class')=='label label-success'){
+          // $(this).attr('class', 'label label-info');
+        }else{
+          // alert($(this).hasClass('label label-info')+$(this).text());
+          $(this).attr('class', 'label label-success'); 
+          // alert('/news/listsimilar/?similarid={{similarid}}&beacon='+$(this).text()+'&title={{title}}');
+          window.location.href = '/news/listsimilar/?similarid={{similarid}}&beacon='+$(this).text() ;
+        }
+          //alert($(this).parent().parent().html());
+          //$tag_list_box.isotope('close', $(this).parent().parent());
+          //$tag_list_box.isotope('insert', "<div class='tag-item' style='display:none'></div>");
+      });
+  } 
+  beacon_proc();
+
+  $tag_list_box = $('div.beacon-container');
+  $tag_list_box.find('.close').click(function(){ 
+      // $tag_list_box.isotope('remove', $(this).parent()); 
+      $(this).parent().remove();
+      beacons += $(this).parent().find('.cbox').val()+"|-|"; 
+      checklist+= "2";
+  });
+
+  $('#add_btn').click(function(){
+      beacon.add_beacon();
+  });
+
+</script>
+{% endblock %}

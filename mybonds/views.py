@@ -326,7 +326,51 @@ def groupmanage(request):
     else:
         return HttpResponse("ok")
         
-
+@login_required
+def sysparms(request,template_name="beacon/sysparms.html"):
+    username = getUserName(request)
+    if username not in ["ltb","wxi","sj"] :  
+        return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
+    if  request.method == 'GET':
+        sysparmsobj = r.hgetall("sysparms")
+         
+        return render_to_response(template_name, { 
+            'username':username, 
+            'sysparmsobj':sysparmsobj,
+            'current_path': request.get_full_path(),
+        }, context_instance=RequestContext(request)) 
+    
+    if  request.method == 'POST':
+#         redis_host = request.POST.get("redis_host", "localhost");
+#         redis_port = request.POST.get("redis_port", "6379");
+        redis_expire = request.POST.get("redis_expire", "186400");
+        doc_expire = request.POST.get("doc_expire", 86400*2);
+        beacon_interval =request.POST.get("beacon_interval", "900");
+        beacon_interval_remove = request.POST.get("beacon_interval_remove", "300");
+        beacon_interval_remove_cnt =request.POST.get("beacon_interval_remove_cnt", "3");
+        beacon_news_num =request.POST.get("beacon_news_num", "300");
+        quantity = request.POST.get("quantity", "1500");
+        quantity_duration = request.POST.get("quantity_duration", "300"); 
+        failed_retry_times = request.POST.get("failed_retry_times", "3"); 
+        r.hset("sysparms","redis_expire",redis_expire)
+        r.hset("sysparms","doc_expire",doc_expire)
+        r.hset("sysparms","beacon_interval",beacon_interval)
+        r.hset("sysparms","beacon_interval_remove",beacon_interval_remove)
+        r.hset("sysparms","beacon_interval_remove_cnt",beacon_interval_remove_cnt)
+        r.hset("sysparms","beacon_news_num",beacon_news_num)
+        r.hset("sysparms","quantity",quantity)
+        r.hset("sysparms","quantity_duration",quantity_duration)
+        r.hset("sysparms","failed_retry_times",failed_retry_times)
+        sysparmsobj = r.hgetall("sysparms")
+        print doc_expire
+        return render_to_response(template_name, {
+            'err_message': "用户信息保存成功".decode("utf8"),
+            'username':username, 
+            'sysparmsobj':sysparmsobj,
+            'current_path': request.get_full_path(),
+        }, context_instance=RequestContext(request)) 
+        
+        
 @login_required
 def user_modify(request,template_name="beacon/usermodify.html"): 
     optype = request.GET.get("o", "");

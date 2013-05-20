@@ -1,0 +1,141 @@
+
+{% extends 'beacon/admin.html' %} 
+{% block content %} 
+<div class="container"> 
+	<!--div class="navbar navbar-inverse  pagination-centered">
+  			<div class="pagination ">
+  				<ul>
+  				  <li><a href="#">Prev</a></li>
+  				  <li><a href="#">1</a></li>
+  				  <li><a href="#">2</a></li>
+  				  <li><a href="#">3</a></li>
+  				  <li><a href="#">4</a></li>
+  				  <li><a href="#">Next</a></li>
+  				</ul>
+  			</div> 	
+  		</div-->
+  		
+  		<div class="tabbable  tabs-top"> <!-- Only required for left/right tabs -->
+  			<ul class="nav nav-tabs">
+  				<li class="active"><a href="#tab1" data-toggle="tab">频道新闻队列</a></li>
+          <li ><a href="#tab2" data-toggle="tab">移除新闻队列</a></li>
+          <li ><a href="#tab3" data-toggle="tab">邮件发送队列</a></li>
+  			</ul>
+  			<div class="tab-content">
+  				<div class="tab-pane active" id="tab1">
+  					<table class="table table-hover table-striped table-bordered table-condensed">
+              <caption>频道新闻已处理队列(最后5条)</caption>
+              <thead>
+                <tr>
+                  <th>time</th>
+                  <th>code</th>
+                  <th>name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for bq in beaconqueuedones %} 
+                <tr class="info">
+                  <td>{{bq.tms}}</td>
+                  <td>{{bq.usr}}:{{bq.beacon}}</td>
+                  <td>{{bq.name}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>  <table class="table table-hover table-striped table-bordered table-condensed">
+              <caption>频道新闻待处理队列 (最后50条: {{ beaconqueues|length }}+)</caption>
+              <thead>
+                <tr>
+                  <th>time</th>
+                  <th>code</th>
+                  <th>name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for bq in beaconqueues %} 
+                <tr class="info">
+                  <td>{{bq.tms}}</td>
+                  <td>{{bq.usr}}:{{bq.beacon}}</td>
+                  <td>{{bq.name}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>  
+  				</div>
+
+          <div class="tab-pane" id="tab2">
+            <table class="table table-hover table-striped table-bordered table-condensed">
+              <caption>移除新闻已处理队列(最后5条)</caption>
+              <thead>
+                <tr>
+                  <th>time</th>
+                  <th>id</th>
+                  <th>channel</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rq in removeqdones %} 
+                <tr class="info">
+                  <td>{{rq.tms}}</td>
+                  <td>{{rq.docid}}</td>
+                  <td>{{rq.usr}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>  
+            <table class="table table-hover table-striped table-bordered table-condensed">
+              <caption>移除新闻待处理队列 (最后50条: {{ removeqs|length }} +)</caption>
+              <thead>
+                <tr>
+                  <th>time</th>
+                  <th>id</th>
+                  <th>channel</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rq in removeqs %} 
+                <tr class="info">
+                  <td>{{rq.tms}}</td>
+                  <td>{{rq.docid}}</td>
+                  <td>{{rq.usr}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>  
+          </div>
+
+          <div class="tab-pane" id="tab3">
+            <table class="table table-hover table-striped table-bordered table-condensed">
+              <caption>移除新闻待处理队列 (最后50条: {{ beaconqueues|length }}+)</caption>
+              <thead>
+                <tr>
+                  <th>time</th>
+                  <th>user</th>
+                  <th>text</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rq in removeqs %} 
+                <tr class="info">
+                  <td>{{rq.tms}}</td>
+                  <td>{{rq.docid}}</td>
+                  <td>{{rq}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>  
+          </div>
+
+  			</div>
+  		</div>
+  		
+
+
+  		{% for user in user_list %}
+  		<!--p>
+  			{{ user }}
+  		</p-->
+  		{% endfor %} 
+  		
+  	</div> <!-- /container -->
+
+  	{% endblock %} 

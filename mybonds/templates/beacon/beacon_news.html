@@ -20,7 +20,11 @@
               <li><a href="/news/beaconnews" title="灯塔阅读"><h5 style="color:white;margin-top: 3px;font-size: 13px;">灯塔阅读</h5></a></li> 
               <!--li><a href="/news/?o=ppl" title="今日热点"><h5 style="margin-top: 3px;font-size: 13px;">今日热点</h5></a></li> 
               <li><a href="/news/?o=rdd" title="我的足迹"><h5 style="margin-top: 3px;font-size: 13px;">我的足迹</h5></a></li--> 
-            </ul><a href="/usermodify/"><p class="navbar-text pull-right">{{user.username}}</a>&nbsp;&nbsp; <a href="/apply/logout">离开</a></p> 
+            
+            </ul>
+            <p class="navbar-text pull-right">{% if isadmin == "1" %}<a href="/news/adm">控制面板</a>&nbsp;&nbsp;{% endif %}
+            <a href="/usermodify/">{{user.username}}</a>&nbsp;&nbsp;
+            <a href="/apply/logout">离开</a></p> 
           </div> 
           <div class="span1">
           </div>

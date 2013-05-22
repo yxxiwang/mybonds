@@ -1249,8 +1249,9 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
     if quantity > QUANTITY:
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
-    userobj = request.user
     username = getUserName(request)
+    isadmin ="1" if username in ["ltb","wxi","sj"] else "0"  
+    
     beaobj = {}
     mybeacon_list = []
     myfllw_list = []
@@ -1342,6 +1343,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         'beacon_search':beacon_search,
         "greetings":getGreeting(),
         'orderby':orderby,
+        'isadmin':isadmin,
         'username':username,
     }, context_instance=RequestContext(request))    
 #    return HttpResponseRedirect("/news/beaconlist/?new")

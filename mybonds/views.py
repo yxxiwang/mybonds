@@ -409,17 +409,17 @@ def sysparms(request,template_name="beacon/sysparms.html"):
         quantity = request.POST.get("quantity", "1500");
         quantity_duration = request.POST.get("quantity_duration", "300"); 
         failed_retry_times = request.POST.get("failed_retry_times", "3"); 
-        r.hset("sysparms","redis_expire",redis_expire)
-        r.hset("sysparms","doc_expire",doc_expire)
-        r.hset("sysparms","beacon_interval",beacon_interval)
-        r.hset("sysparms","beacon_interval_remove",beacon_interval_remove)
-        r.hset("sysparms","beacon_interval_remove_cnt",beacon_interval_remove_cnt)
-        r.hset("sysparms","beacon_news_num",beacon_news_num)
-        r.hset("sysparms","quantity",quantity)
-        r.hset("sysparms","quantity_duration",quantity_duration)
-        r.hset("sysparms","failed_retry_times",failed_retry_times)
+        r.hset("sysparms","redis_expire",int(redis_expire))
+        r.hset("sysparms","doc_expire",int(doc_expire))
+        r.hset("sysparms","beacon_interval",int(beacon_interval))
+        r.hset("sysparms","beacon_interval_remove",int(beacon_interval_remove))
+        r.hset("sysparms","beacon_interval_remove_cnt",int(beacon_interval_remove_cnt))
+        r.hset("sysparms","beacon_news_num",int(beacon_news_num))
+        r.hset("sysparms","quantity",int(quantity))
+        r.hset("sysparms","quantity_duration",int(quantity_duration))
+        r.hset("sysparms","failed_retry_times",int(failed_retry_times))
         sysparmsobj = r.hgetall("sysparms")
-        print doc_expire
+#         print doc_expire
         return render_to_response(template_name, {
             'err_message': "用户信息保存成功".decode("utf8"),
             'username':username, 

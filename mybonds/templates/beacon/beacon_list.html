@@ -53,11 +53,12 @@
               <!--span class="badge badge-success">当前灯塔</span><br> 
               <span class="badge badge-warning">已分享灯塔</span><br--> 
             </div>
-            <input id="beacon_key"  type="hidden" class="uneditable-input" placeholder="灯塔..." value="{{beaconusr}}:{{beaconid}}"> 
             <input id="beacon_id"  type="hidden" class="uneditable-input" placeholder="灯塔..." value="{{beaconid}}"> 
-            所属用户<br><input id="beacon_usr"  type="text" class="" placeholder="灯塔所属用户" value="{{beaconusr}}"> 
+            <br>灯塔key<br><input type="text" readonly value="{{beaconusr}}:{{beaconid}}">
+            <input id="beacon_key"  type="hidden" class="uneditable-input" placeholder="灯塔..." value="{{beaconusr}}:{{beaconid}}"> 
+            <br>所属用户<br><input id="beacon_usr"  type="text" class="" placeholder="灯塔所属用户" value="{{beaconusr}}"> 
             <br>灯塔名称<br><input id="beacon_name"  type="text" class="" placeholder="灯塔名称..." value="{{beaconname}}"> 
-            <br>灯塔显示名称<br><input id="beacon_displayname"  type="text" class="" placeholder="灯塔显示名称..." value="{{beacondisplayname}}"> 
+            <br>灯塔显示名称<br><input id="beacon_displayname"  type="text" class="" placeholder="灯塔显示名称..." value="{{beacondisplayname}}">
             <br>新闻长度<br><input id="beacon_mindoc"  type="text" class="" placeholder="灯塔文章长度" value="{{beaconmindoc}}"> 
             <br>只看热点&nbsp;&nbsp;<input id="headlineonly" class='cbox' type="checkbox" value="{{headlineonly}}" {% if headlineonly == "1" %} checked {% endif %}>
             <br>描述<br><textarea id="beacon_desc" rows="3"  placeholder="灯塔描述..." >{{beacondesc}}</textarea> 

@@ -589,9 +589,9 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
 #         sim_lst += lst
         newcnt = getBeaconNewsCnt(username,beaconusr,beaconid)
         for docid in lst:
-            doc = rdoc.hgetall("doc:" + docid)  
+            doc = rdoc.hgetall("doc:" + docid)
             if len(doc.keys()) == 0:
-                continue 
+                continue
     #         if doc["validTime"]=="false" or not doc["validTime"]:
     #             continue 
     #         doc["tx"] = doc["text"]

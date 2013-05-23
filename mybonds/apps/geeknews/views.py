@@ -1486,11 +1486,12 @@ def admin(request, template_name="beacon/admin.html"):
 #    user_list = r.keys("usr:*:ppl:uptms")
     usrlst = []
     if otype=="log":
-        userinfos= r.zrevrange("log",0,1500)
+        userinfos= r.zrevrange("log",0,1000)
         for userinfo in userinfos:
 #            print userinfo
             usr=json.loads(userinfo)  
-            usr["act_tms"] = getTime(usr["tms"])
+#             usr["act_tms"] = getTime(usr["tms"])
+#             usr["act_tms"] = usr["act_tms"][0:19]
 #            if usr["ip"] not in ["203.208.60.217","203.208.60.218","203.208.60.219","123.125.71.38"]:
             if query =="" :
                 usrlst.append(usr)

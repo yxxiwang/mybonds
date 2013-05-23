@@ -147,7 +147,9 @@ def log_typer(request, act, obj):
     logobj["act"] = act
     logobj["o"] = obj
     logobj["url"] = request.get_full_path()
-    logobj["tms"]=time.time()
+#     logobj["tms"]=time.time()
+    logobj["act_tms"] = "%s" % dt.datetime.now()
+    logobj["act_tms"] = logobj["act_tms"][0:19]
     r.zadd("log", time.time(), json.dumps(logobj))
     r.hset("usrlst", username, json.dumps(logobj))
     return quantity

@@ -1504,7 +1504,7 @@ def admin(request, template_name="beacon/admin.html"):
             usr=json.loads(userinfo)  
 #             usr["act_tms"] = getTime(usr["tms"])
             usrlst.append(usr)
-        usrlst = sorted(usrlst,key=lambda l:l["tms"],reverse = True)
+        usrlst = sorted(usrlst,key=lambda l:l["act_tms"],reverse = True)
 #    print request
     return render_to_response(template_name, { 
         "usrlst": usrlst,

@@ -391,26 +391,26 @@ def greeting_typer(username, act, obj):
     r.zadd("greeting", time.time(), json.dumps(logobj)) 
 
     
-def log_typer(request, act, obj):
-    quantity = 0 
-    client_address = request.META['REMOTE_ADDR']
-#    print "client_address===:" + client_address
-    quantity = r.incr("quantity:" + client_address, 1)
-    if quantity > QUANTITY:
-        return quantity
-    r.expire("quantity:" + client_address, QUANTITY_DURATION)
-    username = getUserName(request)
-    logobj = {}
-    logobj["usr"] = username
-    logobj["ip"] = client_address
-    logobj["act"] = act
-    logobj["o"] = obj
-    logobj["url"] = request.get_full_path()
-    logobj["tms"]=time.time()
-    r.zadd("log", time.time(), json.dumps(logobj))
-    r.hset("usrlst", username, json.dumps(logobj))
-    return quantity
-    
+# def log_typer(request, act, obj):
+#     quantity = 0 
+#     client_address = request.META['REMOTE_ADDR']
+# #    print "client_address===:" + client_address
+#     quantity = r.incr("quantity:" + client_address, 1)
+#     if quantity > QUANTITY:
+#         return quantity
+#     r.expire("quantity:" + client_address, QUANTITY_DURATION)
+#     username = getUserName(request)
+#     logobj = {}
+#     logobj["usr"] = username
+#     logobj["ip"] = client_address
+#     logobj["act"] = act
+#     logobj["o"] = obj
+#     logobj["url"] = request.get_full_path()
+#     logobj["tms"]=time.time()
+#     r.zadd("log", time.time(), json.dumps(logobj))
+#     r.hset("usrlst", username, json.dumps(logobj))
+#     return quantity
+#     
     
 def refreshTagsUptime(username, otype, num, tagid=None):
     if tagid is None:

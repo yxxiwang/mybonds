@@ -1502,7 +1502,7 @@ def admin(request, template_name="beacon/admin.html"):
 #        print userinfos
         for user,userinfo in userinfos.items(): 
             usr=json.loads(userinfo)  
-            usr["act_tms"] = getTime(usr["tms"])
+#             usr["act_tms"] = getTime(usr["tms"])
             usrlst.append(usr)
         usrlst = sorted(usrlst,key=lambda l:l["tms"],reverse = True)
 #    print request

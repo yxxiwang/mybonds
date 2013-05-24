@@ -86,10 +86,13 @@ def saveData(udata,key):
     saveFulltextById(ids)
     pipedoc.execute()
     
-def channelDocs(beaconusr,beaconid): 
+def channelDocs(beaconusr,beaconid,rtycnt=0): 
     channel = getchannelByid(beaconusr,beaconid)
     if channel is None: 
         print "%s:%s haven't channel !" %(beaconusr,beaconid)
+        return
+    if rtycnt>=2 :
+        print "%s:%s rtrcnt reach %d!" %(beaconusr,beaconid,rtycnt)
         return
     urlstr="http://www.gxdx168.com/research/svc?channelid="+urllib2.quote(channel) +"&length="+str(num)
     udata = bench(loadFromUrl,parms=urlstr)
@@ -97,7 +100,6 @@ def channelDocs(beaconusr,beaconid):
     if udata.has_key("docs"): 
         saveData(udata,key)
         r.hset("bmk:" + beaconusr + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
-        r.hset("bmk:" + beaconusr + ":" + beaconid, "last_update", time.time())  # 更新操作时间  
         headlineonly = r.hget(key, "headlineonly")
         headlineonly = "0" if headlineonly is None else headlineonly
         
@@ -112,15 +114,11 @@ def channelDocs(beaconusr,beaconid):
             if doc is None:
                 continue 
             r.zadd(bkey+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
+        r.hset(bkey, "last_update", time.time())  # 更新本操作时间  
+        r.hset(bkey, "removecnt", 0)  # 更新本操作时间  
     else:
         print "%s:%s udata haven't key docs ! do it again.." %(beaconusr,beaconid)
-        udata = bench(loadFromUrl,parms=urlstr)
-        if udata.has_key("docs"):
-            saveData(udata,key)
-            r.hset("bmk:" + beaconusr + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
-            r.hset("bmk:" + beaconusr + ":" + beaconid, "last_update", time.time())  # 更新操作时间  
-        else:
-             print "=============== %s:%s ===============" %(beaconusr,beaconid)
+        channelDocs(beaconusr,beaconid,rtycnt+1)
 
 def doSum():
     pass

@@ -680,6 +680,9 @@ def refreshDocs(beaconusr, beaconid):
     
     urlstr = beaconUrl(beaconusr, beaconid)
     
+    if not r.exists(key):
+        print "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key
+        return -1
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
     r.hset(key, "removecnt", 0)  # 更新本操作时间  

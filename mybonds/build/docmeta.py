@@ -98,6 +98,20 @@ def channelDocs(beaconusr,beaconid):
         saveData(udata,key)
         r.hset("bmk:" + beaconusr + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
         r.hset("bmk:" + beaconusr + ":" + beaconid, "last_update", time.time())  # 更新操作时间  
+        headlineonly = r.hget(key, "headlineonly")
+        headlineonly = "0" if headlineonly is None else headlineonly
+        
+        bkey = "bmk:" + beaconusr + ":" + beaconid
+        if headlineonly=="0" and udata.has_key("docs"):
+            docs =  udata["docs"]
+        elif headlineonly=="1" and udata.has_key("headlines"):
+            docs =  udata["headlines"]
+            
+        r.delete(bkey+":doc:tms")
+        for doc in docs:
+            if doc is None:
+                continue 
+            r.zadd(bkey+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
     else:
         print "%s:%s udata haven't key docs ! do it again.." %(beaconusr,beaconid)
         udata = bench(loadFromUrl,parms=urlstr)

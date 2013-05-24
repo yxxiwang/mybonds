@@ -270,61 +270,120 @@ def buddyhold(request):
     else:
         return HttpResponse("ok")
         
+
 @login_required
-def groupmanage(request):
-    optype = request.GET.get("o", "")
-    acttype = request.GET.get("a", "list")
+def groupdelete(request, template_name="beacon/group_list.html"): 
     username = getUserName(request)
-    robj={}
-    if optype =="service":
-        if acttype == "list":
-            email = request.GET.get("email", "")
-            groups = r.zrevrange("usr:"+username+":group:lst",0,-1)
-            group_list=[]
-            for groupid in groups:
-                groupobj=r.hgetall("usr:"+username+":group:"+groupid)
-                groupobj["groupid"]=groupid
-                if not email=="":
-                    if r.zscore("usr:"+username+":buddy:"+groupid,email) is None:
-                        groupobj["hasemail"]="0" 
-                    else:
-                        groupobj["hasemail"]="1"  
-                else:
-                    groupobj["hasemail"]=str(r.zcard("usr:"+username+":buddy:"+groupid))
-                group_list.append(groupobj)
-#            group_list.append({"groupid":"all","groupname":"all"})
-            robj["groups"] = group_list
-            robj["success"] = 'true'
-            robj["message"] = "list group is success"
-            return HttpResponse(json.dumps(robj), mimetype="application/json")
-        elif acttype == "add": 
-            groupname = request.GET.get("groupname", "")
-            if groupname !="":
-                groupid = getHashid(groupname)
-                r.zadd("usr:"+username+":group:lst",time.time(),groupid)
-                r.hset("usr:"+username+":group:"+groupid,"groupname",groupname)  
-                robj["groupid"]=groupid 
-            robj["groupname"]=groupname  
-            robj["groupid"]=groupid  
-            robj["success"] = 'true'
-            robj["message"] = "add group is success"
-            return HttpResponse(json.dumps(robj), mimetype="application/json")
-        elif acttype == "delete":
-            groupid = request.GET.get("groupid", "")
-            groupname=""
-            if groupid !="":
-                groupname=r.hget("usr:"+username+":group:"+groupid,"groupname")
-                r.zrem("usr:"+username+":group:lst",groupid)
-                r.delete("usr:"+username+":group:"+groupid)
-                r.delete("usr:"+username+":buddy:"+groupid)
-            robj["groupid"]=groupid
-            robj["groupname"]=groupname
-            robj["success"] = 'true'
-            robj["message"] = "delete group is success"
-            return HttpResponse(json.dumps(robj), mimetype="application/json")
-            
-    else:
-        return HttpResponse("ok")
+    if username not in ["ltb","wxi","sj"] :  
+        return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
+    groupid = request.GET.get("groupid", "")
+    r.zrem("groups",groupid)
+    r.delete("group:"+groupid)
+    return HttpResponseRedirect("/grouplist/")
+    
+@login_required
+def groupsave(request, template_name="beacon/group_list.html"): 
+    username = getUserName(request)
+    if username not in ["ltb","wxi","sj"] :  
+        return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
+    gname = request.GET.get("gname", "")
+    gdesc = request.GET.get("gdesc", "")
+    gid = getHashid(gname)
+    r.hset("group:"+gid,"name",gname)
+    r.hset("group:"+gid,"desc",gdesc)
+    r.zadd("groups",time.time(),gid)
+    
+    return HttpResponseRedirect("/grouplist/?groupid="+gid)
+    
+@login_required
+def grouplist(request, template_name="beacon/group_list.html"):
+    groupid = request.GET.get("groupid", "")
+    username = getUserName(request)
+    if username not in ["ltb","wxi","sj"] :  
+        return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
+    beacons = []
+    gobj ={}
+    if groupid != "":  
+        gobj = r.hgetall("group:"+groupid)
+#         gname = "" if gname is None else gname
+        for bstr in r.zrevrange("bmk:doc:share",0,-1):
+#             busr,bid = bstr.split("|-|")
+            key = "bmk:"+bstr.replace("|-|",":")
+            bttl = r.hget(key,"tag")
+            bttl = "" if bttl is None else bttl
+            if re.search(gobj["name"],bttl): 
+                beacons.append(r.hgetall(key))
+        
+    groups = [] 
+    g_lst = r.zrevrange("groups", 0,-1)  # 组集合
+    for gid in g_lst:
+        group = r.hgetall("group:"+gid)
+        group["id"]=gid
+        groups.append(group)
+        
+    print beacons
+    return render_to_response(template_name, { 
+        'gobj': gobj,
+        'groupid': groupid,
+        'groups': groups,
+        'beacons':beacons,
+    }, context_instance=RequestContext(request)) 
+
+# @login_required
+# def groupmanage(request):
+#     optype = request.GET.get("o", "")
+#     acttype = request.GET.get("a", "list")
+#     username = getUserName(request)
+#     robj={}
+#     if optype =="service":
+#         if acttype == "list":
+#             email = request.GET.get("email", "")
+#             groups = r.zrevrange("usr:"+username+":group:lst",0,-1)
+#             group_list=[]
+#             for groupid in groups:
+#                 groupobj=r.hgetall("usr:"+username+":group:"+groupid)
+#                 groupobj["groupid"]=groupid
+#                 if not email=="":
+#                     if r.zscore("usr:"+username+":buddy:"+groupid,email) is None:
+#                         groupobj["hasemail"]="0" 
+#                     else:
+#                         groupobj["hasemail"]="1"  
+#                 else:
+#                     groupobj["hasemail"]=str(r.zcard("usr:"+username+":buddy:"+groupid))
+#                 group_list.append(groupobj)
+# #            group_list.append({"groupid":"all","groupname":"all"})
+#             robj["groups"] = group_list
+#             robj["success"] = 'true'
+#             robj["message"] = "list group is success"
+#             return HttpResponse(json.dumps(robj), mimetype="application/json")
+#         elif acttype == "add": 
+#             groupname = request.GET.get("groupname", "")
+#             if groupname !="":
+#                 groupid = getHashid(groupname)
+#                 r.zadd("usr:"+username+":group:lst",time.time(),groupid)
+#                 r.hset("usr:"+username+":group:"+groupid,"groupname",groupname)  
+#                 robj["groupid"]=groupid 
+#             robj["groupname"]=groupname  
+#             robj["groupid"]=groupid  
+#             robj["success"] = 'true'
+#             robj["message"] = "add group is success"
+#             return HttpResponse(json.dumps(robj), mimetype="application/json")
+#         elif acttype == "delete":
+#             groupid = request.GET.get("groupid", "")
+#             groupname=""
+#             if groupid !="":
+#                 groupname=r.hget("usr:"+username+":group:"+groupid,"groupname")
+#                 r.zrem("usr:"+username+":group:lst",groupid)
+#                 r.delete("usr:"+username+":group:"+groupid)
+#                 r.delete("usr:"+username+":buddy:"+groupid)
+#             robj["groupid"]=groupid
+#             robj["groupname"]=groupname
+#             robj["success"] = 'true'
+#             robj["message"] = "delete group is success"
+#             return HttpResponse(json.dumps(robj), mimetype="application/json")
+#             
+#     else:
+#         return HttpResponse("ok")
         
 @login_required
 def queuelist(request,template_name="beacon/queue_list.html"):

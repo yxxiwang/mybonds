@@ -15,12 +15,12 @@
             </div--> 
         </div><!-- /row-fluid -->
   
-        <div class="row-fluid"><!-- 左边 灯塔入口坐标文档 -->
+        <div class="row-fluid"><!-- 左边 标签入口坐标文档 -->
           <div id="beacon-container"  class="beacon-container span2" style="border-style: dotted;border-width:1px;border-color:#CBDEF1;">
 
-            {% for beacon in beacons %}
+            {% for group in groups %}
               <div class="tag-item span12"  style="margin-left:0px;">
-                <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-info">{{beacon.name}}
+                <span id='{{group.id}}' name='{{group.name}}' class="label label-info">{{group.name}}
                 <!--span class="badge ">{{beacon.cnt}}</span-->
                 </span>
                 <!--a class='close' data-dismiss='tag-item' style="float: none;">×</a-->
@@ -31,41 +31,32 @@
 
           <div class="span7"><!-- 中间灯塔similar文档 --> 
             <div class="span12" style="margin-left:0px;">
-              <span class="badge">{{ udata.docs|length}}</span>
+              <span class="badge">{{ beacons|length}}</span>
             </div> 
-            {% for doc in udata.docs %}
-            <div class="span12 doc-container" style="margin-left:0px;">
-            <blockquote>
-             <p><h5>
-             <a target="_blank" href="{{doc.url}}">{{doc.title}}&nbsp;&nbsp;</a></h5></p>  
-             <p ><small>{{doc.domain}}&nbsp;  {{doc.create_time}}&nbsp; <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
-             </small></p> 
-              {{doc.text}} 
-            </blockquote> 
+            <div class="span12 doc-container" style="margin-left:0px;"> 
+            {% for beacon in beacons %}
+            <div class="span2" style="margin-left:0px;"> 
+              <span id='{{beacon.id}}' name='{{beacon.name}}' class="label label-info">{{beacon.name}} 
+              </span>&nbsp;&nbsp; 
             </div>
             {% endfor %}     
+            </div>
           </div>
 
           <div class="control-group span3" id="beacon-box"> 
             <div class="alert" id="add-error" style="display:block;">
               <a class="close" data-dismiss="alert">×</a>
-              <strong>提示</strong> 请输入灯塔名称再保存,多个标签请用逗号分隔<br>
+              <strong>提示</strong> 请输入标签名称再保存<br>
               <!--span class="badge badge-success">当前灯塔</span><br> 
               <span class="badge badge-warning">已分享灯塔</span><br--> 
             </div>
-            <input id="beacon_id"  type="hidden" class="uneditable-input" placeholder="灯塔..." value="{{beaconid}}"> 
-            <br>灯塔key<br><input type="text" readonly value="{{beaconusr}}:{{beaconid}}">
-            <input id="beacon_key"  type="hidden" class="uneditable-input" placeholder="灯塔..." value="{{beaconusr}}:{{beaconid}}"> 
-            <br>所属用户<br><input id="beacon_usr"  type="text" class="" placeholder="灯塔所属用户" value="{{beaconusr}}"> 
-            <br>灯塔名称<br><input id="beacon_name"  type="text" class="" placeholder="灯塔名称..." value="{{beaconname}}"> 
-            <br>灯塔显示名称<br><input id="beacon_displayname"  type="text" class="" placeholder="灯塔显示名称..." value="{{beacondisplayname}}">
-            <br>新闻长度<br><input id="beacon_mindoc"  type="text" class="" placeholder="灯塔文章长度" value="{{beaconmindoc}}"> 
-            <br>只看热点&nbsp;&nbsp;<input id="headlineonly" class='cbox' type="checkbox" value="{{headlineonly}}" {% if headlineonly == "1" %} checked {% endif %}>
-            <br>标签<br><input id="beacontag"  type="text" class="" placeholder="灯塔标签" value="{{beacontag}}"> 
-            <br>描述<br><textarea id="beacon_desc" rows="3"  placeholder="灯塔描述..." >{{beacondesc}}</textarea> 
-            <button id="add_btn" class="btn btn-warning">新增灯塔</button>
-            <button id="save_btn" class="btn btn-primary">修改保存灯塔</button>
-            <!--button id="backup_btn" class="btn btn-primary">备份灯塔</button> 
+            <input id="gid"  type="hidden" class="uneditable-input" placeholder="标签..." value="{{groupid}}"> 
+            <br>标签id<br><input type="text" readonly value="{{groupid}}">  
+            <br>标签名称<br><input id="gname"  type="text" class="" placeholder="标签名称..." value="{{gobj.name}}">  
+            <br>标签描述<br><textarea id="gdesc" rows="3"  placeholder="标签描述...">{{gobj.desc}}</textarea> 
+            <button id="add_btn" class="btn btn-warning">保存标签</button>
+            <!--button id="save_btn" class="btn btn-primary">修改保存标签</button>
+            <button id="backup_btn" class="btn btn-primary">备份灯塔</button> 
             <button id="restore_btn" class="btn btn-primary">恢复灯塔</button--> 
             <br><br>
             <div class="span12" style="margin-left:0px;border-style: dotted;border-width:1px;border-color:#CBDEF1;">
@@ -91,10 +82,10 @@
 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">删除灯塔</h3>
+    <h3 id="myModalLabel">删除标签</h3>
   </div>
   <div class="modal-body">
-    <p>是否确认删除该灯塔?</p>
+    <p>是否确认删除该标签?</p>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
@@ -117,19 +108,19 @@
   //         window.location.href = '/news/savebeacon/?similarid={{similarid}}&beacon='+$(this).text() ;
   // })
 
-  $('#{{beaconid}}').attr('class', 'label label-success');
+  $('#{{groupid}}').attr('class', 'label label-success');
 
   beacon_proc = function() {
       $tag_list_box = $('div.beacon-container');
       $('.label').css('cursor', 'pointer');
       $('.label').click(function(){
-        // alert($(this).attr('class'))
+        // alert($(this).attr('id'))
         if($(this).attr('class')=='label label-success'){
           // $(this).attr('class', 'label label-success');
         }else{ 
           $(this).attr('class', 'label label-info');  
           // alert('/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name'));
-          window.location.href = '/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name') ;
+          window.location.href = '/grouplist/?groupid='+$(this).attr('id');
         } 
       });
   }
@@ -152,50 +143,20 @@
 
   $('#delete_btn').click(function(){
     // alert('/news/beacondelete/?beaconid='+delete_id+'&beaconusr='+beaconusr);
-    window.location.href = encodeURI('/news/beacondelete/?beaconid='+delete_id+'&beaconusr='+beaconusr);
+    window.location.href = encodeURI('/groupdelete/?groupid='+delete_id);
   });
 
   beacon_proc();
-
-  $('#share_btn').click(function(){
-    beacon_id = $('#beacon_id').val();
-    beacon_name = $('#beacon_name').val();
-    beacon_desc = $('#beacon_desc').val();
-    if(beacon_name==""){
-      alert("灯塔名称不能为空"); 
-      return ;
-    }
-    {%if shared %} 
-    window.location.href = encodeURI('/news/beaconsave/?share=0&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconname='+beacon_name) ;
-    {% else %} 
-    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconname='+beacon_name) ;
-    {% endif %}
-  });
-
-  $('#refresh_btn').click(function(){
-    window.location.href = encodeURI('/news/beaconrefresh/');
-  });
- 
-  // var doc_selected = new Array();
-  $('#add_btn').click(function(){
-    beacon_key = $('#beacon_key').val();
-    beacon_usr = $('#beacon_usr').val();
-    beacon_name = $('#beacon_name').val();
-    beacon_displayname = $('#beacon_displayname').val();
-    beacon_desc = $('#beacon_desc').val();
-    beacon_mindoc = $('#beacon_mindoc').val();
-    headlineonly = "0";
-    beacontag = $('#beacontag').val();
-    if(beacon_name==""){
-      alert("灯塔名称不能为空"); 
+  
+  $('#add_btn').click(function(){ 
+    gname = $('#gname').val();
+    gdesc = $('#gdesc').val();
+    if(gname==""){
+      alert("标签名称不能为空"); 
       return ;
     } 
-    if($("#isheadline").is(':checked')){
-        headlineonly= "1"; 
-    }
-
     // alert('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beaconusr='+beacon_usr);
-    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beaconusr='+beacon_usr+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly+'&beacondisplayname='+beacon_displayname+'&beacontag='+beacontag);
+    window.location.href = encodeURI('/groupsave/?gdesc='+gdesc+'&gname='+gname);
     // $('#beacon_id').val("");
     // $('#beacon_name').val("");
     // $('#beacon_desc').val(""); 
@@ -210,7 +171,6 @@
     beacon_desc = $('#beacon_desc').val();
     beacon_mindoc = $('#beacon_mindoc').val();
     headlineonly = "0";
-    beacontag = $('#beacontag').val();
     if(beacon_name==""){
       alert("灯塔名称不能为空"); 
       return ;
@@ -220,7 +180,7 @@
     }
     
     // alert('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key);
-    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly+'&beacondisplayname='+beacon_displayname+'&beacontag='+beacontag);
+    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly+'&beacondisplayname='+beacon_displayname);
   });
 
 </script>

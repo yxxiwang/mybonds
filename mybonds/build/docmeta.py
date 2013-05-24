@@ -100,10 +100,10 @@ def channelDocs(beaconusr,beaconid,rtycnt=0):
     if udata.has_key("docs"): 
         saveData(udata,key)
         r.hset("bmk:" + beaconusr + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
-        headlineonly = r.hget(key, "headlineonly")
+        bkey = "bmk:" + beaconusr + ":" + beaconid
+        headlineonly = r.hget(bkey, "headlineonly")
         headlineonly = "0" if headlineonly is None else headlineonly
         
-        bkey = "bmk:" + beaconusr + ":" + beaconid
         if headlineonly=="0" and udata.has_key("docs"):
             docs =  udata["docs"]
         elif headlineonly=="1" and udata.has_key("headlines"):

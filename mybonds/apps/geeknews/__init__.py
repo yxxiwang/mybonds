@@ -625,11 +625,11 @@ def beaconUrl(beaconusr, beaconid):
     channel = r.hget(key,"ttl")
     channel = "" if channel is None else channel
     mindoc = r.hget(key,"mindoc") 
-    mindoc = 0 if mindoc is None else mindoc
+    mindoc = 0 if mindoc is None else mindoc 
     if int(mindoc) <= 0 :
-        urlstr = "http://%s/research/svc?channelid="+channel+"&page=%s&length=%s" %(BACKEND_DOMAIN,page,length)
+        urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s" %(BACKEND_DOMAIN,channel,page,length)
     else:
-        urlstr = "http://%s/research/svc?channelid="+channel+"&page=%s&length=%s&mindoc=%s" %(BACKEND_DOMAIN,page,length,mindoc)
+        urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s&mindoc=%s" %(BACKEND_DOMAIN,channel,page,length,mindoc)
     return urlstr
 
 def refreshDocs(beaconusr, beaconid):

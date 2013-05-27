@@ -39,7 +39,7 @@ else:
     RETRY_TIMES = 3
     BACKEND_DOMAIN = "svc.zhijixing.com"
     DOMAIN = "www.9cloudx.com" 
- 
+
 def sendemail(content, rcv_email,title=""):
     from django.core.mail import send_mail
     print "================sendemail============================"

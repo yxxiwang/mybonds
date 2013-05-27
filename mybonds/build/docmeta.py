@@ -20,7 +20,7 @@ else:#os.name=="posix"
     path.append("/root")
 
 from mybonds.apps import *
-from mybonds.apps.newspubfunc import *
+from mybonds.apps.newspubfunc import * 
 import argparse
 
 num = 0
@@ -30,7 +30,7 @@ def saveFulltextById(ids,retrycnt=0):
         return {}
     if retrycnt>=2:
         return {}
-    urlstr = "http://%s/research/svc?docid=" % (BACKEND_DOMAIN,ids)
+    urlstr = "http://%s/research/svc?docid=%s" % (BACKEND_DOMAIN,ids)
     def fetchAndSave(docs):
        for doc in docs:
            if doc.has_key("fulltext"):

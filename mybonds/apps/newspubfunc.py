@@ -9,17 +9,36 @@ import traceback
 import datetime as dt
 from numpy.ma.core import isMA   
  
-from mybonds.apps import *
+from mybonds.apps import * 
 
 REDIS_HOST = 'localhost'
-REDIS_PORT = 6379 
-REDIS_EXPIRETIME = 186400
-DOC_EXPIRETIME = 86400*7
-KEY_UPTIME = 1800
-QUANTITY = 1500
-QUANTITY_DURATION = 300
+REDIS_PORT = 6379
 r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
-rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1)
+rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1) 
+if r.exists("sysparms"):
+    REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire"))
+    DOC_EXPIRETIME = int(r.hget("sysparms", "doc_expire") )
+    KEY_UPTIME = int(r.hget("sysparms", "beacon_interval"))
+    REMOVE_KEYUPTIME = int(r.hget("sysparms", "beacon_interval_remove"))
+    REMOVE_CNT = int(r.hget("sysparms", "beacon_interval_remove_cnt"))
+    CHANNEL_NEWS_NUM = int(r.hget("sysparms", "beacon_news_num"))
+    QUANTITY = int(r.hget("sysparms", "quantity"))
+    QUANTITY_DURATION = int(r.hget("sysparms", "quantity_duration"))
+    RETRY_TIMES = int(r.hget("sysparms", "failed_retry_times"))
+    BACKEND_DOMAIN = r.hget("sysparms", "backend_domain")
+    DOMAIN = r.hget("sysparms", "domain")
+else:
+    REDIS_EXPIRETIME = 186400
+    DOC_EXPIRETIME = 86400*2
+    KEY_UPTIME = 60*15
+    REMOVE_KEYUPTIME = 60*5
+    REMOVE_CNT = 3
+    QUANTITY = 1500
+    QUANTITY_DURATION = 300
+    CHANNEL_NEWS_NUM = 300
+    RETRY_TIMES = 3
+    BACKEND_DOMAIN = "svc.zhijixing.com"
+    DOMAIN = "www.9cloudx.com" 
  
 def sendemail(content, rcv_email,title=""):
     from django.core.mail import send_mail

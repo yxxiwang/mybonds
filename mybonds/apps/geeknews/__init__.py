@@ -26,6 +26,8 @@ if r.exists("sysparms"):
     QUANTITY = int(r.hget("sysparms", "quantity"))
     QUANTITY_DURATION = int(r.hget("sysparms", "quantity_duration"))
     RETRY_TIMES = int(r.hget("sysparms", "failed_retry_times"))
+    BACKEND_DOMAIN = r.hget("sysparms", "backend_domain")
+    DOMAIN = r.hget("sysparms", "domain")
 else:
     REDIS_EXPIRETIME = 186400
     DOC_EXPIRETIME = 86400*2
@@ -36,6 +38,8 @@ else:
     QUANTITY_DURATION = 300
     CHANNEL_NEWS_NUM = 300
     RETRY_TIMES = 3
+    BACKEND_DOMAIN = "svc.zhijixing.com"
+    DOMAIN = "www.9cloudx.com"
 
 r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1)
@@ -86,7 +90,7 @@ def emailcontent(udata):
         for doc in beacon["docs"]:
             title = to_unicode_or_bust(doc["title"])
             url = to_unicode_or_bust(doc["url"])
-            url = "http://www.9cloudx.com/news/research/?likeid=%s&url=%s&title=%s " %(getHashid(url),url,title)
+            url = "http://%s/news/research/?likeid=%s&url=%s&title=%s " %(DOMAIN,getHashid(url),url,title)
             content= textstr
             content = content.replace("{{url}}", url)
             content = content.replace("{{title}}", title)
@@ -653,9 +657,9 @@ def beaconUrl(beaconusr, beaconid):
     mindoc = r.hget(key,"mindoc") 
     mindoc = 0 if mindoc is None else mindoc
     if int(mindoc) <= 0 :
-        urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
+        urlstr = "http://%s/research/svc?channelid="+channel+"&page=%s&length=%s" %(BACKEND_DOMAIN,page,length)
     else:
-        urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s&mindoc=%s" %(page,length,mindoc)
+        urlstr = "http://%s/research/svc?channelid="+channel+"&page=%s&length=%s&mindoc=%s" %(BACKEND_DOMAIN,page,length,mindoc)
     return urlstr
 
 def refreshDocs(beaconusr, beaconid):
@@ -846,7 +850,7 @@ def saveRelativeDocs(username, relativeid):
 def saveDocsByIDS(docids):
     print "==============geeknews/saveDocsByID============"  
     docstr = ";".join(docids)
-    urlstr = "http://www.gxdx168.com/research/svc?docid=" + docstr 
+    urlstr = "http://%s/research/svc?docid=%s" % (BACKEND_DOMAIN,docstr) 
     udata=getDataByUrl(urlstr)
     docs = [] 
     if udata.has_key("docs"):
@@ -921,12 +925,7 @@ def saveSimilarDocs(similarids):
     else:
         similarstr = similarids
     urlstr = "http://www.gxdx168.com/research/svc?length=1100&similarid=" + similarstr
-    udata=getDataByUrl(urlstr)
-#    start = time.clock() 
-#    udata = loadFromUrl(urlstr) 
-#    urlstop = time.clock()  
-#    diff = urlstop - start  
-#    print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff))  
+    udata=getDataByUrl(urlstr) 
     docs = []
     if udata.has_key("docs"):
         docs = udata["docs"]
@@ -1050,7 +1049,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
     if url=="" :
         if ids is None or ids =="":
             return udata
-        urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
+        urlstr = "http://%s/research/svc?docid=%s" %(BACKEND_DOMAIN,ids)
     else:
         urlstr = url
     if retrycnt >=RETRY_TIMES:

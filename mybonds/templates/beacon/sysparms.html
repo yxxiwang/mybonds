@@ -14,39 +14,88 @@
       			</div>
     		</div-->
     		<div class="row-fluid">
-      			<div class="span2" style="display:block"></div> 
-            <div class="span7" > 
-            <form class="well_wxi" method="post" action="/sysparms/" id="sysparms" style="padding-left:10px;"> 
+            <!--div class="span2" style="display:block"></div--> 
+            <div class="span8" > 
+            <form class="well_wxi form-horizontal" method="post" action="/sysparms/" id="sysparms" style="padding-left:10px;"> 
               {% csrf_token %} 
               <fieldset>
+              <div class="control-group">
                 <legend>系统参数信息修改</legend>
-                <label>系统超时时间(秒)</label>
+                <label class="control-label" for="redis_expire">系统超时时间(秒)</label>
+                <div class="controls">  
                 <input type="text" id="redis_expire" name="redis_expire" disabled placeholder="系统超时时间(秒)" value="{{sysparmsobj.redis_expire}}">
-                <label>新闻自动过期时间(秒)</label>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="backend_domain">后台域名地址</label>
+                <div class="controls">  
+                <input type="text" id="backend_domain" name="backend_domain" placeholder="后台域名地址"  value="{{sysparmsobj.backend_domain}}" >
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" >本机对应域名地址</label>
+                <div class="controls">  
+                <input type="text" id="domain" name="domain" placeholder="本机对应域名地址"  value="{{sysparmsobj.domain}}" >
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">新闻自动过期时间(秒)</label>
+                <div class="controls">  
                 <input type="text" id="doc_expire" name="doc_expire" placeholder="新闻自动过期时间(秒)"  value="{{sysparmsobj.doc_expire}}" >
-                <label>频道更新间隔时间(秒)</label>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">频道更新间隔时间(秒)</label>
+                <div class="controls">  
                 <input type="text" id="beacon_interval" name="beacon_interval" placeholder="频道更新间隔时间(秒)" value="{{sysparmsobj.beacon_interval}}">
-                <label>频道更新间隔时间-当有新闻从频道中移除(秒)</label>
-                <input type="text" id="beacon_interval_remove" name="beacon_interval_remove" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.beacon_interval_remove}}">
-                <label>频道更新间隔时间-当有新闻从频道中移除条数(移除数目)</label>
-                <input type="text" id="beacon_interval_remove_cnt" name="beacon_interval_remove_cnt" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.beacon_interval_remove_cnt}}">
-                <label>频道从后台取新闻条数</label>
-                <input type="text" id="beacon_news_num" name="beacon_news_num" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.beacon_news_num}}">
-                <label>流量阀(请求数)</label>
-                <input type="text" id="quantity" name="quantity" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.quantity}}">
-                <label>流量阀限制时间段(秒)</label>
-                <input type="text" id="quantity_duration" name="quantity_duration" placeholder="重置密码" tabindex="2" value="{{sysparmsobj.quantity_duration}}">
-                <label>异步处理失败重试次数</label>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">频道更新间隔时间(秒)</label>
+                <div class="controls">  
+                <input type="text" id="beacon_interval_remove" name="beacon_interval_remove" placeholder="频道更新间隔时间-当有新闻从频道中移除(秒)" tabindex="2" value="{{sysparmsobj.beacon_interval_remove}}"><span class="help-inline">当有新闻从频道中移除</span>  
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">频道更新间隔时间</label>
+                <div class="controls">  
+                <input type="text" id="beacon_interval_remove_cnt" name="beacon_interval_remove_cnt" placeholder="频道更新间隔时间-当有新闻从频道中移除条数" tabindex="2" value="{{sysparmsobj.beacon_interval_remove_cnt}}">
+                <p class="help-block">当有新闻从频道中移除条数(移除数目)</p>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">频道从后台取新闻条数</label>
+                <div class="controls">  
+                <input type="text" id="beacon_news_num" name="beacon_news_num" placeholder="频道从后台取新闻条数" tabindex="2" value="{{sysparmsobj.beacon_news_num}}">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">流量阀(请求数)</label>
+                <div class="controls">  
+                <input type="text" id="quantity" name="quantity" placeholder="流量阀(请求数)" tabindex="2" value="{{sysparmsobj.quantity}}">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">流量阀限制时间段(秒)</label>
+                <div class="controls">  
+                <input type="text" id="quantity_duration" name="quantity_duration" placeholder="流量阀限制时间段(秒)" tabindex="2" value="{{sysparmsobj.quantity_duration}}">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">异步处理失败重试次数</label>
+                <div class="controls">  
                 <input type="text" id="failed_retry_times" name="failed_retry_times" placeholder="异步处理失败重试次数" tabindex="2" value="{{sysparmsobj.failed_retry_times}}">
+                </div>
+              </div>
+              <div class="control-group">
                 <span class="help-block"> </span>
-                <!--label class="checkbox">
-                  <input type="checkbox"> Check me out
-                </label-->
+                <label class="control-label"> </label>
                 <button type="submit" class="btn">保存</button>
+              </div>
               </fieldset>
             </form>
             </div>
-            <div class="span3">
+            <div class="span4">
               <div class="alert" id="alert-message" style="display:block;">
                 <a class="close" data-dismiss="alert">×</a>
                 <strong>提示:</strong> {% if err_message %}<br>{{err_message}} {% else %}

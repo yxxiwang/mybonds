@@ -243,7 +243,7 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
         qobj["email"] = tag 
 #         qobj[qtype] = tag
     elif qtype == "removedoc":
-        urlstr="http://www.gxdx168.com/research/svc?u="+tag+"&o=2&likeid=-%s" %(similarid)
+        urlstr="http://%s/research/svc?u="+tag+"&o=2&likeid=-%s" %(BACKEND_DOMAIN,similarid)
         qobj["docid"] = similarid
         qobj[qtype] = tag 
 

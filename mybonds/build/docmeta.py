@@ -30,7 +30,7 @@ def saveFulltextById(ids,retrycnt=0):
         return {}
     if retrycnt>=2:
         return {}
-    urlstr = "http://www.gxdx168.com/research/svc?docid="+ids
+    urlstr = "http://%s/research/svc?docid=" % (BACKEND_DOMAIN,ids)
     def fetchAndSave(docs):
        for doc in docs:
            if doc.has_key("fulltext"):
@@ -94,7 +94,7 @@ def channelDocs(beaconusr,beaconid,rtycnt=0):
     if rtycnt>=2 :
         print "%s:%s rtrcnt reach %d!" %(beaconusr,beaconid,rtycnt)
         return
-    urlstr="http://www.gxdx168.com/research/svc?channelid="+urllib2.quote(channel) +"&length="+str(num)
+    urlstr="http://"+BACKEND_DOMAIN+"/research/svc?channelid="+urllib2.quote(channel) +"&length="+str(num)
     udata = bench(loadFromUrl,parms=urlstr)
     key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
     if udata.has_key("docs"): 

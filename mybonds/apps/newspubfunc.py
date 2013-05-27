@@ -256,13 +256,13 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     elif qtype == "fulltext":
 #         urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
 #         qobj[qtype] = tag 
-        qobj[qtype] = tag 
-    elif qtype == "sendemail": 
+        qobj[qtype] = tag
+    elif qtype == "sendemail":
         qobj["docid"] = similarid
         qobj["email"] = tag 
 #         qobj[qtype] = tag
     elif qtype == "removedoc":
-        urlstr="http://%s/research/svc?u="+tag+"&o=2&likeid=-%s" %(BACKEND_DOMAIN,similarid)
+        urlstr="http://%s/research/svc?u=%s&o=2&likeid=-%s" %(BACKEND_DOMAIN,tag,similarid)
         qobj["docid"] = similarid
         qobj[qtype] = tag 
 

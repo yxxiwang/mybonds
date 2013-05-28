@@ -165,6 +165,7 @@ def channelsbygroup(request):
     gobj = {}
     if groupid != "":  
         gobj = r.hgetall("group:"+groupid)
+        gobj["groupid"]=groupid
 #         gname = "" if gname is None else gname
         for bstr in r.zrevrange("bmk:doc:share",0,-1):
 #             busr,bid = bstr.split("|-|")
@@ -187,7 +188,7 @@ def grouplist(request):
     g_lst = r.zrevrange("groups", 0,-1)  # 组集合
     for gid in g_lst:
         group = r.hgetall("group:"+gid)
-        group["id"]=gid
+        group["groupid"]=gid
         groups.append(group)
         
     udata["groups"] = groups

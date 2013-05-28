@@ -52,15 +52,15 @@
           	<img class="img-rounded" src="/site_media/static/news/logo1x.png" alt="指极星"></a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="/sysparms">参数管理</a></li>
-              <li><a href="/news/adm" title="用户信息">用户</a></li>
-              <li><a href="/news/captchalist">邀请码</a></li>
-              <li><a href="/news/adm/?otype=log">日志</a></li>
+              <li id="sysparms"><a href="/sysparms">参数管理</a></li>
+              <li id="userinfo"><a href="/news/adm" title="用户信息">用户</a></li>
+              <li id="captchalist"><a href="/news/captchalist">邀请码</a></li>
+              <li id="log"><a href="/news/adm/?otype=log">日志</a></li>
               <!--li><a href="/news/feedbacks">反馈</a></li>
               <li><a href="/news/search">搜索</a></li-->
-              <li><a href="/queuelist">队列处理状况</a></li>
-              <li><a href="/news/beaconlist">灯塔编辑</a></li> 
-              <li><a href="/grouplist">标签编辑</a></li> 
+              <li id="queuelist"><a href="/queuelist">队列处理状况</a></li>
+              <li id="beaconlist"><a href="/news/beaconlist">灯塔编辑</a></li> 
+              <li id="grouplist"><a href="/grouplist">标签编辑</a></li> 
               <!--li><a href="/news/mybeacons">我的灯塔</a></li> 
               <li><a href="/news/beaconnews">灯塔阅读</a></li--> 
             </ul><a href="/usermodify/"><p class="navbar-text pull-right">{{user.username}}</a>&nbsp;&nbsp; <a href="/apply/logout">离开</a></p> 
@@ -166,6 +166,13 @@
 
 {% block script %} 
     <script>
+
+{% if otype == "log" %} 
+  $('#log').attr('class', 'active'); 
+{% else %}
+  $('#userinfo').attr('class', 'active'); 
+{% endif %} 
+
   $('#search_btn').click(function(){
     // if($('#beaconsearch').val()=="") return;
     $(this).button('loading');

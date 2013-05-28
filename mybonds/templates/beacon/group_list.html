@@ -36,7 +36,7 @@
             <div class="span12 doc-container" style="margin-left:0px;"> 
             {% for beacon in beacons %}
             <div class="span2" style="margin-left:0px;"> 
-              <span id='{{beacon.id}}' name='{{beacon.name}}' class="label label-info">{{beacon.name}} 
+              <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label" >{{beacon.name}} 
               </span>&nbsp;&nbsp; 
             </div>
             {% endfor %}     
@@ -108,6 +108,8 @@
   //         window.location.href = '/news/savebeacon/?similarid={{similarid}}&beacon='+$(this).text() ;
   // })
 
+  $('#grouplist').attr('class', 'active');
+  
   $('#{{groupid}}').attr('class', 'label label-success');
 
   beacon_proc = function() {
@@ -117,10 +119,12 @@
         // alert($(this).attr('id'))
         if($(this).attr('class')=='label label-success'){
           // $(this).attr('class', 'label label-success');
-        }else{ 
+        }else if($(this).attr('class')=='label label-info'){ 
           $(this).attr('class', 'label label-info');  
           // alert('/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name'));
           window.location.href = '/grouplist/?groupid='+$(this).attr('id');
+        }else if($(this).attr('class')=='label'){
+          window.location.href = '/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('id');
         } 
       });
   }

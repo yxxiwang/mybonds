@@ -136,6 +136,8 @@
 {% endblock %} 
 {% block script %} 
 <script >
+  $('#sysparms').attr('class', 'active');
+  
   $("#beacon_txt").keydown(function(event){ 
     if(event.keyCode==13 )
       beacon.add_beacon();

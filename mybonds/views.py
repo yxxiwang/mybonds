@@ -321,7 +321,7 @@ def grouplist(request, template_name="beacon/group_list.html"):
         group["id"]=gid
         groups.append(group)
         
-    print beacons
+#     print beacons
     return render_to_response(template_name, { 
         'gobj': gobj,
         'groupid': groupid,

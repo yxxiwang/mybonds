@@ -62,15 +62,12 @@ def newsdetail(request):
         rtlst=[]
         for el in lst:
             di ={}
-            di[key]=el
+            di[key]="\u3000\u3000"+el
             rtlst.append(di)
         return rtlst
     
     if rdoc.exists("doc:"+docid) and rdoc.exists("ftx:"+docid):
-        doc = rdoc.hgetall("doc:"+docid)
-#         ftxdic= json.loads(rdoc.get("ftx:"+docid))
-#         print rdoc.get("ftx:"+docid)
-#         ftx = " \r\n    ".join(json.loads(rdoc.get("ftx:"+docid)))
+        doc = rdoc.hgetall("doc:"+docid) 
         if rtype =="string":
             #在每个段落之前插入两个中文全角空格: \u3000
             txstr = rdoc.get("ftx:"+docid).replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")

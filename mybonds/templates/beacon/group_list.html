@@ -109,7 +109,7 @@
   // })
 
   $('#grouplist').attr('class', 'active');
-  
+
   $('#{{groupid}}').attr('class', 'label label-success');
 
   beacon_proc = function() {
@@ -124,9 +124,9 @@
           // alert('/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name'));
           window.location.href = '/grouplist/?groupid='+$(this).attr('id');
         }else if($(this).attr('class')=='label'){
-          window.location.href = '/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('id');
+          window.location.href = '/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name');
         } 
-      });
+      }); 
   }
  
 

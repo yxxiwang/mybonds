@@ -63,13 +63,33 @@ def makeDocDateCnt():
             r.hincrby(doc_dnum_key,tdate,num)
 def cleanBeacon(op="print"):
     """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""
-    for bstr in r.zrevrange("bmk:doc:share",0,-1):
+#     for bstr in r.zrevrange("bmk:doc:share",0,-1):
+
+    def deleteBeacon(beaconusr,beaconid):            
+        r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid) 
+        r.zrem("bmk:doc:share:byfllw",beaconusr+"|-|"+beaconid) 
+        r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid)
+        r.zrem("usr:" + beaconusr+":fllw",beaconusr+"|-|"+beaconid)
+        key = "bmk:"+beaconusr+":"+beaconid
+        for usr in r.smembers(key+":fllw"):
+            r.zrem("usr:" + usr+":fllw",beaconusr+"|-|"+beaconid)
+        r.delete(key + ":doc:tms")
+        r.delete(key + ":fllw")
+        r.delete(key)
+        
+    for bstr in r.keys("bmk:*"):
 #         print bstr,op
-        bkey = "bmk:"+bstr.replace("|-|",":")
+        if len(bstr.split(":"))!=3:
+            continue
+        bkey = ":".join(bstr.split(":")[0:3])
+#         print bkey,"==",r.type(bkey)
+#         bkey = "bmk:"+bstr.replace("|-|",":")
+        if r.type(bkey) != "hash":
+            continue
         if r.hget(bkey,"ttl") is None or r.hget(bkey,"ttl")=="" :
             print bkey , ",is null!"
             if op=="delete":
-                r.delete(bkey)
+                deleteBeacon(bkey.split(":")[1],bkey.split(":")[2])
                 
     key_lst = r.keys("usr:*:fllw")
     for key in key_lst:

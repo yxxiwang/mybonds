@@ -171,7 +171,7 @@ def channelsbygroup(request):
             key = "bmk:"+bstr.replace("|-|",":")
             bttl = r.hget(key,"tag")
             bttl = "" if bttl is None else bttl
-            if re.search(gobj["name"],bttl): 
+            if re.search(gobj["name"],bttl):
                 beacons.append(r.hgetall(key))
     
     udata["group"] = gobj

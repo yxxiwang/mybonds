@@ -64,9 +64,9 @@ def makeDocDateCnt():
 def cleanBeacon(op="print"):
     """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""
     for bstr in r.zrevrange("bmk:doc:share",0,-1):
-        print bstr,op
+#         print bstr,op
         bkey = "bmk:"+bstr.replace("|-|",":")
-        if r.hget(bkey,"ttl") is None:
+        if r.hget(bkey,"ttl") is None or r.hget(bkey,"ttl")=="" :
             print bkey , ",is null!"
             if op=="delete":
                 r.delete(bkey)

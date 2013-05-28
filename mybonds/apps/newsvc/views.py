@@ -62,7 +62,7 @@ def newsdetail(request):
         rtlst=[]
         for el in lst:
             di ={}
-            di[key]="\u3000\u3000"+el
+            di[key]=el
             rtlst.append(di)
         return rtlst
     
@@ -74,7 +74,8 @@ def newsdetail(request):
             ftx = "\r\n".join(json.loads(txstr))
             doc["fulltext"] = list2dict([ftx],"txt")
         else:
-            doc["fulltext"] = list2dict(json.loads(rdoc.get("ftx:"+docid)),"txt")
+            txstr = rdoc.get("ftx:"+docid).replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")
+            doc["fulltext"] = list2dict(json.loads(txstr),"txt")
 #         doc["text"] = subDocText(doc["text"])
         doc["text"] = ""
         doc["copyNum"] = str(doc["copyNum"])

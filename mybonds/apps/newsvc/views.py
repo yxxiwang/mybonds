@@ -10,7 +10,10 @@ from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required, permission_required
 from django.template.defaultfilters import length
 from django.utils.encoding import smart_str
-
+import json,re
+import csv, string
+import sys, time
+import redis
 from mybonds.apps.newspubfunc import *
 from newspubfunc import *
 from mybonds.apps.newsvc import *
@@ -44,8 +47,7 @@ def channelnews(request):
 @login_required
 def channels(request):
     return HttpResponse("channels")
-
-@login_required
+ 
 def newsdetail(request):  
     username = request.GET.get("u", getUserName(request)) 
     docid=request.GET.get("docid", "")
@@ -154,6 +156,44 @@ def removeDocFromChannel(request):
     if op == "page":
         return HttpResponseRedirect('/news/beaconnews/?orderby=tms&beaconid=%s&beaconusr=%s' %(beaconid,beaconusr))
     
+    return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    
+def channelsbygroup(request):
+    groupid = request.GET.get("groupid", "") 
+    udata={} 
+    beacons = [] 
+    gobj = {}
+    if groupid != "":  
+        gobj = r.hgetall("group:"+groupid)
+#         gname = "" if gname is None else gname
+        for bstr in r.zrevrange("bmk:doc:share",0,-1):
+#             busr,bid = bstr.split("|-|")
+            key = "bmk:"+bstr.replace("|-|",":")
+            bttl = r.hget(key,"tag")
+            bttl = "" if bttl is None else bttl
+            if re.search(gobj["name"],bttl): 
+                beacons.append(r.hgetall(key))
+    
+    udata["group"] = gobj
+    udata["beacons"] = beacons
+    udata["total"] = len(beacons)
+    udata["message"]="success list beacons ." 
+    udata["success"] = "true"
+    return HttpResponse(json.dumps(udata), mimetype="application/json") 
+        
+def grouplist(request):
+    udata={} 
+    groups = [] 
+    g_lst = r.zrevrange("groups", 0,-1)  # 组集合
+    for gid in g_lst:
+        group = r.hgetall("group:"+gid)
+        group["id"]=gid
+        groups.append(group)
+        
+    udata["groups"] = groups
+    udata["total"] = len(groups)
+    udata["message"]="success list groups ." 
+    udata["success"] = "true"
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     
 def countDocs(request):

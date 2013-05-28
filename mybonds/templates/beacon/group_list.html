@@ -36,7 +36,7 @@
             <div class="span12 doc-container" style="margin-left:0px;"> 
             {% for beacon in beacons %}
             <div class="span4" style="margin-left:0px;">  
-              <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label" >{{beacon.name}} 
+              <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-important" >{{beacon.name}} 
               </span>&nbsp;&nbsp; 
             </div>
             {% endfor %}     
@@ -123,7 +123,7 @@
           $(this).attr('class', 'label label-info');  
           // alert('/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name'));
           window.location.href = '/grouplist/?groupid='+$(this).attr('id');
-        }else if($(this).attr('class')=='label'){
+        }else if($(this).attr('class')=='label label-important'){
           window.location.href = '/news/beaconlist/?beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name');
         } 
       }); 

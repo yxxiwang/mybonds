@@ -8,5 +8,7 @@ urlpatterns = patterns('newsvc.views',
     url(r'^channelnews/$', 'channelnews', name="channelnews"),   
     url(r'^newsdetail/$', 'newsdetail', name="newsdetail"), 
     url(r'^removedocfromchannel/$', 'removeDocFromChannel', name="removeDocFromChannel"), 
+    url(r'^grouplist/$', 'grouplist', name="grouplist"), 
+    url(r'^channelsbygroup/$', 'channelsbygroup', name="channelsbygroup"), 
     # upload lswdata 
 )

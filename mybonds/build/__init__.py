@@ -61,7 +61,26 @@ def makeDocDateCnt():
             print "%s incr 1 ,num:%d" %(tdate,num)
             r.hincrby(doc_dcnt_key,tdate,1)
             r.hincrby(doc_dnum_key,tdate,num)
+def cleanBeacon(op="print"):
+    """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""
+    for bstr in r.zrevrange("bmk:doc:share",0,-1):
+        print bstr,op
+        bkey = "bmk:"+bstr.replace("|-|",":")
+        if r.hget(bkey,"ttl") is None:
+            print bkey , ",is null!"
+            if op=="delete":
+                r.delete(bkey)
+                
+    key_lst = r.keys("usr:*:fllw")
+    for key in key_lst:
+        for bstr in r.zrevrange(key,0,-1):
+            bkey = "bmk:"+bstr.replace("|-|",":")
+            if r.hget(bkey,"ttl") is None:
+                print "%s is null in %s,should remove!" % (bkey , key)
+                if op=="delete":
+                    r.zrem(key,bstr)
             
+    
 def initBeaconDisplayName():
     """初始化频道的 显示名称 为频道名称"""
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
@@ -70,19 +89,26 @@ def initBeaconDisplayName():
         key = "bmk:%s:%s" % (beaconusr,beaconid)
         r.hset(key,"name",r.hget(key,"ttl"))
         
-    
-def reflect(functionname):
+def reflect(functionname,parms=""):
     function = globals()[functionname]
-    return function()
+    if parms =="":
+        return function()
+    else:
+        return function(parms)
 
 if __name__ == "__main__":  
     usage = """usage:python %prog func
                eg:  
                   python %prog convUsrFllw 
             """
+    print len(sys.argv)
     if len(sys.argv) >= 2:
         func = sys.argv[1] 
-        reflect(func)
+        if len(sys.argv) ==3:
+            parms = sys.argv[2] 
+            reflect(func,parms)
+        else:
+            reflect(func)
     else:
         print usage.replace("%prog", sys.argv[0])
  

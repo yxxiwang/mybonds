@@ -160,20 +160,45 @@ def removeDocFromChannel(request):
     
 def channelsbygroup(request):
     groupid = request.GET.get("groupid", "") 
+    username = request.GET.get("u", getUserName(request))
     udata={} 
     beacons = [] 
     gobj = {}
-    if groupid != "":  
-        gobj = r.hgetall("group:"+groupid)
-        gobj["groupid"]=groupid
+    if groupid == "":   
+        udata["message"]="groupid is null !" 
+        udata["success"] = "false"
+        return HttpResponse(json.dumps(udata), mimetype="application/json") 
+        
+    mybeacons = r.zrevrange("usr:" + username+":fllw",0,-1)
+    gobj = r.hgetall("group:"+groupid)
+    if gobj is None:
+        udata["message"]="group is not exsist !" 
+        udata["success"] = "false"
+        return HttpResponse(json.dumps(udata), mimetype="application/json") 
+        
+    gobj["groupid"]=groupid
 #         gname = "" if gname is None else gname
-        for bstr in r.zrevrange("bmk:doc:share",0,-1):
+    for bstr in mybeacons:
 #             busr,bid = bstr.split("|-|")
-            key = "bmk:"+bstr.replace("|-|",":")
-            bttl = r.hget(key,"tag")
-            bttl = "" if bttl is None else bttl
-            if re.search(gobj["name"],bttl):
-                beacons.append(r.hgetall(key))
+        key = "bmk:"+bstr.replace("|-|",":")
+        bttl = r.hget(key,"tag")
+        bttl = "" if bttl is None else bttl
+        if re.search(gobj["name"],bttl):
+            bobj = r.hgetall(key)
+            bobj["beaconid"]=bobj.pop("id")
+            bobj["isfllw"] = "true"
+            beacons.append(bobj)
+    
+    for bstr in listsub(r.zrevrange("bmk:doc:share",0,-1),mybeacons):
+        key = "bmk:"+bstr.replace("|-|",":")
+        bttl = r.hget(key,"tag")
+        bttl = "" if bttl is None else bttl
+        if re.search(gobj["name"],bttl):
+            bobj = r.hgetall(key)
+            bobj["beaconid"]=bobj.pop("id")
+            bobj["isfllw"] = "false" 
+            beacons.append(bobj)
+        
     
     udata["group"] = gobj
     udata["beacons"] = beacons

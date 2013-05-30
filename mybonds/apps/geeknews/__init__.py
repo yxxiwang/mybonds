@@ -152,9 +152,9 @@ def sendEmailFindKey(username,email,url):
     return sendemail(content,email,to_unicode_or_bust("指极星:设置新密码"))
     
 def sendemailbydocid(email,docid,otype=""): 
-    print "%s==sendemailbydocid====" % getTime(time.time())
+    logger.info( "%s==sendemailbydocid====" % getTime(time.time()) )
     if not rdoc.exists("doc:"+docid):
-        print "==error:: document is not exsit!!! doc:%" % docid
+        logger.info( "==error:: document is not exsit!!! doc:%" % docid)
         return -1
     doc = rdoc.hgetall("doc:"+docid)
     title = to_unicode_or_bust(doc["title"])
@@ -431,10 +431,10 @@ def checkUptime(username, otype, num):
         keytms = "usr:%s:%s:uptms" % (username, otype)  # usr:wxi:rcm... 
         dt = timeDiff(r.get(keytms), time.time())
         if not r.exists(keytms):
-            print keytms + " is not exists,retrivedocs from backend..." 
+            logger.warn( keytms + " is not exists,retrivedocs from backend..." )
             rt = saveDocs(username, otype) 
         elif dt > KEY_UPTIME:
-            print "data is old,pushQueue(retirvePPL)..%s,%s,%d" % (username, otype, dt)
+            logger.warn( "data is old,pushQueue(retirvePPL)..%s,%s,%d" % (username, otype, dt) )
             r.set(keytms, time.time())  # 更新本操作时间 
             pushQueue(otype, username, otype)       
         if rt == 0 :   
@@ -487,7 +487,7 @@ def getDataByUrl(urlstr,isservice=False):
     udata = loadFromUrl(urlstr) 
     urlstop = time.clock()  
     diff = urlstop - start  
-    print "loadFromUrl(%s) has taken %s" % (urlstr,str(diff))
+    logger.info( "loadFromUrl(%s) has taken %s" % (urlstr,str(diff)) )
     docs = []
     if udata.has_key("docs"):
         for doc in udata["docs"]:
@@ -535,7 +535,7 @@ def getBeaconNewsCnt(username,beaconusr,beaconid):
     return new_cnt
         
 def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
-    print "=getAllBeaconDocsByUser="+username
+    logger.info( "=getAllBeaconDocsByUser="+username )
 #    hour_before=8
 #     beacons = r.smembers("usr:"+username+":fllw")
 #     beacons = r.zrevrange("usr:"+username+":fllw",0,-1)
@@ -635,27 +635,27 @@ def beaconUrl(beaconusr, beaconid):
 def refreshDocs(beaconusr, beaconid):
     """更新频道内容,该方法也会被异步调用"""
     key = "bmk:" + beaconusr + ":" + beaconid
-    print "=====refreshDocs===="+key
+    logger.info( "=====refreshDocs===="+key )
     if not r.exists(key):
-        print "attembrough: i have nothing to do .key:%s is not exists " % key
+        logger.warn( "attembrough: i have nothing to do .key:%s is not exists " % key)
         return -1
     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     if r.hexists(key, "last_update"):#
         dt = timeDiff(r.hget(key, "last_update"), time.time())
         if removecnt > REMOVE_CNT:#如果删除新闻数目大于指定值 ,按照 REMOVE_KEYUPTIME 判断似乎否需要刷新
             if dt < REMOVE_KEYUPTIME :
-                print "attembrough: i have nothing to do .bcz current last_update diff is %d second,and removecnt is %d " % (dt,removecnt)
+                logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second,and removecnt is %d " % (dt,removecnt) )
                 return 0
             else:
-                print "attembrough: needs refresh data ... diff is %d second,and removecnt is %d " % (dt,removecnt)
+                logger.warn( "attembrough: needs refresh data ... diff is %d second,and removecnt is %d " % (dt,removecnt) )
         elif dt < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
-            print "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % dt
+            logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % dt )
             return 0 
     
     urlstr = beaconUrl(beaconusr, beaconid)
     
     if not r.exists(key):
-        print "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key
+        logger.warn( "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key )
         return -1
     udata = saveDocsByUrl(urlstr)
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
@@ -695,27 +695,27 @@ def refreshBeacon(beaconusr, beaconid):
     urlstr = beaconUrl(beaconusr, beaconid)
     
     if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
-        print key + "'s 'last_touch' is not exists,retrivedocs from backend..." 
+        logger.warn( key + "'s 'last_touch' is not exists,retrivedocs from backend..." )
         if r.exists(key):
 #             refreshDocs(beaconusr, beaconid)
 #             r.hset(key, "last_touch", time.time())  # 更新本操作时间  
             pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
         else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
-            print key + " maybe deleted via front  so we ignore it..." 
+            logger.warn( key + " maybe deleted via front  so we ignore it..." )
             
     elif not r.exists("bmk:"+beaconusr+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
 #         refreshDocs(beaconusr, beaconid)
         pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
     elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
-        print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt)
+        logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
     elif dt > KEY_UPTIME:#如果上次更新时间过久,则重新刷新数据
-        print "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt)
+        logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
     else:
-        print "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt,KEY_UPTIME)
+        logger.warn( "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt,KEY_UPTIME) )
         
 def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     key = "bmk:" + beaconusr + ":" + beaconid
@@ -818,7 +818,7 @@ def saveRelativeDocs(username, relativeid):
     pass
 
 def saveDocsByIDS(docids):
-    print "==============geeknews/saveDocsByID============"  
+    logger.info( "==============geeknews/saveDocsByID============"  )
     docstr = ";".join(docids)
     urlstr = "http://%s/research/svc?docid=%s" % (BACKEND_DOMAIN,docstr) 
     udata=getDataByUrl(urlstr)
@@ -1014,7 +1014,7 @@ def saveTagdoc(username, otype, tag, fromdaemon=False):
     return rt
 
 def saveFulltextById(ids,retrycnt=0,url=""):
-    print "===saveFulltextById==="+url
+    logger.info( "===saveFulltextById==="+url )
     udata={}
     if url=="" :
         if ids is None or ids =="":
@@ -1023,7 +1023,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
     else:
         urlstr = url
     if retrycnt >=RETRY_TIMES:
-        print "Attembrough: it's failed again..retrycnt is %d" % retrycnt
+        logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt )
         pushQueue("fulltext", "", "fulltext", "",urlstr=urlstr)
         return udata
     udata = bench(loadFromUrl,parms=urlstr)
@@ -1048,7 +1048,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
             pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
         pipedoc.execute()
     else:
-        print "udata is empty...retrycntis %d" % retrycnt
+        logger.warn( "udata is empty...retrycntis %d" % retrycnt)
         udata = saveFulltextById(ids,retrycnt+1)
     return udata
 #         if udata["docs"].has_key("relatedDocs"):
@@ -1061,7 +1061,7 @@ def saveDocsByUrl(urlstr):
 #     urlstop = time.clock()  
 #     diff = urlstop - start
 #     print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff)) 
-    print "===saveDocsByUrl==="+urlstr
+    logger.info( "===saveDocsByUrl==="+urlstr)
     udata = bench(loadFromUrl,parms=urlstr)
     pipedoc = rdoc.pipeline()
     def saveText(docs,isheadline=False):

@@ -7,7 +7,7 @@ import redis,numpy
 import traceback 
 import datetime as dt
 from datetime import timedelta
-from numpy.ma.core import isMA 
+from numpy.ma.core import isMA
 
 SYSERROR = -1
 COMMUNICATERROR = 6

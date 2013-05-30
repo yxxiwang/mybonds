@@ -30,7 +30,7 @@ class DaemonProcess(Daemon):
  			for qtype in ("sendemail","removedoc","beacon"):
  				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
  					qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
- 					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
+ 					logger.info( "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype) )
  					
  			 	for i in range(lib.r.llen("queue:" + qtype)): 
  			 	 	self.retriveData(qtype) 
@@ -95,7 +95,7 @@ def retriveData(qtype):
 				rt = lib.sendemailbydocid(email,qinfo["docid"],otype)
 		else:
 # 					rt = lib.saveDocs(username, otype)
-			print "error qtype %s " % qtype
+			logger.error( "error qtype %s " % qtype)
 			rt = 0 
 # 			else:
 # 				sys.stdout.write("is nothing to do....\n") 
@@ -116,33 +116,33 @@ def retriveData(qtype):
 		cnt = qinfo["cnt"] if qinfo.has_key("cnt") else 0
 		qinfo["cnt"]=cnt+1
 		if qinfo["cnt"] < RETRYCOUNT:
-			print "process it again"
+			logger.info( "process it again")
 			lib.r.lpush("queue:" + qtype,json.dumps(qinfo))
 		else:
-			print "it's rearch the maxsim count of RETRYCOUNT"
+			logger.warn( "it's rearch the maxsim count of RETRYCOUNT")
 			lib.r.lpush("queue:" + qtype+":error",json.dumps(qinfo)) 
 		
 	urlstop = time.clock()
 	diff = urlstop - start
 # 	content = smart_str(content)  
-	print "retriveData(%s) has taken on %s;and rt is %d" % (smart_str(url),str(diff),rt) 
+	logger.info( "retriveData(%s) has taken on %s;and rt is %d" % (smart_str(url),str(diff),rt) ) 
 	return rt
 			
 def runserver(type):
-	print "-------is running----------"
+	logger.info( "-------is running----------")
 	while True: 
 		qtype = "retirveRCM" 
 		if type != "all":
 			for i in range(lib.r.llen("queue:" + type+":processing")):#先处理遗留的队列
 				qobj=lib.r.rpoplpush( "queue:" + type + ":processing","queue:" + type)
-				print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,type,type)
+				logger.info( "move qobj%s from queue:%s:processing to queue:%s" %(qobj,type,type) )
 			for i in range(lib.r.llen("queue:" + type)): 
 		 	 	retriveData(type) 
 		else:
 			for qtype in ("sendemail","removedoc","beacon","fulltext"):
 				for i in range(lib.r.llen("queue:" + qtype+":processing")):#先处理遗留的队列
 					qobj=lib.r.rpoplpush( "queue:" + qtype + ":processing","queue:" + qtype)
-					print "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype)
+					logger.info( "move qobj%s from queue:%s:processing to queue:%s" %(qobj,qtype,qtype) )
 					
 			 	for i in range(lib.r.llen("queue:" + qtype)): 
 			 	 	retriveData(qtype) 

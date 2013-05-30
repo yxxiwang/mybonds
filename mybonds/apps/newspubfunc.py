@@ -39,7 +39,8 @@ def loginit(LOGLEVEL):
     elif LOGLEVEL.lower() == "warning" or LOGLEVEL.lower() == "warn":
         LOGLEVEL = logging.WARN
     # formatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
-    formatter = logging.Formatter('[%(levelname)s %(asctime)s %(module)s:%(lineno)d p%(process)d t%(thread)d] - %(message)s')
+#     formatter = logging.Formatter('[%(levelname)s %(asctime)s %(module)s:%(lineno)d p%(process)d t%(thread)d] - %(message)s')
+    formatter = logging.Formatter('[%(levelname)s %(asctime)s %(module)s:%(lineno)d] - %(message)s')
     #     logging.basicConfig(format='%(asctime)s %(message)s',level=logging.WARN)
     logger = logging.getLogger(__name__)
     ch = logging.StreamHandler()  
@@ -53,7 +54,7 @@ def loginit(LOGLEVEL):
 logger = loginit(LOGLEVEL)   
 def sendemail(content, rcv_email,title=""):
     from django.core.mail import send_mail
-    print "================sendemail============================"
+    logger.info( "================sendemail============================")
     import smtplib, mimetypes
     from smtplib import SMTPException
     from email.mime.text import MIMEText
@@ -95,10 +96,10 @@ def sendemail(content, rcv_email,title=""):
        smtpObj.starttls()
        smtpObj.login('admin@zhijixing.com', 'software91') 
        smtpObj.sendmail(sender, receivers, msg.as_string())      
-       print "Successfully sent email"
+       logger.info( "Successfully sent email")
        return 0
     except SMTPException:
-       print "Error: unable to send email"
+       logger.exception( "Error: unable to send email")
        traceback.print_exc()
        return 8
     else:
@@ -137,7 +138,7 @@ def getDataByUrl(urlstr,isservice=False):
     udata = loadFromUrl(urlstr) 
     urlstop = time.clock()  
     diff = urlstop - start  
-    print "loadFromUrl(%s) has taken %s" % (urlstr,str(diff))
+    logger.info( "loadFromUrl(%s) has taken %s" % (urlstr,str(diff)))
     docs = []
     if udata.has_key("docs"):
         for doc in udata["docs"]:
@@ -189,7 +190,7 @@ def getFullDocByUrl(urlstr):
     udata = loadFromUrl(urlstr) 
     urlstop = time.clock()  
     diff = urlstop - start  
-    print "loadFromUrl(%s) has taken %s" % (urlstr,str(diff))
+    logger.info( "loadFromUrl(%s) has taken %s" % (urlstr,str(diff)))
     docs = []
     if udata.has_key("docs"):
         for doc in udata["docs"]:

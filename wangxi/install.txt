@@ -60,6 +60,14 @@ pip install requests
 
 pip install uwsgi
 pip install hiredis  ;#(easy_install hiredis)
+pip install logging
+
+pip install fabric
+pip install paramiko
+
+
+
+
 
 
 cd /root/redis

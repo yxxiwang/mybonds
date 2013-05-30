@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*- 
 import json, urllib2, urllib
 import csv, string,random
-import sys, time
+import sys, time,logging
 import redis
 import numpy
 import traceback 
@@ -22,6 +22,7 @@ from mybonds.apps import *
 from mybonds.apps.newspubfunc import *
 import argparse
  
+# logger = logging.getLogger(__name__)
 def convUsrFllw():
     """ 将  用户关注的key 由 set 类型换成 zset 类型.
                             该函数已经被执行过,即可以宣布作废(现在应该已经用不上了)
@@ -61,6 +62,7 @@ def makeDocDateCnt():
             print "%s incr 1 ,num:%d" %(tdate,num)
             r.hincrby(doc_dcnt_key,tdate,1)
             r.hincrby(doc_dnum_key,tdate,num)
+            
 def cleanBeacon(op="print"):
     """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""
 #     for bstr in r.zrevrange("bmk:doc:share",0,-1):
@@ -120,8 +122,11 @@ if __name__ == "__main__":
     usage = """usage:python %prog func
                eg:  
                   python %prog convUsrFllw 
+                  python %prog initBeaconDisplayName 
+                  python %prog cleanBeacon {print|delete} 
+                  python %prog makeDocDateCnt 
+                  python %prog convUsrFllw 
             """
-    print len(sys.argv)
     if len(sys.argv) >= 2:
         func = sys.argv[1] 
         if len(sys.argv) ==3:
@@ -130,7 +135,8 @@ if __name__ == "__main__":
         else:
             reflect(func)
     else:
-        print usage.replace("%prog", sys.argv[0])
+        logger.exception("msg")
+        print( usage.replace("%prog", sys.argv[0]))
  
     
 

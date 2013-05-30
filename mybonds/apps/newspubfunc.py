@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*- 
 import json, urllib2, urllib
 import csv, string,random
-import sys, time
+import sys, time,logging
 import redis
 import numpy
 import traceback 
@@ -15,31 +15,42 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1) 
-if r.exists("sysparms"):
-    REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire"))
-    DOC_EXPIRETIME = int(r.hget("sysparms", "doc_expire") )
-    KEY_UPTIME = int(r.hget("sysparms", "beacon_interval"))
-    REMOVE_KEYUPTIME = int(r.hget("sysparms", "beacon_interval_remove"))
-    REMOVE_CNT = int(r.hget("sysparms", "beacon_interval_remove_cnt"))
-    CHANNEL_NEWS_NUM = int(r.hget("sysparms", "beacon_news_num"))
-    QUANTITY = int(r.hget("sysparms", "quantity"))
-    QUANTITY_DURATION = int(r.hget("sysparms", "quantity_duration"))
-    RETRY_TIMES = int(r.hget("sysparms", "failed_retry_times"))
-    BACKEND_DOMAIN = r.hget("sysparms", "backend_domain")
-    DOMAIN = r.hget("sysparms", "domain")
-else:
-    REDIS_EXPIRETIME = 186400
-    DOC_EXPIRETIME = 86400*2
-    KEY_UPTIME = 60*15
-    REMOVE_KEYUPTIME = 60*5
-    REMOVE_CNT = 3
-    QUANTITY = 1500
-    QUANTITY_DURATION = 300
-    CHANNEL_NEWS_NUM = 300
-    RETRY_TIMES = 3
-    BACKEND_DOMAIN = "svc.zhijixing.com"
-    DOMAIN = "www.9cloudx.com" 
+ 
+REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire")) if r.hexists("sysparms","redis_expire") else 186400
+DOC_EXPIRETIME = int(r.hget("sysparms", "doc_expire") ) if r.hexists("sysparms","redis_expire") else 86400*2
+KEY_UPTIME = int(r.hget("sysparms", "beacon_interval")) if r.hexists("sysparms","redis_expire") else 60*15
+REMOVE_KEYUPTIME = int(r.hget("sysparms", "beacon_interval_remove")) if r.hexists("sysparms","redis_expire") else 60*5
+REMOVE_CNT = int(r.hget("sysparms", "beacon_interval_remove_cnt")) if r.hexists("sysparms","redis_expire") else 3
+CHANNEL_NEWS_NUM = int(r.hget("sysparms", "beacon_news_num")) if r.hexists("sysparms","redis_expire") else 1500
+QUANTITY = int(r.hget("sysparms", "quantity")) if r.hexists("sysparms","redis_expire") else 300
+QUANTITY_DURATION = int(r.hget("sysparms", "quantity_duration")) if r.hexists("sysparms","redis_expire") else 300
+RETRY_TIMES = int(r.hget("sysparms", "failed_retry_times")) if r.hexists("sysparms","redis_expire") else 3
+BACKEND_DOMAIN = r.hget("sysparms", "backend_domain") if r.hexists("sysparms","redis_expire") else "svc.zhijixing.com"
+DOMAIN = r.hget("sysparms", "domain") if r.hexists("sysparms","redis_expire") else "www.9cloudx.com"
+LOGLEVEL = r.hget("sysparms", "loglevel") if r.hexists("sysparms","redis_expire") else "info"
 
+def loginit(LOGLEVEL):
+    if LOGLEVEL is None or LOGLEVEL == "" or LOGLEVEL.lower() == "info":
+        LOGLEVEL = logging.INFO
+    elif LOGLEVEL.lower() == "debug":
+        LOGLEVEL = logging.DEBUG
+    elif LOGLEVEL.lower() == "error":
+        LOGLEVEL = logging.ERROR
+    elif LOGLEVEL.lower() == "warning" or LOGLEVEL.lower() == "warn":
+        LOGLEVEL = logging.WARN
+    # formatter = logging.Formatter('[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s','%m-%d %H:%M:%S')
+    formatter = logging.Formatter('[%(levelname)s %(asctime)s %(module)s:%(lineno)d p%(process)d t%(thread)d] - %(message)s')
+    #     logging.basicConfig(format='%(asctime)s %(message)s',level=logging.WARN)
+    logger = logging.getLogger(__name__)
+    ch = logging.StreamHandler()  
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    logger.setLevel(LOGLEVEL)
+    #     logging.basicConfig(format=formatter)
+    logger.warn("enter newspubfunc ,log init done.loglevel is %d" % LOGLEVEL)
+    return logger
+
+logger = loginit(LOGLEVEL)   
 def sendemail(content, rcv_email,title=""):
     from django.core.mail import send_mail
     print "================sendemail============================"

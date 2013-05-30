@@ -82,6 +82,12 @@
                 </div>
               </div>
               <div class="control-group">
+                <label class="control-label">日志级别</label>
+                <div class="controls">  
+                <input type="text" id="loglevel" name="loglevel" placeholder="日志级别" tabindex="2" value="{{sysparmsobj.loglevel}}"><p class="help-block">日志级别为(debug,info,warn,error)</p>
+                </div>
+              </div>
+              <div class="control-group">
                 <label class="control-label">异步处理失败重试次数</label>
                 <div class="controls">  
                 <input type="text" id="failed_retry_times" name="failed_retry_times" placeholder="异步处理失败重试次数" tabindex="2" value="{{sysparmsobj.failed_retry_times}}">

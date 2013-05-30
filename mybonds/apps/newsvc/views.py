@@ -175,7 +175,9 @@ def channelsbygroup(request):
         udata["message"]="group is not exsist !" 
         udata["success"] = "false"
         return HttpResponse(json.dumps(udata), mimetype="application/json") 
-        
+#     logging.basicConfig(format='%(asctime)s %(message)s',level=logging.WARN)
+#     logger.warn("groupid..."+groupid)
+#     logger.info("groupid..."+groupid)
     gobj["groupid"]=groupid
 #         gname = "" if gname is None else gname
     for bstr in mybeacons:

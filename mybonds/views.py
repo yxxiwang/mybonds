@@ -462,14 +462,16 @@ def sysparms(request,template_name="beacon/sysparms.html"):
         redis_expire = request.POST.get("redis_expire", "186400");
         backend_domain = request.POST.get("backend_domain", "svc.zhijixing.com");
         domain = request.POST.get("domain", "www.9cloudx.com");
-        doc_expire = request.POST.get("doc_expire", 86400*2);
+        doc_expire = request.POST.get("doc_expire","172800");
         beacon_interval =request.POST.get("beacon_interval", "900");
         beacon_interval_remove = request.POST.get("beacon_interval_remove", "300");
         beacon_interval_remove_cnt =request.POST.get("beacon_interval_remove_cnt", "3");
         beacon_news_num =request.POST.get("beacon_news_num", "300");
         quantity = request.POST.get("quantity", "1500");
         quantity_duration = request.POST.get("quantity_duration", "300"); 
+        loglevel = request.POST.get("loglevel", "info"); 
         failed_retry_times = request.POST.get("failed_retry_times", "3"); 
+        
         r.hset("sysparms","redis_expire",int(redis_expire))
         r.hset("sysparms","backend_domain",backend_domain)
         r.hset("sysparms","domain",domain)
@@ -481,7 +483,9 @@ def sysparms(request,template_name="beacon/sysparms.html"):
         r.hset("sysparms","quantity",int(quantity))
         r.hset("sysparms","quantity_duration",int(quantity_duration))
         r.hset("sysparms","failed_retry_times",int(failed_retry_times))
+        r.hset("sysparms","loglevel",loglevel)
         sysparmsobj = r.hgetall("sysparms")
+#         loginit(loglevel)
 #         print doc_expire
         return render_to_response(template_name, {
             'err_message': "用户信息保存成功".decode("utf8"),

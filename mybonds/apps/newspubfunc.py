@@ -4,6 +4,8 @@ import json, urllib2, urllib
 import csv, string,random
 import sys, time,logging
 import redis
+from pymongo import MongoClient
+from pymongo import Connection
 import numpy
 import traceback 
 import datetime as dt
@@ -15,7 +17,13 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 r = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1) 
- 
+# client = MongoClient('localhost', 27017)
+# client = MongoClient('localhost', 27017)
+connection = Connection() 
+mdoc = connection["doc"]
+tftxs = mdoc['tftxs']
+
+
 REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire")) if r.hexists("sysparms","redis_expire") else 186400
 DOC_EXPIRETIME = int(r.hget("sysparms", "doc_expire") ) if r.hexists("sysparms","redis_expire") else 86400*2
 KEY_UPTIME = int(r.hget("sysparms", "beacon_interval")) if r.hexists("sysparms","redis_expire") else 60*15

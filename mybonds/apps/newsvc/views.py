@@ -68,6 +68,27 @@ def newsdetail(request):
             rtlst.append(di)
         return rtlst
     
+    if rtype =="mongodb":
+        logger.info("fetch fulltext from mongodb,docid=" +docid)
+        doc = tftxs.find_one({"_id":docid})
+        doc["text"] = ""
+        doc["relatedDocs"]=""
+        ftx = doc["fulltext"]
+        if rtype =="string":
+            doc["fulltext"] = list2dict([ftx],"txt")
+        else:
+            doc["fulltext"] = list2dict([ftx],"txt")
+        doc["copyNum"] = str(doc["copyNum"])
+        doc["tms"]=str(doc["create_time"]) 
+        doc["create_time"] = timeElaspe(doc["create_time"]) 
+        doc["success"] = "true"
+        doc["message"] = "success return data"
+#         doc["success"] = "true"
+#         doc["message"] = "success return data"
+#         print json.dumps(doc)
+        return HttpResponse(json.dumps(doc), mimetype="application/json")
+        
+    
     if rdoc.exists("doc:"+docid) and rdoc.exists("ftx:"+docid):
         doc = rdoc.hgetall("doc:"+docid) 
         if rtype =="string":
@@ -85,7 +106,7 @@ def newsdetail(request):
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         doc["success"] = "true"
         doc["message"] = "success return data"
-    else: 
+    elif rdoc.exists("doc:"+docid): 
         doc = rdoc.hgetall("doc:"+docid)
         ftx = doc["text"]
         doc["text"] = ""
@@ -98,6 +119,25 @@ def newsdetail(request):
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         doc["success"] = "true"
         doc["message"] = "success return data"
+    else:
+        logger.warn("redis has no key,fetch fulltext from mongodb,docid=" +docid)
+        doc = tftxs.find_one({"_id":docid})
+        if doc is None:
+            logger.warn("mongodb has no key too,docid=" +docid)
+            doc["success"] = "false"
+            doc["message"] = "have no data found."
+            return HttpResponse(json.dumps(doc), mimetype="application/json")
+        doc["text"] = ""
+        ftx = doc["fulltext"]
+        if rtype =="string":
+            doc["fulltext"] = list2dict([ftx],"txt")
+        else:
+            doc["fulltext"] = list2dict([ftx],"txt")
+        doc["copyNum"] = str(doc["copyNum"])
+        doc["tms"]=str(doc["create_time"]) 
+        doc["create_time"] = timeElaspe(doc["create_time"]) 
+        doc["success"] = "false"
+        doc["message"] = "have no data found."
     return HttpResponse(json.dumps(doc), mimetype="application/json")
 
 @login_required

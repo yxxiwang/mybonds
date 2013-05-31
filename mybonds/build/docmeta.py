@@ -20,32 +20,35 @@ else:#os.name=="posix"
     path.append("/root")
 
 from mybonds.apps import *
-from mybonds.apps.newspubfunc import * 
+from mybonds.apps.newspubfunc import *  
 import argparse
 
 num = 0
 def saveFulltextById(ids,retrycnt=0):
-    print "%s===saveFulltextById===%s" %(getTime(time.time()),ids)
+    logger.info( "%s===saveFulltextById===%s" %(getTime(time.time()),ids) )
     if ids is None or ids =="":
         return {}
     if retrycnt>=2:
         return {}
     urlstr = "http://%s/research/svc?docid=%s" % (BACKEND_DOMAIN,ids)
     def fetchAndSave(docs):
-       for doc in docs:
-           if doc.has_key("fulltext"):
-#                 docid = getHashid(doc["url"])
+        for doc in docs:
+            if doc.has_key("fulltext"):
+                doc["_id"]=str(doc["docId"])
+                doc.pop("relatedDocs")
+                tftxs.save(doc)
+                #                 docid = getHashid(doc["url"])
                 docid = str(doc["docId"])
                 rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
                 rdoc.expire("ftx:"+docid,DOC_EXPIRETIME)
                 rdoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1])       
-#                 rdoc.hset("doc:"+docid,"host",doc["host"] )  
+                #                 rdoc.hset("doc:"+docid,"host",doc["host"] )  
                 rdoc.hset("doc:"+docid,"domain",doc["domain"] )
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):
         fetchAndSave(udata["docs"])
     else:
-        print "==%s udata haven't key docs ! do it again..retrycnt is %d" %(urlstr, retrycnt)
+        logger.warn( "==%s udata haven't key docs ! do it again..retrycnt is %d" %(urlstr, retrycnt) )
         saveFulltextById(ids,retrycnt+1)
     return udata
         

@@ -493,8 +493,8 @@ def getDataByUrl(urlstr,isservice=False):
         for doc in udata["docs"]:
             if doc is None:
                 continue
-#             if doc["validTime"]=="false" or not doc["validTime"]:
-#                 continue
+            if doc["validTime"]=="false" or not doc["validTime"]:
+                continue
 #            doc["id"] = getHashid(doc["url"])
 #             doc["docid"] = getHashid(doc["url"])
             doc["docid"] = str(doc["docId"])
@@ -566,12 +566,12 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
             doc = rdoc.hgetall("doc:" + docid)
             if len(doc.keys()) == 0:
                 continue
-    #         if doc["validTime"]=="false" or not doc["validTime"]:
-    #             continue 
+            if doc["validTime"]=="false" or not doc["validTime"]:
+                continue 
     #         doc["tx"] = doc["text"]
             doc["text"] = subDocText(doc["text"])
             doc["copyNum"] = str(doc["copyNum"])
-    #         doc["validTime"] = str(doc["validTime"])
+#             doc["validTime"] = str(doc["validTime"])
             doc["tms"]=str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"]) 
             doc["beaconusr"] = beaconusr
@@ -675,8 +675,8 @@ def refreshDocs(beaconusr, beaconid):
     for doc in docs:
         if doc is None:
             continue
-#         if doc["validTime"]=="false" or not doc["validTime"]:
-#             continue
+        if doc["validTime"]=="false" or not doc["validTime"]:
+            continue
 #             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
         r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)
@@ -730,8 +730,8 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         doc = rdoc.hgetall("doc:" + docid) 
         if len(doc.keys()) == 0:
             continue 
-#         if doc["validTime"]=="false" or not doc["validTime"]:
-#             continue 
+        if doc["validTime"]=="false" or not doc["validTime"]:
+            continue 
         if not isapi:
             doc["tx"] = doc["text"]
         doc["text"] = subDocText(doc["text"])
@@ -1071,8 +1071,8 @@ def saveDocsByUrl(urlstr):
         for doc in docs:
             if doc is None: 
                 continue 
-#             if doc["validTime"]=="false" or not doc["validTime"]:
-#                 continue
+            if doc["validTime"]=="false" or not doc["validTime"]:
+                continue
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
             if not rdoc.exists("ftx:"+docid):
@@ -1112,22 +1112,7 @@ def saveDocsByUrl(urlstr):
             
     if udata.has_key("headlines"):
         saveText(udata["headlines"],isheadline=True)
-            
-#             for doc in udata["docs"]: 
-#                 if doc is None: 
-#                     continue
-#                 if doc["validTime"]=="false" or not doc["validTime"]:
-#                     continue 
-#                 docid = getHashid(doc["url"]) 
-#                 if not rdoc.exists("ftx:"+docid):
-#                     saveFulltextById(docid)
-#                 else:
-#                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.."
-#     try:  
-#     except Exception, e:
-#          traceback.print_exc()
-#          pipedoc.execute()
-#          print "error------la---" 
+        
     return udata
  
 def subDocText(s):

@@ -565,13 +565,10 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
         for docid in lst:
             doc = rdoc.hgetall("doc:" + docid)
             if len(doc.keys()) == 0:
-                continue
-            if doc["validTime"]=="false" or not doc["validTime"]:
                 continue 
     #         doc["tx"] = doc["text"]
             doc["text"] = subDocText(doc["text"])
-            doc["copyNum"] = str(doc["copyNum"])
-#             doc["validTime"] = str(doc["validTime"])
+            doc["copyNum"] = str(doc["copyNum"]) 
             doc["tms"]=str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"]) 
             doc["beaconusr"] = beaconusr

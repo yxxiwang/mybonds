@@ -726,14 +726,11 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     for docid in doc_lst:
         doc = rdoc.hgetall("doc:" + docid) 
         if len(doc.keys()) == 0:
-            continue 
-        if doc["validTime"]=="false" or not doc["validTime"]:
-            continue 
+            continue  
         if not isapi:
             doc["tx"] = doc["text"]
         doc["text"] = subDocText(doc["text"])
-        doc["copyNum"] = str(doc["copyNum"])
-#         doc["validTime"] = str(doc["validTime"])
+        doc["copyNum"] = str(doc["copyNum"]) 
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         docs.append(doc) 

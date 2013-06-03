@@ -1034,9 +1034,14 @@ def saveFulltextById(ids,retrycnt=0,url=""):
 #             elif doc.has_key("text"):
 #                 txt = doc["text"]
 #                 id = getHashid(doc["url"])
+
+            doc["_id"]=str(doc["docId"])
+            doc.pop("relatedDocs")
+            tftxs.save(doc) 
+            
             docid = str(doc["docId"])
-            pipedoc.set("ftx:"+docid,json.dumps(txt))
-            pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
+#             pipedoc.set("ftx:"+docid,json.dumps(txt))
+#             pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
             pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
             pipedoc.hset("doc:"+docid,"host","")
             pipedoc.hset("doc:"+docid,"domain",doc["domain"] )

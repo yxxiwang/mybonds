@@ -29,6 +29,7 @@ def saveFulltextById(ids,retrycnt=0):
     if ids is None or ids =="":
         return {}
     if retrycnt>=2:
+        logger.info( "saveFulltextById(%s) reach the maxium retrycnt :%d" % ( ids, retrycnt))
         return {}
     urlstr = "http://%s/research/svc?docid=%s" % (BACKEND_DOMAIN,ids)
     def fetchAndSave(docs):
@@ -37,11 +38,12 @@ def saveFulltextById(ids,retrycnt=0):
                 doc["_id"]=str(doc["docId"])
                 doc.pop("relatedDocs")
                 tftxs.save(doc) 
-#                 docid = str(doc["docId"])
+                
+                docid = str(doc["docId"])
 #                 rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
 #                 rdoc.expire("ftx:"+docid,DOC_EXPIRETIME)
-#                 rdoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1])        
-#                 rdoc.hset("doc:"+docid,"domain",doc["domain"] )
+                rdoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1])        
+                rdoc.hset("doc:"+docid,"domain",doc["domain"] )
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):
         fetchAndSave(udata["docs"])

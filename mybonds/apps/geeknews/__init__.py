@@ -159,8 +159,12 @@ def sendemailbydocid(email,docid,otype=""):
     doc = rdoc.hgetall("doc:"+docid)
     title = to_unicode_or_bust(doc["title"])
     url = to_unicode_or_bust(doc["url"]) 
-    if rdoc.exists("ftx:"+docid):
-        ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
+    
+    fulldoc = tftxs.find_one({"_id":docid})
+    if fulldoc is not None:
+#         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
+        ftxlist = doc["fulltext"] 
+        ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(ftxlist)
     else:
         ftx = doc["text"]  
     content= to_unicode_or_bust(ftx)
@@ -1074,7 +1078,7 @@ def saveDocsByUrl(urlstr):
                 continue
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
-            if not rdoc.exists("ftx:"+docid):
+            if not rdoc.exists("doc:"+docid):
                 ids+=docid+";"
                 cnt = cnt+1
                 if cnt == 20:

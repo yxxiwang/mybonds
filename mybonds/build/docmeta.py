@@ -73,7 +73,7 @@ def saveData(udata,key):
 #             r.hincrby(doc_dcnt_key,tdate,1)
 #             r.hincrby(doc_dnum_key,tdate,doc["copyNum"])
         
-        if not rdoc.exists("ftx:"+docid): 
+        if not rdoc.exists("doc:"+docid): 
             ids+=docid+";"
         pipedoc.hset("doc:"+docid,"docid",docid)
         pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ","")) 

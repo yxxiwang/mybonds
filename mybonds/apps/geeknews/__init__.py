@@ -164,7 +164,7 @@ def sendemailbydocid(email,docid,otype=""):
     if fulldoc is not None:
         logger.info("fetch fulltext from mongodb,docid=" +docid)
 #         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
-        ftxlist = doc["fulltext"] 
+        ftxlist = fulldoc["fulltext"] 
         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(ftxlist)
     else:
         ftx = doc["text"]  

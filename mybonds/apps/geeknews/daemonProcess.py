@@ -20,6 +20,7 @@ else:#os.name=="posix"
 	
 import __init__ as lib
 from mybonds.apps import *
+from mybonds.apps.newspubfunc import *
 
 class DaemonProcess(Daemon):
 	

@@ -113,19 +113,19 @@ def newsdetail(request):
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         doc["success"] = "true"
         doc["message"] = "success return data"
-    elif rdoc.exists("doc:"+docid): 
-        doc = rdoc.hgetall("doc:"+docid)
-        ftx = doc["text"]
-        doc["text"] = ""
-        if rtype =="string":
-            doc["fulltext"] = list2dict([ftx],"txt")
-        else:
-            doc["fulltext"] = list2dict([ftx],"txt")
-        doc["copyNum"] = str(doc["copyNum"])
-        doc["tms"]=str(doc["create_time"]) 
-        doc["create_time"] = timeElaspe(doc["create_time"]) 
-        doc["success"] = "true"
-        doc["message"] = "success return data"
+#     elif rdoc.exists("doc:"+docid): 
+#         doc = rdoc.hgetall("doc:"+docid)
+#         ftx = doc["text"]
+#         doc["text"] = ""
+#         if rtype =="string":
+#             doc["fulltext"] = list2dict([ftx],"txt")
+#         else:
+#             doc["fulltext"] = list2dict([ftx],"txt")
+#         doc["copyNum"] = str(doc["copyNum"])
+#         doc["tms"]=str(doc["create_time"]) 
+#         doc["create_time"] = timeElaspe(doc["create_time"]) 
+#         doc["success"] = "true"
+#         doc["message"] = "success return data"
     else:
         print "fetch fulltext from mongodb,docid=" +docid
         logger.info("fetch fulltext from mongodb,docid=" +docid)

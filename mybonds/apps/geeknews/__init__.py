@@ -162,6 +162,7 @@ def sendemailbydocid(email,docid,otype=""):
     
     fulldoc = tftxs.find_one({"_id":docid})
     if fulldoc is not None:
+        logger.info("fetch fulltext from mongodb,docid=" +docid)
 #         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
         ftxlist = doc["fulltext"] 
         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(ftxlist)

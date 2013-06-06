@@ -9,6 +9,12 @@ import datetime as dt
 from datetime import timedelta
 from numpy.ma.core import isMA
 
+import httplib2 as http
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+    
 SYSERROR = -1
 COMMUNICATERROR = 6
 SUCCESS = 0
@@ -193,13 +199,6 @@ def dayDiff(create_time):
     return daybefore
 
 def loadFromUrl(url):
-    import urllib2
-    import json
-    import httplib2 as http
-    try:
-        from urlparse import urlparse
-    except ImportError:
-        from urllib.parse import urlparse
     headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json; charset=UTF-8'

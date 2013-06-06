@@ -25,7 +25,7 @@ import argparse
 
 num = 0
 def saveFulltextById(ids,retrycnt=0):
-    logger.info( "%s===saveFulltextById===%s" %(getTime(time.time()),ids) )
+    logger.info( "===saveFulltextById===%s" %  ids )
     if ids is None or ids =="":
         return {}
     if retrycnt>=2:
@@ -54,18 +54,24 @@ def saveFulltextById(ids,retrycnt=0):
         
                 
 def saveData(udata,key):
-    print "%s===saveData===%s" %(getTime(time.time()),key)
+    logger.info( "===saveData===%s" % key)
     pipedoc = rdoc.pipeline()
     ids=""
     doc_dcnt_key = key.replace("doc_cts",":doc_dcnt")
-    doc_dnum_key = key.replace("doc_cts",":doc_dnum") 
+    channel_cnt_key = key.replace("doc_cts",":cnt") 
     for doc in udata["docs"]:
         if not doc["validTime"]:
             continue
 #         docid = getHashid(doc["url"])
         docid= str(doc["docId"])
         tms = doc["create_time"]
+        tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+        r.hset("copynum",docid,doc["copyNum"])
+        r.zadd(doc_dcnt_key,int(tdate),docid)
+        today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
+        cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
+        r.zadd(channel_cnt_key,int(today),cnt)
 #         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
 #         num = int(json.loads(docstr)["num"])
 #         if not rdoc.exists("doc:"+docid):

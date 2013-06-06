@@ -52,9 +52,9 @@ def makeDocDateCnt():
 #         channelDocs(beaconusr,beaconid)
         doc_cts_key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
         doc_dcnt_key = "channel:"+beaconusr+":"+beaconid+":doc_dcnt"
-        doc_dnum_key = "channel:"+beaconusr+":"+beaconid+":doc_dnum"
+        channel_cnt_key = "channel:"+beaconusr+":"+beaconid+":cnt"
         for docstr,tms in r.zrange(doc_cts_key,0,-1,withscores=True):
-            print docstr,tms,doc_cts_key
+#             print docstr,tms,doc_cts_key
             if tms==0:
                 r.zrem(doc_cts_key,docstr)
                 continue
@@ -63,6 +63,15 @@ def makeDocDateCnt():
             id = json.loads(docstr)["id"]
             r.hset("copynum",id,num)
             r.zadd(doc_dcnt_key,int(tdate),id)
+        
+        for i in xrange(90):
+            tdate = (dt.date.today() - timedelta(i)).strftime('%Y%m%d')
+            cnt = r.zcount(doc_dcnt_key,int(tdate),int(tdate))
+#             print doc_dcnt_key,"--",int(tdate)
+            r.zadd(channel_cnt_key,int(tdate),cnt)
+#             if cnt !=0:
+#                 print cnt
+            
 #             print "%s incr 1 ,num:%d" %(tdate,num)
 #             r.hincrby(doc_dcnt_key,tdate,1)
 #             r.hincrby(doc_dnum_key,tdate,num)

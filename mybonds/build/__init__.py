@@ -64,11 +64,13 @@ def makeDocDateCnt():
             r.hset("copynum",id,num)
             r.zadd(doc_dcnt_key,int(tdate),id)
         
-        for i in xrange(90):
+        cnt = 0
+        for i in xrange(120):
             tdate = (dt.date.today() - timedelta(i)).strftime('%Y%m%d')
             cnt = r.zcount(doc_dcnt_key,int(tdate),int(tdate))
-            print doc_dcnt_key,"--",int(tdate),"==",cnt
-            r.zadd(channel_cnt_key,int(tdate),cnt)
+            if cnt >0:
+                r.zadd(channel_cnt_key,cnt,int(tdate))
+#             print doc_dcnt_key,"--",int(tdate),"==",cnt
 #             if cnt !=0:
 #                 print cnt
             

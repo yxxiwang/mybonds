@@ -53,31 +53,45 @@ def makeDocDateCnt():
         doc_cts_key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
         doc_dcnt_key = "channel:"+beaconusr+":"+beaconid+":doc_dcnt"
         doc_dnum_key = "channel:"+beaconusr+":"+beaconid+":doc_dnum"
-        for docstr,tms in r.zrevrangebyscore(doc_cts_key,(time.time()+8*3600)*1000,0,withscores=True):
+        for docstr,tms in r.zrange(doc_cts_key,0,-1,withscores=True):
             print docstr,tms,doc_cts_key
             if tms==0:
+                r.zrem(doc_cts_key,docstr)
                 continue
             tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
             num = int(json.loads(docstr)["num"])
-            print "%s incr 1 ,num:%d" %(tdate,num)
-            r.hincrby(doc_dcnt_key,tdate,1)
-            r.hincrby(doc_dnum_key,tdate,num)
+            id = json.loads(docstr)["id"]
+            r.hset("copynum",id,num)
+            r.zadd(doc_dcnt_key,int(tdate),id)
+#             print "%s incr 1 ,num:%d" %(tdate,num)
+#             r.hincrby(doc_dcnt_key,tdate,1)
+#             r.hincrby(doc_dnum_key,tdate,num)
             
 def cleanBeacon(op="print"):
     """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""
 #     for bstr in r.zrevrange("bmk:doc:share",0,-1):
 
     def deleteBeacon(beaconusr,beaconid):            
-        r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid) 
+        r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid)
         r.zrem("bmk:doc:share:byfllw",beaconusr+"|-|"+beaconid) 
-        r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid)
+        r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid) 
         r.zrem("usr:" + beaconusr+":fllw",beaconusr+"|-|"+beaconid)
+        r.delete("channel:"+beaconusr+":"+beaconid+":doc_cts")
         key = "bmk:"+beaconusr+":"+beaconid
         for usr in r.smembers(key+":fllw"):
             r.zrem("usr:" + usr+":fllw",beaconusr+"|-|"+beaconid)
         r.delete(key + ":doc:tms")
         r.delete(key + ":fllw")
         r.delete(key)
+        
+    for bstr in r.keys("channel:*doc_cts"):
+        bkey = "bmk:"+":".join(bstr.split(":")[1:3])
+        if r.type(bkey) != "hash":
+            continue
+        if r.hget(bkey,"ttl") is None or r.hget(bkey,"ttl")=="" :
+            print bstr , ",is null!"
+            if op=="delete":
+                deleteBeacon(bkey.split(":")[1],bkey.split(":")[2])
         
     for bstr in r.keys("bmk:*"):
 #         print bstr,op
@@ -101,7 +115,10 @@ def cleanBeacon(op="print"):
                 print "%s is null in %s,should remove!" % (bkey , key)
                 if op=="delete":
                     r.zrem(key,bstr)
+    
             
+def cleanCountData():
+    pass
     
 def initBeaconDisplayName():
     """初始化频道的 显示名称 为频道名称"""

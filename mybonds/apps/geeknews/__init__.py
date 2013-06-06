@@ -167,7 +167,7 @@ def sendemailbydocid(email,docid,otype=""):
         ftxlist = fulldoc["fulltext"] 
         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(ftxlist)
     else:
-        ftx = doc["text"]  
+        ftx = doc["text"]
     content= to_unicode_or_bust(ftx)
 #     title_list.append(title)
 #     content_list.append(content) 

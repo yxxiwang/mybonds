@@ -66,7 +66,7 @@ def saveData(udata,key):
         docid= str(doc["docId"])
         tms = doc["create_time"]
         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
-        r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+#         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
         r.hset("copynum",docid,doc["copyNum"])
         r.zadd(doc_dcnt_key,int(tdate),docid)
         today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')

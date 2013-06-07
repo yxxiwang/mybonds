@@ -146,7 +146,7 @@ def newsdetail(request):
         doc["copyNum"] = str(doc["copyNum"])
         doc["tms"]=str(doc["create_time"]) 
         doc["create_time"] = timeElaspe(doc["create_time"])
-        doc["urls"] = doc["urls"][0].split(",")[1]  
+        doc["url"] = doc["urls"][0].split(",")[1]  
         doc["success"] = "true"
         doc["message"] = "success return data"
     return HttpResponse(json.dumps(doc), mimetype="application/json")
@@ -275,12 +275,12 @@ def grouplist(request):
     udata["success"] = "true"
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     
-def countDocs(request):
+def channelcounts(request):
     username = getUserName(request)
     startdate = request.GET.get("startdate", "197906013") 
     enddate = request.GET.get("enddate", "20571231")
-    beaconid = request.GET.get("beaconid", "")
-    beaconusr = request.GET.get("beaconusr", "")
+    lastdays = request.GET.get("lastdays", "7")
+    beaconkey = request.GET.get("beaconkey", "")
     withopynum = request.GET.get("copynum", "false")
     
     

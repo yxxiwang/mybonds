@@ -10,7 +10,7 @@ import datetime
 
 r = redis.StrictRedis()
 
-def querySinaFrequence():
+def querySinaFrequence(parms=[]):
   return RTCfg.timeWindow['sinaIntervalTime']
   
 def getChannelNewsCountsList(parms=[]):
@@ -39,7 +39,7 @@ def getChannelNewsCountsList(parms=[]):
         tdate = (dt.date.today() - dt.timedelta(i)).strftime('%Y%m%d')
         cnt = r.zscore(key, tdate)
         cnt = 0 if cnt is None else cnt
-        rdata[tdate]= cnt
+        rdata[tdate]= str(cnt)
         
     return json.dumps(rdata)
 #   return ["9527","9528"]
@@ -72,6 +72,6 @@ if __name__ == '__main__':
       socket.send(retFunc(ary[1:]))
     else:
       socket.send("no this function")
-    time.sleep(5)
+#     time.sleep(5)
     
     

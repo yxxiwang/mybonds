@@ -25,16 +25,26 @@ if __name__ == '__main__':
     print "Connecting to hello world server..."  
     socket = context.socket(zmq.REQ)  
 #     print RTCfg.zmqPort['systemParameterServicePort']
-    socket.connect (RTCfg.zmqPort['systemParameterClientPort'])  
+#     socket.connect (RTCfg.zmqPort['systemParameterClientPort'])  
+    socket.connect ('tcp://121.199.37.23:30000')  
       
 #     #  Do 10 requests, waiting each time for a response  
 #     for request in range (1,10):  
     print "Sending request ","..."  
-    socket.send ("getChannelNewsCountsList stock sh603000  7  ")  
-      
-    #  Get the reply.  
+    socket.send ("getChannelNewsCountsList stock sh600000  7  ")  
+#     socket.send ("querySinaFrequence ")  
+#     socket.send ("getChannelNewsCountsList stock sh602000  7  ")  
+#     socket.send ("getChannelNewsCountsList stock sh603000  7  ")  
     message = socket.recv()
     print message
+#     
+#     socket.send ("getChannelNewsCountsList stock sh600000  7  ")  
+#     message = socket.recv()
+#     print message
+#     
+#     socket.send ("getChannelNewsCountsList stock sh600001  7  ")   
+#     message = socket.recv()
+#     print message 
 #     print "Received reply ", "[", message, "]"  
     
     

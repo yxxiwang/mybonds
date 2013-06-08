@@ -39,6 +39,8 @@ yum -y install python-setuptools python-devel python-simplejson python-config
 yum -y install libevent-devel 
 yum -y install readline-devel 
 
+yum -y install libtool gcc-c++
+
 easy_install pip
 pip install ipython
 easy_install django
@@ -64,6 +66,17 @@ pip install logging
 
 pip install fabric
 pip install paramiko
+
+################ install zeroMQ   ##############################
+wget http://download.zeromq.org/zeromq-3.2.3.tar.gz
+tar -xvf zeromq-3.2.3.tar.gz
+cd zeromq*
+./configure
+make
+make check
+make install
+
+pip install pyzmq
 
 ################ install mongodb  ############################
 

@@ -57,8 +57,8 @@ def saveData(udata,key):
     logger.info( "===saveData===%s" % key)
     pipedoc = rdoc.pipeline()
     ids=""
-    doc_dcnt_key = key.replace("doc_cts",":doc_dcnt")
-    channel_cnt_key = key.replace("doc_cts",":cnt") 
+    doc_dcnt_key = key.replace("doc_cts","doc_dcnt")
+    channel_cnt_key = key.replace("doc_cts","cnt") 
     for doc in udata["docs"]:
         if not doc["validTime"]:
             continue

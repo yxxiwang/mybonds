@@ -141,12 +141,12 @@ def newsdetail(request):
         ftx = doc["fulltext"] 
         txstr = json.dumps(ftx)
         txstr = txstr.replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""") 
-        ftx = json.loads(txstr) 
+        ftx = json.loads(txstr)
         doc["fulltext"] = list2dict(ftx,"txt")
         doc["copyNum"] = str(doc["copyNum"])
-        doc["tms"]=str(doc["create_time"]) 
+        doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"])
-        doc["url"] = doc["urls"][0].split(",")[1]  
+        doc["url"] = doc["urls"][0].split(",")[1]
         doc["success"] = "true"
         doc["message"] = "success return data"
     return HttpResponse(json.dumps(doc), mimetype="application/json")

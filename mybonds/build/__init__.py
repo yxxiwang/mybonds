@@ -128,8 +128,15 @@ def cleanBeacon(op="print"):
                     r.zrem(key,bstr)
     
             
-def cleanCountData():
-    pass
+def stockChannelHash():
+    """建立一个根据股票代码到频道key的hash"""
+    for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
+        beaconusr,beaconid = beaconstr.split("|-|")
+        key = "bmk:%s:%s" % (beaconusr,beaconid)
+        name = r.hget(key,"ttl")
+        if name.isdigit():
+            print "proc %s:%s <----%s" %(beaconusr,beaconid,name)
+            r.hset("stock:channel",name,"%s:%s" % (beaconusr,beaconid))
     
 def initBeaconDisplayName():
     """初始化频道的 显示名称 为频道名称"""

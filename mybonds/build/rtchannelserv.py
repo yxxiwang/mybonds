@@ -15,32 +15,40 @@ def querySinaFrequence(parms=[]):
   
 def getChannelNewsCountsList(parms=[]):
     print parms
-    rdata = {}
-    if len(parms) != 3:
+    rdata = []
+    if len(parms) != 4:
+        print "parms is %d,not 4!" %len(parms)
         return "{}"
-    
+    code = ""
     action = parms[0]
     if action == "stock":
-        print parms[1][2:]
-        code = r.hget("stock:channel",parms[1][2:])
+#         print parms[2][2:]
+        code = r.hget("stock:channel",parms[2][2:])
     else:
-        code = parms[1]
-        
+        code = parms[2]
+#     print code
     if code is None or code =="":
+        print "code is None!"
         return "{}"
     
     key = "channel:"+code+":cnt"
-    days = parms[2]
-    
+    days = parms[3]
     if not days.isdigit():
+        print "day is not digit!"
         return "{}"
-  
-    for i in xrange(int(days)):
-        tdate = (dt.date.today() - dt.timedelta(i)).strftime('%Y%m%d')
-        cnt = r.zscore(key, tdate)
-        cnt = 0 if cnt is None else cnt
-        rdata[tdate]= str(cnt)
-        
+    
+    schema = parms[1]
+    if schema == "schema":
+        for i in xrange(int(days)):
+            tdate = (dt.date.today() - dt.timedelta(i)).strftime('%Y%m%d')
+            
+            rdata.append(tdate)
+    else:
+        for i in xrange(int(days)):
+            tdate = (dt.date.today() - dt.timedelta(i)).strftime('%Y%m%d')
+            cnt = r.zscore(key, tdate)
+            cnt = 0 if cnt is None else cnt
+            rdata.append(str(cnt)) 
     return json.dumps(rdata)
 #   return ["9527","9528"]
 

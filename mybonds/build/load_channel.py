@@ -23,23 +23,34 @@ def to_unicode_or_bust(obj, encoding='utf-8'):
              obj = unicode(obj, encoding)
      return obj
 
-def load_data(input):
+def load_data(input,parms):
 #     r.delete("bmk:doc:share")
 #     r.delete("bmk:doc:share:byfllw")
 #     r.delete("bmk:doc:share:bynews")
     for line in open(input):
         if line.startswith("#"):
             continue
+        if line.startswith("\n"):
+            continue
+        if line=="":
+            continue
         dlist = line.split(",")
         (usr,name,desc) = dlist[0],dlist[1],dlist[2]
+        
+        tag ="" 
+        if len(dlist) >=5:
+            tag = dlist[4]
         #if usr=="stockmarket":
         #    continue
 #         desc = name if desc=="" or desc is None else ""
 #         name = to_unicode_or_bust(name)
         id = getHashid(name)
-        if r.zscore("bmk:doc:share",usr+"|-|"+id):
+        
+        if r.zscore("bmk:doc:share",usr+"|-|"+id) and parms !="force":
             continue
-        print "usr=%s ;id=%s;name=%s;desc=%s" % (usr,id,name,desc)
+        
+#         print dlist
+        print "usr=%s;id=%s;name=%s;desc=%s" % (usr,id,name,desc)
         r.zadd("bmk:doc:share",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:byfllw",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:bynews",time.time(),usr+"|-|"+id)
@@ -50,9 +61,15 @@ def load_data(input):
         beaobj = r.hset("bmk:" + usr + ":" + id,"desc",desc)
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_usr",usr)
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_tms",time.time())
-        beaobj = r.hset("bmk:" + usr + ":" + id,"last_touch",0) 
-        beaobj = r.hset("bmk:" + usr + ":" + id,"last_update",0) 
-        beaobj = r.hset("bmk:" + usr + ":" + id,"cnt",0) 
+        beaobj = r.hset("bmk:" + usr + ":" + id,"last_touch",0)
+        beaobj = r.hset("bmk:" + usr + ":" + id,"last_update",0)
+        beaobj = r.hset("bmk:" + usr + ":" + id,"cnt",0)
+        beaobj = r.hset("bmk:" + usr + ":" + id,"tag",tag.replace(";", ",")) 
         
 if __name__ == "__main__":
-    load_data("channel.dat")
+    parms =""
+    if len(sys.argv) ==2:
+        parms = sys.argv[1] 
+#     print sys.argv
+    load_data("channel.dat",parms)
+    

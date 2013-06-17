@@ -32,6 +32,7 @@ def getChannelNewsCountsList(parms=[]):
         return json.dumps(rdata)
     
     key = "channel:"+code+":cnt"
+    print "key is %s" % key
     dayfrom = parms[3]
     dayto = parms[4]
     def check_int(s):
@@ -51,9 +52,9 @@ def getChannelNewsCountsList(parms=[]):
             rdata.append(tdate)
     else:
         for i in xrange(int(dayfrom),int(dayto)):
-            tdate = (dt.date.today() - dt.timedelta(i)).strftime('%Y%m%d')
-            print tdate
+            tdate = (dt.date.today() + dt.timedelta(i)).strftime('%Y%m%d')
             cnt = r.zscore(key, tdate)
+#             print tdate,cnt
             cnt = 0 if cnt is None else cnt
             rdata.append(str(cnt))
     return json.dumps(rdata)

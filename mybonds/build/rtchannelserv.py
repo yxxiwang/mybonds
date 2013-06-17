@@ -46,12 +46,12 @@ def getChannelNewsCountsList(parms=[]):
     
     schema = parms[1]
     if schema == "schema":
-        for i in xrange(int(dayfrom),int(dayto)):
+        for i in xrange(int(dayfrom),int(dayto)+1):
             tdate = (dt.date.today() + dt.timedelta(i)).strftime('%Y%m%d')
 #             print tdate
             rdata.append(tdate)
     else:
-        for i in xrange(int(dayfrom),int(dayto)):
+        for i in xrange(int(dayfrom),int(dayto)+1):
             tdate = (dt.date.today() + dt.timedelta(i)).strftime('%Y%m%d')
             cnt = r.zscore(key, tdate)
 #             print tdate,cnt

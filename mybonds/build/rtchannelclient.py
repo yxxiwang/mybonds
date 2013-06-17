@@ -27,16 +27,16 @@ if __name__ == '__main__':
 #     print RTCfg.zmqPort['systemParameterServicePort']
 #     socket.connect (RTCfg.zmqPort['systemParameterClientPort'])  
     socket.connect ('tcp://localhost:30000')  
-#     socket.connect ('tcp://121.199.37.23:30000')  
+#     socket.connect ('tcp://121.199.37.23:30000')
       
 #     #  Do 10 requests, waiting each time for a response  
 #     for request in range (1,10):  
     print "Sending request ","..."  
-    socket.send ("getChannelNewsCountsList stock schema sh600000 -30 -1 ")   
+    socket.send ("getChannelNewsCountsList stock schema sh600000 -7 -1 ")   
     message = socket.recv()
     print message
      
-    socket.send ("getChannelNewsCountsList stock data sh600000  -30 -1  ")  
+    socket.send ("getChannelNewsCountsList stock data sh600000  -7 -1  ")  
     message = socket.recv()
     print message
 #     

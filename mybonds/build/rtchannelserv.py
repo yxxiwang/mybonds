@@ -16,9 +16,9 @@ def querySinaFrequence(parms=[]):
 def getChannelNewsCountsList(parms=[]):
     print parms
     rdata = []
-    if len(parms) != 4:
+    if len(parms) != 5:
         print "parms is %d,not 4!" %len(parms)
-        return "{}"
+        return json.dumps(rdata)
     code = ""
     action = parms[0]
     if action == "stock":
@@ -29,26 +29,33 @@ def getChannelNewsCountsList(parms=[]):
 #     print code
     if code is None or code =="":
         print "code is None!"
-        return "{}"
+        return json.dumps(rdata)
     
     key = "channel:"+code+":cnt"
-    days = parms[3]
-    if not days.isdigit():
+    dayfrom = parms[3]
+    dayto = parms[4]
+    def check_int(s):
+        if s[0] in ('-', '+'):
+            return s[1:].isdigit()
+        return s.isdigit()
+
+    if not check_int(dayfrom) or  not check_int(dayto):
         print "day is not digit!"
-        return "{}"
+        return json.dumps(rdata)
     
     schema = parms[1]
     if schema == "schema":
-        for i in xrange(int(days)):
-            tdate = (dt.date.today() - dt.timedelta(i)).strftime('%Y%m%d')
-            
+        for i in xrange(int(dayfrom),int(dayto)):
+            tdate = (dt.date.today() + dt.timedelta(i)).strftime('%Y%m%d')
+#             print tdate
             rdata.append(tdate)
     else:
-        for i in xrange(int(days)):
+        for i in xrange(int(dayfrom),int(dayto)):
             tdate = (dt.date.today() - dt.timedelta(i)).strftime('%Y%m%d')
+            print tdate
             cnt = r.zscore(key, tdate)
             cnt = 0 if cnt is None else cnt
-            rdata.append(str(cnt)) 
+            rdata.append(str(cnt))
     return json.dumps(rdata)
 #   return ["9527","9528"]
 

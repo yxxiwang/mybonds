@@ -94,7 +94,9 @@ def cleanBeacon(op="print"):
         r.delete(key + ":doc:tms")
         r.delete(key + ":fllw")
         r.delete(key)
-        
+    ###########deleteBeacon is over######################
+    
+       
     for bstr in r.keys("channel:*doc_cts"):
         bkey = "bmk:"+":".join(bstr.split(":")[1:3])
         if r.type(bkey) != "hash":
@@ -126,6 +128,9 @@ def cleanBeacon(op="print"):
                 print "%s is null in %s,should remove!" % (bkey , key)
                 if op=="delete":
                     r.zrem(key,bstr)
+                    
+    for bstr in r.zrevrange("bmk:doc:shar",0,-1):
+        bkey = "bmk:"+bstr.replace("|-|",":")
     
             
 def stockChannelHash():

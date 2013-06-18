@@ -87,8 +87,8 @@ def apply_service(request):
         r.hset("captcha:"+captcha,"used_tms","")
         r.hset("captcha:"+captcha,"issendmail",False)
     saveCaptcha(id_generator())
-    saveCaptcha(id_generator())
-    saveCaptcha(id_generator())
+#     saveCaptcha(id_generator())
+#     saveCaptcha(id_generator())
     user = auth.authenticate(username=username, password=password)
     if user is not None and user.is_active:
         auth.login(request, user)
@@ -189,8 +189,8 @@ def apply(request):
                 r.hset("captcha:"+captcha,"used_tms","")
                 r.hset("captcha:"+captcha,"issendmail",False)
             saveCaptcha(id_generator())
-            saveCaptcha(id_generator())
-            saveCaptcha(id_generator())
+#             saveCaptcha(id_generator())
+#             saveCaptcha(id_generator())
             
             user = auth.authenticate(username=username, password=password)
             if user is not None and user.is_active:

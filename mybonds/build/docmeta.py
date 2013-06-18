@@ -19,7 +19,10 @@ else:#os.name=="posix"
 #     path.append(os.path.abspath('../../..'))# mybonds's parrent dir
     path.append("/root")
 
-from mybonds.apps import *
+# from mybonds.apps import *
+# import __init__ as lib
+
+from mybonds.apps.geeknews import *  
 from mybonds.apps.newspubfunc import *  
 import argparse
 
@@ -69,10 +72,7 @@ def saveData(udata,key):
 #         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
         r.hset("copynum",docid,doc["copyNum"])
         r.zadd(doc_dcnt_key,int(tdate),docid)
-        today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
-        cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
-        if cnt>0:
-            r.zadd(channel_cnt_key,cnt,int(today))
+
 #         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
 #         num = int(json.loads(docstr)["num"])
 #         if not rdoc.exists("doc:"+docid):
@@ -93,6 +93,11 @@ def saveData(udata,key):
         
         
         pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
+        
+    today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
+    cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
+    if cnt>0:
+        r.zadd(channel_cnt_key,cnt,int(today))
     saveFulltextById(ids)
     pipedoc.execute()
     
@@ -137,7 +142,8 @@ def channels():
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
         beaconusr,beaconid = beaconstr.split("|-|")
         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
-        channelDocs(beaconusr,beaconid)
+        refreshDocs(beaconusr, beaconid)
+#         channelDocs(beaconusr,beaconid)
         
 def initProc(codes):
         if codes[0]=="all":
@@ -146,7 +152,8 @@ def initProc(codes):
             for code in codes:
                 beaconusr,beaconid = code.split(":")
                 print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
-                channelDocs(beaconusr,beaconid)
+#                 channelDocs(beaconusr,beaconid)
+                refreshDocs(beaconusr, beaconid)
     
 
 if __name__ == "__main__":  

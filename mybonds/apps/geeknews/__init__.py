@@ -643,15 +643,15 @@ def refreshDocs(beaconusr, beaconid):
         return -1
     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     if r.hexists(key, "last_update"):#
-        dt = timeDiff(r.hget(key, "last_update"), time.time())
+        timediff = timeDiff(r.hget(key, "last_update"), time.time())
         if removecnt > REMOVE_CNT:#如果删除新闻数目大于指定值 ,按照 REMOVE_KEYUPTIME 判断似乎否需要刷新
-            if dt < REMOVE_KEYUPTIME :
+            if timediff < REMOVE_KEYUPTIME :
                 logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second,and removecnt is %d " % (dt,removecnt) )
                 return 0
             else:
-                logger.warn( "attembrough: needs refresh data ... diff is %d second,and removecnt is %d " % (dt,removecnt) )
-        elif dt < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
-            logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % dt )
+                logger.warn( "attembrough: needs refresh data ... diff is %d second,and removecnt is %d " % (timediff,removecnt) )
+        elif timediff < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
+            logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % timediff )
             return 0 
     
     urlstr = beaconUrl(beaconusr, beaconid)
@@ -660,8 +660,10 @@ def refreshDocs(beaconusr, beaconid):
         logger.warn( "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key )
         return -1
     udata = saveDocsByUrl(urlstr)
-    r.hset(key, "last_update", time.time())  # 更新本操作时间  
-    r.hset(key, "removecnt", 0)  # 更新本操作时间  
+    
+    if udata.has_key("channels"):
+        r.hset(key, "channels", ",".join(udata["channels"]) )
+        
     headlineonly = r.hget(key, "headlineonly")
     headlineonly = "0" if headlineonly is None else headlineonly
     
@@ -673,6 +675,9 @@ def refreshDocs(beaconusr, beaconid):
         return COMMUNICATERROR
      
 #      if len(docs) >0:
+    ctskey = "channel:"+beaconusr+":"+beaconid+":doc_cts"
+    doc_dcnt_key = ctskey.replace("doc_cts","doc_dcnt")
+    channel_cnt_key = ctskey.replace("doc_cts","cnt") 
     r.delete(key+":doc:tms")
     for doc in docs:
         if doc is None:
@@ -682,6 +687,22 @@ def refreshDocs(beaconusr, beaconid):
 #             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
         r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)
+################ 统计信息   ############################
+        docid= str(doc["docId"])
+        tms = doc["create_time"]
+        tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
+#         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+        r.hset("copynum",docid,doc["copyNum"])
+        r.zadd(doc_dcnt_key,int(tdate),docid)
+    ##### end for #####
+    today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
+    cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
+    if cnt>0:
+        r.zadd(channel_cnt_key,cnt,int(today))
+################ 统计信息  over ############################
+            
+    r.hset(key, "last_update", time.time())  # 更新本操作时间  
+    r.hset(key, "removecnt", 0)  # 更新本操作时间  
     return SUCCESS
             
 
@@ -1110,6 +1131,7 @@ def saveDocsByUrl(urlstr):
         else:
             saveFulltextById(ids)
         pipedoc.execute()
+    ################## saveText is over ##############################
             
     if udata.has_key("docs"):
         saveText(udata["docs"],isheadline=False)

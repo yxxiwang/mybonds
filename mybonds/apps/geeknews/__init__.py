@@ -678,14 +678,14 @@ def refreshDocs(beaconusr, beaconid):
     ctskey = "channel:"+beaconusr+":"+beaconid+":doc_cts"
     doc_dcnt_key = ctskey.replace("doc_cts","doc_dcnt")
     channel_cnt_key = ctskey.replace("doc_cts","cnt") 
-    r.delete(key+":doc:tms")
+#     r.delete(key+":doc:tms")
     for doc in docs:
         if doc is None:
             continue
         if doc["validTime"]=="false" or not doc["validTime"]:
             continue
 #             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
-        r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
+        r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)
 ################ 统计信息   ############################
         docid= str(doc["docId"])
@@ -695,6 +695,7 @@ def refreshDocs(beaconusr, beaconid):
         r.hset("copynum",docid,doc["copyNum"])
         r.zadd(doc_dcnt_key,int(tdate),docid)
     ##### end for #####
+    r.rename(key+":doc:tms:bak",key+":doc:tms")
     today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
     cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
     if cnt>0:
@@ -748,6 +749,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         return {} 
     udata = {}
     docs = [] 
+    channels = []
     doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
     for docid in doc_lst:
         doc = rdoc.hgetall("doc:" + docid) 
@@ -761,6 +763,17 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         docs.append(doc) 
     udata["docs"] = docs  
+    channelstr = r.hget(key,"channels")
+    if channelstr is not None and  channelstr !="" :
+        for cname in  channelstr.split(","):
+            if r.hexists("beacon:channel",cname):
+                cobj = {}
+                cobj["beaconname"]=cname
+                ckey = r.hget("beacon:channel",cname)
+                cobj["beaconusr"]=ckey.split(":")[1]
+                cobj["beaconid"]=ckey.split(":")[2]
+                channels.append(cobj)
+    udata["channels"] =  channels
     udata["total"] = str(len(udata["docs"]) )
 #     r.hset(key, "cnt", len(docs))
     return udata
@@ -826,6 +839,9 @@ def beaconChangeName(key, beaconusr, beaconid):
     
     if r.exists(srckey + ":doc:tms"):
         r.rename(srckey + ":doc:tms", dstkey + ":doc:tms") 
+    
+    from mybonds.build import beaconNameHash
+    beaconNameHash()
 
 def getTag(displayTag):
     if isinstance(displayTag, unicode): 

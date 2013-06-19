@@ -129,9 +129,17 @@ def cleanBeacon(op="print"):
                 if op=="delete":
                     r.zrem(key,bstr)
                     
-    for bstr in r.zrevrange("bmk:doc:shar",0,-1):
+def beaconNameHash(op="print"):
+    print "==beaconNameHash=="
+    for bstr in r.zrevrange("bmk:doc:share",0,-1):
+        print "proc %s" % bstr
         bkey = "bmk:"+bstr.replace("|-|",":")
-    
+        ttl = r.hget(bkey,"ttl")
+        if ttl is None:
+            print "%s is null in %s,should remove!" % (bkey , key)
+        else:
+            r.hset("beacon:channel:bak",ttl,bkey)
+    r.rename("beacon:channel:bak","beacon:channel")
             
 def stockChannelHash():
     """建立一个根据股票代码到频道key的hash"""

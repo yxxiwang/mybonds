@@ -93,6 +93,14 @@
 
           <div class="span6"><!-- 中间灯塔similar文档 -->
             <div class="span12" style="margin-left:0px;">
+            <blockquote>
+           <p style="font-size: 13px;">
+              {% for channel in udata.channels %}
+              <div class="span2" style="margin-left:0px;">
+              <a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:green">{{ channel.beaconname }} &nbsp;  </span> </a>
+              </div>
+              {% endfor %}  
+            </blockquote>        
             </div>
             {% for doc in udata.docs %}
             <div class="span12" style="margin-left:0px;">

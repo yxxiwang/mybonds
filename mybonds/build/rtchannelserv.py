@@ -32,7 +32,7 @@ def getChannelNewsCountsList(parms=[]):
         return json.dumps(rdata)
     
     key = "channel:"+code+":cnt"
-    print "key is %s" % key
+#     print "key is %s" % key
     dayfrom = parms[3]
     dayto = parms[4]
     def check_int(s):

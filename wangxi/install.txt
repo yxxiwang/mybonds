@@ -67,6 +67,21 @@ pip install logging
 pip install fabric
 pip install paramiko
 
+############ Installing rdbtools #########################
+pip install rdbtools
+
+# rdb --command json --key "user.*" /var/redis/6379/dump.rdb
+# rdb --command json --db 2 --type hash --key "a.*" /var/redis/6379/dump.rdb
+# redis-memory-for-key copynum
+# [root@AY130408103023353483 ~]# redis-memory-for-key copynum
+# Key                             "copynum"
+# Bytes                           14790816.0
+# Type                            hash
+# Encoding                        hashtable
+# Number of Elements              181952
+# Length of Largest Element       19
+
+
 ################ install zeroMQ   ##############################
 wget http://download.zeromq.org/zeromq-3.2.3.tar.gz
 tar -xvf zeromq-3.2.3.tar.gz

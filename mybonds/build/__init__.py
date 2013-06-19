@@ -19,6 +19,7 @@ else:#os.name=="posix"
 #     path.append(os.path.abspath('../../..'))# mybonds's parrent dir
     path.append("/root") 
 from mybonds.apps import *
+from mybonds.apps.geeknews import saveFulltextById
 from mybonds.apps.newspubfunc import *
 import argparse
  
@@ -140,7 +141,11 @@ def beaconNameHash(op="print"):
         else:
             r.hset("beacon:channel:bak",ttl,bkey)
     r.rename("beacon:channel:bak","beacon:channel")
-            
+
+def saveFulltext(ids):
+    """保存单个或者多个id到后台(mongodb或其他)"""
+    saveFulltextById(ids)
+    
 def stockChannelHash():
     """建立一个根据股票代码到频道key的hash"""
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):

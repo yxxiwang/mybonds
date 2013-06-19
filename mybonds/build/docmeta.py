@@ -142,7 +142,8 @@ def channels():
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
         beaconusr,beaconid = beaconstr.split("|-|")
         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
-        refreshDocs(beaconusr, beaconid)
+        rt = refreshDocs(beaconusr, beaconid)
+        
 #         channelDocs(beaconusr,beaconid)
         
 def initProc(codes):

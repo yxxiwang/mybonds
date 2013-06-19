@@ -777,7 +777,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     udata["total"] = str(len(udata["docs"]) )
 #     r.hset(key, "cnt", len(docs))
     return udata
-        
+
 def buildJsonData(username, docs, tags=None):
     seeds = []
     for hashid in docs:
@@ -1084,6 +1084,17 @@ def saveFulltextById(ids,retrycnt=0,url=""):
             docid = str(doc["docId"])
 #             pipedoc.set("ftx:"+docid,json.dumps(txt))
 #             pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
+            if not r.hexists("doc:"+docid,"docid"):
+                pipedoc.hset("doc:"+docid,"docid",docid)
+            if not r.hexists("doc:"+docid,"title"):
+                pipedoc.hset("doc:"+docid,"title",doc["title"].rstrip() ) 
+            if not r.hexists("doc:"+docid,"text"):
+                pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
+            if not r.hexists("doc:"+docid,"copyNum"):
+                pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
+            if not r.hexists("doc:"+docid,"create_time"):
+                pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
+            
             pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
             pipedoc.hset("doc:"+docid,"host","")
             pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
@@ -1116,7 +1127,7 @@ def saveDocsByUrl(urlstr):
                 continue
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
-            if not rdoc.exists("doc:"+docid):
+            if not rdoc.hexists("doc:"+docid,"url"):
                 ids+=docid+";"
                 cnt = cnt+1
                 if cnt == 20:
@@ -1127,9 +1138,9 @@ def saveDocsByUrl(urlstr):
                 pass
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
             pipedoc.hset("doc:"+docid,"docid",docid)
-            pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ",""))
+            pipedoc.hset("doc:"+docid,"title",doc["title"].rstrip())
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
-            pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
+            pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
     #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       

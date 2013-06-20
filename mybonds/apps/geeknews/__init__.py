@@ -840,6 +840,11 @@ def beaconChangeName(key, beaconusr, beaconid):
     
     if r.exists(srckey + ":doc:tms"):
         r.rename(srckey + ":doc:tms", dstkey + ":doc:tms") 
+        
+    if r.exists("channel:" + key + ":doc_dcnt"):
+        r.rename("channel:" + key + ":doc_dcnt", "channel:" + beaconusr + ":" + beaconid + ":doc_dcnt") 
+    if r.exists("channel:" + key + ":doc_tcnt"):
+        r.rename("channel:" + key + ":doc_tcnt", "channel:" + beaconusr + ":" + beaconid + ":doc_tcnt") 
     
     from mybonds.build import beaconNameHash
     beaconNameHash()

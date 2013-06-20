@@ -100,6 +100,15 @@ def makeDocDateCnt():
 #             print "%s incr 1 ,num:%d" %(tdate,num)
 #             r.hincrby(doc_dcnt_key,tdate,1)
 #             r.hincrby(doc_dnum_key,tdate,num)
+
+def cleanChannelCnt(op="print"): 
+    """ 清理多余的 频道统计的key"""
+    for bstr in r.keys("channel:*cnt"):
+        bkey = "bmk:"+":".join(bstr.split(":")[1:3])
+        if not r.exists(bkey):
+            print "%s is not exists with %s !" % (bkey,bstr)
+            if op=="delete":
+                r.delete(bstr)
             
 def cleanBeacon(op="print"):
     """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""

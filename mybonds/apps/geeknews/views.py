@@ -1432,6 +1432,9 @@ def beacondelete(request, template_name="beacon/beacon_list.html"):
     r.delete(key + ":fllw")
     r.delete(key)
     
+    r.delete("channel:" + beaconusr + ":" + beaconid+ ":doc_dcnt")
+    r.delete("channel:" + beaconusr + ":" + beaconid+ ":doc_tcnt")
+    
     return HttpResponseRedirect("/news/beaconlist/")
         
 @login_required

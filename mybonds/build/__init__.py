@@ -57,7 +57,7 @@ def makeDocTimeCnt():
             tms = rdoc.hget("doc:"+docid,"create_time")
             if tms is None or tms==0:
                 print "warnning: %s is not exsist!" % docid
-                pass
+                continue
 #             if os.name =="nt":
 #                 tms=int(tms)/1000
             tms=int(tms)/1000

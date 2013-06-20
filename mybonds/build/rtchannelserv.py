@@ -13,11 +13,54 @@ r = redis.StrictRedis()
 def querySinaFrequence(parms=[]):
   return RTCfg.timeWindow['sinaIntervalTime']
   
+def getChannelNewsCopynumListByTime(parms=[]):
+    print parms
+    if len(parms) != 5:
+        print "parms is %d,not 5!" %len(parms)
+        return json.dumps(rdata)
+    
+    (action,schema,code,dayfrom,dayto)=parms
+    rdata = []
+    code = "" 
+    if action == "stock":
+#         print parms[2][2:]
+        code = r.hget("stock:channel",parms[2][2:])
+    else:
+        code = parms[2]
+#     print code
+    if code is None or code =="":
+        print "code is None!"
+        return json.dumps(rdata)
+     
+    def check_int(s):
+        if s[0] in ('-', '+'):
+            return s[1:].isdigit()
+        return s.isdigit()
+
+    if not check_int(dayfrom) or  not check_int(dayto):
+        print "day is not digit!"
+        return json.dumps(rdata)
+     
+    key = "channel:"+code+":doc_tcnt"
+    tmsfrom = ( dt.date.today() + dt.timedelta(int(dayfrom)) ).strftime('%Y%m%d') 
+    tmsto = ( dt.date.today() + dt.timedelta(int(dayto)) ).strftime('%Y%m%d')
+    tmsfrom = int(tmsfrom+"000000")
+    tmsto = int(tmsto+"240000")
+    print tmsfrom ,"=",tmsto,"=",key
+    if schema == "schema": 
+        for docid,tms in r.zrangebyscore(key, tmsfrom, tmsto, 0, -1, withscores=True):
+            rdata.append(tms)
+    else:
+        for docid,tms in r.zrangebyscore(key, tmsfrom, tmsto, 0, -1, withscores=True):
+            rdata.append(r.hget("copynum", docid))
+    return json.dumps(rdata)
+    
+    
 def getChannelNewsCountsList(parms=[]):
     print parms
     rdata = []
     if len(parms) != 5:
-        print "parms is %d,not 4!" %len(parms)
+        print "parms is %d,not 5!" %len(parms)
         return json.dumps(rdata)
     code = ""
     action = parms[0]
@@ -65,6 +108,7 @@ class functionMapping:
     self.controllers = {
       'querySinaFrequence': querySinaFrequence,
       'getChannelNewsCountsList': getChannelNewsCountsList,
+      'getChannelNewsCopynumListByTime': getChannelNewsCopynumListByTime,
       #'/logout/':logout,
     }
 

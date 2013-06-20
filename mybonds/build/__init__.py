@@ -3,7 +3,7 @@
 import json, urllib2, urllib
 import csv, string,random
 import sys, time,logging
-import redis
+import redis,re
 import numpy
 import traceback 
 import datetime as dt
@@ -43,6 +43,28 @@ def convUsrFllw():
     return 0
 #     r.srem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
 
+def makeDocTimeCnt():
+    """
+                根据doc_dcnt初始数据 生成  实时新闻条数 基础数据 doc_tcnt
+    """
+    for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
+        beaconusr,beaconid = beaconstr.split("|-|")
+        print "proc %s:%s " %(beaconusr,beaconid)
+        doc_dcnt_key = "channel:"+beaconusr+":"+beaconid+":doc_dcnt"
+        doc_tcnt_key = "channel:"+beaconusr+":"+beaconid+":doc_tcnt"
+        channel_cnt_key = "channel:"+beaconusr+":"+beaconid+":cnt"
+        for docid in r.zrange(doc_dcnt_key,0,-1):
+            tms = rdoc.hget("doc:"+docid,"create_time")
+            if tms is None or tms==0:
+                print "warnning: %s is not exsist!" % docid
+                pass
+            if os.name =="nt":
+                tms=int(tms)/1000
+            tms=getTime(tms)
+#             tms = tms.replace(":","")
+            tms = re.sub(r":|-|\s", "", tms)
+            r.zadd(doc_tcnt_key,long(tms),docid)
+            
 def makeDocDateCnt():
     """
                 根据初始数据 生成  每日新闻条数 统计数据
@@ -145,7 +167,7 @@ def beaconNameHash(op="print"):
 def saveFulltext(ids):
     """保存单个或者多个id到后台(mongodb或其他)"""
     saveFulltextById(ids)
-    
+
 def stockChannelHash():
     """建立一个根据股票代码到频道key的hash"""
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):

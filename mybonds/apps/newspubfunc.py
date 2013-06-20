@@ -23,20 +23,45 @@ connection = Connection()
 mdoc = connection["doc"]
 tftxs = mdoc['tftxs']
 
+sysparms_hkey = {
+    "REDIS_EXPIRETIME":"redis_expire",
+    "DOC_EXPIRETIME":"doc_expire",
+    "KEY_UPTIME":"beacon_interval",
+    "REMOVE_KEYUPTIME":"beacon_interval_remove",
+    "REMOVE_CNT":"beacon_interval_remove_cnt",
+    "CHANNEL_NEWS_NUM":"beacon_news_num",
+    "QUANTITY":"quantity",
+    "QUANTITY_DURATION":"quantity_duration",
+    "RETRY_TIMES":"failed_retry_times",
+    "BACKEND_DOMAIN":"backend_domain",
+    "DOMAIN":"domain",
+    "LOGLEVEL":"loglevel",
+}
 
-REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire")) if r.hexists("sysparms","redis_expire") else 186400
-DOC_EXPIRETIME = int(r.hget("sysparms", "doc_expire") ) if r.hexists("sysparms","redis_expire") else 86400*2
-KEY_UPTIME = int(r.hget("sysparms", "beacon_interval")) if r.hexists("sysparms","redis_expire") else 60*15
-REMOVE_KEYUPTIME = int(r.hget("sysparms", "beacon_interval_remove")) if r.hexists("sysparms","redis_expire") else 60*5
-REMOVE_CNT = int(r.hget("sysparms", "beacon_interval_remove_cnt")) if r.hexists("sysparms","redis_expire") else 3
-CHANNEL_NEWS_NUM = int(r.hget("sysparms", "beacon_news_num")) if r.hexists("sysparms","redis_expire") else 1500
-QUANTITY = int(r.hget("sysparms", "quantity")) if r.hexists("sysparms","redis_expire") else 300
-QUANTITY_DURATION = int(r.hget("sysparms", "quantity_duration")) if r.hexists("sysparms","redis_expire") else 300
-RETRY_TIMES = int(r.hget("sysparms", "failed_retry_times")) if r.hexists("sysparms","redis_expire") else 3
-BACKEND_DOMAIN = r.hget("sysparms", "backend_domain") if r.hexists("sysparms","redis_expire") else "svc.zhijixing.com"
-DOMAIN = r.hget("sysparms", "domain") if r.hexists("sysparms","redis_expire") else "www.9cloudx.com"
-LOGLEVEL = r.hget("sysparms", "loglevel") if r.hexists("sysparms","redis_expire") else "info"
+# REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire")) if r.hexists("sysparms","redis_expire") else 186400
+# DOC_EXPIRETIME = int(r.hget("sysparms", "doc_expire") ) if r.hexists("sysparms","doc_expire") else 86400*2
+# KEY_UPTIME = int(r.hget("sysparms", "beacon_interval")) if r.hexists("sysparms","beacon_interval") else 60*15
+# # REMOVE_KEYUPTIME = int(r.hget("sysparms", "beacon_interval_remove")) if r.hexists("sysparms","redis_expire") else 60*5
+# # REMOVE_CNT = int(r.hget("sysparms", "beacon_interval_remove_cnt")) if r.hexists("sysparms","redis_expire") else 3
+# CHANNEL_NEWS_NUM = int(r.hget("sysparms", "beacon_news_num")) if r.hexists("sysparms","beacon_news_num") else 300
+# QUANTITY = int(r.hget("sysparms", "quantity")) if r.hexists("sysparms","quantity") else 1500
+# QUANTITY_DURATION = int(r.hget("sysparms", "quantity_duration")) if r.hexists("sysparms","quantity_duration") else 300
+# RETRY_TIMES = int(r.hget("sysparms", "failed_retry_times")) if r.hexists("sysparms","failed_retry_times") else 3
+# BACKEND_DOMAIN = r.hget("sysparms", "backend_domain") if r.hexists("sysparms","backend_domain") else "svc.zhijixing.com"
+# DOMAIN = r.hget("sysparms", "domain") if r.hexists("sysparms","domain") else "www.9cloudx.com"
+# LOGLEVEL = r.hget("sysparms", "loglevel") if r.hexists("sysparms","loglevel") else "info"
 
+if not r.hexists("sysparms","redis_expire"):
+    r.hset("sysparms", "redis_expire",186400) 
+    r.hset("sysparms", "doc_expire",86400*2) 
+    r.hset("sysparms", "beacon_interval",60*15) 
+    r.hset("sysparms", "beacon_news_num",300) 
+    r.hset("sysparms", "quantity",1500) 
+    r.hset("sysparms", "quantity_duration",300) 
+    r.hset("sysparms", "backend_domain","svc.zhijixing.com")
+    r.hset("sysparms", "domain","www.9cloudx.com")
+    r.hset("sysparms", "loglevel","info")
+    
 def loginit(LOGLEVEL):
     if LOGLEVEL is None or LOGLEVEL == "" or LOGLEVEL.lower() == "info":
         LOGLEVEL = logging.INFO
@@ -59,7 +84,12 @@ def loginit(LOGLEVEL):
     logger.warn("enter newspubfunc ,log init done.loglevel is %d" % LOGLEVEL)
     return logger
 
-logger = loginit(LOGLEVEL)   
+def getsysparm(parstr):
+#     REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire")) if r.hexists("sysparms","redis_expire") else 186400
+    hval = r.hget("sysparms", sysparms_hkey[parstr.rstrip()])
+    return int(hval) if  hval.isdigit() else hval
+
+logger = loginit(getsysparm("LOGLEVEL"))   
 def sendemail(content, rcv_email,title=""):
     from django.core.mail import send_mail
     logger.info( "================sendemail============================")
@@ -171,14 +201,15 @@ def getDataByUrl(urlstr,isservice=False):
         udata["docs"] = []
     return udata
     
+
 def log_typer(request, act, obj):
     quantity = 0 
     client_address = request.META['REMOTE_ADDR']
 #    print "client_address===:" + client_address
     quantity = r.incr("quantity:" + client_address, 1)
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return quantity
-    r.expire("quantity:" + client_address, QUANTITY_DURATION)
+    r.expire("quantity:" + client_address, getsysparm("QUANTITY_DURATION") )
     username = getUserName(request)
     logobj = {}
     logobj["usr"] = username
@@ -282,7 +313,7 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
         qobj["email"] = tag 
 #         qobj[qtype] = tag
     elif qtype == "removedoc":
-        urlstr="http://%s/research/svc?u=%s&o=2&likeid=-%s" %(BACKEND_DOMAIN,tag,similarid)
+        urlstr="http://%s/research/svc?u=%s&o=2&likeid=-%s" %(getsysparm("BACKEND_DOMAIN"),tag,similarid)
         qobj["docid"] = similarid
         qobj[qtype] = tag 
 

@@ -58,8 +58,9 @@ def makeDocTimeCnt():
             if tms is None or tms==0:
                 print "warnning: %s is not exsist!" % docid
                 pass
-            if os.name =="nt":
-                tms=int(tms)/1000
+#             if os.name =="nt":
+#                 tms=int(tms)/1000
+            tms=int(tms)/1000
             tms=getTime(tms)
 #             tms = tms.replace(":","")
             tms = re.sub(r":|-|\s", "", tms)

@@ -467,8 +467,8 @@ def sysparms(request,template_name="beacon/sysparms.html"):
         domain = request.POST.get("domain", "www.9cloudx.com");
         doc_expire = request.POST.get("doc_expire","172800");
         beacon_interval =request.POST.get("beacon_interval", "900");
-        beacon_interval_remove = request.POST.get("beacon_interval_remove", "300");
-        beacon_interval_remove_cnt =request.POST.get("beacon_interval_remove_cnt", "3");
+#         beacon_interval_remove = request.POST.get("beacon_interval_remove", "300");
+#         beacon_interval_remove_cnt =request.POST.get("beacon_interval_remove_cnt", "3");
         beacon_news_num =request.POST.get("beacon_news_num", "300");
         quantity = request.POST.get("quantity", "1500");
         quantity_duration = request.POST.get("quantity_duration", "300"); 
@@ -480,8 +480,8 @@ def sysparms(request,template_name="beacon/sysparms.html"):
         r.hset("sysparms","domain",domain)
         r.hset("sysparms","doc_expire",int(doc_expire))
         r.hset("sysparms","beacon_interval",int(beacon_interval))
-        r.hset("sysparms","beacon_interval_remove",int(beacon_interval_remove))
-        r.hset("sysparms","beacon_interval_remove_cnt",int(beacon_interval_remove_cnt))
+#         r.hset("sysparms","beacon_interval_remove",int(beacon_interval_remove))
+#         r.hset("sysparms","beacon_interval_remove_cnt",int(beacon_interval_remove_cnt))
         r.hset("sysparms","beacon_news_num",int(beacon_news_num))
         r.hset("sysparms","quantity",int(quantity))
         r.hset("sysparms","quantity_duration",int(quantity_duration))

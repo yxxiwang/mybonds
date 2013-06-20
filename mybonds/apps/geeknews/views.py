@@ -95,7 +95,7 @@ def test(request):
 def feedback_reply(request):
     content = request.GET.get("content", "")
     quantity = log_typer(request, "feedback", content)
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
     userobj = request.user  
@@ -152,7 +152,7 @@ def research(request):
     title = request.GET.get("title", likeid) 
     
     quantity = log_typer(request, "reserch", title)
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
 #    otype = request.GET.get("t", "")
     
@@ -187,7 +187,7 @@ def research(request):
 def overview(request):
     print "---------geeknews/overview---------"
     quantity = log_typer(request, "ppl", "none")
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>') 
     otype = request.GET.get("o", "0") 
     
@@ -228,7 +228,7 @@ def overview(request):
 def history(request):
     print "---------geeknews/history---------"
     quantity = log_typer(request, "rdd", "none") 
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
     otype = request.GET.get("o", "rdd")
@@ -265,7 +265,7 @@ def history(request):
 def navi(request, template_name="geeknews.html"):
     print "---------geeknews/foucs---------"
     quantity = log_typer(request, "nav", "none") 
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
     otype = request.GET.get("o", "nav")
@@ -303,7 +303,7 @@ def navi(request, template_name="geeknews.html"):
 def recomm(request, template_name="geeknews.html"):
     print "geeknews/recomment" 
     quantity = log_typer(request, "rcm", "none") 
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
     otype = request.GET.get("o", "rcm") 
@@ -345,7 +345,7 @@ def recomm(request, template_name="geeknews.html"):
 def tagdoc(request, tag, template_name="geeknews.html"):  # 获得某个标签的关联标签信息
     print "geeknews/tagdoc" 
     quantity = log_typer(request, "tag", tag)
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
 
 #    username = request.session['username']
@@ -431,7 +431,7 @@ def load_seeds(request):
     # if request.is_ajax(): 
     otype = request.GET.get("t", "")
     quantity = log_typer(request, "load_seeds", otype) 
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
     start = request.GET.get("start", "0")
@@ -569,7 +569,7 @@ def searchs(request, template_name="beacon/search_list.html"):
 def globaltag(request, template_name="beacon/related_list.html"):
     globaltag = request.GET.get("globaltag", "") 
     quantity = log_typer(request, "globaltag", globaltag)
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     username = getUserName(request)
     globaltag = urllib2.quote(globaltag.encode("utf8")) 
@@ -596,7 +596,7 @@ def globaltag(request, template_name="beacon/related_list.html"):
 def todaynews(request, template_name="beacon/related_list.html"):
     otype = request.GET.get("o", "")
     quantity = log_typer(request, "todaynews", "今闻观止")
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>') 
     username = getUserName(request)
     urlstr = "http://www.gxdx168.com/research/svc?o=1&page=0&length=90"
@@ -642,7 +642,7 @@ def relatednews(request, template_name="beacon/related_list.html"):
         host = request.GET.get("host", relatedid)
         title = request.GET.get("title", relatedid)
         quantity = log_typer(request, "relatednews", title+"|-|"+host)
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     username = getUserName(request)
     if localtag !="":
@@ -672,7 +672,7 @@ def relatednews(request, template_name="beacon/related_list.html"):
 @login_required
 def load_beacons(request): 
     quantity = log_typer(request, "load_beacons", "None") 
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
     start = request.GET.get("start", "0")
@@ -878,7 +878,7 @@ def load_similars(request):
     beaconusr = request.GET.get("beaconusr", "ltb")
     obj= "all" if groupid !="" else beaconusr+":"+beaconid
     quantity = log_typer(request, "load_similars", obj) 
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
      
     start = request.GET.get("start", "0")
@@ -1250,7 +1250,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         logobj="all"
     
     quantity = log_typer(request, "beaconnews", logobj)
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
     username = getUserName(request)
@@ -1553,7 +1553,7 @@ def sendemailfornews(request):
         return HttpResponse(json.dumps(robj), mimetype="application/json")
     
     quantity = log_typer(request, "sendemailfornews", emails+"->"+docids)
-#     if quantity > QUANTITY:
+#     if quantity > getsysparm("QUANTITY"):
 #         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     def pushqueue(emails,docids):
         for email,docid in zip( emails.split(","),docids.split(";") ):
@@ -1596,7 +1596,7 @@ def captchalist(request, template_name="beacon/captcha.html"):
         quantity = log_typer(request, "sendemail", captchaid)
     else:
         quantity = log_typer(request, "captchalist", captchaid)
-    if quantity > QUANTITY:
+    if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     if captchaid != "":
         r.hset("captcha:"+captchaid,"issendmail",True)

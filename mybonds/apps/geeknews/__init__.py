@@ -3,7 +3,7 @@
 from numpy.ma.core import isMA  
 import json, numpy, time
 import csv, string, random
-import sys,os
+import sys,os,re
 import redis
 import traceback
 import urllib2
@@ -60,7 +60,7 @@ def emailcontent(udata):
         for doc in beacon["docs"]:
             title = to_unicode_or_bust(doc["title"])
             url = to_unicode_or_bust(doc["url"])
-            url = "http://%s/news/research/?likeid=%s&url=%s&title=%s " %(DOMAIN,getHashid(url),url,title)
+            url = "http://%s/news/research/?likeid=%s&url=%s&title=%s " %(getsysparm("DOMAIN"),getHashid(url),url,title)
             content= textstr
             content = content.replace("{{url}}", url)
             content = content.replace("{{title}}", title)
@@ -401,7 +401,7 @@ def refreshTagsUptime(username, otype, num, tagid=None):
         keytms = "usr:%s:%s:tag:%s" % (username, otype, getHashid(tag))
         ct = "0" if r.get(keytms) is None else r.get(keytms)
         dt = timeDiff(ct, time.time())
-        if dt > KEY_UPTIME:
+        if dt > getsysparm("KEY_UPTIME"):
             print "tag %s timediff is %d,last uptime is %s" % (tag, dt, ct)
             if otype == "nav":
                 pushQueue("navtag", username, otype, tag)
@@ -419,7 +419,7 @@ def checkTagUptime(username, otype, num, tag, tagid):
         else:
             print keytms + " is not exists,retrivedocs from backend..."
         rt = saveTagdoc(username, otype, tag)
-    elif td > KEY_UPTIME:
+    elif td > getsysparm("KEY_UPTIME"):
 #        if isinstance(username, unicode): 
 #            print "data is old,pushQueue(retirveTAG).%s,%s,%d" % (username.encode("utf8"), otype, td)
 #        else:
@@ -438,7 +438,7 @@ def checkUptime(username, otype, num):
         if not r.exists(keytms):
             logger.warn( keytms + " is not exists,retrivedocs from backend..." )
             rt = saveDocs(username, otype) 
-        elif dt > KEY_UPTIME:
+        elif dt > getsysparm("KEY_UPTIME"):
             logger.warn( "data is old,pushQueue(retirvePPL)..%s,%s,%d" % (username, otype, dt) )
             r.set(keytms, time.time())  # 更新本操作时间 
             pushQueue(otype, username, otype)       
@@ -619,19 +619,20 @@ def beaconUrl(beaconusr, beaconid):
                         根据频道所属用户及频道id生成从后台取频道的请求地址
     """
     page = 0
-    if os.name =="posix":
-        length=CHANNEL_NEWS_NUM
-    else:
-        length = 10 
+#     if os.name =="posix":
+#         length=CHANNEL_NEWS_NUM
+#     else:
+#         length = 20 
+    length=getsysparm("CHANNEL_NEWS_NUM")
     key = "bmk:" + beaconusr + ":" + beaconid
     channel = r.hget(key,"ttl")
     channel = "" if channel is None else channel
     mindoc = r.hget(key,"mindoc") 
     mindoc = 0 if mindoc is None else mindoc 
     if int(mindoc) <= 0 :
-        urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s" %(BACKEND_DOMAIN,channel,page,length)
+        urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s" %(getsysparm("BACKEND_DOMAIN"),channel,page,length)
     else:
-        urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s&mindoc=%s" %(BACKEND_DOMAIN,channel,page,length,mindoc)
+        urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s&mindoc=%s" %(getsysparm("BACKEND_DOMAIN"),channel,page,length,mindoc)
     return urlstr
 
 def refreshDocs(beaconusr, beaconid):
@@ -641,16 +642,10 @@ def refreshDocs(beaconusr, beaconid):
     if not r.exists(key):
         logger.warn( "attembrough: i have nothing to do .key:%s is not exists " % key)
         return -1
-    removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
+#     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     if r.hexists(key, "last_update"):#
-        timediff = timeDiff(r.hget(key, "last_update"), time.time())
-        if removecnt > REMOVE_CNT:#如果删除新闻数目大于指定值 ,按照 REMOVE_KEYUPTIME 判断似乎否需要刷新
-            if timediff < REMOVE_KEYUPTIME :
-                logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second,and removecnt is %d " % (dt,removecnt) )
-                return 0
-            else:
-                logger.warn( "attembrough: needs refresh data ... diff is %d second,and removecnt is %d " % (timediff,removecnt) )
-        elif timediff < KEY_UPTIME:#如果上次更新时间才过去不久,则不重复更新
+        timediff = timeDiff(r.hget(key, "last_update"), time.time()) 
+        if timediff < getsysparm("KEY_UPTIME"):#如果上次更新时间才过去不久,则不重复更新
             logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % timediff )
             return 0 
     
@@ -677,6 +672,7 @@ def refreshDocs(beaconusr, beaconid):
 #      if len(docs) >0:
     ctskey = "channel:"+beaconusr+":"+beaconid+":doc_cts"
     doc_dcnt_key = ctskey.replace("doc_cts","doc_dcnt")
+    doc_tcnt_key = ctskey.replace("doc_cts","doc_tcnt")
     channel_cnt_key = ctskey.replace("doc_cts","cnt") 
 #     r.delete(key+":doc:tms")
     for doc in docs:
@@ -689,13 +685,20 @@ def refreshDocs(beaconusr, beaconid):
 #         r.expire(key+":doc:tms",DOC_EXPIRETIME)
 ################ 统计信息   ############################
         docid= str(doc["docId"])
-        tms = doc["create_time"]
+        tms = doc["create_time"] 
+        if tms is None or tms==0:
+            continue
+        
         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
 #         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+        tms=getTime(int(tms)/1000) 
+        tms = re.sub(r":|-|\s", "", tms)
+        r.zadd(doc_tcnt_key,long(tms),docid)
         r.hset("copynum",docid,doc["copyNum"])
         r.zadd(doc_dcnt_key,int(tdate),docid)
     ##### end for #####
-    r.rename(key+":doc:tms:bak",key+":doc:tms")
+    if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
+        r.rename(key+":doc:tms:bak",key+":doc:tms")
     today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
     cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
     if cnt>0:
@@ -720,9 +723,7 @@ def refreshBeacon(beaconusr, beaconid):
     
     if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
         logger.warn( key + "'s 'last_touch' is not exists,retrivedocs from backend..." )
-        if r.exists(key):
-#             refreshDocs(beaconusr, beaconid)
-#             r.hset(key, "last_touch", time.time())  # 更新本操作时间  
+        if r.exists(key): 
             pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
         else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             logger.warn( key + " maybe deleted via front  so we ignore it..." )
@@ -730,16 +731,16 @@ def refreshBeacon(beaconusr, beaconid):
     elif not r.exists("bmk:"+beaconusr+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
 #         refreshDocs(beaconusr, beaconid)
         pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
-    elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
-        logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
-        r.hset(key, "last_touch", time.time())  # 更新本操作时间  
-        pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
-    elif dt > KEY_UPTIME:#如果上次更新时间过久,则重新刷新数据
+#     elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
+#         logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
+#         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
+#         pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
+    elif dt > getsysparm("KEY_UPTIME"):#如果上次更新时间过久,则重新刷新数据
         logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
     else:
-        logger.warn( "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt,KEY_UPTIME) )
+        logger.warn( "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt,getsysparm("KEY_UPTIME") ) )
         
 def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     key = "bmk:" + beaconusr + ":" + beaconid
@@ -856,7 +857,7 @@ def saveRelativeDocs(username, relativeid):
 def saveDocsByIDS(docids):
     logger.info( "==============geeknews/saveDocsByID============"  )
     docstr = ";".join(docids)
-    urlstr = "http://%s/research/svc?docid=%s" % (BACKEND_DOMAIN,docstr) 
+    urlstr = "http://%s/research/svc?docid=%s" % (getsysparm("BACKEND_DOMAIN"),docstr) 
     udata=getDataByUrl(urlstr)
     docs = [] 
     if udata.has_key("docs"):
@@ -1055,10 +1056,10 @@ def saveFulltextById(ids,retrycnt=0,url=""):
     if url=="" :
         if ids is None or ids =="":
             return udata
-        urlstr = "http://%s/research/svc?docid=%s" %(BACKEND_DOMAIN,ids)
+        urlstr = "http://%s/research/svc?docid=%s" %(getsysparm("BACKEND_DOMAIN"),ids)
     else:
         urlstr = url
-    if retrycnt >=RETRY_TIMES:
+    if retrycnt >=getsysparm("RETRY_TIMES"):
         logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt )
         pushQueue("fulltext", "", "fulltext", "",urlstr=urlstr)
         return udata
@@ -1151,7 +1152,7 @@ def saveDocsByUrl(urlstr):
             else:
                 pipedoc.hset("doc:"+docid,"isheadline","0")
                 
-            pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
+            pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME") )
         if len(ids_lst) > 0:
             for tids in ids_lst:
                 saveFulltextById(tids)

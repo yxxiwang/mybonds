@@ -1084,6 +1084,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
 #                 id = getHashid(doc["url"])
 
             doc["_id"]=str(doc["docId"])
+            doc["title"] = doc["title"].replace("&ldquo;","").replace("&rdquo;","")
             doc.pop("relatedDocs")
             tftxs.save(doc) 
             

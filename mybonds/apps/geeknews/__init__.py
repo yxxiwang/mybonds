@@ -635,7 +635,7 @@ def beaconUrl(beaconusr, beaconid):
         urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s&mindoc=%s" %(getsysparm("BACKEND_DOMAIN"),channel,page,length,mindoc)
     return urlstr
 
-def refreshDocs(beaconusr, beaconid):
+def refreshDocs(beaconusr, beaconid,force=False):
     """更新频道内容,该方法也会被异步调用"""
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info( "=====refreshDocs===="+key )
@@ -643,7 +643,7 @@ def refreshDocs(beaconusr, beaconid):
         logger.warn( "attembrough: i have nothing to do .key:%s is not exists " % key)
         return -1
 #     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
-    if r.hexists(key, "last_update"):#
+    if r.hexists(key, "last_update") and not force:#
         timediff = timeDiff(r.hget(key, "last_update"), time.time()) 
         if timediff < getsysparm("KEY_UPTIME"):#如果上次更新时间才过去不久,则不重复更新
             logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % timediff )
@@ -1143,8 +1143,10 @@ def saveDocsByUrl(urlstr):
             else:
                 pass
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
+            title = doc["title"]
+            title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
             pipedoc.hset("doc:"+docid,"docid",docid)
-            pipedoc.hset("doc:"+docid,"title",doc["title"].rstrip())
+            pipedoc.hset("doc:"+docid,"title",title)
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  

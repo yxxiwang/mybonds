@@ -146,7 +146,7 @@ def channels():
         
 #         channelDocs(beaconusr,beaconid)
         
-def initProc(codes):
+def initProc(codes,force=False):
         if codes[0]=="all":
             channels()
         else:
@@ -154,7 +154,7 @@ def initProc(codes):
                 beaconusr,beaconid = code.split(":")
                 print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
 #                 channelDocs(beaconusr,beaconid)
-                refreshDocs(beaconusr, beaconid)
+                refreshDocs(beaconusr, beaconid,force)
     
 
 if __name__ == "__main__":  
@@ -169,6 +169,9 @@ if __name__ == "__main__":
     
     parser.add_argument("-n", "--num", dest="num",default=20,type=int,
                     help="fetchdata length from backend (use in urls).")
+    
+    parser.add_argument("-f", "--force", dest="force",default=False,
+                    help="force flag")
     
     parser.add_argument("-s", "--start", dest="sdate",default="20130101",
                       help="begin date default is 20100101")
@@ -200,13 +203,14 @@ if __name__ == "__main__":
         end_date = options.edate
         auto = options.auto
         num = options.num
+        force = options.force
         print "reading cods  %s..." % options.code
         if auto!=0:
            while True:
-               initProc(codes)
+               initProc(codes,force)
                time.sleep(auto)
         else:
-            initProc(codes)
+            initProc(codes,force)
             
         
 #     action =sys.argv[0]

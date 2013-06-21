@@ -141,7 +141,8 @@ def newsdetail(request):
         ftx = doc["fulltext"] 
         txstr = json.dumps(ftx)
         txstr = txstr.replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")
-        txstr = txstr.replace("""\",""","""\\u3000\",""").replace("""\"]""","""\\u3000\"]""")
+        txstr = txstr.replace("""\" ,""","""\\u3000\",""").replace("""\"]""","""\\u3000\"]""")
+        txstr = txstr.replace("&ldquo;","").replace("&rdquo;","")
         ftx = json.loads(txstr)
         doc["fulltext"] = list2dict(ftx,"txt")
         doc["copyNum"] = str(doc["copyNum"])

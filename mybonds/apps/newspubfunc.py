@@ -133,7 +133,7 @@ def sendemail(content, rcv_email,title=""):
        smtpObj.ehlo()
        smtpObj.starttls()
        smtpObj.login('admin@zhijixing.com', 'software91') 
-       smtpObj.sendmail("灯塔资讯", receivers, msg.as_string())      
+       smtpObj.sendmail(sender, receivers, msg.as_string())      
        logger.info( "Successfully sent email")
        return 0
     except SMTPException:

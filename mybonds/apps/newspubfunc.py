@@ -106,7 +106,7 @@ def sendemail(content, rcv_email,title=""):
     receivers = [rcv_email]
 
     msg = MIMEMultipart()
-    msg['From'] = "灯塔阅读"
+    msg['From'] = "灯塔资讯"
     msg['To'] = rcv_email
     if title!="":
         msg['Subject'] = Header(title, charset='UTF-8')  # 中文主题 
@@ -133,7 +133,7 @@ def sendemail(content, rcv_email,title=""):
        smtpObj.ehlo()
        smtpObj.starttls()
        smtpObj.login('admin@zhijixing.com', 'software91') 
-       smtpObj.sendmail(sender, receivers, msg.as_string())      
+       smtpObj.sendmail("灯塔资讯", receivers, msg.as_string())      
        logger.info( "Successfully sent email")
        return 0
     except SMTPException:
@@ -321,4 +321,6 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     qobj["id"] = getHashid(urlstr)
     r.lpush("queue:" + qtype, json.dumps(qobj))
     
-
+    def strfilter(istr):
+        return istr.replace("&ldquo;","").replace("&rdquo;","").replace("&amp;","&").replace("&#215;","X")
+    

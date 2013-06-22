@@ -165,9 +165,11 @@ def sendemailbydocid(email,docid,otype=""):
         logger.info("fetch fulltext from mongodb,docid=" +docid)
 #         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
         ftxlist = fulldoc["fulltext"] 
-        ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(ftxlist)
+        ftx = fulldoc["title"] +"<br><br>\\u3000\\u3000"+ "<br><br>\\u3000\\u3000".join(ftxlist)
+        ftx = ftx+"<br><br>"+doc["url"]
     else:
-        ftx = doc["text"]
+        ftx = doc["title"] +"<br><br>\\u3000\\u3000"+doc["text"]
+        ftx = ftx+"<br><br>"+ "<a href='"+doc["url"]+"'>"+doc["url"]+"</a><br><br>" 
     content= to_unicode_or_bust(ftx)
 #     title_list.append(title)
 #     content_list.append(content) 
@@ -1084,7 +1086,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
 #                 id = getHashid(doc["url"])
 
             doc["_id"]=str(doc["docId"])
-            doc["title"] = doc["title"].replace("&ldquo;","").replace("&rdquo;","")
+            doc["title"] = strfilter(doc["title"])
             doc.pop("relatedDocs")
             tftxs.save(doc) 
             

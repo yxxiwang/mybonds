@@ -166,19 +166,21 @@ def sendemailbydocid(email,docid,otype=""):
 #         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
         ftxlist = fulldoc["fulltext"] 
 #         print  "<br><br>    ".join(ftxlist)
-        ftx = fulldoc["title"] +"<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".join(ftxlist)
-        ftx = ftx+"<br><br>"+doc["url"]
+        spstr = "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+        ftx = fulldoc["title"] +spstr + spstr.join(ftxlist)
+        ftx = ftx+"<br><br>"+"原文地址:".decode("utf8")+"<br>"+doc["url"]
     else:
         ftx = doc["title"] +"<br><br>    "+doc["text"]
         ftx = ftx+"<br><br>"+ "<a href='"+doc["url"]+"'>"+doc["url"]+"</a><br><br>" 
     content= to_unicode_or_bust(ftx)
 #     title_list.append(title)
 #     content_list.append(content) 
-    content = """<html>
+    content = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=GBK"> 
     </head>
-    <body> """+content+"</body> </html>"
+    <body><div class="text"> """+content+"</div></body> </html>"
     return sendemail(content,email,title)
     
 #     for usr_email in emails.split(","):

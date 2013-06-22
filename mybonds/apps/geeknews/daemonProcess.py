@@ -116,7 +116,7 @@ def retriveData(qtype):
 		qinfo = json.loads(qobj)
 		cnt = qinfo["cnt"] if qinfo.has_key("cnt") else 0
 		qinfo["cnt"]=cnt+1
-		if qinfo["cnt"] < getsysparm("RETRYCOUNT"):
+		if qinfo["cnt"] < getsysparm("RETRY_TIMES"):
 			logger.info( "process it again")
 			lib.r.lpush("queue:" + qtype,json.dumps(qinfo))
 		else:

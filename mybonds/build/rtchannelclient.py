@@ -32,21 +32,37 @@ if __name__ == '__main__':
 #     #  Do 10 requests, waiting each time for a response  
 #     for request in range (1,10):  
     print "Sending request ","..."  
-    socket.send ("getChannelNewsCountsList stock schema sh600000 -7 -1 ")   
+    socket.send ("getChannelNewsCountsList stock schema sh600016 -7 -1 ")   
     message = socket.recv()
     print message
-     
-    socket.send ("getChannelNewsCountsList stock data sh600000  -7 -1  ")  
+    socket.send ("getChannelNewsCountsList stock data sh600016  -7 -1  ")  
     message = socket.recv()
     print message
+    print "============================"
+    
+    socket.send ("getNewsCnts stock schema sh600016 -7 -1 140000")   
+    message = socket.recv()
+    print message 
+    socket.send ("getNewsCnts stock data sh600016  -7 -1 140000")  
+    message = socket.recv()
+    print message
+    print "============================"
+    
+    socket.send ("getNewsCoypNums stock schema sh600016 -7 -1 140000")   
+    message = socket.recv()
+    print message 
+    socket.send ("getNewsCoypNums stock data sh600016  -7 -1 140000")  
+    message = socket.recv()
+    print message
+    print "============================"
     
     socket.send ("getChannelNewsCopynumListByTime stock schema sh600016 -7 -1 ")   
     message = socket.recv()
-    print message
-     
+    print message 
     socket.send ("getChannelNewsCopynumListByTime stock data sh600016  -7 -1  ")  
     message = socket.recv()
     print message
+    print "============================"
 #     
 #     socket.send ("getChannelNewsCountsList stock sh600001  7  ")   
 #     message = socket.recv()

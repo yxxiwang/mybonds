@@ -10,9 +10,100 @@ import datetime
 
 r = redis.StrictRedis()
 
+def check_int(s):
+    if s[0] in ('-', '+'):
+        return s[1:].isdigit()
+    return s.isdigit()
+
 def querySinaFrequence(parms=[]):
   return RTCfg.timeWindow['sinaIntervalTime']
   
+def getNewsCoypNums(parms=[]):
+    print parms
+    if len(parms) < 6:
+        print "parms is %d,less than 6!" %len(parms)
+        return json.dumps(rdata)
+    (action,schema,code,dayfrom,dayto,timedelta)=parms
+    rdata = []
+    code = "" 
+    if action == "stock": 
+        code = r.hget("stock:channel",parms[2][2:])
+    else:
+        code = parms[2]
+    if code is None or code =="":
+        print "code is None!"
+        return json.dumps(rdata)
+    
+    if not check_int(dayfrom) or not check_int(dayto) or not check_int(timedelta):
+        print "day is not digit!"
+        return json.dumps(rdata)
+    
+    key = "channel:"+code+":doc_tcnt"
+    if schema == "schema": 
+        for i in xrange(int(dayfrom),int(dayto)+1):
+            tdate = (dt.date.today() + dt.timedelta(i)).strftime('%Y%m%d')
+            rdata.append(tdate)
+    else:
+        for i in xrange(int(dayfrom),int(dayto)+1):
+            tmsfrom = ( dt.date.today() + dt.timedelta(i-1) ).strftime('%Y%m%d')
+            tmsfrom = tmsfrom+timedelta #"140000"
+            tmsto = ( dt.date.today() + dt.timedelta(i) ).strftime('%Y%m%d')
+            tmsto = tmsto+timedelta
+            cnt = 0
+            for docid in r.zrangebyscore(key, int(tmsfrom),int(tmsto), 0, -1):
+                cnt += int(r.hget("copynum", docid))
+#             cnt = 0 if cnt is None else cnt
+            print "%s--->%s cnt is:%d" % (tmsfrom,tmsto,cnt)
+            rdata.append(str(cnt)) 
+    return json.dumps(rdata)
+    
+def getNewsCnts(parms=[]):
+    print parms
+    if len(parms) < 6:
+        print "parms is %d,less than 6!" %len(parms)
+        return json.dumps(rdata)
+    (action,schema,code,dayfrom,dayto,timedelta)=parms
+    rdata = []
+    code = "" 
+    if action == "stock": 
+        code = r.hget("stock:channel",parms[2][2:])
+    else:
+        code = parms[2]
+    if code is None or code =="":
+        print "code is None!"
+        return json.dumps(rdata)
+    
+    if not check_int(dayfrom) or not check_int(dayto) or not check_int(timedelta):
+        print "day is not digit!"
+        return json.dumps(rdata)
+    
+    key = "channel:"+code+":doc_tcnt"
+    
+#     tmsfrom = ( dt.datetime.now() + dt.timedelta(int(dayfrom)-1) )
+#     tmsto = ( dt.datetime.now() + dt.timedelta(int(dayto)+1) )
+#     
+#     tmsfromstr = "%.4d%.2d%.2d140000" % (tmsfrom.year,tmsfrom.month,tmsfrom.day) 
+#     tmsto = "%.4d%.2d%.2d140000" % (tmsto.year,tmsto.month,tmsto.day) 
+#     print tmsfrom ,"=",tmsto,"=",key
+    if schema == "schema": 
+        for i in xrange(int(dayfrom),int(dayto)+1):
+            tdate = (dt.date.today() + dt.timedelta(i)).strftime('%Y%m%d')
+            rdata.append(tdate)
+    else:
+        for i in xrange(int(dayfrom),int(dayto)+1):
+            tmsfrom = ( dt.date.today() + dt.timedelta(i-1) ).strftime('%Y%m%d')
+            tmsfrom = tmsfrom+timedelta #"140000"
+            tmsto = ( dt.date.today() + dt.timedelta(i) ).strftime('%Y%m%d')
+            tmsto = tmsto+timedelta
+            cnt = r.zcount(key,int(tmsfrom),int(tmsto))
+            cnt = 0 if cnt is None else cnt            
+            print "%s--->%s cnt is:%d" % (tmsfrom,tmsto,cnt)
+            rdata.append(str(cnt)) 
+#         for docid,tms in r.zrangebyscore(key, tmsfrom, tmsto, 0, -1, withscores=True):
+#             rdata.append(r.hget("copynum", docid))
+    return json.dumps(rdata)
+     
+    
 def getChannelNewsCopynumListByTime(parms=[]):
     print parms
     if len(parms) != 5:
@@ -22,20 +113,13 @@ def getChannelNewsCopynumListByTime(parms=[]):
     (action,schema,code,dayfrom,dayto)=parms
     rdata = []
     code = "" 
-    if action == "stock":
-#         print parms[2][2:]
+    if action == "stock": 
         code = r.hget("stock:channel",parms[2][2:])
     else:
-        code = parms[2]
-#     print code
+        code = parms[2] 
     if code is None or code =="":
         print "code is None!"
-        return json.dumps(rdata)
-     
-    def check_int(s):
-        if s[0] in ('-', '+'):
-            return s[1:].isdigit()
-        return s.isdigit()
+        return json.dumps(rdata) 
 
     if not check_int(dayfrom) or  not check_int(dayto):
         print "day is not digit!"
@@ -59,7 +143,7 @@ def getChannelNewsCopynumListByTime(parms=[]):
 def getChannelNewsCountsList(parms=[]):
     print parms
     rdata = []
-    if len(parms) != 5:
+    if len(parms) < 5:
         print "parms is %d,not 5!" %len(parms)
         return json.dumps(rdata)
     code = ""
@@ -77,11 +161,7 @@ def getChannelNewsCountsList(parms=[]):
     key = "channel:"+code+":cnt"
 #     print "key is %s" % key
     dayfrom = parms[3]
-    dayto = parms[4]
-    def check_int(s):
-        if s[0] in ('-', '+'):
-            return s[1:].isdigit()
-        return s.isdigit()
+    dayto = parms[4] 
 
     if not check_int(dayfrom) or  not check_int(dayto):
         print "day is not digit!"
@@ -109,6 +189,8 @@ class functionMapping:
       'querySinaFrequence': querySinaFrequence,
       'getChannelNewsCountsList': getChannelNewsCountsList,
       'getChannelNewsCopynumListByTime': getChannelNewsCopynumListByTime,
+      'getNewsCnts': getNewsCnts,
+      'getNewsCoypNums': getNewsCoypNums,
       #'/logout/':logout,
     }
 

@@ -1558,18 +1558,18 @@ def sendemailfornews(request):
     quantity = log_typer(request, "sendemailfornews", emails+"->"+docids)
 #     if quantity > getsysparm("QUANTITY"):
 #         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-    def pushqueue(emails,docids):
+    def pushemail(emails,docids):
         for email,docid in zip( emails.split(","),docids.split(";") ):
             pushQueue("sendemail", username, "byemail", tag=email, similarid=docid)
             
     if otype=="service":
         if emails != "":
 #             pushQueue("sendemail", username, "byemail", tag=emails, similarid=docids.replace(",",";"))
-            pushqueue(emails,docids.replace(",",";"))
+            pushemail(emails,docids.replace(",",";"))
             robj["message"] = "send email to:"+emails 
         else:
 #             pushQueue("sendemail", username, "byemail", tag=usr_email, similarid=docids.replace(",",";"))
-            pushqueue(usr_email,docids.replace(",",";"))   
+            pushemail(usr_email,docids.replace(",",";"))   
             robj["message"] = "send email to:"+usr_email
         if groupname !="": 
             robj["group"] = groupname

@@ -166,7 +166,7 @@ def sendemailbydocid(email,docid,otype=""):
 #         ftx = "&nbsp;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(json.loads(rdoc.get("ftx:"+docid)))
         ftxlist = fulldoc["fulltext"] 
 #         print  "<br><br>    ".join(ftxlist)
-        ftx = fulldoc["title"] +"<br><br>&nbsp;&nbsp;&nbsp;&nbsp;"+ "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;".join(ftxlist)
+        ftx = fulldoc["title"] +"<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".join(ftxlist)
         ftx = ftx+"<br><br>"+doc["url"]
     else:
         ftx = doc["title"] +"<br><br>    "+doc["text"]
@@ -174,6 +174,11 @@ def sendemailbydocid(email,docid,otype=""):
     content= to_unicode_or_bust(ftx)
 #     title_list.append(title)
 #     content_list.append(content) 
+    content = """<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=GBK"> 
+    </head>
+    <body> """+content+"</body> </html>"
     return sendemail(content,email,title)
     
 #     for usr_email in emails.split(","):

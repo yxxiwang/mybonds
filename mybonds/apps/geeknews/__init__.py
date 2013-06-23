@@ -689,10 +689,9 @@ def refreshDocs(beaconusr, beaconid,force=False):
         if doc is None:
             continue
         if doc["validTime"]=="false" or not doc["validTime"]:
-            continue
-#             r.zadd(key+":doc:tms",int(doc["create_time"]),getHashid(doc["url"]))
-        r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
-#         r.expire(key+":doc:tms",DOC_EXPIRETIME)
+            pass 
+        else:
+            r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"])) 
 ################ 统计信息   ############################
         docid= str(doc["docId"])
         tms = doc["create_time"] 
@@ -779,10 +778,11 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         for cname in  channelstr.split(","):
             if r.hexists("beacon:channel",cname):
                 cobj = {}
-                cobj["beaconname"]=cname
+                cobj["beaconttl"]=cname
                 ckey = r.hget("beacon:channel",cname)
                 cobj["beaconusr"]=ckey.split(":")[1]
                 cobj["beaconid"]=ckey.split(":")[2]
+                cobj["beaconname"]=r.hget("bmk:"+ckey.split(":")[1]+":"+ckey.split(":")[2],"name")
                 channels.append(cobj)
     udata["channels"] =  channels
     udata["total"] = str(len(udata["docs"]) )

@@ -143,7 +143,9 @@ def channels():
         beaconusr,beaconid = beaconstr.split("|-|")
         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
         rt = refreshDocs(beaconusr, beaconid)
-        
+        if not rt == SUCCESS:
+            urlstr = beaconUrl(beaconusr, beaconid)
+            pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
 #         channelDocs(beaconusr,beaconid)
         
 def initProc(codes,force=False):

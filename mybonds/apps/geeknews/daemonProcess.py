@@ -121,6 +121,7 @@ def retriveData(qtype):
 			lib.r.lpush("queue:" + qtype,json.dumps(qinfo))
 		else:
 			logger.warn( "it's rearch the maxsim count of RETRYCOUNT")
+			qinfo["cnt"] = 0# prepire to do again in housekeeping programe
 			lib.r.lpush("queue:" + qtype+":error",json.dumps(qinfo)) 
 		
 	urlstop = time.clock()

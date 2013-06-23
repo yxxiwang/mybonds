@@ -26,35 +26,35 @@ if __name__ == '__main__':
     socket = context.socket(zmq.REQ)  
 #     print RTCfg.zmqPort['systemParameterServicePort']
 #     socket.connect (RTCfg.zmqPort['systemParameterClientPort'])  
-    socket.connect ('tcp://localhost:30000')
-#     socket.connect ('tcp://121.199.37.23:30000')
+#     socket.connect ('tcp://localhost:30000')
+    socket.connect ('tcp://121.199.37.23:30000')
       
 #     #  Do 10 requests, waiting each time for a response  
 #     for request in range (1,10):  
     print "Sending request ","..."  
     print "============getChannelNewsCountsList================"
-    socket.send ("getChannelNewsCountsList stock schema sh600016 -7 -1 ")   
+    socket.send ("getChannelNewsCountsList stock schema sh300088 -60 -1 ")   
     message = socket.recv()
     print message
-    socket.send ("getChannelNewsCountsList stock data sh600016  -7 -1  ")  
+    socket.send ("getChannelNewsCountsList stock data sh300088  -60 -1  ")  
     message = socket.recv()
     print message
     
     print "============getNewsCnts================"
     
-    socket.send ("getNewsCnts stock schema sh600016 -7 -1 140000")   
+    socket.send ("getNewsCnts stock schema sh300088 -60 -1 240000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCnts stock data sh600016  -7 -1 140000")  
+    socket.send ("getNewsCnts stock data sh300088  -60 -1 240000")  
     message = socket.recv()
     print message
     
     print "===========getNewsCoypNums================="
     
-    socket.send ("getNewsCoypNums stock schema sh600016 -7 -1 140000")   
+    socket.send ("getNewsCoypNums stock schema sh300088 -60 -1 240000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCoypNums stock data sh600016  -7 -1 140000")  
+    socket.send ("getNewsCoypNums stock data sh300088  -60 -1 240000")  
     message = socket.recv()
     print message
     

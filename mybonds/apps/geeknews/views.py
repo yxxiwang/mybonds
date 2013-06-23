@@ -1329,6 +1329,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
     if beaconid != "":  
         udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=100) 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
+        beacondisname = r.hget("bmk:" + beaconusr + ":" + beaconid, "name") 
         r.hset("usr:"+username+":channeltms",beaconusr+":"+beaconid,time.time())#增加用户关于该频道的最后跟新时间
         cnt = len(udata["docs"]) if udata.has_key("docs") else 0
         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",cnt)
@@ -1344,6 +1345,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         'beaconid':beaconid,#当前灯塔的ID
         'beaconusr':beaconusr,#当前灯塔的ID
         'beaconname':beaconname,#当前灯塔的名称
+        'beacondisname':beacondisname,#当前灯塔的名称
         'beacon_search':beacon_search,
         "greetings":getGreeting(),
         'orderby':orderby,

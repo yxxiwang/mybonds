@@ -92,12 +92,14 @@
           </div>
 
           <div class="span6"><!-- 中间灯塔similar文档 -->
-            <div class="span12" style="margin-left:0px;">
-            <blockquote>
-           <p style="font-size: 13px;">
+            <div class="span12" style="margin-left:0px;"> 
+            <blockquote> 
+              <div class="span3" style="margin-left:0px;">
+              <span style="color:red">{{ beacondisname }} &nbsp;  </span> 
+              </div>
               {% for channel in udata.channels %}
-              <div class="span2" style="margin-left:0px;">
-              <a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:green">{{ channel.beaconname }} &nbsp;  </span> </a>
+              <div class="span3" style="margin-left:0px;">
+              <p style="font-size: 13px;"><a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:green">{{ channel.beaconname }} &nbsp;  </span> </a>
               </div>
               {% endfor %}  
             </blockquote>        

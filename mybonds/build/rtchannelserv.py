@@ -20,11 +20,11 @@ def querySinaFrequence(parms=[]):
   
 def getNewsCoypNums(parms=[]):
     print parms
+    rdata = []
     if len(parms) < 6:
         print "parms is %d,less than 6!" %len(parms)
         return json.dumps(rdata)
     (action,schema,code,dayfrom,dayto,timedelta)=parms
-    rdata = []
     code = "" 
     if action == "stock": 
         code = r.hget("stock:channel",parms[2][2:])
@@ -53,17 +53,17 @@ def getNewsCoypNums(parms=[]):
             for docid in r.zrangebyscore(key, int(tmsfrom),int(tmsto), 0, -1):
                 cnt += int(r.hget("copynum", docid))
 #             cnt = 0 if cnt is None else cnt
-            print "%s--->%s cnt is:%d" % (tmsfrom,tmsto,cnt)
+#             print "%s--->%s cnt is:%d" % (tmsfrom,tmsto,cnt)
             rdata.append(str(cnt)) 
     return json.dumps(rdata)
     
 def getNewsCnts(parms=[]):
     print parms
+    rdata = []
     if len(parms) < 6:
         print "parms is %d,less than 6!" %len(parms)
         return json.dumps(rdata)
     (action,schema,code,dayfrom,dayto,timedelta)=parms
-    rdata = []
     code = "" 
     if action == "stock": 
         code = r.hget("stock:channel",parms[2][2:])
@@ -97,7 +97,7 @@ def getNewsCnts(parms=[]):
             tmsto = tmsto+timedelta
             cnt = r.zcount(key,int(tmsfrom),int(tmsto))
             cnt = 0 if cnt is None else cnt            
-            print "%s--->%s cnt is:%d" % (tmsfrom,tmsto,cnt)
+#             print "%s--->%s cnt is:%d" % (tmsfrom,tmsto,cnt)
             rdata.append(str(cnt)) 
 #         for docid,tms in r.zrangebyscore(key, tmsfrom, tmsto, 0, -1, withscores=True):
 #             rdata.append(r.hget("copynum", docid))

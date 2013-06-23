@@ -1235,6 +1235,7 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
     heartopt = request.GET.get("heartopt", "")
     heartid = request.GET.get("heartid", "")
     heartusr = request.GET.get("heartusr", "")
+    beacondisname = ""
     
     logobj = "ordey by "+orderby
     if beaconid !="":

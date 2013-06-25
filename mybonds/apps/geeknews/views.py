@@ -992,7 +992,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.hset(key, "desc", desc)
         r.hset(key, "crt_usr", beaconusr)
 #         r.hset(key, "crt_tms", time.time())
-        r.hset(key, "crt_tms", int(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))-8*3600 )
+        r.hset(key, "crt_tms",  getUnixTimestamp(beacontime,"%Y%m%d%H%M%S") ) 
         r.hset(key, "last_touch",0) 
         r.hset(key, "last_update",0) 
         r.hset(key, "cnt",0) 
@@ -1001,7 +1001,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.hset(key, "headlineonly",headlineonly) 
         
         r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)
-        r.zadd("bmk:doc:share", time.time(), beaconusr + "|-|" + beaconid)
+        r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
         r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
         r.zadd("bmk:doc:share:bynews",time.time() , beaconusr + "|-|" + beaconid) 
     else:
@@ -1012,20 +1012,22 @@ def beaconsave(request, template_name="beacon_list.html"):
             key = "bmk:" + beaconusr + ":" + beaconid
             r.hset(key, "id", beaconid)
             r.hset(key, "crt_usr", beaconusr)
-            r.hset(key, "crt_tms", int(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))-8*3600 )
+            r.hset(key, "crt_tms", getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")) 
             r.hset(key, "ttl", beaconname)
             r.hset(key, "name", beacondisplayname)
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc",beaconmindoc) 
-            r.hset(key, "tag",beacontag) 
+            r.hset(key, "tag",beacontag)
+            r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
         else:#modify desc and so on
             r.hset(key, "crt_usr", beaconusr)
-            r.hset(key, "crt_tms", int(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))-8*3600 )
+            r.hset(key, "crt_tms", getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")) 
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc",beaconmindoc) 
             r.hset(key, "name", beacondisplayname)
             r.hset(key, "headlineonly",headlineonly) 
             r.hset(key, "tag",beacontag) 
+            r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
             
 #     if share == "1":
 # #         fllwcnt = r.scard(key+":fllw") if r.scard(key+":fllw") is not None else 0
@@ -1387,7 +1389,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         beacondesc = r.hget("bmk:" + beaconusr + ":" + beaconid, "desc") 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
         beacontime = r.hget("bmk:" + beaconusr + ":" + beaconid, "crt_tms")
-        beacontime = getTime(beacontime,"%Y-%m-%d-%H:%M:%S")
+        beacontime = getTime(beacontime,formatstr="%Y-%m-%d-%H:%M:%S",addtimezone=False)
         beacondisplayname = r.hget("bmk:" + beaconusr + ":" + beaconid, "name")
         beacontag = r.hget("bmk:" + beaconusr + ":" + beaconid, "tag")
         beaconmindoc = r.hget("bmk:" + beaconusr + ":" + beaconid, "mindoc") 
@@ -1408,7 +1410,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
 #         beaobj["shared"] = False if r.zrank("bmk:doc:share", beaconusr + "|-|" + beaconid) is None else True
         beacon_list.append(beaobj)   
     if beacontime == "":
-        beacontime = getTime(time.time(),"%Y-%m-%d-%H:%M:%S")
+        beacontime = getTime(beacontime,formatstr="%Y-%m-%d-%H:%M:%S",addtimezone=False)
     return render_to_response(template_name, {
         'current_path': request.get_full_path(),
         'udata': udata,

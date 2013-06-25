@@ -89,7 +89,7 @@ def revintersect(a,b):
 def listsub(a,b):
     return list(set(a)-set(b))
  
-def getTime(tms,formatstr="%Y-%m-%d %H:%M:%S"):
+def getTime(tms,formatstr="%Y-%m-%d %H:%M:%S",addtimezone=True):
     """ return the converted date & time 'yyyy-mm-dd hh:mm:ss' by input tms """
     if type(tms).__name__ == "str":
         if tms=="":
@@ -101,7 +101,9 @@ def getTime(tms,formatstr="%Y-%m-%d %H:%M:%S"):
 # #     ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec)
 #     return "%s %s" %(tdate,ttime)
     try:
-        tdate = dt.datetime.fromtimestamp(tms+3600*8).strftime(formatstr)
+        if addtimezone:
+            tms=tms+3600*8
+        tdate = dt.datetime.fromtimestamp(tms).strftime(formatstr)
     except:
         print "Attembrough: i use getDate(%s,formatstr=%s) but it's report error..." % (tms,formatstr)
         traceback.print_exc()

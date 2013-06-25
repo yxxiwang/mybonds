@@ -26,8 +26,8 @@ if __name__ == '__main__':
     socket = context.socket(zmq.REQ)  
 #     print RTCfg.zmqPort['systemParameterServicePort']
 #     socket.connect (RTCfg.zmqPort['systemParameterClientPort'])  
-#     socket.connect ('tcp://localhost:30000')
-    socket.connect ('tcp://121.199.37.23:30000')
+    socket.connect ('tcp://localhost:30000')
+#     socket.connect ('tcp://121.199.37.23:30000')
       
 #     #  Do 10 requests, waiting each time for a response  
 #     for request in range (1,10):  
@@ -51,10 +51,19 @@ if __name__ == '__main__':
     
     print "===========getNewsCoypNums================="
     
-    socket.send ("getNewsCoypNums stock schema sh300088 -60 -1 240000")   
+    socket.send ("getNewsCoypNums stock schema sz300088 -60 -1 240000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCoypNums stock data sh300088  -60 -1 240000")  
+    socket.send ("getNewsCoypNums stock data sz300088  -60 -1 240000")  
+    message = socket.recv()
+    print message
+    
+    print "===========getNewsCntsFromDate================="
+    
+    socket.send ("getNewsCntsFromDate stock schema sh600016 20130420 30 240000")   
+    message = socket.recv()
+    print message 
+    socket.send ("getNewsCntsFromDate stock data sh600016  20130420 30 240000")  
     message = socket.recv()
     print message
     

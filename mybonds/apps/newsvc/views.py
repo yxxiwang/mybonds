@@ -223,39 +223,35 @@ def channelsbygroup(request):
         udata["success"] = "false"
         return HttpResponse(json.dumps(udata), mimetype="application/json") 
         
-    mybeacons = r.zrevrange("usr:" + username+":fllw",0,-1)
     gobj = r.hgetall("group:"+groupid)
     if gobj is None:
         udata["message"]="group is not exsist !" 
         udata["success"] = "false"
         return HttpResponse(json.dumps(udata), mimetype="application/json") 
-#     logging.basicConfig(format='%(asctime)s %(message)s',level=logging.WARN)
-#     logger.warn("groupid..."+groupid)
-#     logger.info("groupid..."+groupid)
     gobj["groupid"]=groupid
 #         gname = "" if gname is None else gname
-    for bstr in mybeacons:
-#             busr,bid = bstr.split("|-|")
+#     for bstr in mybeacons:
+# #             busr,bid = bstr.split("|-|")
+#         key = "bmk:"+bstr.replace("|-|",":")
+#         bttl = r.hget(key,"tag")
+#         bttl = "" if bttl is None else bttl
+#         if re.search(gobj["name"],bttl):
+#             bobj = r.hgetall(key)
+#             bobj["beaconid"]=bobj.pop("id")
+#             bobj["isfllw"] = "true"
+#             beacons.append(bobj)
+    
+    mybeacons = r.zrevrange("usr:" + username+":fllw",0,-1)
+    for bstr in r.zrevrange("bmk:doc:share",0,-1):
         key = "bmk:"+bstr.replace("|-|",":")
         bttl = r.hget(key,"tag")
         bttl = "" if bttl is None else bttl
         if re.search(gobj["name"],bttl):
             bobj = r.hgetall(key)
             bobj["beaconid"]=bobj.pop("id")
-            bobj["isfllw"] = "true"
+            bobj["isfllw"] = "true" if bstr in mybeacons else "false"
             beacons.append(bobj)
-    
-    for bstr in listsub(r.zrevrange("bmk:doc:share",0,-1),mybeacons):
-        key = "bmk:"+bstr.replace("|-|",":")
-        bttl = r.hget(key,"tag")
-        bttl = "" if bttl is None else bttl
-        if re.search(gobj["name"],bttl):
-            bobj = r.hgetall(key)
-            bobj["beaconid"]=bobj.pop("id")
-            bobj["isfllw"] = "false" 
-            beacons.append(bobj)
-        
-    
+
     udata["group"] = gobj
     udata["beacons"] = beacons
     udata["total"] = len(beacons)

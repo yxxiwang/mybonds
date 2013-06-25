@@ -36,7 +36,34 @@ def getNewsCnts(parms=[]):
         rtstr = ccnt_data[code] if ccnt_data.has_key(code) else "has no key:"+code
         return rtstr 
     
+def getNewsCntsFromDate(parms=[]):
+    print parms
+    if len(parms) < 5:
+        print "parms is %d,less than 5!" %len(parms)
+        return "len(parms) is not 5"
+    
+    (action,schema,code,dayfrom,dayto,timedelta)=parms
+    
+    if schema =="schema" :
+        return ccnt_data["date"]
+    else:
+        rtstr = ccnt_data[code] if ccnt_data.has_key(code) else "has no key:"+code
+        return rtstr 
+    
 def getNewsCoypNums(parms=[]):
+    print parms
+    if len(parms) < 5:
+        print "parms is %d,less than 5!" %len(parms)
+        return "len(parms) is not 5"
+    (action,schema,code,dayfrom,dayto,timedelta)=parms
+    
+    if schema =="schema" :
+        return ccopynum_data["date"]
+    else: 
+        rtstr = ccopynum_data[code] if ccopynum_data.has_key(code) else "has no key:"+code
+        return rtstr 
+
+def getNewsCoypNumsFromDate(parms=[]):
     print parms
     if len(parms) < 5:
         print "parms is %d,less than 5!" %len(parms)
@@ -80,6 +107,8 @@ class functionMapping:
       'querySinaFrequence': querySinaFrequence,
       'getNewsCnts': getNewsCnts,
       'getNewsCoypNums': getNewsCoypNums,
+      'getNewsCntsFromDate': getNewsCntsFromDate,
+      'getNewsCoypNumsFromDate': getNewsCoypNumsFromDate,
       #'/logout/':logout,
     }
 

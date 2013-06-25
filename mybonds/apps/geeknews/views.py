@@ -1410,7 +1410,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
 #         beaobj["shared"] = False if r.zrank("bmk:doc:share", beaconusr + "|-|" + beaconid) is None else True
         beacon_list.append(beaobj)   
     if beacontime == "":
-        beacontime = getTime(beacontime,formatstr="%Y-%m-%d-%H:%M:%S",addtimezone=False)
+        beacontime = getTime(time.time(),formatstr="%Y-%m-%d-%H:%M:%S",addtimezone=False)
     return render_to_response(template_name, {
         'current_path': request.get_full_path(),
         'udata': udata,

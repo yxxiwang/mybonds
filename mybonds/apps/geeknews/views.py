@@ -1009,12 +1009,14 @@ def beaconsave(request, template_name="beacon_list.html"):
             beaconChangeName(beaconkey,beaconusr,beaconid)
             key = "bmk:" + beaconusr + ":" + beaconid
             r.hset(key, "id", beaconid)
+            r.hset(key, "crt_usr", beaconusr)
             r.hset(key, "ttl", beaconname)
             r.hset(key, "name", beacondisplayname)
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc",beaconmindoc) 
             r.hset(key, "tag",beacontag) 
         else:#modify desc and so on
+            r.hset(key, "crt_usr", beaconusr)
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc",beaconmindoc) 
             r.hset(key, "name", beacondisplayname)

@@ -89,17 +89,25 @@ def revintersect(a,b):
 def listsub(a,b):
     return list(set(a)-set(b))
  
-def getTime(tms):
+def getTime(tms,formatstr="%Y-%m-%d %H:%M:%S"):
     """ return the converted date & time 'yyyy-mm-dd hh:mm:ss' by input tms """
     if type(tms).__name__ == "str":
         if tms=="":
             tms="0"
         tms=float(tms)
-    tt = time.gmtime(tms+3600*8)
-    tdate = dt.date.fromtimestamp(tms).strftime('%Y-%m-%d')
-    ttime = "%.2d:%.2d:%.2d" %(tt.tm_hour,tt.tm_min,tt.tm_sec)
-#     ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec)
-    return "%s %s" %(tdate,ttime)
+#     tt = time.gmtime(tms+3600*8)
+#     tdate = dt.date.fromtimestamp(tms).strftime('%Y-%m-%d')
+#     ttime = "%.2d:%.2d:%.2d" %(tt.tm_hour,tt.tm_min,tt.tm_sec)
+# #     ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec)
+#     return "%s %s" %(tdate,ttime)
+    try:
+        tdate = dt.datetime.fromtimestamp(tms+3600*8).strftime(formatstr)
+    except:
+        print "Attembrough: i use getDate(%s,formatstr=%s) but it's report error..." % (tms,formatstr)
+        traceback.print_exc()
+        return "" 
+    else:
+        return tdate
 
 def getDate(tms,formatstr='%Y%m%d'):
     """ return the converted date by input tms """
@@ -108,8 +116,8 @@ def getDate(tms,formatstr='%Y%m%d'):
             tms="0"
         tms=float(tms)
     try:
-        tt = time.gmtime(tms+3600*8)
-        tdate = dt.date.fromtimestamp(tms).strftime(formatstr)
+#         tt = time.gmtime(tms+3600*8)
+        tdate = dt.date.fromtimestamp(tms+3600*8).strftime(formatstr)
     except:
         print "Attembrough: i use getDate(%s,formatstr=%s) but it's report error..." % (tms,formatstr)
         traceback.print_exc()
@@ -117,15 +125,15 @@ def getDate(tms,formatstr='%Y%m%d'):
     else:
         return tdate
         
-def getUnixTimestamp(tstr):
+def getUnixTimestamp(tstr,formatstr='%Y%m%d'):
     """return unix timestamp input mustbe yyyymmdd"""
     rt = 0
     try:
-       rt = time.mktime(dt.datetime.strptime(tstr, "%Y%m%d").timetuple())
+       rt = time.mktime(dt.datetime.strptime(tstr, formatstr).timetuple())
     except:
         print "Attembrough: i use getUnixTimestamp(%s) but it's report error..." % (tstr) 
         traceback.print_exc()
-        return -1
+        return 0
     else:
         return rt
 

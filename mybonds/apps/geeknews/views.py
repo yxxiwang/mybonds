@@ -966,6 +966,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
     beaconid = request.GET.get("beaconid", "")
     beaconusr = request.GET.get("beaconusr", "")
+    beacontime = request.GET.get("beacontime", "")
     beaconkey = request.GET.get("beaconkey", "")
     beaconmindoc = request.GET.get("beaconmindoc", "")
     headlineonly = request.GET.get("headlineonly", "0")
@@ -990,7 +991,8 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.hset(key, "name", beacondisplayname)
         r.hset(key, "desc", desc)
         r.hset(key, "crt_usr", beaconusr)
-        r.hset(key, "crt_tms", time.time())
+#         r.hset(key, "crt_tms", time.time())
+        r.hset(key, "crt_tms", int(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))-8*3600 )
         r.hset(key, "last_touch",0) 
         r.hset(key, "last_update",0) 
         r.hset(key, "cnt",0) 
@@ -1010,6 +1012,7 @@ def beaconsave(request, template_name="beacon_list.html"):
             key = "bmk:" + beaconusr + ":" + beaconid
             r.hset(key, "id", beaconid)
             r.hset(key, "crt_usr", beaconusr)
+            r.hset(key, "crt_tms", int(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))-8*3600 )
             r.hset(key, "ttl", beaconname)
             r.hset(key, "name", beacondisplayname)
             r.hset(key, "desc", desc)
@@ -1017,6 +1020,7 @@ def beaconsave(request, template_name="beacon_list.html"):
             r.hset(key, "tag",beacontag) 
         else:#modify desc and so on
             r.hset(key, "crt_usr", beaconusr)
+            r.hset(key, "crt_tms", int(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))-8*3600 )
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc",beaconmindoc) 
             r.hset(key, "name", beacondisplayname)
@@ -1373,6 +1377,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
     udata = {}
     beacondesc = ""
     beaconname = "" 
+    beacontime = ""
     beacontag = ""
     beacondisplayname =""
     beaconmindoc = 0
@@ -1381,6 +1386,8 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         udata = buildBeaconData(beaconusr, beaconid)
         beacondesc = r.hget("bmk:" + beaconusr + ":" + beaconid, "desc") 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
+        beacontime = r.hget("bmk:" + beaconusr + ":" + beaconid, "crt_tms")
+        beacontime = getTime(beacontime,"%Y-%m-%d-%H:%M:%S")
         beacondisplayname = r.hget("bmk:" + beaconusr + ":" + beaconid, "name")
         beacontag = r.hget("bmk:" + beaconusr + ":" + beaconid, "tag")
         beaconmindoc = r.hget("bmk:" + beaconusr + ":" + beaconid, "mindoc") 
@@ -1400,11 +1407,14 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         beaobj["crt_usr"] = busr
 #         beaobj["shared"] = False if r.zrank("bmk:doc:share", beaconusr + "|-|" + beaconid) is None else True
         beacon_list.append(beaobj)   
+    if beacontime == "":
+        beacontime = getTime(time.time(),"%Y-%m-%d-%H:%M:%S")
     return render_to_response(template_name, {
         'current_path': request.get_full_path(),
         'udata': udata,
         'beacons':beacon_list,
         'beaconid':beaconid,#当前灯塔的ID
+        'beacontime':beacontime,#当前灯塔的ID
         'beacondesc':beacondesc,#当前灯塔的备注
         'beacontag':beacontag,#当前灯塔的备注
         'beaconname':beaconname,#当前灯塔的名称 

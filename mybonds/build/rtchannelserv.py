@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*- 
 
 import os,string,sys,time,re
 import redis,json

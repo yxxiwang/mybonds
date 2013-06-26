@@ -106,7 +106,7 @@ def sendemail(content, rcv_email,title=""):
     receivers = [rcv_email]
 
     msg = MIMEMultipart()
-    msg['From'] = "灯塔资讯"
+    msg['From'] = "灯塔资讯".decode("utf8")
     msg['To'] = rcv_email
     if title!="":
         msg['Subject'] = Header(title, charset='UTF-8')  # 中文主题 

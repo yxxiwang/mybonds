@@ -27,7 +27,7 @@ if __name__ == '__main__':
     socket = context.socket(zmq.REQ)  
 #     print RTCfg.zmqPort['systemParameterServicePort']
 #     socket.connect (RTCfg.zmqPort['systemParameterClientPort'])  
-    socket.connect ('tcp://localhost:39527')
+    socket.connect('tcp://localhost:39527')
 #     socket.connect ('tcp://121.199.37.23:30000')
       
 #     #  Do 10 requests, waiting each time for a response  

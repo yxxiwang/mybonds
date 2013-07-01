@@ -34,7 +34,9 @@ def getNewsCnts(parms=[]):
     dayto = int(dayto)+1 
     dayto = None if dayto == 0 else dayto
     dayfrom = int(dayfrom)
-    
+    rdata=[]
+#     print "dayfrom=%d,dayto=%d,code=%s" %(dayfrom,dayto,code)
+#     print ",".join(ccnt_data[code])
     if schema =="schema" :
         rdata = ccnt_data["date"][dayfrom:dayto]
         return json.dumps(rdata)
@@ -66,10 +68,14 @@ def getNewsCntsFromDate(parms=[]):
     if daycnt < 0:
         st = daycnt+dayfrom
         st = 0 if st < 0 else st
+        ed = ed+1
     else:
         st = dayfrom
-        ed = dayfrom + daycnt 
+        ed = dayfrom + daycnt +1
         
+#     print "st=%d,ed=%d,code=%s" %(st,ed,code)
+#     print ",".join(ccnt_data[code])
+#     print ",".join(ccnt_data["date"])
     if schema =="schema" :
         rdata = ccnt_data["date"][st:ed]
         return json.dumps(rdata)  
@@ -125,14 +131,15 @@ def getNewsCoypNumsFromDate(parms=[]):
     if daycnt < 0:
         st = daycnt+dayfrom
         st = 0 if st < 0 else st
+        ed = ed+1
     else:
         st = dayfrom
-        ed = dayfrom + daycnt
+        ed = dayfrom + daycnt +1
          
 #     print dayfrom,daycnt
     if schema =="schema" :
         rdata =  ccopynum_data["date"][st:ed]
-        return json.dumps(rdata) 
+        return json.dumps(rdata)
     else: 
         rdata = ccopynum_data[code][st:ed] if ccopynum_data.has_key(code) else "has no key:"+code
         return json.dumps(rdata) 
@@ -143,7 +150,7 @@ def initData(parms=[]):
     socket.connect ('tcp://121.199.37.23:30000')
     print "============getNewsCnts================"
     
-    socket.send ("getNewsCnts stock schema sh300088 -60 -1 240000")   
+    socket.send ("getNewsCnts stock schema sh300088 -120 -1 240000")   
     message = socket.recv()
     print "dates is:",message
     

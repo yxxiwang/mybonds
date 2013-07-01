@@ -35,37 +35,37 @@ if __name__ == '__main__':
     print "Sending request ","..."  
     print "============getNewsCnts================"
     
-    socket.send ("getNewsCnts stock schema sh600000 -6 -1 240000")   
+    socket.send ("getNewsCnts stock schema sh600006 -28 -7 240000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCnts stock data sh600000  -6 -1 240000")  
+    socket.send ("getNewsCnts stock data sh600006  -28 -7 240000")  
     message = socket.recv()
     print message
     
     print "===========getNewsCoypNums================="
     
-    socket.send ("getNewsCoypNums stock schema sh600000 -30 -1 240000")   
+    socket.send ("getNewsCoypNums stock schema sh600006 -28 -7 240000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCoypNums stock data sh600000  -30 -1 240000")  
+    socket.send ("getNewsCoypNums stock data sh600006  -28 -7 240000")  
     message = socket.recv()
     print message
 #     
     print "============getNewsCntsFromDate================"
     
-    socket.send ("getNewsCntsFromDate stock schema sh600000 20130613 10 240000")   
+    socket.send ("getNewsCntsFromDate stock schema sh600006 20130620 -20 240000")   
     message = socket.recv()
     print message
-    socket.send ("getNewsCntsFromDate stock data sh600000  20130613 10 240000")  
+    socket.send ("getNewsCntsFromDate stock data sh600006  20130620 -20 240000")  
     message = socket.recv()
     print message
     
     print "===========getNewsCoypNumsFromDate================="
     
-    socket.send ("getNewsCoypNumsFromDate stock schema sh600000 20130613 -10 240000")   
+    socket.send ("getNewsCoypNumsFromDate stock schema sh600006 20130620 -20 240000")   
     message = socket.recv()
     print message
-    socket.send ("getNewsCoypNumsFromDate stock data sh600000  20130613 -10 240000")  
+    socket.send ("getNewsCoypNumsFromDate stock data sh600006  20130620 -20 240000")  
     message = socket.recv()
     print message
     

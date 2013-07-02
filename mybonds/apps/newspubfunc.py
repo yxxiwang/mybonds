@@ -280,7 +280,10 @@ def subDocText(s):
 def getchannelByid(beaconusr,beaconid): 
     return r.hget("bmk:" + beaconusr + ":" + beaconid,"ttl") 
     # if r.exists("bmk:" + beaconusr + ":" + beaconid) else ""
-
+    
+def strfilter(istr):
+    return istr.replace("&ldquo;","").replace("&rdquo;","").replace("&amp;","&").replace("&#215;","X")
+    
 def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
 #    if isinstance(username, unicode): 
 #        print "--pushQueue-[qtype=%s;username=%s;otype=%s;]" % (qtype, username, otype)
@@ -321,6 +324,4 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     qobj["id"] = getHashid(urlstr)
     r.lpush("queue:" + qtype, json.dumps(qobj))
     
-    def strfilter(istr):
-        return istr.replace("&ldquo;","").replace("&rdquo;","").replace("&amp;","&").replace("&#215;","X")
-    
+

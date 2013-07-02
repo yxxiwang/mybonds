@@ -11,6 +11,7 @@ import datetime as dt
 
 from mybonds.apps import *
 from mybonds.apps.newspubfunc import *
+
 # from django import template
 # register = template.Library()
 

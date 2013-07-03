@@ -43,10 +43,10 @@ if __name__ == '__main__':
     
     print "============getNewsCnts================"
     
-    socket.send ("getNewsCnts stock schema sh300088 -60 -1 240000")   
+    socket.send ("getNewsCnts stock schema cp990001 -60 -1 240000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCnts stock data sh300088  -60 -1 240000")  
+    socket.send ("getNewsCnts stock data cp990001  -60 -1 240000")  
     message = socket.recv()
     print message
     

@@ -196,7 +196,8 @@ def conceptChannelHash(op="show"):
     for cpcode,cpname in cplist:
         print "proc ",cpcode,cpname.decode("utf8")
         print "stockmarket:"+getHashid(cpname.decode("utf8"))
-        r.hset("stock:channel",cpcode,"%s:%s" % ("stockmarket",getHashid(cpname.decode("utf8"))))
+        r.hset("stock:channel",cpcode[2:],"%s:%s" % ("stockmarket",getHashid(cpname.decode("utf8"))))
+        r.hdel("stock:channel",cpcode)
         if op == "showstock":
             urlstr = "http://svc.zhijixing.com/research/svc?channelid=%s&page=0&length=20" % cpname.decode("utf8")
             udata = loadFromUrl(urlstr)

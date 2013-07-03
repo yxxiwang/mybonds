@@ -53,19 +53,19 @@ if __name__ == '__main__':
 #     
     print "============getNewsCntsFromDate================"
     
-    socket.send ("getNewsCntsFromDate stock schema sh600006 20130702 -20 140000")   
+    socket.send ("getNewsCntsFromDate stock schema cp990001 20130702 -20 140000")   
     message = socket.recv()
     print message
-    socket.send ("getNewsCntsFromDate stock data sh600006  20130702 -20 140000")  
+    socket.send ("getNewsCntsFromDate stock data cp990001  20130702 -20 140000")  
     message = socket.recv()
     print message
     
     print "===========getNewsCoypNumsFromDate================="
     
-    socket.send ("getNewsCoypNumsFromDate stock schema sh600006 20130702 -20 240000")   
+    socket.send ("getNewsCoypNumsFromDate stock schema cp990001 20130702 -20 240000")   
     message = socket.recv()
     print message
-    socket.send ("getNewsCoypNumsFromDate stock data sh600006  20130702 -20 240000")  
+    socket.send ("getNewsCoypNumsFromDate stock data cp990001  20130702 -20 240000")  
     message = socket.recv()
     print message
     

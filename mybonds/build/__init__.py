@@ -11,6 +11,7 @@ from numpy.ma.core import isMA
 from sys import path
 from os import getcwd
 import os
+from numpy import bench
 path.append(getcwd())# current dir
 if os.name =="nt":
 #     path.append(os.path.abspath('..\..\..'))# mybonds's parrent dir
@@ -186,6 +187,35 @@ def stockChannelHash():
         if name.isdigit():
             print "proc %s:%s <----%s" %(beaconusr,beaconid,name)
             r.hset("stock:channel",name,"%s:%s" % (beaconusr,beaconid))
+            
+def conceptChannelHash(op="show"):
+    """建立一个根据概念股票代码到频道key的hash"""
+    import CfgGrp
+    cplist = CfgGrp.CPGroup.items()
+    cpstocklst = []
+    for cpcode,cpname in cplist:
+        print "proc ",cpcode,cpname.decode("utf8")
+        print "stockmarket:"+getHashid(cpname.decode("utf8"))
+        r.hset("stock:channel",cpcode,"%s:%s" % ("stockmarket",getHashid(cpname.decode("utf8"))))
+        if op == "showstock":
+            urlstr = "http://svc.zhijixing.com/research/svc?channelid=%s&page=0&length=20" % cpname.decode("utf8")
+            udata = loadFromUrl(urlstr)
+            if udata.has_key("channels"):
+                channels = udata["channels"]
+                channels = [channel for channel in channels if channel.isdigit()]
+                cpstk = " \"%s\":\"%s\" " % (cpcode,",".join(channels))
+                print cpstk
+                cpstocklst.append(cpstk)
+            else:
+                udata = loadFromUrl(urlstr)
+                channels = udata["channels"]
+                channels = [channel for channel in channels if channel.isdigit()]
+                cpstk = " \"%s\":\"%s\" " % (cpcode,",".join(channels))
+                print cpstk
+                cpstocklst.append(cpstk)
+    cpstocklst = cpstocklst.sort()
+            
+    
     
 def initBeaconDisplayName():
     """初始化频道的 显示名称 为频道名称"""

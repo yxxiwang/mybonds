@@ -60,7 +60,9 @@ def getNewsCntsFromDate(parms=[]):
     if dayfrom in ccnt_data["date"]:
         dayfrom = ccnt_data["date"].index(dayfrom)
     else:
-        dayfrom = 0 
+        dayfrom = 0
+        
+#     print "dayfrom=%d," %(dayfrom,)
         
     daycnt = int(daycnt)
     st =0
@@ -150,7 +152,7 @@ def initData(parms=[]):
     socket.connect ('tcp://121.199.37.23:30000')
     print "============getNewsCnts================"
     
-    socket.send ("getNewsCnts stock schema sh300088 -120 -1 240000")   
+    socket.send ("getNewsCnts stock schema sh300088 -120 0 140000")   
     message = socket.recv()
     print "dates is:",message
     
@@ -161,11 +163,11 @@ def initData(parms=[]):
     for stockcode in stockliststr.split(","):
         print "proc: ",stockcode
         
-        socket.send ("getNewsCnts stock data "+stockcode+"  -120 -1 240000")  
+        socket.send ("getNewsCnts stock data "+stockcode+"  -120 0 140000")  
         message = socket.recv() 
         ccnt_data[stockcode]=json.loads(message)
         
-        socket.send ("getNewsCoypNums stock data "+stockcode+"  -120 -1 240000")  
+        socket.send ("getNewsCoypNums stock data "+stockcode+"  -120 0 140000")  
         message = socket.recv() 
         ccopynum_data[stockcode]=json.loads(message)
     

@@ -139,9 +139,26 @@ num = 0
 #     pass
 
 def channels():
+    start = time.clock()
+    cnt = r.zcard("bmk:doc:share")
+    i = 0
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
+        i= i+1
         beaconusr,beaconid = beaconstr.split("|-|")
-        print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
+        elaspestr =""
+        minbefore =0
+        stop = time.clock()  
+        diff = stop - start
+        hourbefore = diff // 3600
+        if hourbefore == 0:
+            minbefore = diff // 60
+            elaspestr = str(minbefore) + " minites before"
+        else:
+            elaspestr = str(hourbefore) + " hours before"
+        print "<-----proc %s:%s (%d of %d), time elaspe %s ------>" % (beaconusr,beaconid,i,cnt,elaspestr)
+        
+#         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
+        
         rt = refreshDocs(beaconusr, beaconid)
         if not rt == SUCCESS:
             urlstr = beaconUrl(beaconusr, beaconid)

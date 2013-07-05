@@ -63,9 +63,9 @@ def isAscii(s):
     return True
 
 def bench(func,parms=None):
-    start = time.clock()   
+    start = time.time()
     rt = func() if parms is None else func(parms)
-    stop = time.clock()  
+    stop = time.time()
     diff = stop - start  
     print "%s==%s(%s) has taken %s" % (dt.datetime.now(),func.func_name,parms, str(diff)) 
     return rt

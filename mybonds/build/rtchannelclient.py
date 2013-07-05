@@ -33,43 +33,43 @@ if __name__ == '__main__':
 #     #  Do 10 requests, waiting each time for a response  
 #     for request in range (1,10):  
     print "Sending request ","..."  
-    print "============getChannelNewsCountsList================"
-    socket.send ("getChannelNewsCountsList stock schema sh300088 -60 -1 ")   
-    message = socket.recv()
-    print message
-    socket.send ("getChannelNewsCountsList stock data sh300088  -60 -1  ")  
-    message = socket.recv()
-    print message
+#     print "============getChannelNewsCountsList================"
+#     socket.send ("getChannelNewsCountsList stock schema cp990001 -60 -1 ")   
+#     message = socket.recv()
+#     print message
+#     socket.send ("getChannelNewsCountsList stock data cp990001  -60 -1  ")  
+#     message = socket.recv()
+#     print message
     
     print "============getNewsCnts================"
     
-    socket.send ("getNewsCnts stock schema cp990001 -60 -1 240000")   
+    socket.send ("getNewsCnts stock schema cp990001 -60 -1 140000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCnts stock data cp990001  -60 -1 240000")  
+    socket.send ("getNewsCnts stock data cp990001  -60 -1 140000")  
     message = socket.recv()
     print message
     
     print "===========getNewsCoypNums================="
     
-    socket.send ("getNewsCoypNums stock schema sz300088 -60 -1 240000")   
+    socket.send ("getNewsCoypNums stock schema cp990001 -60 -1 140000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCoypNums stock data sz300088  -60 -1 240000")  
+    socket.send ("getNewsCoypNums stock data cp990001  -60 -1 140000")  
     message = socket.recv()
     print message
     
-    print "===========getNewsCntsFromDate================="
-    
-    socket.send ("getNewsCntsFromDate stock schema sh600016 20130420 30 240000")   
-    message = socket.recv()
-    print message 
-    socket.send ("getNewsCntsFromDate stock data sh600016  20130420 30 240000")  
-    message = socket.recv()
-    print message
+#     print "===========getNewsCntsFromDate================="
+#     
+#     socket.send ("getNewsCntsFromDate stock schema cp990001 20130420 30 140000")   
+#     message = socket.recv()
+#     print message 
+#     socket.send ("getNewsCntsFromDate stock data cp990001  20130420 30 140000")  
+#     message = socket.recv()
+#     print message
     
     print "===============getChannelNewsCopynumListByTime============="
-    
+     
     socket.send ("getChannelNewsCopynumListByTime stock schema sh600016 -7 -1 ")   
     message = socket.recv()
     print message 

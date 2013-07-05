@@ -139,7 +139,7 @@ num = 0
 #     pass
 
 def channels():
-    start = time.clock()
+    start = time.time()
     cnt = r.zcard("bmk:doc:share")
     i = 0
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
@@ -147,14 +147,14 @@ def channels():
         beaconusr,beaconid = beaconstr.split("|-|")
         elaspestr =""
         minbefore =0
-        stop = time.clock()  
+        stop = time.time()
         diff = stop - start
         hourbefore = diff // 3600
         if hourbefore == 0:
             minbefore = diff // 60
-            elaspestr = str(minbefore) + " minites before"
+            elaspestr = str(minbefore) + " minites "
         else:
-            elaspestr = str(hourbefore) + " hours before"
+            elaspestr = str(hourbefore) + " hours "
         print "<-----proc %s:%s (%d of %d), time elaspe %s ------>" % (beaconusr,beaconid,i,cnt,elaspestr)
         
 #         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)

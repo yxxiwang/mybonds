@@ -8,6 +8,20 @@ import RTCfg
 import datetime as dt
 import datetime
 # import fcntl
+import warnings
+
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emmitted
+    when the function is used."""
+    def newFunc(*args, **kwargs):
+        warnings.warn("Call to deprecated function %s." % func.__name__,
+                      category=DeprecationWarning)
+        return func(*args, **kwargs)
+    newFunc.__name__ = func.__name__
+    newFunc.__doc__ = func.__doc__
+    newFunc.__dict__.update(func.__dict__)
+    return newFunc
 
 r = redis.StrictRedis()
 
@@ -104,50 +118,50 @@ def getNewsCnts(parms=[]):
 #             rdata.append(r.hget("copynum", docid))
     return json.dumps(rdata)
      
-    
-def getNewsCntsFromDate(parms=[]):
-    print parms
-    rdata = []
-    if len(parms) < 6:
-        print "parms is %d,less than 6!" %len(parms)
-        return json.dumps(rdata)
-    (action,schema,code,dayfrom,daycnt,timedelta)=parms
-    code = "" 
-    if action == "stock": 
-        code = r.hget("stock:channel",parms[2][2:])
-    else:
-        code = parms[2]
-    if code is None or code =="":
-        print "code is None!"
-        return json.dumps(rdata)
-    
-    if not check_int(dayfrom) or not check_int(daycnt) or not check_int(timedelta):
-        print "day is not digit!"
-        return json.dumps(rdata)
-    
-    print dayfrom+timedelta
-    key = "channel:"+code+":doc_tcnt"
-    if schema == "schema": 
-        for i in xrange( int(daycnt)+1 ):
-            fromdate=dt.datetime.strptime(dayfrom, "%Y%m%d")  
-            tdate = (fromdate + dt.timedelta(i)).strftime('%Y%m%d')
-            rdata.append(tdate)
-    else:
-        for i in xrange( int(daycnt)+1 ):
-#             tmsfrom = ( dt.date.today() + dt.timedelta(i-1) ).strftime('%Y%m%d')
-#             tmsfrom = tmsfrom+timedelta #"140000"
-#             tmsto = ( dt.date.today() + dt.timedelta(i) ).strftime('%Y%m%d')
-#             tmsto = (fromdate + dt.timedelta(i)).strftime("%Y%m%d%H%M%S")
+#     
+# def getNewsCntsFromDate(parms=[]):
+#     print parms
+#     rdata = []
+#     if len(parms) < 6:
+#         print "parms is %d,less than 6!" %len(parms)
+#         return json.dumps(rdata)
+#     (action,schema,code,dayfrom,daycnt,timedelta)=parms
+#     code = "" 
+#     if action == "stock": 
+#         code = r.hget("stock:channel",parms[2][2:])
+#     else:
+#         code = parms[2]
+#     if code is None or code =="":
+#         print "code is None!"
+#         return json.dumps(rdata)
+#     
+#     if not check_int(dayfrom) or not check_int(daycnt) or not check_int(timedelta):
+#         print "day is not digit!"
+#         return json.dumps(rdata)
+#     
+#     print dayfrom+timedelta
+#     key = "channel:"+code+":doc_tcnt"
+#     if schema == "schema": 
+#         for i in xrange( int(daycnt)+1 ):
+#             fromdate=dt.datetime.strptime(dayfrom, "%Y%m%d")  
+#             tdate = (fromdate + dt.timedelta(i)).strftime('%Y%m%d')
+#             rdata.append(tdate)
+#     else:
+#         for i in xrange( int(daycnt)+1 ):
+# #             tmsfrom = ( dt.date.today() + dt.timedelta(i-1) ).strftime('%Y%m%d')
+# #             tmsfrom = tmsfrom+timedelta #"140000"
+# #             tmsto = ( dt.date.today() + dt.timedelta(i) ).strftime('%Y%m%d')
+# #             tmsto = (fromdate + dt.timedelta(i)).strftime("%Y%m%d%H%M%S")
+# #             tmsto = tmsto+timedelta
+#             tmsfrom = dayfrom+timedelta
+#             fromdate=dt.datetime.strptime(dayfrom, "%Y%m%d")
+#             tmsto = (fromdate + dt.timedelta(i) ).strftime('%Y%m%d')
 #             tmsto = tmsto+timedelta
-            tmsfrom = dayfrom+timedelta
-            fromdate=dt.datetime.strptime(dayfrom, "%Y%m%d")
-            tmsto = (fromdate + dt.timedelta(i) ).strftime('%Y%m%d')
-            tmsto = tmsto+timedelta
-            cnt = r.zcount(key,int(tmsfrom),int(tmsto))
-            cnt = 0 if cnt is None else cnt            
-#             print "%s--->%s cnt is:%d" % (tmsfrom,tmsto,cnt)
-            rdata.append(str(cnt))  
-    return json.dumps(rdata)
+#             cnt = r.zcount(key,int(tmsfrom),int(tmsto))
+#             cnt = 0 if cnt is None else cnt            
+# #             print "%s--->%s cnt is:%d" % (tmsfrom,tmsto,cnt)
+#             rdata.append(str(cnt))  
+#     return json.dumps(rdata)
     
     
 def getChannelNewsCopynumListByTime(parms=[]):
@@ -185,7 +199,7 @@ def getChannelNewsCopynumListByTime(parms=[]):
             rdata.append(r.hget("copynum", docid))
     return json.dumps(rdata)
     
-    
+@deprecated
 def getChannelNewsCountsList(parms=[]):
     print parms
     rdata = []
@@ -237,7 +251,7 @@ class functionMapping:
       'getChannelNewsCopynumListByTime': getChannelNewsCopynumListByTime,
       'getNewsCnts': getNewsCnts,
       'getNewsCoypNums': getNewsCoypNums,
-      'getNewsCntsFromDate': getNewsCntsFromDate,
+#       'getNewsCntsFromDate': getNewsCntsFromDate,
       #'/logout/':logout,
     }
 

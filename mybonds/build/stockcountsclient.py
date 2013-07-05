@@ -35,19 +35,19 @@ if __name__ == '__main__':
     print "Sending request ","..."  
     print "============getNewsCnts================"
     
-    socket.send ("getNewsCnts stock schema sh600006 -28 -7 240000")   
+    socket.send ("getNewsCnts stock schema cp990001 -28 -7 140000") 
     message = socket.recv()
     print message 
-    socket.send ("getNewsCnts stock data sh600006  -28 -7 240000")  
+    socket.send ("getNewsCnts stock data cp990001  -28 -7 140000")  
     message = socket.recv()
     print message
     
     print "===========getNewsCoypNums================="
     
-    socket.send ("getNewsCoypNums stock schema sh600006 -28 -7 240000")   
+    socket.send ("getNewsCoypNums stock schema cp990001 -28 -7 140000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCoypNums stock data sh600006  -28 -7 240000")  
+    socket.send ("getNewsCoypNums stock data cp990001  -28 -7 140000")  
     message = socket.recv()
     print message
 #     
@@ -62,10 +62,10 @@ if __name__ == '__main__':
     
     print "===========getNewsCoypNumsFromDate================="
     
-    socket.send ("getNewsCoypNumsFromDate stock schema cp990001 20130702 -20 240000")   
+    socket.send ("getNewsCoypNumsFromDate stock schema cp990001 20130702 -20 140000")
     message = socket.recv()
     print message
-    socket.send ("getNewsCoypNumsFromDate stock data cp990001  20130702 -20 240000")  
+    socket.send ("getNewsCoypNumsFromDate stock data cp990001  20130702 -20 140000")  
     message = socket.recv()
     print message
     

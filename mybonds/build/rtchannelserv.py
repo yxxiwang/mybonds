@@ -243,6 +243,9 @@ def getChannelNewsCountsList(parms=[]):
     return json.dumps(rdata)
 #   return ["9527","9528"]
 
+def getChannelStock(parms=[]):
+    pass
+
 class functionMapping:
   def __init__(self):
     self.controllers = {
@@ -251,6 +254,7 @@ class functionMapping:
       'getChannelNewsCopynumListByTime': getChannelNewsCopynumListByTime,
       'getNewsCnts': getNewsCnts,
       'getNewsCoypNums': getNewsCoypNums,
+      'getChannelStock': getChannelStock,
 #       'getNewsCntsFromDate': getNewsCntsFromDate,
       #'/logout/':logout,
     }

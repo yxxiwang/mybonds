@@ -219,12 +219,21 @@ def conceptChannelHash(op="show"):
             if not r.exists(bmkkey):
                 continue
             channels = r.hget(bmkkey,"channels").split(",")
-            channels = [channel for channel in channels if channel.isdigit()]
-            cpstk = " \"%s\":\"%s\", " % (cpcode,",".join(channels))
-            print cpstk
-            cpstocklst.append(cpstk)
             
-    cpstocklst = cpstocklst.sort()
+            def addhead(channel):
+                if int(channel) > 599999:
+                    return "sh"+channel
+                else:
+                    return "sz"+channel 
+                
+            channels = [addhead(channel) for channel in channels if channel.isdigit()]
+            cpstk = """ "%s":'''%s''', """ % (cpcode,",".join(channels))
+            print cpstk
+            cpstocklst.append(",".join(channels))
+#             print cpstocklst
+            
+    cpstocklst = sorted(cpstocklst)
+    print """ "%s":'''%s''', """ % ("cp990999",",".join(cpstocklst))
             
     
     

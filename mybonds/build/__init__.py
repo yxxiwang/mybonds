@@ -197,8 +197,8 @@ def conceptChannelHash(op="show"):
         print "proc ",cpcode,cpname.decode("utf8")
         print "stockmarket:"+getHashid(cpname.decode("utf8"))
         r.hset("stock:channel",cpcode[2:],"%s:%s" % ("stockmarket",getHashid(cpname.decode("utf8"))))
-        r.hdel("stock:channel",cpcode)
-        if op == "showstock":
+#         r.hdel("stock:channel",cpcode)
+        if op == "frombackend":
             urlstr = "http://svc.zhijixing.com/research/svc?channelid=%s&page=0&length=20" % cpname.decode("utf8")
             udata = loadFromUrl(urlstr)
             if udata.has_key("channels"):
@@ -214,6 +214,16 @@ def conceptChannelHash(op="show"):
                 cpstk = " \"%s\":\"%s\" " % (cpcode,",".join(channels))
                 print cpstk
                 cpstocklst.append(cpstk)
+        elif op=="fromredis":
+            bmkkey = "bmk:%s:%s" % ("stockmarket",getHashid(cpname.decode("utf8")) ) 
+            if not r.exists(bmkkey):
+                continue
+            channels = r.hget(bmkkey,"channels").split(",")
+            channels = [channel for channel in channels if channel.isdigit()]
+            cpstk = " \"%s\":\"%s\", " % (cpcode,",".join(channels))
+            print cpstk
+            cpstocklst.append(cpstk)
+            
     cpstocklst = cpstocklst.sort()
             
     

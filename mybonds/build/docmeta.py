@@ -155,7 +155,7 @@ def channels():
             elaspestr = str(minbefore) + " minites "
         else:
             elaspestr = str(hourbefore) + " hours "
-        print "<-----proc %s:%s (%d of %d), time elaspe %s ------>" % (beaconusr,beaconid,i,cnt,elaspestr)
+        print "<-----proc %s:%s (%d of %d), time elaspe %s(%d sec) ------>" % (beaconusr,beaconid,i,cnt,elaspestr,diff)
         
 #         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
         

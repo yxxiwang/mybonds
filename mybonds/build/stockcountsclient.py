@@ -32,7 +32,7 @@ if __name__ == '__main__':
       
 #     #  Do 10 requests, waiting each time for a response  
 #     for request in range (1,10):  
-    print "Sending request ","..."  
+    print "Sending request ","..."
 #     print "============getNewsCnts================"
 #     
 #     socket.send ("getNewsCnts stock schema cp990001 -28 -7 140000") 

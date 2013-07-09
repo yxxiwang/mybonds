@@ -288,7 +288,7 @@ def getCPinfo(parms=[]):
             r.hset("cp:channel", cpkey, bobj["crt_usr"]+":"+bobj["id"])
             print cpkey, bobj["crt_usr"]+":"+bobj["id"]
     else: 
-        rdata = [bobj["name"].encode("utf8") for bobj in beacons]
+        rdata = [bobj["name"] for bobj in beacons]
 #         print beacons
 #         print '["%s"]' % '","'.join(rdata)
     return '["%s"]' % '","'.join(rdata)

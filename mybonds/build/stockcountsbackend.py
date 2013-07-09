@@ -194,10 +194,10 @@ def initData(parms=[]):
     print message 
     cpcode_list = json.loads(message)
     
-    socket.send ("getCPinfo data 829105579")   
-    message = socket.recv()
-    print message 
-    cpname_list = json.loads(message)
+#     socket.send ("getCPinfo data 829105579")   
+#     message = socket.recv()
+# #     print message 
+#     cpname_list = json.loads(message)
     
     for cpcode in cpcode_list:
         print cpcode
@@ -228,9 +228,11 @@ if __name__ == '__main__':
     socket.bind("tcp://*:39527")
     initData()
     
-#     print getCPinfo(["schema","829105579"])
-#     print getCPinfo(["data","829105579"])
-#     print getChannelStock(["cp990001"])
+    print getCPinfo(["schema"])
+    print getCPinfo(["data"])
+    print getChannelStock(["cp990001"])
+    exit(0)
+    
     print "====getNewsCnts is okay====="
     while True:
       #  Wait for next request from client

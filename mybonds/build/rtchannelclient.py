@@ -43,10 +43,10 @@ if __name__ == '__main__':
     
     print "============getNewsCnts================"
     
-    socket.send ("getNewsCnts stock schema cp990001 -60 -1 140000")   
+    socket.send ("getNewsCnts stock schema sh600792 -120 0 140000")   
     message = socket.recv()
     print message 
-    socket.send ("getNewsCnts stock data cp990001  -60 -1 140000")  
+    socket.send ("getNewsCnts stock data sh600792  -120 0 140000")  
     message = socket.recv()
     print message
     
@@ -74,6 +74,15 @@ if __name__ == '__main__':
     message = socket.recv()
     print message 
     socket.send ("getChannelNewsCopynumListByTime stock data sh600016  -7 -1  ")  
+    message = socket.recv()
+    print message
+    
+    print "===============getCPinfo============="
+     
+    socket.send ("getCPinfo schema 829105579")   
+    message = socket.recv()
+    print message 
+    socket.send ("getCPinfo data 829105579")  
     message = socket.recv()
     print message
     print "============================"

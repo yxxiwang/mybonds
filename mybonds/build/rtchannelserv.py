@@ -9,6 +9,7 @@ import datetime as dt
 import datetime
 # import fcntl
 import warnings
+from test.test_iterlen import len
 
 def deprecated(func):
     """This is a decorator which can be used to mark functions
@@ -244,8 +245,56 @@ def getChannelNewsCountsList(parms=[]):
 #   return ["9527","9528"]
 
 def getChannelStock(parms=[]):
-    pass
+    (cpcode,)=parms
+    cpstocklst=[]
+    bmkkey = "bmk:%s" % r.hget("cp:channel", cpcode)
+    if not r.exists(bmkkey):
+        return "[]"
+    channels = r.hget(bmkkey,"channels").split(",")
+    
+    def addhead(channel):
+        if int(channel) > 599999:
+            return "sh"+channel
+        else:
+            return "sz"+channel 
+        
+    channels = [addhead(channel) for channel in channels if channel.isdigit()]
+    cpstk = """ "%s":'''%s''', """ % (cpcode,",".join(channels))
+    print cpstk
+#     cpstocklst.append(",".join(channels))
+    return json.dumps(channels)
 
+def getCPinfo(parms=[]):
+    (schema,code)=parms
+    beacons = []
+    rdata = []
+    
+#     gobj = r.hgetall("group:829105579")
+    gobj = r.hgetall("group:"+code)
+#     print gobj,schema
+    if not gobj.has_key("name") :
+        return "[]"
+    for bstr in r.zrevrange("bmk:doc:share",0,-1):
+#             busr,bid = bstr.split("|-|")
+        key = "bmk:"+bstr.replace("|-|",":")
+        bttl = r.hget(key,"tag")
+        bttl = "" if bttl is None else bttl
+        if re.search(gobj["name"],bttl): 
+            beacons.append(r.hgetall(key))
+            r.hset("cp:channel", key, r.hget(key, "crt_usr")+":"+r.hget(key, "id"))
+    if schema == "schema":
+        rdata = ["cp99%.4d" % i for i in range(1,len(beacons)+1)]
+        for i, bobj in enumerate(beacons):
+            cpkey = "cp99%.4d" % (i+1,)
+            r.hset("cp:channel", cpkey, bobj["crt_usr"]+":"+bobj["id"])
+            print cpkey, bobj["crt_usr"]+":"+bobj["id"]
+    else: 
+        rdata = [bobj["name"].encode("utf8") for bobj in beacons]
+#         print beacons
+#         print '["%s"]' % '","'.join(rdata)
+    return '["%s"]' % '","'.join(rdata)
+#     return json.dumps(rdata)
+            
 class functionMapping:
   def __init__(self):
     self.controllers = {
@@ -255,30 +304,35 @@ class functionMapping:
       'getNewsCnts': getNewsCnts,
       'getNewsCoypNums': getNewsCoypNums,
       'getChannelStock': getChannelStock,
+      'getCPinfo': getCPinfo,
 #       'getNewsCntsFromDate': getNewsCntsFromDate,
       #'/logout/':logout,
     }
 
 if __name__ == '__main__':
+#     print getCPinfo(["schema","829105579"])
+#     print getCPinfo(["data","829105579"])
+#     print getChannelStock(["cp990001"])
+#     exit(0)
 
-  context = zmq.Context()
-  funcMapping = functionMapping()
-  
-  socket = context.socket(zmq.REP) 
-  socket.bind(RTCfg.zmqPort['systemParameterServicePort'])
-
-  while True:
-    #  Wait for next request from client
-    message = socket.recv()
-    message = message.rstrip()
-    ary = re.split('\s+',message)
-
-    #  Send reply back to client
-    retFunc = funcMapping.controllers.get(ary[0])
-    if retFunc:
-      socket.send(retFunc(ary[1:]))
-    else:
-      socket.send("no this function")
-#     time.sleep(5)
+    context = zmq.Context()
+    funcMapping = functionMapping()
+    
+    socket = context.socket(zmq.REP) 
+    socket.bind(RTCfg.zmqPort['systemParameterServicePort'])
+    
+    while True:
+      #  Wait for next request from client
+      message = socket.recv()
+      message = message.rstrip()
+      ary = re.split('\s+',message)
+    
+      #  Send reply back to client
+      retFunc = funcMapping.controllers.get(ary[0])
+      if retFunc:
+        socket.send(retFunc(ary[1:]))
+      else:
+        socket.send("no this function")
+    #     time.sleep(5)
     
     

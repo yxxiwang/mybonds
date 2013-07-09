@@ -193,6 +193,7 @@ def conceptChannelHash(op="show"):
     import CfgGrp
     cplist = CfgGrp.CPGroup.items()
     cpstocklst = []
+    cpsstk = {}
     for cpcode,cpname in cplist:
         print "proc ",cpcode,cpname.decode("utf8")
         print "stockmarket:"+getHashid(cpname.decode("utf8"))

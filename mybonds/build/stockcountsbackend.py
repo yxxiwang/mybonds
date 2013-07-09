@@ -13,6 +13,9 @@ import datetime
 r = redis.StrictRedis()
 ccnt_data={}
 ccopynum_data={}
+cpcode_list = []
+cpname_list = []
+cp_stock_data = {}
 
 def check_int(s):
     if s[0] in ('-', '+'):
@@ -75,9 +78,9 @@ def getNewsCntsFromDate(parms=[]):
         st = dayfrom
         ed = dayfrom + daycnt +1
         
-#     print "st=%d,ed=%d,code=%s" %(st,ed,code)
-#     print ",".join(ccnt_data[code])
-#     print ",".join(ccnt_data["date"])
+    print "st=%d,ed=%d,code=%s" %(st,ed,code)
+    print ",".join(ccnt_data[code])
+    print ",".join(ccnt_data["date"])
     if schema =="schema" :
         rdata = ccnt_data["date"][st:ed]
         return json.dumps(rdata)  
@@ -146,10 +149,22 @@ def getNewsCoypNumsFromDate(parms=[]):
         rdata = ccopynum_data[code][st:ed] if ccopynum_data.has_key(code) else "has no key:"+code
         return json.dumps(rdata) 
     
+def getChannelStock(parms=[]):
+    (cpcode,)=parms
+    return json.dumps(cp_stock_data[cpcode])
+
+def getCPinfo(parms=[]):
+    (schema,)=parms
+    if schema == "schema":
+        return json.dumps(cpcode_list)
+    else:
+        return json.dumps(cpname_list)
+
 def initData(parms=[]):
     context = zmq.Context()   
     socket = context.socket(zmq.REQ)  
     socket.connect ('tcp://121.199.37.23:30000')
+#     socket.connect ('tcp://localhost:30000')
     print "============getNewsCnts================"
     
     socket.send ("getNewsCnts stock schema sh300088 -120 0 140000")   
@@ -170,7 +185,26 @@ def initData(parms=[]):
         socket.send ("getNewsCoypNums stock data "+stockcode+"  -120 0 140000")  
         message = socket.recv() 
         ccopynum_data[stockcode]=json.loads(message)
+        
+    #===============================================#
+    #==================装载 概念频道  数据==================#
+    #===============================================#
+    socket.send ("getCPinfo schema 829105579")   
+    message = socket.recv()
+    print message 
+    cpcode_list = json.loads(message)
     
+    socket.send ("getCPinfo data 829105579")   
+    message = socket.recv()
+    print message 
+    cpname_list = json.loads(message)
+    
+    for cpcode in cpcode_list:
+        print cpcode
+        socket.send_unicode("getChannelStock "+cpcode)   
+        message = socket.recv()
+        print message
+        cp_stock_data[cpcode] = json.loads(message)    
     
 class functionMapping:
   def __init__(self):
@@ -180,30 +214,36 @@ class functionMapping:
       'getNewsCoypNums': getNewsCoypNums,
       'getNewsCntsFromDate': getNewsCntsFromDate,
       'getNewsCoypNumsFromDate': getNewsCoypNumsFromDate,
+      'getChannelStock': getChannelStock,
+      'getCPinfo': getCPinfo,
       #'/logout/':logout,
     }
 
 if __name__ == '__main__':
 
-  context = zmq.Context()
-  funcMapping = functionMapping()
-  
-  socket = context.socket(zmq.REP) 
-  socket.bind("tcp://*:39527")
-  initData()
-  print "====getNewsCnts is okay====="
-  while True:
-    #  Wait for next request from client
-    message = socket.recv()
-    message = message.rstrip()
-    ary = re.split('\s+',message)
-
-    #  Send reply back to client
-    retFunc = funcMapping.controllers.get(ary[0])
-    if retFunc:
-      socket.send(retFunc(ary[1:]))
-    else:
-      socket.send("no this function")
-#     time.sleep(5)
+    context = zmq.Context()
+    funcMapping = functionMapping()
+    
+    socket = context.socket(zmq.REP) 
+    socket.bind("tcp://*:39527")
+    initData()
+    
+#     print getCPinfo(["schema","829105579"])
+#     print getCPinfo(["data","829105579"])
+#     print getChannelStock(["cp990001"])
+    print "====getNewsCnts is okay====="
+    while True:
+      #  Wait for next request from client
+      message = socket.recv()
+      message = message.rstrip()
+      ary = re.split('\s+',message)
+    
+      #  Send reply back to client
+      retFunc = funcMapping.controllers.get(ary[0])
+      if retFunc:
+        socket.send(retFunc(ary[1:]))
+      else:
+        socket.send("no this function")
+    #     time.sleep(5)
     
     

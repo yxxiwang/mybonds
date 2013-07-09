@@ -9,7 +9,6 @@ import datetime as dt
 import datetime
 # import fcntl
 import warnings
-from test.test_iterlen import len
 
 def deprecated(func):
     """This is a decorator which can be used to mark functions

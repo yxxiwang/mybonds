@@ -309,10 +309,10 @@ class functionMapping:
     }
 
 if __name__ == '__main__':
-    print getCPinfo(["schema","829105579"])
-    print getCPinfo(["data","829105579"])
-    print getChannelStock(["cp990001"])
-    exit(0)
+#     print getCPinfo(["schema","829105579"])
+#     print getCPinfo(["data","829105579"])
+#     print getChannelStock(["cp990001"])
+#     exit(0)
 
     context = zmq.Context()
     funcMapping = functionMapping()

@@ -184,7 +184,7 @@ def initData(parms=[]):
         socket.send ("getNewsCoypNums stock data "+stockcode+"  -120 0 140000")  
         message = socket.recv() 
         ccopynum_data[stockcode]=json.loads(message)
-        
+    
     #===============================================#
     #==================装载 概念频道  数据==================#
     #===============================================#
@@ -193,16 +193,28 @@ def initData(parms=[]):
     print message 
     cp_data["code"] = json.loads(message)
     
+    cplist = json.loads(message)
+    for cpcode in cplist:
+        print "proc: ",cpcode 
+        socket.send_unicode("getNewsCnts stock data "+cpcode+"  -120 0 140000")  
+        message = socket.recv() 
+        ccnt_data[cpcode]=json.loads(message)
+        
+        socket.send_unicode("getNewsCoypNums stock data "+cpcode+"  -120 0 140000")  
+        message = socket.recv() 
+        ccopynum_data[cpcode]=json.loads(message)
+    
+    
     socket.send ("getCPinfo data 829105579")   
     message = socket.recv()
     print message 
     cp_data["name"] = json.loads(message)
     
     for cpcode in cp_data["code"]:
-        print cpcode
+#         print cpcode
         socket.send_unicode("getChannelStock "+cpcode)   
         message = socket.recv()
-        print message
+#         print message
         cp_stock_data[cpcode] = json.loads(message)
     
 class functionMapping:

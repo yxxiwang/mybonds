@@ -769,6 +769,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         if not isapi:
             doc["tx"] = doc["text"]
         doc["text"] = subDocText(doc["text"])
+        doc["title"] = doc["text"].decode("utf8")+u"\u3000"
         doc["copyNum"] = str(doc["copyNum"]) 
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
@@ -871,200 +872,25 @@ def saveRelativeDocs(username, relativeid):
     pass
 
 def saveDocsByIDS(docids):
-    logger.info( "==============geeknews/saveDocsByID============"  )
-    docstr = ";".join(docids)
-    urlstr = "http://%s/research/svc?docid=%s" % (getsysparm("BACKEND_DOMAIN"),docstr) 
-    udata=getDataByUrl(urlstr)
-    docs = [] 
-    if udata.has_key("docs"):
-        docs = udata["docs"]
-    hsetDocs(docs)
+    pass
     
 def hsetDocs(docs):
-    pipedoc = rdoc.pipeline()
-    rtdocs = [] 
-    docmap = {} 
-    tagstr = ""
-    for doc in docs:
-        if doc is None:
-            continue
-        if doc =="null":
-            continue
-        hashid = getHashid(doc["url"])
-        doc["id"] = hashid
-        ukey = "doc:" + hashid 
-        if doc.has_key("tags"):
-            tags = doc["tags"]
-#            for tag in tags:
-#                r.hset("tag:ori", tag.replace(' ', ''), tag)  
-##            tags = [tag.replace(' ', '') for tag in tags] 
-            tagstr = "|-|".join(tags)
-            
-        docmap["ttl"] = doc["title"]
-        docmap["host"] = doc["host"]
-        docmap["tx"] = doc["text"]
-        docmap["url"] = doc["url"]
-        docmap["crt_tms"] = doc["create_time"]
-        docmap["tms"] = doc["tms"]
-        docmap["tags"] = tagstr
-        pipedoc.hmset(ukey, docmap)
-        pipedoc.hset(ukey, "tags", tagstr)
-        rtdocs.append(doc)
-    pipedoc.execute() 
-    return rtdocs
+    pass
 
 def saveLocaltagDocs(relatedid,localtag):
     print "==============geeknews/saveLocaltagDocs============"  
-    localtag = to_unicode_or_bust(localtag)
-    localtag = urllib2.quote(localtag.encode("utf8"))
-    urlstr = "http://www.gxdx168.com/research/svc?length=1100&relatedid=" + relatedid+"&localtag="+localtag
-    udata=getDataByUrl(urlstr)
-    docs = []
-    if udata.has_key("docs"):
-        docs = udata["docs"]
-        docs.reverse()
-    return hsetDocs(docs)
+    pass
 
 def saveRelatedDocs(relatedids):
     print "==============geeknews/saveRelatedDocs============"  
-    print type(relatedids)
-    if type(relatedids).__name__ == "list":
-        relatedstr = ";".join(relatedids)
-    else:
-        relatedstr = relatedids
-    urlstr = "http://www.gxdx168.com/research/svc?length=1100&relatedid=" + relatedstr
-    udata=getDataByUrl(urlstr)
-    docs = []
-    if udata.has_key("docs"):
-        docs = udata["docs"]
-        docs.reverse()  
-    return hsetDocs(docs)   
+    pass
 #return docs
 def saveSimilarDocs(similarids):
     print "==============geeknews/saveSimilarDocs============"  
-    print type(similarids)
-    if type(similarids).__name__ == "list":
-        similarstr = ";".join(similarids)
-    else:
-        similarstr = similarids
-    urlstr = "http://www.gxdx168.com/research/svc?length=1100&similarid=" + similarstr
-    udata=getDataByUrl(urlstr) 
-    docs = []
-    if udata.has_key("docs"):
-        docs = udata["docs"]
-        docs.reverse()  
-    return hsetDocs(docs)   
+    pass  
             
 def saveTagdoc(username, otype, tag, fromdaemon=False):   
-    print "==============geeknews/saveTagdoc============" 
-    if otype == "nav":
-        otag = getNavUrl(tag) 
-    else:
-        otag = getTag(tag)  # otag has space .
-    if otag is None:
-        print "error:---cannot get real Tag "
-        return 911
-    if isinstance(otag, unicode): 
-        ltag = otag.replace(' ', '%20')  # ltag trans space to %20
-    else:
-        print "otag is not unicode,need decode, fromdaemon=" + str(fromdaemon)
-        ltag = otag.decode("utf8")
-#        ltag = unicode(otag, "utf8")
-        ltag = ltag.replace(' ', '%20')  # ltag trans space to %20 
-#    print ltag.encode("utf8")
-    dlen = 0 
-    try:  # &page=1&length=40
-        if otype == "nav":
-            urlstr = "http://www.gxdx168.com/research/svc?o=%s&tag=%s&page=0&length=90" % (getOtype(otype), ltag)
-        else:
-            urlstr = "http://www.gxdx168.com/research/svc?u=%s&o=%s&tag=%s&page=0&length=90" % (username, getOtype(otype), ltag)
-    #    print urlstr
-        rt = 0 
-        start = time.clock() 
-        udata = loadFromUrl(urlstr) 
-        urlstop = time.clock()  
-        diff = urlstop - start  
-        if fromdaemon:
-            print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff))
-        else:
-            print "loadFromUrl() has taken %s" % (str(diff))
-    #    print "udata len is %d" % len(udata) 
-        pipe = r.pipeline()
-        pipedoc = rdoc.pipeline()
-        tagid = getHashid(tag)
-        key = "usr:%s:%s:tag:%s" % (username, otype, tagid)  # usr:wxi:rcm:tag:10086 ...
-
-        pipe.zadd("tag:" + otype, time.time(), username + ":" + tag)
-        pipe.zincrby("tag:" + otype + ":cnt", username + ":" + tag, 1) 
-        pipe.set(key, time.time())
-#        pipi.expire(key,REDIS_EXPIRETIME)
-        if udata.has_key("tags"):
-            tags = udata["tags"] 
-            tags.reverse()
-            pipe.delete(key + ":taglst")
-    #        tags = [tag.replace(' ', '') for tag in tags]
-#            print "tags len is %d,[%s]" % (len(tags),tag) 
-#            print key + ":taglst"
-            for ztag in tags:
-                if otype == "nav":  
-                    pipe.lpush(key + ":taglst", getNavTag(ztag))
-                else:                    
-                    if isAscii(ztag):
-                        pipe.hset("tag:ori", ztag , ztag)
-                        pipe.lpush(key + ":taglst", ztag)
-                    else:
-                        pipe.hset("tag:ori", ztag.replace(' ', ''), ztag)
-                        pipe.lpush(key + ":taglst", ztag.replace(' ', ''))
-                    
-        #            timescore = time.time()
-        #            pipe.zadd(key + ":tag", timescore, tag)
-        uid = ""
-        relatestr = ""
-        docs = []
-        relatedocs = []
-        docmap = {}
-        if udata.has_key("docs"):
-            docs = udata["docs"]
-            docs.reverse()
-            pipe.delete(key + ":lst")
-#            pipe.delete(key + ":zset")
-            dlen = len(docs)
-#        print "docs len is %d" % len(docs) 
-        for doc in docs:
-            if doc is None: 
-                continue
-            timescore = int(time.time())
-#            print doc["url"]
-            hashid = getHashid(doc["url"])  
-            ukey = "doc:" + hashid
-            if not rdoc.exists(ukey):  # 如果是新贴,将该贴加入总的docs池中,并更新文章时间信息
-                docmap["ttl"] = doc["title"]
-                docmap["host"] = doc["host"]
-                docmap["tx"] = doc["text"]
-                docmap["url"] = doc["url"]
-                docmap["crt_tms"] = doc["create_time"]
-#                docmap["rel_cnt"] = doc["relatedCount"]
-#                docmap["sml_cnt"] = doc["similarCount"]
-                pipedoc.hmset(ukey, docmap)  
-            else:  # 否则,则是旧帖 (或被重复推荐) 
-                if rdoc.hget(ukey, "tx") == "":
-                    pipedoc.hset(ukey, "tx", doc["text"])
-# #            if otype == "ppl":  # 对于综览,按照时间排序(使用sort set)
-# #                pipe.zadd(key + ":zset", doc["create_time"], hashid)
-#            else:
-            pipe.lpush(key + ":lst", hashid)  # 标签&文章关联
-        pipe.execute()
-        pipedoc.execute() 
-    except:
-#            traceback.print_exc()
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        traceback.print_exception(exc_type, exc_value, exc_traceback,
-                          limit=2, file=sys.stdout)
-        rt = 2
-    savestop = time.clock()  
-    diff = savestop - urlstop  
-    print "saveTagDocs %s data has taken on %s; and rt is %d" % (dlen, str(diff), rt)  
-    return rt
+    return 0
 
 def saveFulltextById(ids,retrycnt=0,url=""):
     logger.info( "===saveFulltextById==="+url )
@@ -1156,7 +982,8 @@ def saveDocsByUrl(urlstr):
                 pass
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
             title = doc["title"]
-            title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
+#             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
+            title = strfilter(title)
             pipedoc.hset("doc:"+docid,"docid",docid)
             pipedoc.hset("doc:"+docid,"title",title)
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))

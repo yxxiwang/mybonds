@@ -246,7 +246,7 @@ def getChannelNewsCountsList(parms=[]):
 def getChannelStock(parms=[]):
     (cpcode,)=parms
     cpstocklst=[]
-    bmkkey = "bmk:%s" % r.hget("cp:channel", cpcode)
+    bmkkey = "bmk:%s" % r.hget("stock:channel", cpcode[2:])
     if not r.exists(bmkkey):
         return "[]"
     channels = r.hget(bmkkey,"channels").split(",")
@@ -284,8 +284,8 @@ def getCPinfo(parms=[]):
     if schema == "schema":
         rdata = ["cp99%.4d" % i for i in range(1,len(beacons)+1)]
         for i, bobj in enumerate(beacons):
-            cpkey = "cp99%.4d" % (i+1,)
-            r.hset("cp:channel", cpkey, bobj["crt_usr"]+":"+bobj["id"])
+            cpkey = "99%.4d" % (i+1,)
+            r.hset("stock:channel", cpkey, bobj["crt_usr"]+":"+bobj["id"])
             print cpkey, bobj["crt_usr"]+":"+bobj["id"]
     else: 
         rdata = [bobj["name"] for bobj in beacons]
@@ -309,10 +309,10 @@ class functionMapping:
     }
 
 if __name__ == '__main__':
-#     print getCPinfo(["schema","829105579"])
-#     print getCPinfo(["data","829105579"])
-#     print getChannelStock(["cp990001"])
-#     exit(0)
+    print getCPinfo(["schema","829105579"])
+    print getCPinfo(["data","829105579"])
+    print getChannelStock(["cp990001"])
+    exit(0)
 
     context = zmq.Context()
     funcMapping = functionMapping()

@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print message
     
     print "===============getChannelStock=============" 
-    socket.send ("getChannelStock cp990001 ")   
+    socket.send ("getChannelStock cp990002 ")   
     message = socket.recv()
     print message  
     

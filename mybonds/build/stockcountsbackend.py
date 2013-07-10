@@ -13,8 +13,7 @@ import datetime
 r = redis.StrictRedis()
 ccnt_data={}
 ccopynum_data={}
-cpcode_list = []
-cpname_list = []
+cp_data ={}
 cp_stock_data = {}
 
 def check_int(s):
@@ -154,11 +153,11 @@ def getChannelStock(parms=[]):
     return json.dumps(cp_stock_data[cpcode])
 
 def getCPinfo(parms=[]):
-    (schema,)=parms
+    (schema,)=parms 
     if schema == "schema":
-        return json.dumps(cpcode_list)
+        return json.dumps(cp_data["code"])
     else:
-        return json.dumps(cpname_list)
+        return json.dumps(cp_data["name"])
 
 def initData(parms=[]):
     context = zmq.Context()   
@@ -192,19 +191,19 @@ def initData(parms=[]):
     socket.send ("getCPinfo schema 829105579")   
     message = socket.recv()
     print message 
-    cpcode_list = json.loads(message)
+    cp_data["code"] = json.loads(message)
     
-#     socket.send ("getCPinfo data 829105579")   
-#     message = socket.recv()
-# #     print message 
-#     cpname_list = json.loads(message)
+    socket.send ("getCPinfo data 829105579")   
+    message = socket.recv()
+    print message 
+    cp_data["name"] = json.loads(message)
     
-    for cpcode in cpcode_list:
+    for cpcode in cp_data["code"]:
         print cpcode
         socket.send_unicode("getChannelStock "+cpcode)   
         message = socket.recv()
         print message
-        cp_stock_data[cpcode] = json.loads(message)    
+        cp_stock_data[cpcode] = json.loads(message)
     
 class functionMapping:
   def __init__(self):
@@ -228,10 +227,10 @@ if __name__ == '__main__':
     socket.bind("tcp://*:39527")
     initData()
     
-    print getCPinfo(["schema"])
-    print getCPinfo(["data"])
-    print getChannelStock(["cp990001"])
-    exit(0)
+#     print getCPinfo(["schema"])
+#     print getCPinfo(["data"])
+#     print getChannelStock(["cp990001"])
+#     exit(0)
     
     print "====getNewsCnts is okay====="
     while True:

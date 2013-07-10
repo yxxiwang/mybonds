@@ -769,7 +769,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         if not isapi:
             doc["tx"] = doc["text"]
         doc["text"] = subDocText(doc["text"])
-        doc["title"] = doc["text"].decode("utf8")+u"\u3000"
+        doc["title"] = doc["title"].decode("utf8")+u"\u3000"
         doc["copyNum"] = str(doc["copyNum"]) 
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 

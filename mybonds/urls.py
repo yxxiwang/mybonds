@@ -20,7 +20,6 @@ urlpatterns = patterns("",
     url(r'^apply/sapply/$', 'mybonds.views.apply_service', name="apply_service"),
     url(r'^feedback/get_captcha/$', 'mybonds.views.get_captcha', name="get_captcha"),
     
-#     url(r'^groupmanage/$', 'mybonds.views.groupmanage', name="groupmanage"),
     url(r'^buddyhold/$', 'mybonds.views.buddyhold', name="buddyhold"),
     url(r'^usermodify/$', 'mybonds.views.user_modify', name="user_modify"),
     url(r'^sysparms/$', 'mybonds.views.sysparms', name="sysparms"),
@@ -29,14 +28,7 @@ urlpatterns = patterns("",
     url(r'^groupsave/$', 'mybonds.views.groupsave', name="groupsave"),
     url(r'^groupdelete/$', 'mybonds.views.groupdelete', name="groupdelete"),
     url(r'^character/$', 'mybonds.views.character', name="character"),
-#    url(r'^static/(?P<path>.*)$', 'django.views.static.serve',
-#         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-#                       
-#    url(r"^index/$", direct_to_template, {"template": "index.html", }, name="index"),
-#    # url(r'^examples/(?P<page_name>.*)/index.htm$', 'staticpage', name='static-pages'),
-#
-#    url(r"^dynamic/$", direct_to_template, {"template": "dynamic.html", }, name="home"),
-    # url(r"^geeknews/$", direct_to_template, {"template": "geeknews.html",}, name="geeknews"),
+
     (r'^bonds/', include('bonds.urls')),
     (r'^news/', include('geeknews.urls')), 
     (r'^newsvc/', include('newsvc.urls')), 

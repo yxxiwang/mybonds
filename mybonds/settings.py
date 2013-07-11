@@ -6,8 +6,10 @@ import posixpath
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-DEBUG = True
-DEBUG404 = True
+DEBUG = False
+DEBUG404 = False
+
+ALLOWED_HOSTS = ['www.9cloudx.com','www.9cloudx.cn','stock.9cloudx.com','stock.9cloudx.cn','localhost']
 
 TEMPLATE_DEBUG = DEBUG
 

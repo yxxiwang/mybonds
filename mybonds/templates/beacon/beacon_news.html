@@ -102,6 +102,11 @@
               <p style="font-size: 13px;"><a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:green">{{ channel.beaconname }} &nbsp;  </span> </a>
               </div>
               {% endfor %}  
+              {% for channel in udata.channelfromtags %}
+              <div class="span3" style="margin-left:0px;">
+              <p style="font-size: 13px;"><a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:orange">{{ channel.beaconname }} &nbsp;  </span> </a>
+              </div>
+              {% endfor %}  
             </blockquote>        
             </div>
             {% for doc in udata.docs %}

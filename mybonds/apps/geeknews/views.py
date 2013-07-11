@@ -1003,7 +1003,10 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)
         r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
         r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
-        r.zadd("bmk:doc:share:bynews",time.time() , beaconusr + "|-|" + beaconid) 
+        r.zadd("bmk:doc:share:bynews",time.time() , beaconusr + "|-|" + beaconid)
+        
+        from mybonds.build import beaconNameHash
+        beaconNameHash()
     else:
         if beaconkey != beaconusr+":"+getHashid(beaconname):# modifykeys
 #             print beaconkey,beaconusr+":"+getHashid(beaconname)

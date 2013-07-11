@@ -260,7 +260,7 @@ def getChannelStock(parms=[]):
         tags = "" if tags is None else tags
         bttl = r.hget(bkey,"ttl")
         if re.search(ttl,tags) and bttl not in channels:
-            channels.append( bttl )
+            channels.append( bttl ) 
             
     def addhead(channel):
         if int(channel) > 599999:

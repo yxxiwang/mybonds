@@ -85,6 +85,12 @@ if __name__ == '__main__':
     socket.send ("getCPinfo data 829105579")  
     message = socket.recv()
     print message
+    
+    print "===============getChannelStock============="
+     
+    socket.send ("getChannelStock cp990045")   
+    message = socket.recv()
+    print message  
     print "============================"
 #     
 #     socket.send ("getChannelNewsCountsList stock sh600001  7  ")   

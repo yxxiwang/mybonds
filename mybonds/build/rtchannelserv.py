@@ -249,16 +249,17 @@ def getChannelStock(parms=[]):
     bmkkey = "bmk:%s" % r.hget("stock:channel", cpcode[2:])
     if not r.exists(bmkkey):
         return "[]"
+    print bmkkey
     channels = r.hget(bmkkey,"channels").split(",")
     
+    ttl = r.hget(bmkkey,"ttl")
     #根据标签取概念频道项下的股票
     for bstr in r.zrevrange("bmk:doc:share",0,-1):
         bkey = "bmk:"+bstr.replace("|-|",":")
         tags = r.hget(bkey,"tag") 
         tags = "" if tags is None else tags
-        ttl = r.hget(bmkkey,"ttl")
         if re.search(ttl,tags):
-            channels.append(ttl)
+            channels.append( r.hget(bkey,"ttl") )
             
     def addhead(channel):
         if int(channel) > 599999:
@@ -318,10 +319,12 @@ class functionMapping:
     }
 
 if __name__ == '__main__':
-#     print getCPinfo(["schema","829105579"])
-#     print getCPinfo(["data","829105579"])
-#     print getChannelStock(["cp990001"])
-#     exit(0)
+    print getCPinfo(["schema","829105579"])
+    print getCPinfo(["data","829105579"])
+    print "==getChannelStock=="
+    print getChannelStock(["cp990001"])
+    print getChannelStock(["cp990002"])
+    exit(0)
 
     context = zmq.Context()
     funcMapping = functionMapping()

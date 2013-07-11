@@ -799,6 +799,8 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
                 cobj["beaconusr"]=r.hget(bkey,"crt_usr")
                 cobj["beaconid"]=r.hget(bkey,"id")
                 cobj["beaconname"]=r.hget(bkey,"name")
+                if cobj in channels:
+                    continue
                 channelfromtags.append(cobj)   
             
     udata["channels"] =  channels

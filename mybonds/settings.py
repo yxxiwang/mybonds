@@ -6,7 +6,7 @@ import posixpath
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-DEBUG = True
+DEBUG = False
 DEBUG404 = True
 
 TEMPLATE_DEBUG = DEBUG

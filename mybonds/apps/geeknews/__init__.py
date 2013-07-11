@@ -757,7 +757,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     if r.exists(key):
         refreshBeacon(beaconusr, beaconid)
     else:
-        return {} 
+        return {}
     udata = {}
     docs = [] 
     channels = []
@@ -786,6 +786,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
                 cobj["beaconid"]=ckey.split(":")[2]
                 cobj["beaconname"]=r.hget("bmk:"+ckey.split(":")[1]+":"+ckey.split(":")[2],"name")
                 channels.append(cobj)
+    
     udata["channels"] =  channels
     udata["total"] = str(len(udata["docs"]) )
 #     r.hset(key, "cnt", len(docs))

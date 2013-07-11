@@ -251,6 +251,15 @@ def getChannelStock(parms=[]):
         return "[]"
     channels = r.hget(bmkkey,"channels").split(",")
     
+    #根据标签取概念频道项下的股票
+    for bstr in r.zrevrange("bmk:doc:share",0,-1):
+        bkey = "bmk:"+bstr.replace("|-|",":")
+        tags = r.hget(bkey,"tag") 
+        tags = "" if tags is None else tags
+        ttl = r.hget(bmkkey,"ttl")
+        if re.search(ttl,tags):
+            channels.append(ttl)
+            
     def addhead(channel):
         if int(channel) > 599999:
             return "sh"+channel

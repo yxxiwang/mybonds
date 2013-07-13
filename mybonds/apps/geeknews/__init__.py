@@ -155,7 +155,8 @@ def sendEmailFindKey(username,email,url):
 def sendemailbydocid(email,docid,otype=""): 
     logger.info( "%s==sendemailbydocid====" % getTime(time.time()) )
     if not rdoc.exists("doc:"+docid):
-        logger.info( "==error:: document is not exsit!!! doc:%" % docid)
+        print type(docid)
+        logger.info( "==error:: document is not exsit!!! doc:"+docid)
         return -1
     doc = rdoc.hgetall("doc:"+docid)
     title = to_unicode_or_bust(doc["title"])
@@ -168,8 +169,9 @@ def sendemailbydocid(email,docid,otype=""):
         ftxlist = fulldoc["fulltext"] 
 #         print  "<br><br>    ".join(ftxlist)
         spstr = "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-        ftx = fulldoc["title"] +spstr + spstr.join(ftxlist)
-        ftx = ftx+"<br><br>"+"原文地址:".decode("utf8")+"<br>"+doc["url"]
+#         ftx = fulldoc["title"] +spstr + spstr.join(ftxlist)
+        ftx = spstr.join(ftxlist)
+        ftx = ftx+"<br><br><br><a href='"+doc["url"]+"'>"+"原文地址".decode("utf8")+"</a>"
     else:
         ftx = doc["title"] +"<br><br>    "+doc["text"]
         ftx = ftx+"<br><br>"+ "<a href='"+doc["url"]+"'>"+doc["url"]+"</a><br><br>" 
@@ -182,7 +184,7 @@ def sendemailbydocid(email,docid,otype=""):
         <meta http-equiv="Content-Type" content="text/html; charset=GBK"> 
     </head>
     <body><div class="text"> """+content+"</div></body> </html>"
-    return sendemail(content,email,title)
+    return sendemail(content,email,"[分享] ".decode("utf8")+title)
     
 #     for usr_email in emails.split(","):
 #         content_list =[]

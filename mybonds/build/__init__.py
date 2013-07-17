@@ -245,6 +245,65 @@ def initBeaconDisplayName():
         print "proc %s:%s " %(beaconusr,beaconid)
         key = "bmk:%s:%s" % (beaconusr,beaconid)
         r.hset(key,"name",r.hget(key,"ttl"))
+
+def deleteUser(username=""):
+    if username=="":
+        return "username is null!"
+    urlstr = "http://%s/userdelete/?username=%s" %(getsysparm("DOMAIN"),username)
+    procUrl(["wxi","wxi",urlstr])
+        
+def procUrl(parms=[]):
+    """ 先登录,然后再执行webservice"""
+    import cookielib, urllib, urllib2 
+    (usr,pwd,url2) = parms
+    
+    loginstr = "http://%s/apply/slogin/?usr=%s&pwd=%s" %(getsysparm("DOMAIN"),usr,pwd)
+    print "loginstr is:"+loginstr
+    req1 = urllib2.Request(loginstr)
+    response = urllib2.urlopen(req1)
+    cookie = response.headers.get('Set-Cookie')
+    
+    # Use the cookie is subsequent requests
+#     url2='http://localhost:8000/news/sfllowbeacon/?u=wang9529&fllwopt=add&beaconid=1108470809&beaconusr=rd'
+    print "proc url:"+url2
+    req2 = urllib2.Request(url2)
+    req2.add_header('cookie', cookie)
+    response = urllib2.urlopen(req2)
+    print response.readlines()
+    
+def loginAndDo(parms=[]):
+    (usr,pwd) = parms
+    import cookielib, urllib, urllib2
+    login = 'wxi'
+    password = 'wxi'
+    # Enable cookie support for urllib2
+    cookiejar = cookielib.CookieJar()
+    urlOpener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
+     
+    # Send login/password to the site and get the session cookie
+    values = {'usr':login, 'pwd':password }
+    data = urllib.urlencode(values)
+#     request = urllib2.Request("http://localhost:8000/apply/login/", data)
+    loginstr = "http://%s/apply/slogin/?usr=%s&pwd=%s" %(getsysparm("DOMAIN"),usr,pwd)
+    request = urllib2.Request(loginstr)
+    
+    url = urlOpener.open(request)  # Our cookiejar automatically receives the cookies
+    page = url.read(500000)
+    print page
+    for cookie in cookiejar:
+        print type(cookie),cookie.name 
+     
+    # Make sure we are logged in by checking the presence of the cookie "id".
+    # (which is the cookie containing the session identifier.)
+    if not 'sessionid' in [cookie.name for cookie in cookiejar]:
+        raise ValueError, "Login failed with login=%s, password=%s" % (login,password)
+     
+    print "We are logged in !" 
+    # Make another request with our session cookie
+    # (Our urlOpener automatically uses cookies from our cookiejar)
+    url = urlOpener.open('http://localhost:8000/news/sfllowbeacon/?u=wang9529&fllwopt=add&beaconid=1108470809&beaconusr=rd')
+    page = url.read(200000)
+    print page
         
 def reflect(functionname,parms=""):
     function = globals()[functionname]
@@ -266,6 +325,9 @@ if __name__ == "__main__":
         func = sys.argv[1] 
         if len(sys.argv) ==3:
             parms = sys.argv[2] 
+            reflect(func,parms)
+        elif len(sys.argv) >3:
+            parms = sys.argv[2:] 
             reflect(func,parms)
         else:
             reflect(func)

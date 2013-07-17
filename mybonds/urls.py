@@ -22,6 +22,7 @@ urlpatterns = patterns("",
     
     url(r'^buddyhold/$', 'mybonds.views.buddyhold', name="buddyhold"),
     url(r'^usermodify/$', 'mybonds.views.user_modify', name="user_modify"),
+    url(r'^userdelete/$', 'mybonds.views.user_delete', name="user_delete"),
     url(r'^sysparms/$', 'mybonds.views.sysparms', name="sysparms"),
     url(r'^queuelist/$', 'mybonds.views.queuelist', name="queuelist"),
     url(r'^grouplist/$', 'mybonds.views.grouplist', name="grouplist"),

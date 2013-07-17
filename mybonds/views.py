@@ -96,6 +96,16 @@ def apply_service(request):
         robj["message"] = "apply is success" 
         robj["data"] = r.hgetall("usr:" + username)
         greeting_typer(username, "apply", username)
+
+        fllwkey="bmk:rd:1108470809:fllw"
+        r.sadd(fllwkey,username) 
+        r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
+        r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
+        
+        fllwkey="bmk:rd:954189947:fllw"
+        r.sadd(fllwkey,username) 
+        r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
+        r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
     else:
         robj["success"] = 'false'
         robj["message"] = "disabled account!" 
@@ -197,6 +207,21 @@ def apply(request):
                 auth.login(request, user)
                 log_typer(request, "apply", "none")
                 greeting_typer(username, "apply", username)
+
+                fllwkey="bmk:rd:1108470809:fllw"
+                r.sadd(fllwkey,username) 
+                r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
+                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
+                
+                fllwkey="bmk:rd:954189947:fllw"
+                r.sadd(fllwkey,username) 
+                r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
+                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
+#                 print user.is_authenticated()
+#                 urlstr="http://%s/news/sfllowbeacon/?u=%s&fllwopt=add&beaconid=1108470809&beaconusr=rd" %(getsysparm("DOMAIN"),username)
+#                 loadFromUrl(urlstr)
+#                 urlstr="http://%s/news/sfllowbeacon/?u=%s&fllwopt=add&beaconid=954189947&beaconusr=rd" %(getsysparm("DOMAIN"),username)
+#                 loadFromUrl(urlstr)
                 return HttpResponseRedirect('/news/beaconnews')
             else:
                 # Return a 'disabled account' error message 
@@ -497,6 +522,27 @@ def sysparms(request,template_name="beacon/sysparms.html"):
             'current_path': request.get_full_path(),
         }, context_instance=RequestContext(request)) 
         
+@login_required
+def user_delete(request): 
+    username = getUserName(request)
+    if username not in ["wxi","sj","ltb"]:#
+        return HttpResponse('<h1>只有管理用户才能访问该功能..</h1>')
+    delusr = request.GET.get("username", "");
+    try:
+        user = User.objects.get(username=delusr)
+    except:
+        r.hdel("usrlst",delusr)
+        r.delete("usr:"+delusr+":channeltms")
+        r.delete("usr:"+delusr)
+    else:
+        if user is not None and user.is_active:
+            user.delete()
+            r.hdel("usrlst",delusr)
+            r.delete("usr:"+delusr)
+            r.delete("usr:"+delusr+":fllw")
+            r.delete("usr:"+delusr+":channeltms")
+            r.delete("usr:"+delusr+":buddy:all")
+        return HttpResponse('user %s is deleted' % delusr)
         
 @login_required
 def user_modify(request,template_name="beacon/usermodify.html"): 
@@ -581,8 +627,6 @@ def user_modify(request,template_name="beacon/usermodify.html"):
             'email':email,
             'current_path': request.get_full_path(),
         }, context_instance=RequestContext(request)) 
-
-             
         
 def character(request, template_name="beacon/suggestion.html"): 
     otype = request.GET.get("o", "")

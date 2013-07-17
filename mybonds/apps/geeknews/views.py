@@ -852,13 +852,10 @@ def fllowbeacon_service(request):
         
     if heartopt=="remove":
         r.srem(fllwkey,username)
-#         r.srem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
         r.zrem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
         r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),heartusr+"|-|"+heartid)
-#            r.zincrby("bmk:doc:share:byfllw",heartusr+"|-|"+heartid,-1)
     elif heartopt== "add":
-        r.sadd(fllwkey,username)
-#         r.sadd("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
+        r.sadd(fllwkey,username) 
         r.zadd("usr:" + username+ ":fllw" ,time.time(), heartusr+"|-|"+heartid)
         r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),heartusr+"|-|"+heartid)
     
@@ -1530,7 +1527,7 @@ def admin(request, template_name="beacon/admin.html"):
     else:
         userinfos = r.hgetall("usrlst")
 #        print userinfos
-        for user,userinfo in userinfos.items(): 
+        for user,userinfo in userinfos.items():
             usr=json.loads(userinfo)  
 #             usr["act_tms"] = getTime(usr["tms"])
             usrlst.append(usr)

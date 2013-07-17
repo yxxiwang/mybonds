@@ -152,6 +152,8 @@ def newsdetail(request):
         doc["url"] = doc["urls"][0].split(",")[1]
         doc["success"] = "true"
         doc["message"] = "success return data"
+#     print json.dumps(doc, ensure_ascii=False)
+#     return HttpResponse(json.dumps(doc,ensure_ascii=False), mimetype="application/json")
     return HttpResponse(json.dumps(doc), mimetype="application/json")
 
 @login_required

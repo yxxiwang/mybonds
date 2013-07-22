@@ -676,17 +676,19 @@ def refreshDocs(beaconusr, beaconid,force=False):
     if not r.exists(key):
         logger.warn( "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key )
         return -1
+    
+    headlineonly = r.hget(key, "headlineonly")
+    headlineonly = "0" if headlineonly is None else headlineonly
+    
     if r.hget(key,"ttl").isdigit():#说明频道本身原来是新闻,docAsChannel 则为False
-        udata = saveDocsByUrl(urlstr,docAsChannel=False)
+        udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=False)
     else:
-        udata = saveDocsByUrl(urlstr,docAsChannel=True)
+        udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=True)
     
     if udata.has_key("channels"):
         r.hset(key, "channels", ",".join(udata["channels"]) )
         
 #     20130718 注释掉, 因为判断是否热点改为在beaconUrl中,不再需要在此处进行
-#     headlineonly = r.hget(key, "headlineonly")
-#     headlineonly = "0" if headlineonly is None else headlineonly
 #     if headlineonly=="0" and udata.has_key("docs"):
 #         docs =  udata["docs"]
 #     elif headlineonly=="1" and udata.has_key("headlines"):
@@ -988,7 +990,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
 #             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
 
 
-def saveDocsByUrl(urlstr,docAsChannel=False): 
+def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False): 
 #     start = time.clock() 
 #     udata = loadFromUrl(urlstr) 
 #     urlstop = time.clock()  
@@ -997,7 +999,7 @@ def saveDocsByUrl(urlstr,docAsChannel=False):
     logger.info( "===saveDocsByUrl==="+urlstr)
     udata = bench(loadFromUrl,parms=urlstr)
     pipedoc = rdoc.pipeline()
-    def saveText(docs,isheadline=False):
+    def saveText(docs):
         ids_lst=[]
         cnt=0
         ids=""
@@ -1015,8 +1017,8 @@ def saveDocsByUrl(urlstr,docAsChannel=False):
                     ids_lst.append(ids)
                     ids=""
                     cnt = 0
-                if docAsChannel:
-                    addBeacon("doc",getHashid(docid),docid,beaconname=doc["title"],tag="auto",headlineonly="1")
+                if docAsChannel and headlineonly=="1":
+                    addBeacon("doc",getHashid(docid),docid,beaconname=doc["title"],tag="auto",headlineonly)
             else:
                 pass
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
@@ -1031,11 +1033,8 @@ def saveDocsByUrl(urlstr,docAsChannel=False):
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
     #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
     #             pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-            pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
-            if isheadline:
-                pipedoc.hset("doc:"+docid,"isheadline","1")
-            else:
-                pipedoc.hset("doc:"+docid,"isheadline","0")
+            pipedoc.hset("doc:"+docid,"domain",doc["domain"] ) 
+            pipedoc.hset("doc:"+docid,"isheadline",headlineonly) 
                 
             pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME") )
         if len(ids_lst) > 0:
@@ -1045,12 +1044,12 @@ def saveDocsByUrl(urlstr,docAsChannel=False):
             saveFulltextById(ids)
         pipedoc.execute()
     ################## saveText is over ##############################
-            
+
     if udata.has_key("docs"):
-        saveText(udata["docs"],isheadline=False)
+        saveText(udata["docs"])
             
-    if udata.has_key("headlines"):
-        saveText(udata["headlines"],isheadline=True)
+#     if udata.has_key("headlines"):
+#         saveText(udata["headlines"],isheadline=True)
         
     return udata
 

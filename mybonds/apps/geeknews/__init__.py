@@ -1018,7 +1018,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                     ids=""
                     cnt = 0
                 if docAsChannel and headlineonly=="1":
-                    addBeacon("doc",getHashid(docid),docid,beaconname=doc["title"],tag="auto",headlineonly)
+                    addBeacon("doc",getHashid(docid),docid,beaconname=doc["title"],tag="auto",headlineonly=headlineonly)
             else:
                 pass
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 

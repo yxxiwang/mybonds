@@ -98,14 +98,16 @@ def apply_service(request):
         greeting_typer(username, "apply", username)
 
         fllwkey="bmk:rd:1108470809:fllw"
-        r.sadd(fllwkey,username) 
-        r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
-        r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
+        if r.exists(fllwkey):
+            r.sadd(fllwkey,username) 
+            r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
+            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
         
         fllwkey="bmk:rd:954189947:fllw"
-        r.sadd(fllwkey,username) 
-        r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
-        r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
+        if r.exists(fllwkey):
+            r.sadd(fllwkey,username) 
+            r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
+            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
     else:
         robj["success"] = 'false'
         robj["message"] = "disabled account!" 
@@ -209,14 +211,16 @@ def apply(request):
                 greeting_typer(username, "apply", username)
 
                 fllwkey="bmk:rd:1108470809:fllw"
-                r.sadd(fllwkey,username) 
-                r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
-                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
+                if r.exists(fllwkey):
+                    r.sadd(fllwkey,username) 
+                    r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
+                    r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
                 
                 fllwkey="bmk:rd:954189947:fllw"
-                r.sadd(fllwkey,username) 
-                r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
-                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
+                if r.exists(fllwkey):
+                    r.sadd(fllwkey,username) 
+                    r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
+                    r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
 #                 print user.is_authenticated()
 #                 urlstr="http://%s/news/sfllowbeacon/?u=%s&fllwopt=add&beaconid=1108470809&beaconusr=rd" %(getsysparm("DOMAIN"),username)
 #                 loadFromUrl(urlstr)

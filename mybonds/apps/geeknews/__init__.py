@@ -642,10 +642,19 @@ def beaconUrl(beaconusr, beaconid):
     channel = "" if channel is None else channel
     mindoc = r.hget(key,"mindoc") 
     mindoc = 0 if mindoc is None else mindoc 
+    
+    popularid = r.hget(key, "headlineonly")
+    popularid = "0" if popularid is None else popularid
+    
+    channelparm = "channelid" if popularid == "0" else "popularid"
+    today = dt.date.fromtimestamp(time.time())
+    after = time.mktime(today.timetuple())
+    after = (after+2*3600) * 1000
+    before = time.time() * 1000
     if int(mindoc) <= 0 :
-        urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s" %(getsysparm("BACKEND_DOMAIN"),channel,page,length)
+        urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d" %(getsysparm("BACKEND_DOMAIN"),channelparm,channel,after,before)
     else:
-        urlstr = "http://%s/research/svc?channelid=%s&page=%s&length=%s&mindoc=%s" %(getsysparm("BACKEND_DOMAIN"),channel,page,length,mindoc)
+        urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d&mindoc=%s" %(getsysparm("BACKEND_DOMAIN"),channelparm,channel,after,before,mindoc)
     return urlstr
 
 def refreshDocs(beaconusr, beaconid,force=False):
@@ -667,18 +676,25 @@ def refreshDocs(beaconusr, beaconid,force=False):
     if not r.exists(key):
         logger.warn( "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key )
         return -1
-    udata = saveDocsByUrl(urlstr)
+    if r.hget(key,"ttl").isdigit():#说明频道本身原来是新闻,docAsChannel 则为False
+        udata = saveDocsByUrl(urlstr,docAsChannel=False)
+    else:
+        udata = saveDocsByUrl(urlstr,docAsChanne=True)
     
     if udata.has_key("channels"):
         r.hset(key, "channels", ",".join(udata["channels"]) )
         
-    headlineonly = r.hget(key, "headlineonly")
-    headlineonly = "0" if headlineonly is None else headlineonly
-    
-    if headlineonly=="0" and udata.has_key("docs"):
-        docs =  udata["docs"]
-    elif headlineonly=="1" and udata.has_key("headlines"):
-        docs =  udata["headlines"]
+#     20130718 注释掉, 因为判断是否热点改为在beaconUrl中,不再需要在此处进行
+#     headlineonly = r.hget(key, "headlineonly")
+#     headlineonly = "0" if headlineonly is None else headlineonly
+#     if headlineonly=="0" and udata.has_key("docs"):
+#         docs =  udata["docs"]
+#     elif headlineonly=="1" and udata.has_key("headlines"):
+#         docs =  udata["headlines"]
+#     else:
+#         return COMMUNICATERROR
+    if udata.has_key("docs"):
+        docs = udata["docs"]
     else:
         return COMMUNICATERROR
      
@@ -692,35 +708,36 @@ def refreshDocs(beaconusr, beaconid,force=False):
         if doc is None:
             continue
         if doc["validTime"]=="false" or not doc["validTime"]:
-            pass 
+            pass
         else:
-            r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"])) 
+#             r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"])) 
+            r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
 ################ 统计信息   ############################
         docid= str(doc["docId"])
-        tms = doc["create_time"] 
+        tms = doc["create_time"]
         if tms is None or tms==0:
             continue
         
         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
 #         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
-        tms=getTime(int(tms)/1000) 
+        tms=getTime(int(tms)/1000)
         tms = re.sub(r":|-|\s", "", tms)
         r.zadd(doc_tcnt_key,long(tms),docid)
         r.hset("copynum",docid,doc["copyNum"])
         r.zadd(doc_dcnt_key,int(tdate),docid)
     ##### end for #####
-    if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
-        r.rename(key+":doc:tms:bak",key+":doc:tms")
-    today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
-    cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
-    if cnt>0:
-        r.zadd(channel_cnt_key,cnt,int(today))
+#     if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
+#         r.rename(key+":doc:tms:bak",key+":doc:tms")
+#     today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
+#     cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
+#     if cnt>0:
+#         r.zadd(channel_cnt_key,cnt,int(today))
 ################ 统计信息  over ############################
             
     r.hset(key, "last_update", time.time())  # 更新本操作时间  
     r.hset(key, "removecnt", 0)  # 更新本操作时间  
     return SUCCESS
-            
+
 
 def refreshBeacon(beaconusr, beaconid):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
@@ -971,7 +988,7 @@ def saveFulltextById(ids,retrycnt=0,url=""):
 #             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
 
 
-def saveDocsByUrl(urlstr): 
+def saveDocsByUrl(urlstr,docAsChannel=False): 
 #     start = time.clock() 
 #     udata = loadFromUrl(urlstr) 
 #     urlstop = time.clock()  
@@ -998,6 +1015,8 @@ def saveDocsByUrl(urlstr):
                     ids_lst.append(ids)
                     ids=""
                     cnt = 0
+                if docAsChannel:
+                    addBeacon("doc",getHashid(docid),docid,beaconname=doc["title"],tag="auto",headlineonly="1")
             else:
                 pass
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
@@ -1008,7 +1027,7 @@ def saveDocsByUrl(urlstr):
             pipedoc.hset("doc:"+docid,"title",title)
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
-            pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
+            pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
     #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
     #             pipedoc.hset("doc:"+docid,"host",doc["host"] )  
@@ -1034,7 +1053,32 @@ def saveDocsByUrl(urlstr):
         saveText(udata["headlines"],isheadline=True)
         
     return udata
- 
+
+def addBeacon(beaconusr,beaconid,beaconttl,beaconname="",desc="",beacontime="",mindoc="",tag="",headlineonly="0"):
+    logger.info("--addBeacon--"+beaconttl)
+    beaconname = beaconttl if beaconname=="" else beaconname
+    beacontime = getTime(time.time(),formatstr="%Y%m%d%H%M%S") if beacontime=="" else beacontime
+    mindoc = "0" if mindoc=="" else mindoc
+    
+    key = "bmk:" + beaconusr + ":" + beaconid
+    r.hset(key, "id", beaconid)
+    r.hset(key, "ttl", beaconttl)
+    r.hset(key, "name", beaconname)
+    r.hset(key, "desc", desc)
+    r.hset(key, "crt_usr", beaconusr)
+    r.hset(key, "crt_tms",  long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))) 
+    r.hset(key, "last_touch",0) 
+    r.hset(key, "last_update",0) 
+    r.hset(key, "cnt",0) 
+    r.hset(key, "mindoc",mindoc) 
+    r.hset(key, "tag",tag) 
+    r.hset(key, "headlineonly",headlineonly) 
+    
+    r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)
+    r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
+    r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
+    r.zadd("bmk:doc:share:bynews",time.time() , beaconusr + "|-|" + beaconid)
+        
 def subDocText(s):
 #    us=unicode(s,"utf8")
 #    return s

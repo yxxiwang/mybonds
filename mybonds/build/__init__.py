@@ -235,9 +235,7 @@ def conceptChannelHash(op="show"):
             
     cpstocklst = sorted(cpstocklst)
     print """ "%s":'''%s''', """ % ("cp990999",",".join(cpstocklst))
-            
-    
-    
+
 def initBeaconDisplayName():
     """初始化频道的 显示名称 为频道名称"""
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
@@ -246,6 +244,28 @@ def initBeaconDisplayName():
         key = "bmk:%s:%s" % (beaconusr,beaconid)
         r.hset(key,"name",r.hget(key,"ttl"))
 
+def exportkey(pattan="*"):
+    """按照redis的key的模糊匹配规则 导出相应的数据 为command (暂时只支持zset与hash 两种类型数据)"""
+#     print pattan
+    import redis
+    r = redis.StrictRedis()
+    for rkey in r.keys(pattan):
+#         print rkey
+        if r.type(rkey) == "hash":
+            for data in r.hgetall(rkey).iteritems():
+                print "hset %s %s %s " % (rkey,data[0],data[1])
+        elif r.type(rkey) =="zset":
+            for data,score in r.zrevrange(rkey,0,-1,withscores=True):
+                print "zadd %s %d %s" % (rkey,score,data)
+        elif r.type(rkey) =="list":
+            for data in r.lrange(rkey, 0, -1):
+                print "rpush %s %s" % (rkey,data)
+        elif r.type(rkey) == "string":
+            print "set %s %s" % (rkey,data)
+        elif r.type(rkey) == "set":
+            for data in r.smembers(rkey):
+                print "sadd %s %s" % (rkey,data)
+        
 def deleteUser(username=""):
     if username=="":
         return "username is null!"
@@ -304,7 +324,69 @@ def loginAndDo(parms=[]):
     url = urlOpener.open('http://localhost:8000/news/sfllowbeacon/?u=wang9529&fllwopt=add&beaconid=1108470809&beaconusr=rd')
     page = url.read(200000)
     print page
+    
+def getTime(tms):
+    """ return the converted date & time 'yyyy-mm-dd hh:mm:ss' by input tms """
+    addtimezone=False
+    formatstr="%Y-%m-%d %H:%M:%S"
+    if type(tms).__name__ == "str":
+        if tms=="":
+            tms="0"
+        tms=float(tms) 
+    try:
+        if addtimezone:
+            tms=tms+3600*8
+        tdate = dt.datetime.fromtimestamp(tms).strftime(formatstr)
+    except:
+        print "Attembrough: i use getDate(%s,formatstr=%s) but it's report error..." % (tms,formatstr)
+        traceback.print_exc()
+        print "" 
+    else:
+        print tdate
+
+def getUnixTime(tstr):
+    """return unix timestamp input mustbe yyyymmdd"""
+    rt = 0
+    formatstr='%Y%m%d'
+    try:
+       rt = time.mktime(dt.datetime.strptime(tstr, formatstr).timetuple())
+    except:
+        print "Attembrough: i use getUnixTimestamp(%s) but it's report error..." % (tstr) 
+        traceback.print_exc()
+        print 0
+    else:
+        print rt
+    
+def plotshow():
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    r1 = 26.56 # GPS radius
+    r2 = 6.371 # Earth radius
+    
+    theta = np.linspace(0, 360, 361) / 180. * np.pi # angles of plotting points
+    
+    # Polar coordinate to Cartesian coordinate
+    x1 = r1*np.cos(theta)
+    y1 = r1*np.sin(theta)
+    
+    x2 = r2*np.cos(theta)
+    y2 = r2*np.sin(theta)
+    
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    ax.set_aspect("equal")
+    
+    plt.plot(x1, y1, color="red", label="GPS")
+    plt.plot(x2, y2, color="blue", label="Earth")
+    
+    plt.title("Earth and GPS orbit, unit: 1000 km")
+    
+    plt.legend()
+    
+    plt.show()
         
+
 def reflect(functionname,parms=""):
     function = globals()[functionname]
     if parms =="":

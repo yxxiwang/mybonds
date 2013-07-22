@@ -679,7 +679,7 @@ def refreshDocs(beaconusr, beaconid,force=False):
     if r.hget(key,"ttl").isdigit():#说明频道本身原来是新闻,docAsChannel 则为False
         udata = saveDocsByUrl(urlstr,docAsChannel=False)
     else:
-        udata = saveDocsByUrl(urlstr,docAsChanne=True)
+        udata = saveDocsByUrl(urlstr,docAsChannel=True)
     
     if udata.has_key("channels"):
         r.hset(key, "channels", ",".join(udata["channels"]) )

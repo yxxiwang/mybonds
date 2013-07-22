@@ -109,8 +109,33 @@ def cleanChannelCnt(op="print"):
         if not r.exists(bkey):
             print "%s is not exists with %s !" % (bkey,bstr)
             if op=="delete":
-                r.delete(bstr)
+                r.delete(bstr) 
+                
+def cleanDocChannel(op="print"):
+    """ 清理由热点新闻所建立频道,并将其从用户的关注列表中清理掉."""
+    def deleteBeacon(beaconusr,beaconid):            
+        r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid)
+        r.zrem("bmk:doc:share:byfllw",beaconusr+"|-|"+beaconid) 
+        r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid) 
+        r.zrem("usr:" + beaconusr+":fllw",beaconusr+"|-|"+beaconid)
+        r.delete("channel:"+beaconusr+":"+beaconid+":doc_cts")
+        key = "bmk:"+beaconusr+":"+beaconid
+        for usr in r.smembers(key+":fllw"):
+            r.zrem("usr:" + usr+":fllw",beaconusr+"|-|"+beaconid)
+        r.delete(key + ":doc:tms")
+        r.delete(key + ":fllw")
+        r.delete(key)
+    ###########deleteBeacon is over######################
+    for bstr in r.zrevrange("bmk:doc:share",0,-1):
+        bkey = "bmk:"+bstr.replace("|-|",":")
+        ttl = r.hget(bkey,"ttl") 
+        if ttl is None or (ttl.isdigit() and len(ttl)>6 ):
+            print "%s ---> %s" % (bkey,ttl)
+            if op=="delete" :
+                deleteBeacon(bstr.split("|-|")[0],bstr.split("|-|")[1])
+                rdoc.delete("doc:"+ttl)
             
+    
 def cleanBeacon(op="print"):
     """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""
 #     for bstr in r.zrevrange("bmk:doc:share",0,-1):
@@ -355,37 +380,7 @@ def getUnixTime(tstr):
         traceback.print_exc()
         print 0
     else:
-        print rt
-    
-def plotshow():
-    import numpy as np
-    import matplotlib.pyplot as plt
-    
-    r1 = 26.56 # GPS radius
-    r2 = 6.371 # Earth radius
-    
-    theta = np.linspace(0, 360, 361) / 180. * np.pi # angles of plotting points
-    
-    # Polar coordinate to Cartesian coordinate
-    x1 = r1*np.cos(theta)
-    y1 = r1*np.sin(theta)
-    
-    x2 = r2*np.cos(theta)
-    y2 = r2*np.sin(theta)
-    
-    fig = plt.figure()
-    ax = plt.subplot(111)
-    ax.set_aspect("equal")
-    
-    plt.plot(x1, y1, color="red", label="GPS")
-    plt.plot(x2, y2, color="blue", label="Earth")
-    
-    plt.title("Earth and GPS orbit, unit: 1000 km")
-    
-    plt.legend()
-    
-    plt.show()
-        
+        print rt 
 
 def reflect(functionname,parms=""):
     function = globals()[functionname]

@@ -29,6 +29,7 @@ urlpatterns = patterns("",
     url(r'^groupsave/$', 'mybonds.views.groupsave', name="groupsave"),
     url(r'^groupdelete/$', 'mybonds.views.groupdelete', name="groupdelete"),
     url(r'^character/$', 'mybonds.views.character', name="character"),
+    url(r'^test/$', 'mybonds.views.test', name="test"),
 
     (r'^bonds/', include('bonds.urls')),
     (r'^news/', include('geeknews.urls')), 

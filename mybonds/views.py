@@ -300,6 +300,25 @@ def buddyhold(request):
         return HttpResponse("ok")
         
 
+def test(request, template_name="beacon/test.html"):
+    bkcolor = request.GET.get("bkcolor", "#f5f5f5") 
+    lineheight = request.GET.get("lineheight", "8.5px") 
+    fontsize = request.GET.get("fontsize", "18.5px") 
+    padding = request.GET.get("padding", "0px 9px 0px 9px") 
+    fontcolor = request.GET.get("fontcolor", "red") 
+    fontfamily = request.GET.get("fontfamily", """"Arial Hebrew","Microsoft Yahei","Luxi Sans","Helvetica Neue", "DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;""")
+    font = request.GET.get("font", "18.5px/1.8 Arial,\5FAE\8F6F\96C5\9ED1,\82F9\679C\4E3D\4E2D\9ED1;")
+    print fontsize,padding,bkcolor
+    return render_to_response(template_name, { 
+        'bkcolor': bkcolor,
+        'lineheight': lineheight,
+        'fontsize': fontsize,
+        'padding':padding,
+        'fontcolor':fontcolor,
+        'fontfamily':fontfamily,
+        'font':font,
+    }, context_instance=RequestContext(request))  
+
 @login_required
 def groupdelete(request, template_name="beacon/group_list.html"): 
     username = getUserName(request)

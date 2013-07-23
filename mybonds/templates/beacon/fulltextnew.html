@@ -1,27 +1,83 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html class="no-js" lang="zh-CN" dir="ltr"><!--<![endif]-->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+    <title>指极星</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  {% extends 'beacon/admin.html' %}
+    <!-- Le styles -->
+    <link href="/site_media/static/css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="/site_media/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/site_media/static/news/jquery.fancybox.css">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet/less" href="/site_media/static/less/bootstrap.less">
+    <!--script src="/site_media/static/js/less-1.3.0.min.js"></script-->
+    <style>
+        body {
+          padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+          /*行间距
+            line-height:{{lineheight}}; 
+            -webkit-text-size-adjust: 100%;*/ 
+          /*背景色 ,可以是简单的red,black之类的颜色描述,也可以是 #f5f5f5 这样的颜色代码*/
+            background-color: {{tempparmsobj.bkcolor}};
+        }
+
+        .fulltext p  {
+          /*字体大小*/
+            font-size: {{tempparmsobj.fontsize}};
+          /* 边距定义: 依次定义:上 右 下 左 的边距  eg: 0px 9px 0px 9px */
+            padding: {{tempparmsobj.padding}};
+            /*字体颜色定义 可以是简单的red,black之类的颜色描述,也可以是 #f5f5f5 这样的颜色代码*/
+            color: {{tempparmsobj.fontcolor}};
+            /*中西文字体定义(第一个为微软雅黑)
+            font-family:"Arial Hebrew","Microsoft Yahei","Luxi Sans","Helvetica Neue", "DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;*/
+            {% if tempparmsobj.fontfamily %}
+            font-family:{{tempparmsobj.fontfamily}};
+            {% endif %}
+
+            {% if font %}
+            /*font:1.8 Arial,\5FAE\8F6F\96C5\9ED1,\82F9\679C\4E3D\4E2D\9ED1;
+            font:{{font}}*/
+            {% endif %}
+        }
+    </style>
+    
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body> 
+    
 
     
 {% block navbar %} 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container-fluid">
-          <!--a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a-->
+        <div class="container-fluid"> 
           <div class="nav-collapse collapse row-fluid">
           <div class="span3">
           </div>
           <div class="span8">
             <ul class="nav"> 
-              <li><a class="brand" href="/news/"><img class="img-rounded" src="/site_media/static/news/logo1x.png" alt="指极星"></a></li>
-              <li><a href="/news/beaconnews" title="灯塔阅读"><h5 style="color:white;margin-top: 3px;font-size: 13px;">灯塔阅读</h5></a></li> 
-              <!--li><a href="/news/?o=ppl" title="今日热点"><h5 style="margin-top: 3px;font-size: 13px;">今日热点</h5></a></li> 
-              <li><a href="/news/?o=rdd" title="我的足迹"><h5 style="margin-top: 3px;font-size: 13px;">我的足迹</h5></a></li--> 
+              <li><a class="brand" href="/news/beaconnews"><img class="img-rounded" src="/site_media/static/news/logo1x.png" alt="指极星"></a></li>
+              <li><a href="/news/beaconnews" title="灯塔阅读"><h5 style="color:white;margin-top: 3px;font-size: 13px;">灯塔阅读</h5></a></li>  
             </ul><p class="navbar-text pull-right">{{user.username}}</a>&nbsp;&nbsp; <a href="/apply/logout">离开</a></p> 
-          </div> 
+          </div>
           <div class="span1">
           </div>
 
@@ -32,201 +88,22 @@
 {% endblock %}
 
   {% block content %} 
-  <div class="container-fluid"> 
-  	<div class="row-fluid">
-
-      <div class="span12">
-        <!--div class="row-fluid">
-          <div class="span2" style="border-style: dotted;border-width:0px;border-color:#CBDEF1;"> 
-          </div>
-            <div id="beacon-container" class="beacon-container row span9" style="border-bottom-style: dotted;border-width:1px;border-color:#CBDEF1;">
-
-            </div> 
-        </div--><!-- /row-fluid -->
-  
-        <div class="row-fluid"><!-- 左边  -->
-          <div class="span3" style="border-style: dotted;border-width:0px;border-color:#CBDEF1;">
-            <div class="span12" style="margin-left:0px;">
-              <div class="well_wxi span12"  style="margin-left:0px;">
-             <span id='' name='{{user.username}}' class="label label-wxi" style="font-size: 13px;"><strong> 全部灯塔  <span class="badge badge-info">{{myfllw_list|length}}</span></strong></span>
-              </div>  
-             <!--ul class="pager">
-              <li class="previous"><a href="#">Previous</a></li>
-              <li><a href="#">Next</a></li>
-            </ul-->
-            </div> 
-            {% for beacon in myfllw_list %}
-              <div class="well_wxi span12"  style="margin-left:0px;">
-                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi" style="font-size: 13px;">{{beacon.ttl}}</span>
-                   <span class="badge-wxi"><abbr title="文章数">{{beacon.cnt}}</abbr></span>
-                   <span class="badge-wxi-green"><abbr title="建设者">{{beacon.crt_usr}}</abbr></span>
-                  &nbsp;<a class="heartremove" href="/news/beaconnews/?orderby={{orderby}}&heartopt=remove&heartid={{beacon.id}}&heartusr={{beacon.crt_usr}}"  rel="tooltip" title="取消收集" style="float:right;"  ><button class="badge badge-info" type="button">-</button></a>
-              </div>  
-            {% endfor %}  
-            {% if mybeacons %}
-            <div class="span12" style="margin-left:0px;">
-             <strong> 我发现的灯塔  <span class="badge-wxi">{{mybeacons|length}}</span></strong>
-            </div> 
-            {% for beacon in mybeacons %}
-              <div class="well_wxi span12"  style="margin-left:0px;">
-                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi" style="font-size: 13px;">{{beacon.ttl}}</span>
-                   <span class="badge-wxi"><abbr title="文章数">{{beacon.cnt}}</abbr></span>
-                   <span class="badge-wxi-green"><abbr title="建设者">{{beacon.crt_usr}}</abbr></span>
-              </div>  
-            {% endfor %}    
-            {% endif %} 
-        <div class="span12 ">  
-        </div> 
-
-          <div id="list_greeting" class="well_wxi span12 " style="margin-left:0px;">   
-            {% for greeting in greetings %}
-            {% if greeting.act == "beacon_save" %}
-            <span style="color:green;">&nbsp;{{greeting.usr}}&nbsp;</span>
-            <span style="color:black;">正在建设灯塔 </span>
-            <span style="color:blue;">&nbsp;{{greeting.o}}&nbsp;</span>
-            <span style="color:black;">-&nbsp;{{greeting.tms}}&nbsp;</span> <br>
-            {% elif greeting.act == "apply" %}  
-            {% elif greeting.act == "apply" %}  
-            <span style="color:black;">欢迎新用户 </span>
-            <span style="color:green;">&nbsp;{{greeting.o}}&nbsp;</span>
-            <span style="color:black;">-&nbsp;{{greeting.tms}}&nbsp;</span> <br>
-            {% else %} 
-            {% endif %} 
-            {% endfor %}
-          </div>
-
-          </div>
-
-          <div class="span6"><!-- 中间灯塔similar文档 -->
-            <div class="span12" style="margin-left:0px;">
-            </div>
-            {% for doc in udata.docs %}
-            <div class="span12" style="margin-left:0px;">
-            <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
-             <p style="font-size: 13px;"><a target="_blank" href="{{doc.url}}"><strong>{{doc.title}}</strong>&nbsp;&nbsp;</a>
-              {% if username == "ltb" %}
-              {% if beaconid %}
-              <a class="docremove" href="/newsvc/removedocfromchannel/?o=page&docid={{doc.docid}}&beaconid={{beaconid}}&beaconusr={{beaconusr}}"  rel="tooltip" title="移除文档" style="float:right;"  >
-                <button class="badge badge-info" type="button">-</button>
-              </a>
-              {% endif %}
-              {% endif %}</p>
-             <p ><small>{{doc.domain}}&nbsp;  {{doc.create_time}}&nbsp; <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
-             </small></p> 
-              {{doc.text}}
-               <!--br><br>{{doc.tx}} <br-->
-            </blockquote> 
-            </div>
-            {% endfor %}          
-          </div>
-
-          <div class="control-group span3" id="beacon-box">   
-            <div class="span12" style="margin-left:0px;"> 
-              {% if beacon_search %}
-              <strong>已经被发现的灯塔  <span class="badge badge-info">{{beacon_search|length}}</span> </strong>
-               {% else %}  
-              <strong>已经被发现的灯塔  <span class="badge badge-info">{{sharebeacons|length}}</span> </strong>
-               {% endif %}  
-            </div> 
-            <div class="input-append span12" style="margin-left:0px;">
-              <input class="span9" id="beaconsearch" type="text">
-              <button class="btn btn-primary" id="search_btn" type="button" data-loading-text="搜索中">搜索</button> </a>
-            </div> 
-
-            <div class="row-fluid"> 
-              <div class="btn-group">
-                <button id="orderby_news" class="btn btn-info">最多新闻</button>
-                <button id="orderby_flls" class="btn btn-info">最多收集</button>
-                <button id="orderby_tms" class="btn btn-info">最新发现</button>
-              </div>
-            </div>
-
-            <div class="span12" style="margin-left:0px;border-style: dotted;border-width:1px;border-color:#CBDEF1;"> 
-            {% if beacon_search %}
-              {% for beacon in beacon_search %}
-              <div class="well_wxi span12 "  style="margin-left:0px;"> 
-                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi"  style="font-size: 13px;">{{beacon.ttl}}</span>
-                  <p style="font-size: 12px;">{{beacon.desc}}</p>
-                   <span class="badge-wxi"><abbr title="文章数">{{beacon.cnt}}</abbr></span>
-                  &nbsp;<a class="heartadd" href="/news/beaconnews/?orderby={{orderby}}&heartopt=add&heartid={{beacon.id}}&heartusr={{beacon.crt_usr}}"  rel="tooltip" title="收集灯塔" style="float: right;"  ><button class="badge badge-info" type="button">+</button></a>
-              </div>
-              {% endfor %}    
-            {% else %}     
-              {% for beacon in sharebeacons %}
-              <div class="well_wxi span12 "  style="margin-left:0px;"> 
-                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi"  style="font-size: 13px;">{{beacon.ttl}}</span>
-                  <!--p style="font-size: 12px;">{{beacon.desc}}</p-->
-                   <span class="badge-wxi"><abbr title="文章数">{{beacon.cnt}}</abbr></span>
-                   <span class="badge-wxi-green"><abbr title="建设者">{{beacon.crt_usr}}</abbr></span>
-                  &nbsp;<a class="heartadd" href="/news/beaconnews/?orderby={{orderby}}&heartopt=add&heartid={{beacon.id}}&heartusr={{beacon.crt_usr}}"  rel="tooltip" title="收集灯塔" style="float: right;"  ><button class="badge badge-info" type="button">+</button></a>
-              </div>
-              {% endfor %} 
-
-            {% endif %}     
-            </div>
-
-          </div>
-        </div><!-- /row-fluid -->
-      </div><!-- /span10 -->
+<div class="container-fluid span12"> 
+	<div class="row-fluid">
+    <div class="fulltext">
+    {% for ftx in ftxlist %}
+    <p class="lead" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ftx}}  
+    {% endfor %}
+  </div> <!-- fulltext -->
   </div> <!-- /row-fluid -->
 
- </div> <!-- /container -->
- 
-
+</div> <!-- /container --> 
 {% endblock %} 
+
 {% block script %} 
 <script > 
-  var beacons = ""
-  var delete_beacon = ""
-  var delete_id =""
-  var tag_unchk = new Array()
-  var doc_unchk = new Array()
-
-  // $("#beacon_desc").keydown(function(event){ 
-  //   if(event.keyCode==13 )
-  //         window.location.href = '/news/savebeacon/?similarid={{similarid}}&beacon='+$(this).text() ;
-  // })
-
-  $('#{{beaconid}}').attr('class', 'label label-wxi-selected');
-
-  beacon_proc = function() {
-      $tag_list_box = $('div.beacon-container');
-      $('.label').css('cursor', 'pointer');
-      $('.label').click(function(){
-        if($(this).attr('class')=='label label-info'){
-          // $(this).attr('class', 'label label-info');
-        }else{ 
-          $(this).attr('class', 'label label-wxi-selected');  
-          window.location.href = '/news/beaconnews/?orderby={{orderby}}&beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name') ;
-        } 
-      });
-  }
- 
-  beacon_proc();
-  
-  $('#orderby_tms').click(function(){ 
-    // $(this).button('loading');
-    window.location.href = encodeURI('/news/beaconnews/?orderby=tms&beaconid={{beaconid}}&beaconusr={{beaconusr}}'); 
-  });
-  $('#orderby_flls').click(function(){ 
-    // $(this).button('loading');
-    window.location.href = encodeURI('/news/beaconnews/?orderby=fllw&beaconid={{beaconid}}&beaconusr={{beaconusr}}'); 
-  });
-  $('#orderby_news').click(function(){ 
-    // $(this).button('loading');
-    window.location.href = encodeURI('/news/beaconnews/?orderby=news&beaconid={{beaconid}}&beaconusr={{beaconusr}}'); 
-  });
-
-
-  $("#beaconsearch").keydown(function(event){ 
-    if(event.keyCode==13 )
-     window.location.href = encodeURI('/news/beaconnews/?beaconname='+$('#beaconsearch').val().trim());
-  })
-  
-  $('#search_btn').click(function(){
-    // if($('#beaconsearch').val()=="") return;
-    $(this).button('loading');
-    window.location.href = encodeURI('/news/beaconnews/?beaconname='+$('#beaconsearch').val().trim()); 
-  });
 </script>
 {% endblock %}
+
+</body>
+</html>

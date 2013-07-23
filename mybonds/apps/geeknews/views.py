@@ -1,24 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*- 
 from django.http import HttpResponse
-from django.template import Context, loader
-from django.template import RequestContext
+from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponseRedirect
-from django.http import HttpResponseNotFound  
-import json, urllib2, urllib
-import csv, string,re
-import sys, time
-import redis
-import numpy
+from django.http import HttpResponseRedirect, HttpResponseNotFound
+import json, urllib2, urllib, redis
+import csv, string, re, sys, time, numpy
 from django.core import urlresolvers
 from django.contrib.auth.decorators import login_required, permission_required
-#import mybonds.apps.geeknews.daemonProcess as daemonProcess
 from django.template.defaultfilters import length
-
 from mybonds.apps.newspubfunc import *
 from mybonds.apps.geeknews import *
+# import mybonds.apps.geeknews.daemonProcess as daemonProcess
 
 
 def index(request): 
@@ -44,24 +38,24 @@ def index(request):
     return HttpResponseRedirect("/news/" + flagname + "/?o=" + otype) 
 
 @login_required
-def init(request,oper): 
+def init(request, oper): 
     def init_bmk_fllwkeys():
-        fllwkeys =r.keys("bmk:*:fllw")
+        fllwkeys = r.keys("bmk:*:fllw")
         print fllwkeys
         for fllwkey in fllwkeys:
-            bmk,usr,id,fllw = fllwkey.split(":")
-            print bmk,usr,id,fllw 
+            bmk, usr, id, fllw = fllwkey.split(":")
+            print bmk, usr, id, fllw 
             print r.scard(fllwkey)
-            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),usr+"|-|"+id)
+            r.zadd("bmk:doc:share:byfllw", r.scard(fllwkey), usr + "|-|" + id)
     def init_bmk_newskey():
-        keystrs = r.zrevrange("bmk:doc:share",0,-1)
+        keystrs = r.zrevrange("bmk:doc:share", 0, -1)
         for keystr in keystrs:
-            usr,id = keystr.split("|-|")
-            cnt = r.hget("bmk:"+usr+":"+id,"cnt") if r.hget("bmk:"+usr+":"+id,"cnt") is not None else 0
-            r.zadd("bmk:doc:share:bynews",cnt,keystr)
-    if oper=="init_bmk_fllwkeys":
+            usr, id = keystr.split("|-|")
+            cnt = r.hget("bmk:" + usr + ":" + id, "cnt") if r.hget("bmk:" + usr + ":" + id, "cnt") is not None else 0
+            r.zadd("bmk:doc:share:bynews", cnt, keystr)
+    if oper == "init_bmk_fllwkeys":
         init_bmk_fllwkeys()
-    elif oper=="init_bmk_newskey":
+    elif oper == "init_bmk_newskey":
         init_bmk_newskey()
     return HttpResponse("ok")
     
@@ -69,26 +63,6 @@ def init(request,oper):
 @login_required
 def test(request):
     print "---------geeknews/test---------"
-    #otype = request.GET.get("o", "all")
-#    if otype == "tag" or otype == "all":
-#        for i in range(r.llen("queue:tag:error")):
-#            qobj = r.rpoplpush("queue:tag:error", "queue:tag")
-#    if otype == "ppl" or otype == "all":
-#        for i in range(r.llen("queue:ppl:error")):
-#            qobj = r.rpoplpush("queue:ppl:error", "queue:ppl")
-#    if otype == "rcm" or otype == "all":
-#        for i in range(r.llen("queue:rcm:error")):
-#            qobj = r.rpoplpush("queue:rcm:error", "queue:rcm")
-#    t = loader.get_template('test.html')   
-#    a=u'\u5965\u5df4\u9a6c'
-#    print a 
-#    username = getUserName(request.user) 
-#    c = Context({   
-#        "otype":otype,
-##        "user":request.user,
-#        "otypes": ["on", "", "", "", "", ""],
-#    })
-#    return HttpResponse(t.render(c))
     return HttpResponse("ok")
 
 @login_required
@@ -142,532 +116,79 @@ def feedbackform(request):
     """
     return HttpResponse(rtstr)
 
-def research(request):
-    # foward request to backend
-#    username = request.GET.get("u", "")
-    username = request.GET.get("u", getUserName(request))
-    likeid = request.GET.get("likeid", "")
-    relatedid = request.GET.get("relatedid", "")
-    url = request.GET.get("url", "")
-    title = request.GET.get("title", likeid) 
-    
-    quantity = log_typer(request, "reserch", title)
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-#    otype = request.GET.get("t", "")
-    
-    if url != "":
-        if likeid != "":
-            pushQueue("read", username, "ppl", "", similarid=likeid)
-        return HttpResponseRedirect(url)
-    else:
-        url="http://www.9cloudx.com"
-
-    if likeid != "":
-        url = rdoc.hget("doc:" + likeid, "url")
-        if url == "" or url is None:
-            return HttpResponse('<h1>亲,你想要访问的页面正在建设中..</h1>')
-            
-        keyid = "usr:" + username + ":rdd"
-        r.zadd(keyid + ":tms", time.time(), likeid)  # 更新用户的已读最新文章时间
-        r.lpush(keyid + ":lst", likeid)
-        r.sadd(keyid, likeid)  # 用户&已读文章关联
-#        r.srem("usr:" + username + ":rcm", likeid)# 从推荐列表中移除 
-        tags = r.smembers("doc:" + likeid + ":tag")
-        for tag in tags:
-            r.zadd(keyid + ":tag", int(time.time()), tag)
-        
-#        url = "http://www.gxdx168.com/research?u=" + username + "&likeid=" + likeid
-#        return HttpResponseRedirect(url) 
-        pushQueue("read", username, "research", "", similarid=likeid)
-#        print url
-    return HttpResponseRedirect(url)  
-
 @login_required
-def overview(request):
-    print "---------geeknews/overview---------"
-    quantity = log_typer(request, "ppl", "none")
+def research(request,template_name="beacon/fulltextnew.html"): 
+    username = getUserName(request) 
+    docid = request.GET.get("docid", "")
+    name = r.hget("doc:"+docid,"name")
+    quantity = log_typer(request, "reserch", name)
     if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>') 
-    otype = request.GET.get("o", "0") 
     
-#    #转向bootstrap页面
-#    return HttpResponseRedirect("/news/todaynews/")
-        
-    t = loader.get_template('geeknews.html')  
-    userobj = request.user
-    username = getUserName(request) 
-    userobj.username = username    
-    request.session["otype"] = otype
-    
-    rt = checkUptime(username, otype, 50)  # 推送更新标签到队列
-    if rt != 0 or getOtype(otype) == "":
-        return HttpResponse('<h1>亲,别像猴子一样在浏览器里乱敲地址..</h1>')
-    
-    tags = r.lrange("usr:" + username + ":" + otype + ":taglst" , 0, 9)
-    tags1 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 10, 19)
-    tags2 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 20, 29) 
-    tags3 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 30, 39) 
-    tags4 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 40, 49) 
-    c = Context({
-        "list_tags": tags,
-        "list_tags1": tags1,
-        "list_tags2": tags2,
-        "list_tags3": tags3,
-        "list_tags4": tags4,
-        "user": userobj,
-        "otype":otype,
-#        "greetings":getGreeting(),
-        "otypes": ["on", "", "", "", "", ""],
-    })
-    request.session.set_test_cookie()
-#    print request
-    return HttpResponse(t.render(c))
-
-@login_required
-def history(request):
-    print "---------geeknews/history---------"
-    quantity = log_typer(request, "rdd", "none") 
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-    
-    otype = request.GET.get("o", "rdd")
-    t = loader.get_template('geeknews.html')  
-    userobj = request.user
-#    username = getUserName(userobj)
-    username = getUserName(request) 
-    userobj.username = username    
-    request.session["otype"] = otype
-    rt = checkUptime(username, otype, 50)  # 推送更新标签到队列
-    if rt != 0 or getOtype(otype) == "":
-        return HttpResponse('<h1>亲,别像猴子一样在浏览器里乱敲地址..</h1>')
-        
-    tags = r.lrange("usr:" + username + ":" + otype + ":taglst" , 0, 9)
-    tags1 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 10, 19)
-    tags2 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 20, 29)
-    tags3 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 30, 39) 
-    tags4 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 40, 49) 
-        
-    c = Context({
-        "list_tags": tags,
-        "list_tags1": tags1,
-        "list_tags2": tags2,
-        "list_tags3": tags3,
-        "list_tags4": tags4,
-        "user": userobj,
-        "otype":otype,
-        "greetings":getGreeting(),
-        "otypes": ["", "", "", "", "", "on"],
-    })
-    return HttpResponse(t.render(c))
-    
-@login_required
-def navi(request, template_name="geeknews.html"):
-    print "---------geeknews/foucs---------"
-    quantity = log_typer(request, "nav", "none") 
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-    
-    otype = request.GET.get("o", "nav")
-#    t = loader.get_template('geeknews.html')  
-    userobj = request.user
-#    username = getUserName(userobj)
-    username = getUserName(request) 
-    userobj.username = username
-    request.session["otype"] = otype
-    
-    tags = [] 
-    rt = checkUptime(username, otype, 35)  # 推送更新标签到队列
-    if rt != 0 or getOtype(otype) == "":
-        return HttpResponse('<h1>亲,别像猴子一样在浏览器里乱敲地址..</h1>') 
-    tags = r.lrange("usr:" + username + ":" + otype + ":taglst" , 0, 6)
-    tags1 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 7, 13)
-    tags2 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 14, 20)
-    tags3 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 21, 27) 
-    tags4 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 28, 34) 
-        
+    fulldoc = tftxs.find_one({"_id":docid})
+    if fulldoc is not None:
+        print fulldoc
+        ftxlist = fulldoc["fulltext"] 
+        url = fulldoc["urls"][0].split(",")[1]
+    else:
+        doc = rdoc.hgetall("doc:"+docid)
+        ftxlist = [].append(doc["text"])
+        url = doc["url"]
     return render_to_response(template_name, {
-        "list_tags": tags,
-        "list_tags1": tags1,
-        "list_tags2": tags2,
-        "list_tags3": tags3,
-        "list_tags4": tags4,
-        'current_path': '/news/recomm/?o=rcm',
-        "user": userobj,
-        "otype":otype,
-        "greetings":getGreeting(),
-        "otypes": ["", "", "", "on", "", ""],
-    }, context_instance=RequestContext(request))
+        'ftxlist': ftxlist, 
+        'url': url,
+        'tempparmsobj':r.hgetall("tempparms"),
+    }, context_instance=RequestContext(request))    
 
-@login_required
-def recomm(request, template_name="geeknews.html"):
-    print "geeknews/recomment" 
-    quantity = log_typer(request, "rcm", "none") 
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
+# @login_required
+# def overview(request):
+#     print "---------geeknews/overview---------"
+#     pass
+
+# @login_required
+# def history(request):
+#     print "---------geeknews/history---------"
+#     pass
     
-    otype = request.GET.get("o", "rcm") 
-    last = request.GET.get("last", "0")
-    userobj = request.user
-#    username = getUserName(userobj)
-    username = getUserName(request) 
-    userobj.username = username
-    request.session["otype"] = otype
+# @login_required
+# def navi(request, template_name="geeknews.html"):
+#     print "---------geeknews/foucs---------"
+#     pass
+
+# @login_required
+# def recomm(request, template_name="geeknews.html"):
+#     print "geeknews/recomment" 
+#     pass
+#     
+# 
+# @login_required
+# def tagdoc(request, tag, template_name="geeknews.html"):  # 获得某个标签的关联标签信息
+#     print "geeknews/tagdoc" 
+#     pass
+
+# @login_required
+# def load_seeds(request):
+#     pass
      
-    tags = []
-    
-    rt = checkUptime(username, otype, 50)  # 推送更新标签到队列
-    if rt != 0 or getOtype(otype) == "":
-        return HttpResponse('<h1>亲,别像猴子一样在浏览器里乱敲地址..</h1>')
-    
-    tags = r.lrange("usr:" + username + ":" + otype + ":taglst" , 0, 9)
-    tags1 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 10, 19)
-    tags2 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 20, 29)
-    tags3 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 30, 39) 
-    tags4 = r.lrange("usr:" + username + ":" + otype + ":taglst" , 40, 49) 
-        
-    return render_to_response(template_name, {
-        "list_tags": tags,
-        "list_tags1": tags1,
-        "list_tags2": tags2,
-        "list_tags3": tags3,
-        "list_tags4": tags4,
-        'current_path': '/news/recomm/?o=rcm',
-        "onday":last,
-        "user": userobj,
-        "otype":otype,
-        "greetings":getGreeting(),
-        "otypes": ["", "", "on", "", "", ""],
-    }, context_instance=RequestContext(request))
-    
+# @login_required
+# def retriveData(request):
+#     pass
 
-@login_required
-def tagdoc(request, tag, template_name="geeknews.html"):  # 获得某个标签的关联标签信息
-    print "geeknews/tagdoc" 
-    quantity = log_typer(request, "tag", tag)
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-
-#    username = request.session['username']
-    otype = request.GET.get("o", "ppl") 
-    last = request.GET.get("last", "0")
-#    otype = request.session['otype']) 
-    userobj = request.user 
-    username = getUserName(request) 
-    userobj.username = username
-    request.session["otype"] = otype
-#    tag = request.GET.get("tag", "all")
-    if isinstance(tag, unicode): 
-        print "is unicode!"
-#        print tag.encode("utf8") 
-#        ltag = unicodedata.normalize('NFKD', tag).encode('ascii','ignore')
- 
-#    tag = unicode(tag.strip(codecs.BOM_UTF8), 'utf-8')
-#    print "username is %s,otype is %s,tag is %s" % (username, otype, tag)
-#    key = "tag:%s:%s" % (otype, tagid)  # usr:wxi:rcm:tag:10086 ... 
-#    print "tag's key==" + key
-#    if r.zrank(key, username) is None:  # 标签信息缓存中不存在 
-    tagid = getHashid(tag)
-    rt = checkTagUptime(username, otype, 50, tag, tagid)    
-    if rt != 0 or getOtype(otype) == "":
-        return HttpResponse('<h1>亲,别像猴子一样在浏览器里乱敲地址..</h1>')
-#    print tagid
-    keytms = "usr:%s:%s:tag:%s" % (username, otype, tagid)  # usr:wxi:rcm:tag:10086 ...
-    r.zadd("tag:" + otype, time.time(), username + ":" + tag)
-    r.zincrby("tag:" + otype + ":cnt", username + ":" + tag, 1)
-    
-#    docs = r.lrange(key, 0 , -1)  # 取出所有数据
-#    obj = buildJsonData(username,docs)
-    tags = r.lrange(keytms + ":taglst" , 0, 9)  # tag:z:ppl:35218736511:taglst
-    tags1 = r.lrange(keytms + ":taglst" , 10, 19)  # tag:z:ppl:35218736511:taglst
-    tags2 = r.lrange(keytms + ":taglst" , 20, 29)  # tag:z:ppl:35218736511:taglst
-    tags3 = r.lrange(keytms + ":taglst" , 30, 39)  # tag:z:ppl:35218736511:taglst
-    tags4 = r.lrange(keytms + ":taglst" , 40, 49)  # tag:z:ppl:35218736511:taglst
-#    print "tags len is %d,[%s]" % (len(tags), tag) 
-#    print keytms + ":taglst"
-    
-    if otype == "rcm":
-        otypes = ["", "", "on", "", "", ""]
-    elif otype == "ppl":
-        otypes = ["on", "", "", "", "", ""]
-    elif otype == "rdd":
-        otypes = ["", "", "", "", "", "on"]
-    elif otype == "nav":
-        otypes = ["", "", "", "on", "", ""]
-    else:
-        otypes = ["", "", "", "", "", "on"] 
-    return render_to_response(template_name, {
-        "list_tags": tags,
-        "list_tags1": tags1,
-        "list_tags2": tags2,
-        "list_tags3": tags3,
-        "list_tags4": tags4,
-        "ori_tag": tag,
-#        'current_path': request.get_full_path(),
-        'current_path':'/news/tagdoc/' + tag + '/?o=rcm',
-        "onday":last,
-        "user": userobj,
-        "otype":otype,
-        "otypes": otypes,
-    }, context_instance=RequestContext(request))
-    
-#@login_required
-#def load_similar(request):
-#    username = request.GET.get("u", getUserName(request))
-#    start = request.GET.get("start", "0")
-#    num = request.GET.get("num", "5")
-#    similarid = request.GET.get("similarid", "")
-#    if similarid != "":
-#        saveSimilarDocs([similarid]) 
-#        r.lpush("docsml:" + similarid + ":lst", similarid)
-#        docs = r.lrange("docsml:" + similarid + ":lst", 0 , -1)
-##        docs = docs[int(start): int(start) + int(num)]  
-#        obj = buildJsonData(username, docs)
-#        return HttpResponse(json.dumps(obj), mimetype="application/json")
-
-@login_required
-def load_seeds(request):
-#    user = request.GET.get("u", "ltb")
-    # if request.is_ajax(): 
-    otype = request.GET.get("t", "")
-    quantity = log_typer(request, "load_seeds", otype) 
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-    
-    start = request.GET.get("start", "0")
-    num = request.GET.get("num", "5")
-    last = request.GET.get("last", "0")
-    tag_id = request.GET.get("tag_id", "undefined")
-    order = request.GET.get("order", "undefined")
-    username = request.GET.get("u", getUserName(request))
-     
-#    r = redis.StrictRedis(host='localhost', port=6380, db=0)
-    keyid = "usr:" + username + ":" + otype
-    rddkey = "usr:" + username + ":rdd"
-    
-    if not (tag_id == "undefined" or tag_id == ""):  # 如果按照tag过滤
-        if isinstance(tag_id, unicode): 
-            print "==tag in load_seeds is unicode!"
-#            tag_id = tag_id.replace('%','\\') 
-            if not isAscii(tag_id):
-#                tag_id = "".join([ (len(i)>0 and unichr(int(i,16)) or "") for i in tag_id.split('%u') ])
-                tag_id = unescape(tag_id)
-#            print tag_id
-#            print repr(tag_id)
-#            tag_id=tag_id.encode("utf8") 
-#            print tag_id
-#            print repr(tag_id).encode("utf8")
-#        else:
-#            tag_id=tag_id.decode("utf8")
-        keyid = "usr:%s:%s:tag:%s" % (username, otype, getHashid(tag_id)) 
-#    if otype =="ppl":
-#        docs = r.zrevrange(keyid + ":zset", 0 , -1)  # 取出所有列表数据
-#    else:
-    docs = r.lrange(keyid + ":lst", 0 , -1)  # 取出所有列表数据
-#    if not otype == "rdd":  # 过滤掉阅读历史的数据
-#        docs = [doc for doc in docs if not r.sismember(rddkey, doc)]  
-#    if last != "0":  # 过滤出1天或者7天内的数据
-#        docs = [doc for doc in docs if dayDiff(rdoc.hget("doc:" + doc, "crt_tms")) <= int(last) ]  
- 
-    if isinstance(username, unicode): 
-        print "load_seed,keyid is: %s;docs len is :%d" % (keyid.encode("utf8"), len(docs))
-    else:
-        print "load_seed,keyid is: %s;docs len is :%d" % (keyid, len(docs))
-        
-    docs = docs[int(start): int(start) + int(num)] 
-    
-    if order == "withtag":  # 如果附带标签数据
-        checkUptime(username, otype, 10)  # 推送更新标签到队列
-        tags = r.lrange("usr:" + username + ":" + otype + ":taglst" , 0, 9)
-        obj = buildJsonData(username, docs, tags)
-    else:
-        obj = buildJsonData(username, docs)
-    # uobj = urllib2.urlopen('http://www.geekpark.net/ajax/load_seeds/?order=undefined&start=0&num=24&tt=1352271348055&t=')
-    # encoded = json.dumps(head_list)
-    # uobj.close()
-#    print request 
-    # udata = loadFromUrl('http://www.geekpark.net/ajax/load_seeds/?order=undefined&start=0&num=24&tt=1352271348055&t=')
-    response = HttpResponse(json.dumps(obj), mimetype="application/json")
-#    response = HttpResponse(json.dumps(obj))
-    return response
-     
-@login_required
-def retriveData(request):
-    print "geeknews/retriveData..."
-#    print request
-    otype = request.GET.get("o", "")
-    if otype == "":
-        return "otype is None!"  
-#    username = getUserName(request.user)    
-    username = getUserName(request)  
-    rt = saveDocs(username, otype) 
-    if rt == 0:
-        print "save data is ok"
-    else:
-        print "error----"
-    return HttpResponseRedirect("/news/?o=" + otype) 
-#  
-# def get_cast_list(request, poll_id):
-#    # return HttpResponse("You're looking at poll %s." % poll_id)
-#    head_list = [('Duration', 'CURRENT YLD', 'PREV YLD', 'CHANGE', '1 WK YLD', '1 MO YLD', '6 MO YLD'),
-#                 ('1-Month', '1.12', '0.22', '1.1', '1.1', '2.2', '2.1'),
-#                ];
-#    # writer = csv.writer(sys.stdout)
-#    writer = csv.writer(open("testcsv.data", 'w'))
-#    for item in head_list:
-#      writer.writerow(item)
-#
-#    response = HttpResponse()
-#    # response = HttpResponse(mimetype='text/csv')
-#    # response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
-#    writer = csv.writer(response)
-#
-#    reader = csv.reader(open("testcsv.data"), delimiter=",")
-#    # for title, year, director in reader:
-#    # print year, title
-#    # writer.writerow([year,title])
-#    for adr, acry, apry, cag, a1wy, a1my, a6my in reader:
-#      print adr, acry
-#      writer.writerow([adr, acry])
-#    return response
-
-@login_required
-def searchs(request, template_name="beacon/search_list.html"):
-    query = request.GET.get("query", "")
-    username = getUserName(request) 
-    if query == "": 
-        return render_to_response(template_name, {
-            'current_path': request.get_full_path(),
-        }, context_instance=RequestContext(request))
-#    query = urllib2.quote(query.encode("utf8"))
-#    query = to_unicode_or_bust(query)
-#    query = urllib2.quote(query.encode("utf8")) 
-    urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&length=1100&query=" + urllib2.quote(query.encode("utf8"))  
-    udata=getDataByUrl(urlstr)
-#    print urlstr
-#    start = time.clock() 
-#    udata = loadFromUrl(urlstr) 
-#    urlstop = time.clock()  
-#    diff = urlstop - start  
-##    print "loadFromUrl(%s) has taken %s" % (urlstr,str(diff))
-#    docs = []
-#    if udata.has_key("docs"):
-#        for doc in udata["docs"]:
-#            doc["id"] = getHashid(doc["url"])
-#            doc["create_time"] = timeElaspe(doc["create_time"])
-#            docs.append(doc)
-#        udata["docs"] = docs
-#    udata["docs"] = [procDoc(doc) for doc in udata["docs"] ]  
-    return render_to_response(template_name, {
-        'current_path': request.get_full_path(),
-#        'udata': udata["docs"][0]["title"],  
-        'udata': udata,
-        "query":query,
-    }, context_instance=RequestContext(request)) 
-
-@login_required
-def globaltag(request, template_name="beacon/related_list.html"):
-    globaltag = request.GET.get("globaltag", "") 
-    quantity = log_typer(request, "globaltag", globaltag)
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-    username = getUserName(request)
-    globaltag = urllib2.quote(globaltag.encode("utf8")) 
-    urlstr = "http://www.gxdx168.com/research/svc?globaltag=" + globaltag
-    
-    otype = request.GET.get("o", "")
-    if otype=="service":
-        udata=getDataByUrl(urlstr,True) 
-        start = request.GET.get("start", "0")
-        num = request.GET.get("num", "50")
-        tagnum = request.GET.get("tagnum", "10")
-        udata["docs"] = udata["docs"][int(start): int(start) + int(num)] 
-        udata["tags"] = udata["tags"][0: int(tagnum)] 
-        udata["total"] = str(udata["total"])
-        return HttpResponse(json.dumps(udata), mimetype="application/json")
-    
-    udata=getDataByUrl(urlstr)
-    return render_to_response(template_name, {
-        'udata': udata,
-        "user": request.user,
-    }, context_instance=RequestContext(request)) 
-    
-@login_required
-def todaynews(request, template_name="beacon/related_list.html"):
-    otype = request.GET.get("o", "")
-    quantity = log_typer(request, "todaynews", "今闻观止")
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>') 
-    username = getUserName(request)
-    urlstr = "http://www.gxdx168.com/research/svc?o=1&page=0&length=90"
-    
-    if otype=="service":
-        udata=getDataByUrl(urlstr,True) 
-        start = request.GET.get("start", "0")
-        num = request.GET.get("num", "50")
-        tagnum = request.GET.get("tagnum", "10")
-        udata["docs"] = udata["docs"][int(start): int(start) + int(num)] 
-        udata["tags"] = udata["tags"][0: int(tagnum)] 
-        udata["total"] = str(udata["total"])
-        return HttpResponse(json.dumps(udata), mimetype="application/json")
-    else:
-        udata=getDataByUrl(urlstr) 
-    tags = []
-    if udata.has_key("tags"):
-        tags = udata["tags"] 
-#    primarytags = [ "央 行","银 行","保 险","证 券","大 盘","基 金","信 托","外 汇","黄 金","债 券",
-#"期 货","理 财","电 商","电 信","房 地 产","能 源","煤 炭","航 空","铁 路",
-#"汽 车","钢 铁","船 舶","医 药","食 品","白 酒","茶 叶","蔬 菜","鞋 业","农 村",
-#"林 业","土 地","畜 牧 业","渔 业","旅 游","文 化","电 影","传 媒","贸 易","欧 洲",
-#"美 联 储","环 保","就 业","城 镇 化"
-#                  ]
-#    primarytags = [tag.decode("utf8") for tag in primarytags ]
-#    tags = [tag for tag in tags if tag not in primarytags]
-#    tags = primarytags + tags
-#    udata["tags"] = primarytags
-    udata["tags"] = tags[0:30]
-    return render_to_response(template_name, {
-        'udata': udata,
-        "user": request.user,
-    }, context_instance=RequestContext(request)) 
-
-@login_required
-def relatednews(request, template_name="beacon/related_list.html"):
-    relatedid = request.GET.get("relatedid", "") 
-    localtag = request.GET.get("localtag", "")
-    if localtag !="":
-        title = request.GET.get("title", relatedid)
-        quantity = log_typer(request, "relatednews", title+"|-|"+localtag)
-    else:
-        host = request.GET.get("host", relatedid)
-        title = request.GET.get("title", relatedid)
-        quantity = log_typer(request, "relatednews", title+"|-|"+host)
-    if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-    username = getUserName(request)
-    if localtag !="":
-        localtag = urllib2.quote(localtag.encode("utf8"))
-        urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&relatedid="+relatedid+"&localtag=" + localtag
-    else:
-        urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&relatedid=" + relatedid
-         
-    otype = request.GET.get("o", "")
-    if otype=="service":
-        udata=getDataByUrl(urlstr,True) 
-        start = request.GET.get("start", "0")
-        num = request.GET.get("num", "50")
-        tagnum = request.GET.get("tagnum", "10")
-        udata["docs"] = udata["docs"][int(start): int(start) + int(num)] 
-        udata["tags"] = udata["tags"][0: int(tagnum)] 
-        udata["total"] = str(udata["total"])
-        return HttpResponse(json.dumps(udata), mimetype="application/json")
-    udata=getDataByUrl(urlstr) 
-    
-    return render_to_response(template_name, {
-        'username': username,
-        'udata': udata,
-        "user": request.user,
-    }, context_instance=RequestContext(request)) 
+# @login_required
+# def searchs(request, template_name="beacon/search_list.html"):
+#     pass
+# 
+# @login_required
+# def globaltag(request, template_name="beacon/related_list.html"):
+#     pass
+#     
+# @login_required
+# def todaynews(request, template_name="beacon/related_list.html"):
+#     pass
+# 
+# @login_required
+# def relatednews(request, template_name="beacon/related_list.html"):
+#     pass
      
 @login_required
 def load_beacons(request): 
@@ -683,25 +204,25 @@ def load_beacons(request):
     beacon_list = []
     mybeaconids = []
     fllwbeaconids = []
-    group_list=[]
-    groupobj={} 
+    group_list = []
+    groupobj = {} 
 #    if orderby=="tms":
 #        sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
 #    elif orderby=="fllw":
 #        sharebeacons = r.zrevrange("bmk:doc:share:byfllw",0,-1)
 #    elif orderby=="news":
 #        sharebeacons = r.zrevrange("bmk:doc:share:bynews",0,-1)  
-    beacons = r.smembers("usr:" + username+":fllw") 
+    beacons = r.smembers("usr:" + username + ":fllw") 
     for beastr in beacons:
 #        if r.hget("bmk:" + beaid, "crt_usr") != username:
 #            continue
-        beausr,beaid=beastr.split("|-|")
+        beausr, beaid = beastr.split("|-|")
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid)
-        if not beaobj.has_key("ttl"):#如果该灯塔已经被删除了(脏数据)
+        if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
         beaobj["news_cnt"] = "1"
 #        beaobj["desc"] = beaobj["ttl"]
-        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
+        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
         beaobj["beaconid"] = beaid
         beacon_list.append(beaobj)
         fllwbeaconids.append(beaid)
@@ -709,11 +230,11 @@ def load_beacons(request):
     mybeaconids = r.smembers("bmk:" + username)
     for beaid in mybeaconids:  
         beaobj = r.hgetall("bmk:" + username + ":" + beaid)
-        if not beaobj.has_key("ttl"):#如果该灯塔已经被删除了(脏数据)
+        if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
         beaobj["news_cnt"] = "1"
 #        beaobj["desc"] = beaobj["ttl"]
-        beaobj["fllw_cnt"] = str(r.scard("bmk:" + username + ":" + beaid+":fllw"))
+        beaobj["fllw_cnt"] = str(r.scard("bmk:" + username + ":" + beaid + ":fllw"))
         beaobj["beaconid"] = beaid
         beacon_list.append(beaobj) 
         
@@ -725,12 +246,12 @@ def load_beacons(request):
     groupobj["groupid"] = getHashid("myFllw")
     groupobj["groupname"] = "myFllw"
     group_list.append(groupobj)
-    groupobj={}
+    groupobj = {}
     groupobj["beaconids"] = ",".join(mybeaconids)
     groupobj["groupid"] = getHashid("myCre")
     groupobj["groupname"] = "myCre"
     group_list.append(groupobj)
-    groupobj={}
+    groupobj = {}
     groupobj["beaconids"] = ",".join(set(fllwbeaconids).union(mybeaconids))
     groupobj["groupid"] = getHashid("All")
     groupobj["groupname"] = "All"
@@ -753,16 +274,16 @@ def load_beacons(request):
 # @login_required
 def listbeacons_service(request):
     orderby = request.GET.get("orderby", "news")
-    beaconname=request.GET.get("beaconname", "")
+    beaconname = request.GET.get("beaconname", "")
     username = request.GET.get("u", getUserName(request))
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5")
-    btype = request.GET.get("btype", "notfllw")#fllw,notfllw,all
-    sharebeacons=[]
-    sharebeacon_list=[]
-    mybeacons=[]
-    robj={}
-    beaobj={}
+    btype = request.GET.get("btype", "notfllw")  # fllw,notfllw,all
+    sharebeacons = []
+    sharebeacon_list = []
+    mybeacons = []
+    robj = {}
+    beaobj = {}
     
 #     if orderby=="tms":
 #         sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
@@ -770,45 +291,45 @@ def listbeacons_service(request):
 #         sharebeacons = r.zrevrange("bmk:doc:share:byfllw",0,-1)
 #     elif orderby=="news":
 #         sharebeacons = r.zrevrange("bmk:doc:share:bynews",0,-1) 
-    sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
+    sharebeacons = r.zrevrange("bmk:doc:share", 0, -1)
         
 #     mybeacons = r.smembers("usr:" + username+":fllw")
-    mybeacons = r.zrevrange("usr:" + username+":fllw",0,-1)
+    mybeacons = r.zrevrange("usr:" + username + ":fllw", 0, -1)
     for beaconstr in mybeacons:
-        beausr,beaid = beaconstr.split("|-|")
+        beausr, beaid = beaconstr.split("|-|")
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
-        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
+        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
         beaobj["beaconid"] = beaid 
         beaobj["isfllw"] = "true" 
         if not beaobj.has_key("ttl"):
             continue
-        if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询) 
+        if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询) 
             beaconttl = beaobj["ttl"]
-            beaconname=to_unicode_or_bust(beaconname)
-            beaconttl=to_unicode_or_bust(beaconttl)  
-            if re.search(beaconname,beaconttl): 
+            beaconname = to_unicode_or_bust(beaconname)
+            beaconttl = to_unicode_or_bust(beaconttl)  
+            if re.search(beaconname, beaconttl): 
                 sharebeacon_list.append(beaobj)
         else:
             sharebeacon_list.append(beaobj)
         
-    sharebeacons =  listsub(sharebeacons,mybeacons)
+    sharebeacons = listsub(sharebeacons, mybeacons)
     for beaconstr in sharebeacons:
-        beausr,beaid = beaconstr.split("|-|")
+        beausr, beaid = beaconstr.split("|-|")
 #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
-        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
+        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
         beaobj["beaconid"] = beaid
         beaobj["isfllw"] = "false"
         if not beaobj.has_key("ttl"):
             continue
-        if not beaconname=="":#根据beaconid取所有同名的灯塔(如果是查询)  
+        if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)  
             beaconttl = beaobj["ttl"] 
 #                 print isinstance( beaconname, unicode )
 #                 print isinstance( beaconttl, unicode )
-            beaconname=to_unicode_or_bust(beaconname)
-            beaconttl=to_unicode_or_bust(beaconttl) 
+            beaconname = to_unicode_or_bust(beaconname)
+            beaconttl = to_unicode_or_bust(beaconttl) 
 #                 print beaconname.encode("gbk"),":",beaconttl.encode("gbk")
-            if re.search(beaconname,beaconttl):
+            if re.search(beaconname, beaconttl):
 #                     print beaconname,"==",beaconttl
                 sharebeacon_list.append(beaobj)
         else:
@@ -839,28 +360,28 @@ def fllowbeacon_service(request):
     heartid = request.GET.get("beaconid", "")  
     heartopt = request.GET.get("fllwopt", "")
     username = request.GET.get("u", getUserName(request))
-    robj={}
-    beaobj={}
-    fllwkey=""
+    robj = {}
+    beaobj = {}
+    fllwkey = ""
     if r.exists("bmk:" + heartusr + ":" + heartid):
-        fllwkey="bmk:" + heartusr + ":" + heartid+":fllw"
+        fllwkey = "bmk:" + heartusr + ":" + heartid + ":fllw"
     else:
         robj["success"] = 'false'
-        robj["message"] = "beacon with beaconusr:%s and beaconid:%s is not exist" %(heartusr,heartid)
+        robj["message"] = "beacon with beaconusr:%s and beaconid:%s is not exist" % (heartusr, heartid)
         robj["beacon"] = []
         return HttpResponse(json.dumps(robj), mimetype="application/json")
         
-    if heartopt=="remove":
-        r.srem(fllwkey,username)
-        r.zrem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
-        r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),heartusr+"|-|"+heartid)
-    elif heartopt== "add":
-        r.sadd(fllwkey,username) 
-        r.zadd("usr:" + username+ ":fllw" ,time.time(), heartusr+"|-|"+heartid)
-        r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),heartusr+"|-|"+heartid)
+    if heartopt == "remove":
+        r.srem(fllwkey, username)
+        r.zrem("usr:" + username + ":fllw" , heartusr + "|-|" + heartid)
+        r.zadd("bmk:doc:share:byfllw", r.scard(fllwkey), heartusr + "|-|" + heartid)
+    elif heartopt == "add":
+        r.sadd(fllwkey, username) 
+        r.zadd("usr:" + username + ":fllw" , time.time(), heartusr + "|-|" + heartid)
+        r.zadd("bmk:doc:share:byfllw", r.scard(fllwkey), heartusr + "|-|" + heartid)
     
     robj["success"] = 'true'
-    robj["message"] = "success %s beacon" %(heartopt)
+    robj["message"] = "success %s beacon" % (heartopt)
     beaobj = r.hgetall("bmk:" + heartusr + ":" + heartid)
     beaobj["news_cnt"] = "1"
     beaobj["fllw_cnt"] = str(r.scard(fllwkey))
@@ -873,7 +394,7 @@ def load_similars(request):
     groupid = request.GET.get("groupid", "") 
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "ltb")
-    obj= "all" if groupid !="" else beaconusr+":"+beaconid
+    obj = "all" if groupid != "" else beaconusr + ":" + beaconid
     quantity = log_typer(request, "load_similars", obj) 
     if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
@@ -883,12 +404,12 @@ def load_similars(request):
     username = getUserName(request)
 #     username = request.GET.get("u", getUserName(request))
     
-    sim_lst=[]
-    lst=[]
+    sim_lst = []
+    lst = []
     beacons = []
     # modified by devwxi 临时使用..
-    if groupid==getHashid("All"):
-        udata = getAllBeaconDocsByUser(username,start=start ,num=num,newscnt=1)
+    if groupid == getHashid("All"):
+        udata = getAllBeaconDocsByUser(username, start=start , num=num, newscnt=1)
         udata["success"] = "true"
         udata["message"] = "success return data"
         if udata.has_key("docs"):
@@ -896,9 +417,9 @@ def load_similars(request):
         else:
             udata["total"] = "0"  
         return HttpResponse(json.dumps(udata), mimetype="application/json")
-    else:#取某个灯塔的新闻
-        udata = buildBeaconData(beaconusr, beaconid,start=start ,end=num,isapi=True)
-        r.hset("usr:"+username+":channeltms",beaconusr+":"+beaconid,time.time())
+    else:  # 取某个灯塔的新闻
+        udata = buildBeaconData(beaconusr, beaconid, start=start , end=num, isapi=True)
+        r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
         if udata.has_key("docs"):
             udata["success"] = "true"
             udata["message"] = "success retrive data"
@@ -915,17 +436,17 @@ def beaconcopy(request, template_name="beacon_new.html"):
     username = getUserName(request)
 #    username = request.GET.get("u", username)
     otype = request.GET.get("o", "")  
-    r.sunionstore("usr:"+username+":fllw","usr:"+usr+":fllw")
-    r.hset("usr:"+username,"fllw_chart",usr)
+    r.sunionstore("usr:" + username + ":fllw", "usr:" + usr + ":fllw")
+    r.hset("usr:" + username, "fllw_chart", usr)
     if otype == "service": 
-        beacon_json={}
-        beacon_list=[]
-        beacons = r.smembers("usr:" + username+":fllw") 
+        beacon_json = {}
+        beacon_list = []
+        beacons = r.smembers("usr:" + username + ":fllw") 
         for beastr in beacons: 
-            beausr,beaid=beastr.split("|-|")
+            beausr, beaid = beastr.split("|-|")
             beaobj = r.hgetall("bmk:" + beausr + ":" + beaid)
             beaobj["news_cnt"] = "1"
-            beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
+            beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
             beaobj["beaconid"] = beaid
             beacon_list.append(beaobj) 
         beacon_json["message"] = "success"
@@ -944,22 +465,22 @@ def beaconfilter(request, template_name="beacon_list.html"):
     doc_unchk = request.GET.get("doc_unchk", "")
     username = getUserName(request)
     key = "bmk:" + username + ":" + beaconid
-    r.delete(key+":tag:unchk")
-    r.delete(key+":doc:unchk")
+    r.delete(key + ":tag:unchk")
+    r.delete(key + ":doc:unchk")
     for tagid in tag_unchk.split(','):
-        r.sadd(key+":tag:unchk",tagid)
+        r.sadd(key + ":tag:unchk", tagid)
 #        print "sadd tagid @[%s] %s is ok" %(tagid,key+":tag:unchk")
     for docid in doc_unchk.split(','):
-        r.sadd(key+":doc:unchk",docid)
+        r.sadd(key + ":doc:unchk", docid)
     
-    saveBeacon(username,beaconid)
+    saveBeacon(username, beaconid)
 #        print "sadd docid @[%s] %s is ok" %(docid,key+":doc:unchk")
-    return HttpResponseRedirect("/news/beaconlist/?beaconid="+beaconid)
+    return HttpResponseRedirect("/news/beaconlist/?beaconid=" + beaconid)
     
 @login_required
 def beaconsave(request, template_name="beacon_list.html"):
     username = getUserName(request)
-    if username not in ["ltb","wxi","sj"] :  
+    if username not in ["ltb", "wxi", "sj"] :  
         return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
     beaconid = request.GET.get("beaconid", "")
     beaconusr = request.GET.get("beaconusr", "")
@@ -975,12 +496,12 @@ def beaconsave(request, template_name="beacon_list.html"):
     if beaconname == "" :
         return HttpResponseRedirect("/news/beaconlist/")
     
-    quantity = log_typer(request, "beaconsave", beaconusr+":"+beaconid)
+    quantity = log_typer(request, "beaconsave", beaconusr + ":" + beaconid)
     
-    beaconname = beaconname.replace(" ","")
-    beaconmindoc = 0 if beaconmindoc=="" else beaconmindoc
-    key = "bmk:"+beaconkey
-    if beaconkey == "":# new add 
+    beaconname = beaconname.replace(" ", "")
+    beaconmindoc = 0 if beaconmindoc == "" else beaconmindoc
+    key = "bmk:" + beaconkey
+    if beaconkey == "":  # new add 
         beaconid = getHashid(beaconname)
         key = "bmk:" + beaconusr + ":" + beaconid
         r.hset(key, "id", beaconid)
@@ -989,45 +510,45 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.hset(key, "desc", desc)
         r.hset(key, "crt_usr", beaconusr)
 #         r.hset(key, "crt_tms", time.time())
-        r.hset(key, "crt_tms",  getUnixTimestamp(beacontime,"%Y%m%d%H%M%S") ) 
-        r.hset(key, "last_touch",0) 
-        r.hset(key, "last_update",0) 
-        r.hset(key, "cnt",0) 
-        r.hset(key, "mindoc",beaconmindoc) 
-        r.hset(key, "tag",beacontag) 
-        r.hset(key, "headlineonly",headlineonly) 
+        r.hset(key, "crt_tms", getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")) 
+        r.hset(key, "last_touch", 0) 
+        r.hset(key, "last_update", 0) 
+        r.hset(key, "cnt", 0) 
+        r.hset(key, "mindoc", beaconmindoc) 
+        r.hset(key, "tag", beacontag) 
+        r.hset(key, "headlineonly", headlineonly) 
         
-        r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)
-        r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
+        r.zadd("usr:" + beaconusr + ":fllw", time.time(), beaconusr + "|-|" + beaconid)
+        r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
         r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
-        r.zadd("bmk:doc:share:bynews",time.time() , beaconusr + "|-|" + beaconid)
+        r.zadd("bmk:doc:share:bynews", time.time() , beaconusr + "|-|" + beaconid)
         
         from mybonds.build import beaconNameHash
         beaconNameHash()
     else:
-        if beaconkey != beaconusr+":"+getHashid(beaconname):# modifykeys
+        if beaconkey != beaconusr + ":" + getHashid(beaconname):  # modifykeys
 #             print beaconkey,beaconusr+":"+getHashid(beaconname)
             beaconid = getHashid(beaconname) 
-            beaconChangeName(beaconkey,beaconusr,beaconid)
+            beaconChangeName(beaconkey, beaconusr, beaconid)
             key = "bmk:" + beaconusr + ":" + beaconid
             r.hset(key, "id", beaconid)
             r.hset(key, "crt_usr", beaconusr)
-            r.hset(key, "crt_tms", getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")) 
+            r.hset(key, "crt_tms", getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")) 
             r.hset(key, "ttl", beaconname)
             r.hset(key, "name", beacondisplayname)
             r.hset(key, "desc", desc)
-            r.hset(key, "mindoc",beaconmindoc) 
-            r.hset(key, "tag",beacontag)
-            r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
-        else:#modify desc and so on
+            r.hset(key, "mindoc", beaconmindoc) 
+            r.hset(key, "tag", beacontag)
+            r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
+        else:  # modify desc and so on
             r.hset(key, "crt_usr", beaconusr)
-            r.hset(key, "crt_tms", getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")) 
+            r.hset(key, "crt_tms", getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")) 
             r.hset(key, "desc", desc)
-            r.hset(key, "mindoc",beaconmindoc) 
+            r.hset(key, "mindoc", beaconmindoc) 
             r.hset(key, "name", beacondisplayname)
-            r.hset(key, "headlineonly",headlineonly) 
-            r.hset(key, "tag",beacontag) 
-            r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
+            r.hset(key, "headlineonly", headlineonly) 
+            r.hset(key, "tag", beacontag) 
+            r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
             
 #     if share == "1":
 # #         fllwcnt = r.scard(key+":fllw") if r.scard(key+":fllw") is not None else 0
@@ -1042,107 +563,13 @@ def beaconsave(request, template_name="beacon_list.html"):
 #         r.zrem("bmk:doc:share:bynews", beaconusr + "|-|" + beaconid)
 #         r.zrem("bmk:doc:share:byfllw", beaconusr + "|-|" + beaconid)
 # #    return HttpResponse("a")
-    return HttpResponseRedirect("/news/beaconlist/?beaconid="+beaconid+"&beaconusr="+beaconusr)
+    return HttpResponseRedirect("/news/beaconlist/?beaconid=" + beaconid + "&beaconusr=" + beaconusr)
     
 @login_required
 def beaconRelate(request, template_name="beacon_news.html"):
     """在搜索出来的新闻主题页面(坐标文章)下,关联一系列灯塔
     """
-    beacons = request.GET.get("beacons", "") 
-    checklist = request.GET.get("checklist", "") 
-    similarid = request.GET.get("similarid", "")  
-    
-    userobj = request.user
-    if userobj.is_anonymous():  # 用户未登录
-        return HttpResponse('<h1>只有登录用户才能访问该功能..</h1>')
-    username = getUserName(request) 
-    
-    otype = request.GET.get("otype", "beacon") 
-    objectid = request.GET.get("objectid", "") 
-    if otype =="similar":
-        print "similar"
-        similarid=objectid
-        urlstr = "http://www.gxdx168.com/research/svc?length=1100&similarid=" + similarid
-#        return HttpResponse(objectid)
-    elif otype =="related":
-        print "related"  
-        similarid=objectid
-        urlstr = "http://www.gxdx168.com/research/svc?relatedid=" + similarid 
-    elif otype =="localtag":
-        similarid,localtag=objectid.split("|-|")
-        localtag = urllib2.quote(localtag.encode("utf8"))
-        urlstr = "http://www.gxdx168.com/research/svc?relatedid=" + similarid+"&localtag="+localtag
-#        return HttpResponse(objectid)
-    udata = getDataByUrl(urlstr)
-    sim_docs = udata["docs"]
-    beacons = beacons[0:-3] if beacons != "" else ""
-    b_list = beacons.split('|-|')
-#    sim_docs = saveSimilarDocs(similarid)
-#    print sim_ids
-    pipe = r.pipeline()
-    i = 0
-    for beacon in b_list:
-        id = getHashid(beacon)
-#        print beacon + "==" + id
-        if beacon == "":
-            continue
-        key = "bmk:" + username + ":" + id
-        pipe.zadd("bmk:doc:share", time.time(), username + "|-|" + id)
-        if not r.sismember("bmk:"+username, id):
-            pipe.sadd("bmk:" + username, id)
-            pipe.hset(key, "ttl", beacon) 
-#            pipe.hset(key, "desc", beacon)
-            pipe.hset(key, "crt_usr", username)
-            pipe.hset(key, "crt_tms", time.time())
-            pipe.hset(key, "brk_tms", time.time())
-            
-        if checklist[i] == '1':  # 标签被选中
-            if otype == "similar":
-                pipe.sadd(key + ":doc", similarid)
-                pipe.zadd(key + ":doc:tms", time.time(), similarid)
-            elif otype =="related":
-                pipe.sadd(key + ":doc:related", similarid)
-                pipe.zadd(key + ":doc:tms", time.time(), similarid)
-            elif otype =="localtag":
-                pipe.sadd(key + ":doc:localtag", objectid)
-                pipe.zadd(key + ":doc:tms", time.time(), similarid)
-            greeting_typer(username, "beacon_save", beacon)  # 保存信息到动态欢迎日志
-            for simdoc in sim_docs:
-                pipe.sadd(key + ":sml", simdoc["docid"])
-                pipe.zadd(key + ":sml:tms", int(simdoc["tms"]), simdoc["docid"])
-        elif checklist[i] == '0':  # 标签未选中
-            if otype == "similar":
-                pipe.srem(key + ":doc", similarid)
-            elif otype =="related":
-                pipe.srem(key + ":doc:related", similarid) 
-            elif otype =="localtag":
-                pipe.srem(key + ":doc:localtag", objectid) 
-            pipe.srem(key + ":doc:unchk", similarid)
-            for simdoc in sim_docs:
-                pipe.srem(key + ":sml", simdoc["docid"])
-                pipe.zrem(key + ":sml:tms", simdoc["docid"])
-        elif checklist[i] == '2':  # 已有标签删除
-            pipe.srem("bmk:" + username, id)  # 从标签总的集合中删除该标签
-            pipe.zrem("bmk:doc:share",username + "|-|" + id)
-            pipe.zrem("bmk:doc:byfllw",username + "|-|" + id)
-            pipe.zrem("bmk:doc:bynews",username + "|-|" + id)
-            pipe.delete(key + ":doc")
-            pipe.delete(key + ":doc:related")
-            pipe.delete(key + ":doc:localtag")
-            pipe.delete(key + ":doc:tms")
-            pipe.delete(key + ":sml")
-            pipe.delete(key + ":sml:tms")
-#            pipe.srem(key + ":doc", similarid)#去除标签的 坐标文档
-#            for simdoc in sim_docs:
-#                pipe.srem(key + ":sml", simdoc["id"])
-#                pipe.zrem(key + ":sml:tms", simdoc["id"])
-        else:
-            pass
-        i = i+1
-        
-        pipe.execute()
-    return HttpResponse("beacon relative is ok.")
-#    return HttpResponseRedirect("/news/beaconinit/?similarid=" + similarid + "&title=" + title) 
+    pass
 
 @login_required
 def mybeacons(request, template_name="beacon/mybeacons.html"): 
@@ -1153,50 +580,50 @@ def mybeacons(request, template_name="beacon/mybeacons.html"):
     orderby = request.GET.get("orderby", "tms")
     username = getUserName(request)
     userobj = request.user
-    beacon_list=[]
-    mybeacons=[] 
-    beacon_search=[]
-    beaobj={}
+    beacon_list = []
+    mybeacons = [] 
+    beacon_search = []
+    beaobj = {}
     myfllw_list = []
     
-    if heartid !="":
-        fllwkey="bmk:" + heartusr + ":" + heartid+":fllw"
-        if heartopt=="remove":
-            r.srem(fllwkey,username)
-            r.srem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
-            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),heartusr+"|-|"+heartid)
+    if heartid != "":
+        fllwkey = "bmk:" + heartusr + ":" + heartid + ":fllw"
+        if heartopt == "remove":
+            r.srem(fllwkey, username)
+            r.srem("usr:" + username + ":fllw" , heartusr + "|-|" + heartid)
+            r.zadd("bmk:doc:share:byfllw", r.scard(fllwkey), heartusr + "|-|" + heartid)
 #            r.zincrby("bmk:doc:share:byfllw",heartusr+"|-|"+heartid,-1)
-        elif heartopt== "add":
-            r.sadd(fllwkey,username)
-            r.sadd("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
-            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),heartusr+"|-|"+heartid)
+        elif heartopt == "add":
+            r.sadd(fllwkey, username)
+            r.sadd("usr:" + username + ":fllw" , heartusr + "|-|" + heartid)
+            r.zadd("bmk:doc:share:byfllw", r.scard(fllwkey), heartusr + "|-|" + heartid)
 #            r.zincrby("bmk:doc:share:byfllw",heartusr+"|-|"+heartid,1)
 #            r.hincrby("bmk:" + heartusr + ":" + heartid,)
-    if orderby=="tms":
-        sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
-    elif orderby=="fllw":
-        sharebeacons = r.zrevrange("bmk:doc:share:byfllw",0,-1)
-    elif orderby=="news":
-        sharebeacons = r.zrevrange("bmk:doc:share:bynews",0,-1)
+    if orderby == "tms":
+        sharebeacons = r.zrevrange("bmk:doc:share", 0, -1)
+    elif orderby == "fllw":
+        sharebeacons = r.zrevrange("bmk:doc:share:byfllw", 0, -1)
+    elif orderby == "news":
+        sharebeacons = r.zrevrange("bmk:doc:share:bynews", 0, -1)
         
     mybeacon_list = r.smembers("bmk:" + username)
         
-    descstr=""
-    for beastr in sharebeacons:#取所有分享的,不属于自己的,未被following的灯塔(可以follow的灯塔)
-        beaconusername,beaconid=beastr.split('|-|')
+    descstr = ""
+    for beastr in sharebeacons:  # 取所有分享的,不属于自己的,未被following的灯塔(可以follow的灯塔)
+        beaconusername, beaconid = beastr.split('|-|')
         beaobj = r.hgetall("bmk:" + beaconusername + ":" + beaconid)
         if beaobj.has_key("desc"):
 #            print beaobj["desc"].decode("utf8")
             descstr = beaobj["desc"].decode("utf8")[0:15]
 #            print beaobj["desc"].decode("utf8")
-            beaobj["desc"]= descstr
+            beaobj["desc"] = descstr
         beaobj["news_cnt"] = "1"
-        beaobj["fllw_cnt"] = r.scard("bmk:" + beaconusername + ":" + beaconid+":fllw")
+        beaobj["fllw_cnt"] = r.scard("bmk:" + beaconusername + ":" + beaconid + ":fllw")
         beaobj["id"] = beaconid 
-        if beaconid in mybeacon_list :# 自己的灯塔
+        if beaconid in mybeacon_list :  # 自己的灯塔
             mybeacons.append(beaobj)
             continue
-        if r.sismember("bmk:" + beaconusername + ":" + beaconid+":fllw",username):#已经following的灯塔
+        if r.sismember("bmk:" + beaconusername + ":" + beaconid + ":fllw", username):  # 已经following的灯塔
             myfllw_list.append(beaobj)  
             continue 
         
@@ -1207,14 +634,14 @@ def mybeacons(request, template_name="beacon/mybeacons.html"):
 #            if re.search(beaconname,beaobj["ttl"].decode("utf8")):
 #                beacon_search.append(beaobj) 
         import re
-        if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询)
+        if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)
             if beaobj.has_key("ttl"):
                 beaconttl = beaobj["ttl"]
             else:
-                beaconttl=""
-            beaconname=to_unicode_or_bust(beaconname)
-            beaconttl=to_unicode_or_bust(beaconttl) 
-            if re.search(beaconname,beaconttl):
+                beaconttl = ""
+            beaconname = to_unicode_or_bust(beaconname)
+            beaconttl = to_unicode_or_bust(beaconttl) 
+            if re.search(beaconname, beaconttl):
                 beacon_search.append(beaobj)
                 
 #        if getHashid(beaconname)==beaconid:#根据beaconid取所有同名的灯塔(如果是查询)
@@ -1233,7 +660,7 @@ def mybeacons(request, template_name="beacon/mybeacons.html"):
     }, context_instance=RequestContext(request)) 
 
 @login_required
-def beaconnews(request,template_name="beacon/beacon_news.html"):  
+def beaconnews(request, template_name="beacon/beacon_news.html"):  
     start = time.clock()
     
     beaconid = request.GET.get("beaconid", "")  
@@ -1245,53 +672,53 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
     heartusr = request.GET.get("heartusr", "")
     beacondisname = ""
     
-    logobj = "ordey by "+orderby
-    if beaconid !="":
-        logobj= r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl")
-    elif heartid !="":
+    logobj = "ordey by " + orderby
+    if beaconid != "":
+        logobj = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl")
+    elif heartid != "":
         beaconname = r.hget("bmk:" + heartusr + ":" + heartid, "ttl")
         beaconname = to_unicode_or_bust(beaconname)
-        logobj = heartopt+" --> "+ heartusr+":"+beaconname
-    elif not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询)
-        beaconname=to_unicode_or_bust(beaconname)
-        logobj = "query : "+beaconname
+        logobj = heartopt + " --> " + heartusr + ":" + beaconname
+    elif not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)
+        beaconname = to_unicode_or_bust(beaconname)
+        logobj = "query : " + beaconname
     else :
-        logobj="all"
+        logobj = "all"
     
     quantity = log_typer(request, "beaconnews", logobj)
     if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     
     username = getUserName(request)
-    isadmin ="1" if username in ["ltb","wxi","sj"] else "0"  
+    isadmin = "1" if username in ["ltb", "wxi", "sj"] else "0"  
     
     beaobj = {}
     mybeacon_list = []
     myfllw_list = []
     sharebeacon_list = []
-    sharebeacons=[]
+    sharebeacons = []
     mybeacons = []
-    beacon_search=[]
+    beacon_search = []
     request.session["otype"] = "beaconnews"
     
     udata = {}
     shared = ""
     
-    if heartid !="":
-        beaconname =""
+    if heartid != "":
+        beaconname = ""
         if r.exists("bmk:" + heartusr + ":" + heartid):
-            fllwkey="bmk:" + heartusr + ":" + heartid+":fllw"
-            if heartopt=="remove":
-                r.srem(fllwkey,username)
+            fllwkey = "bmk:" + heartusr + ":" + heartid + ":fllw"
+            if heartopt == "remove":
+                r.srem(fllwkey, username)
 #                 r.srem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
-                r.zrem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
-                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),heartusr+"|-|"+heartid)
+                r.zrem("usr:" + username + ":fllw" , heartusr + "|-|" + heartid)
+                r.zadd("bmk:doc:share:byfllw", r.scard(fllwkey), heartusr + "|-|" + heartid)
     #            r.zincrby("bmk:doc:share:byfllw",heartusr+"|-|"+heartid,-1)
-            elif heartopt== "add":
-                r.sadd(fllwkey,username)
+            elif heartopt == "add":
+                r.sadd(fllwkey, username)
 #                 r.sadd("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
-                r.zadd("usr:" + username+ ":fllw" , time.time(),heartusr+"|-|"+heartid)
-                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),heartusr+"|-|"+heartid)
+                r.zadd("usr:" + username + ":fllw" , time.time(), heartusr + "|-|" + heartid)
+                r.zadd("bmk:doc:share:byfllw", r.scard(fllwkey), heartusr + "|-|" + heartid)
             
 #     if orderby=="tms":
 #         sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
@@ -1299,51 +726,51 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
 #         sharebeacons = r.zrevrange("bmk:doc:share:byfllw",0,-1)
 #     elif orderby=="news":
 #         sharebeacons = r.zrevrange("bmk:doc:share:bynews",0,-1)
-    sharebeacons = r.zrevrange("bmk:doc:share",0,-1) 
+    sharebeacons = r.zrevrange("bmk:doc:share", 0, -1) 
 #     mybeacons = r.smembers("usr:" + username+":fllw") 
-    mybeacons = r.zrevrange("usr:" + username+":fllw",0,-1)
+    mybeacons = r.zrevrange("usr:" + username + ":fllw", 0, -1)
     
     for beaconstr in mybeacons:
-        beausr,beaid = beaconstr.split("|-|") 
+        beausr, beaid = beaconstr.split("|-|") 
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
-        beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid+":fllw")
+        beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid + ":fllw")
         beaobj["id"] = beaid
-        beaobj["new_cnt"] = getBeaconNewsCnt(username,beausr,beaid)
-        if not beaobj.has_key("ttl"):#如果该灯塔已经被删除了(脏数据)
+        beaobj["new_cnt"] = getBeaconNewsCnt(username, beausr, beaid)
+        if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
         myfllw_list.append(beaobj)
     
-    sharebeacons = listsub(sharebeacons,mybeacons) 
+    sharebeacons = listsub(sharebeacons, mybeacons) 
     for beaconstr in sharebeacons:
-        beausr,beaid = beaconstr.split("|-|")
+        beausr, beaid = beaconstr.split("|-|")
 #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
-        beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid+":fllw")
-        beaobj["new_cnt"] = getBeaconNewsCnt(username,beausr,beaid)
+        beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid + ":fllw")
+        beaobj["new_cnt"] = getBeaconNewsCnt(username, beausr, beaid)
         beaobj["id"] = beaid
-        if not beaobj.has_key("ttl"):#如果该灯塔已经被删除了(脏数据)
+        if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
         sharebeacon_list.append(beaobj)
           
-        if not beaconname == "":#根据beaconid取所有同名的灯塔(如果是查询)
+        if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)
             if beaobj.has_key("ttl"):
                 beaconttl = beaobj["ttl"]
             else:
                 continue
-            beaconname=to_unicode_or_bust(beaconname)
-            beaconttl=to_unicode_or_bust(beaconttl,"utf8") 
-            if re.search(beaconname,beaconttl):
+            beaconname = to_unicode_or_bust(beaconname)
+            beaconttl = to_unicode_or_bust(beaconttl, "utf8") 
+            if re.search(beaconname, beaconttl):
                 beacon_search.append(beaobj) 
                 
     if beaconid != "":  
-        udata = buildBeaconData(beaconusr, beaconid,start=0 ,end=100) 
+        udata = buildBeaconData(beaconusr, beaconid, start=0 , end=100) 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
         beacondisname = r.hget("bmk:" + beaconusr + ":" + beaconid, "name") 
-        r.hset("usr:"+username+":channeltms",beaconusr+":"+beaconid,time.time())#增加用户关于该频道的最后跟新时间
+        r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())  # 增加用户关于该频道的最后跟新时间
         cnt = len(udata["docs"]) if udata.has_key("docs") else 0
-        r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",cnt)
+        r.hset("bmk:" + beaconusr + ":" + beaconid, "cnt", cnt)
     else:  
-        udata = getAllBeaconDocsByUser(username,newscnt=5)
+        udata = getAllBeaconDocsByUser(username, newscnt=5)
 #         udata["simdocs"]=udata.pop("docs") 
         
     return render_to_response(template_name, {
@@ -1351,10 +778,10 @@ def beaconnews(request,template_name="beacon/beacon_news.html"):
         'mybeacons':mybeacon_list,
         'myfllw_list':myfllw_list,
         'sharebeacons':sharebeacon_list,
-        'beaconid':beaconid,#当前灯塔的ID
-        'beaconusr':beaconusr,#当前灯塔的ID
-        'beaconname':beaconname,#当前灯塔的名称
-        'beacondisname':beacondisname,#当前灯塔的名称
+        'beaconid':beaconid,  # 当前灯塔的ID
+        'beaconusr':beaconusr,  # 当前灯塔的ID
+        'beaconname':beaconname,  # 当前灯塔的名称
+        'beacondisname':beacondisname,  # 当前灯塔的名称
         'beacon_search':beacon_search,
         "greetings":getGreeting(),
         'orderby':orderby,
@@ -1371,7 +798,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
 #     if userobj.is_anonymous():  # 用户未登录
 #         return HttpResponse('<h1>只有登录用户才能访问该功能..</h1>')
     username = getUserName(request)
-    if username not in ["ltb","wxi","sj"] :  
+    if username not in ["ltb", "wxi", "sj"] :  
         return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
     beacon_json = {}
     beacon_list = []
@@ -1381,7 +808,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
     beaconname = "" 
     beacontime = ""
     beacontag = ""
-    beacondisplayname =""
+    beacondisplayname = ""
     beaconmindoc = 0
     headlineonly = "0"
     if beaconid != "":  
@@ -1389,7 +816,7 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
         beacondesc = r.hget("bmk:" + beaconusr + ":" + beaconid, "desc") 
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
         beacontime = r.hget("bmk:" + beaconusr + ":" + beaconid, "crt_tms")
-        beacontime = getTime(beacontime,formatstr="%Y-%m-%d-%H:%M:%S",addtimezone=False)
+        beacontime = getTime(beacontime, formatstr="%Y-%m-%d-%H:%M:%S", addtimezone=False)
         beacondisplayname = r.hget("bmk:" + beaconusr + ":" + beaconid, "name")
         beacontag = r.hget("bmk:" + beaconusr + ":" + beaconid, "tag")
         beaconmindoc = r.hget("bmk:" + beaconusr + ":" + beaconid, "mindoc") 
@@ -1400,28 +827,28 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
 #         r.hset("bmk:" + beaconusr + ":" + beaconid,"cnt",len(udata["docs"]))
 
 #     beacons = r.smembers("bmk:" + username)
-    beacons = r.zrevrange("bmk:doc:share",0 ,-1)
+    beacons = r.zrevrange("bmk:doc:share", 0 , -1)
 #     print beacons
     for beaconstr in beacons:
-        busr,bid = beaconstr.split("|-|")
+        busr, bid = beaconstr.split("|-|")
         beaobj = r.hgetall("bmk:" + busr + ":" + bid) 
         beaobj["id"] = bid
         beaobj["crt_usr"] = busr
 #         beaobj["shared"] = False if r.zrank("bmk:doc:share", beaconusr + "|-|" + beaconid) is None else True
         beacon_list.append(beaobj)   
     if beacontime == "":
-        beacontime = getTime(time.time(),formatstr="%Y-%m-%d-%H:%M:%S",addtimezone=False)
+        beacontime = getTime(time.time(), formatstr="%Y-%m-%d-%H:%M:%S", addtimezone=False)
     return render_to_response(template_name, {
         'current_path': request.get_full_path(),
         'udata': udata,
         'beacons':beacon_list,
-        'beaconid':beaconid,#当前灯塔的ID
-        'beacontime':beacontime,#当前灯塔的ID
-        'beacondesc':beacondesc,#当前灯塔的备注
-        'beacontag':beacontag,#当前灯塔的备注
-        'beaconname':beaconname,#当前灯塔的名称 
-        'beacondisplayname':beacondisplayname,#当前灯塔的名称
-        'beaconusr':beaconusr,#当前灯塔的名称  
+        'beaconid':beaconid,  # 当前灯塔的ID
+        'beacontime':beacontime,  # 当前灯塔的ID
+        'beacondesc':beacondesc,  # 当前灯塔的备注
+        'beacontag':beacontag,  # 当前灯塔的备注
+        'beaconname':beaconname,  # 当前灯塔的名称 
+        'beacondisplayname':beacondisplayname,  # 当前灯塔的名称
+        'beaconusr':beaconusr,  # 当前灯塔的名称  
         'beaconmindoc':beaconmindoc,
         'headlineonly':headlineonly,
         "user": userobj,
@@ -1430,27 +857,27 @@ def beaconlist(request, template_name="beacon/beacon_list.html"):
 @login_required
 def beacondelete(request, template_name="beacon/beacon_list.html"):  
     username = getUserName(request)  
-    if username not in ["ltb","wxi","sj"] :  
+    if username not in ["ltb", "wxi", "sj"] :  
         return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
     beaconusr = request.GET.get("beaconusr", "")
     beaconid = request.GET.get("beaconid", "")
 #     print beaconusr,beaconid
     key = "bmk:" + beaconusr + ":" + beaconid
-    channel = r.hget(key,"ttl")
+    channel = r.hget(key, "ttl")
     quantity = log_typer(request, "beacondelete", to_unicode_or_bust(channel))
-    r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid) 
-    r.zrem("bmk:doc:share:byfllw",beaconusr+"|-|"+beaconid) 
-    r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid)
-    r.zrem("usr:" + beaconusr+":fllw",beaconusr+"|-|"+beaconid)
-    key = "bmk:"+beaconusr+":"+beaconid
-    for usr in r.smembers(key+":fllw"):
-        r.zrem("usr:" + usr+":fllw",beaconusr+"|-|"+beaconid)
+    r.zrem("bmk:doc:share", beaconusr + "|-|" + beaconid) 
+    r.zrem("bmk:doc:share:byfllw", beaconusr + "|-|" + beaconid) 
+    r.zrem("bmk:doc:share:bynews", beaconusr + "|-|" + beaconid)
+    r.zrem("usr:" + beaconusr + ":fllw", beaconusr + "|-|" + beaconid)
+    key = "bmk:" + beaconusr + ":" + beaconid
+    for usr in r.smembers(key + ":fllw"):
+        r.zrem("usr:" + usr + ":fllw", beaconusr + "|-|" + beaconid)
     r.delete(key + ":doc:tms")
     r.delete(key + ":fllw")
     r.delete(key)
     
-    r.delete("channel:" + beaconusr + ":" + beaconid+ ":doc_dcnt")
-    r.delete("channel:" + beaconusr + ":" + beaconid+ ":doc_tcnt")
+    r.delete("channel:" + beaconusr + ":" + beaconid + ":doc_dcnt")
+    r.delete("channel:" + beaconusr + ":" + beaconid + ":doc_tcnt")
     
     return HttpResponseRedirect("/news/beaconlist/")
         
@@ -1502,36 +929,36 @@ def admin(request, template_name="beacon/admin.html"):
 #    user_list = [user.replace("usr:", "") for user in user_list ]
     otype = request.GET.get("otype", "user")
     query = request.GET.get("query", "")
-    query = query.replace(" ","")
+    query = query.replace(" ", "")
     userobj = request.user
     if userobj.is_anonymous():  # 用户未登录
         return HttpResponse('<h1>只有登录用户才能访问该功能..</h1>')
     username = getUserName(request)
     
-    if username not in ["wxi","sj","ltb"]:#
+    if username not in ["wxi", "sj", "ltb"]:  #
         return HttpResponse('<h1>只有管理用户才能访问该功能..</h1>')
 #    user_list = r.keys("usr:*:ppl:uptms")
     usrlst = []
-    if otype=="log":
-        userinfos= r.zrevrange("log",0,1000)
+    if otype == "log":
+        userinfos = r.zrevrange("log", 0, 1000)
         for userinfo in userinfos:
 #            print userinfo
-            usr=json.loads(userinfo)  
+            usr = json.loads(userinfo)  
 #             usr["act_tms"] = getTime(usr["tms"])
 #             usr["act_tms"] = usr["act_tms"][0:19]
 #            if usr["ip"] not in ["203.208.60.217","203.208.60.218","203.208.60.219","123.125.71.38"]:
-            if query =="" :
+            if query == "" :
                 usrlst.append(usr)
             elif usr["ip"] == query or usr["usr"] == query:
                 usrlst.append(usr)
     else:
         userinfos = r.hgetall("usrlst")
 #        print userinfos
-        for user,userinfo in userinfos.items():
-            usr=json.loads(userinfo)  
+        for user, userinfo in userinfos.items():
+            usr = json.loads(userinfo)  
 #             usr["act_tms"] = getTime(usr["tms"])
             usrlst.append(usr)
-        usrlst = sorted(usrlst,key=lambda l:l["act_tms"],reverse = True)
+        usrlst = sorted(usrlst, key=lambda l:l["act_tms"], reverse=True)
 #    print request
     return render_to_response(template_name, { 
         "usrlst": usrlst,
@@ -1543,11 +970,11 @@ def admin(request, template_name="beacon/admin.html"):
 @login_required
 def sendemailforbeacon(request):
     username = getUserName(request)
-    if username not in ["wxi","sj","ltb"]:#
+    if username not in ["wxi", "sj", "ltb"]:  #
         return HttpResponse('<h1>只有管理用户才能访问该功能..</h1>')
     hourbefore = request.GET.get("hourbefore", "8")
-    beaconid=request.GET.get("beacon", "allbeacons")
-    user=request.GET.get("u", username)
+    beaconid = request.GET.get("beacon", "allbeacons")
+    user = request.GET.get("u", username)
     
     pushQueue("sendemail", user, "bybeacon", tag=hourbefore, similarid=beaconid)
     return HttpResponse("sendemail is okay.")
@@ -1558,46 +985,46 @@ def sendemailfornews(request):
     print "===sendemailfornews==="
     
     username = getUserName(request)  
-    usr_email = r.hget("usr:"+username,"email")
+    usr_email = r.hget("usr:" + username, "email")
     groupname = request.GET.get("group", "all")
-    groupemail = ",".join(r.zrevrange("usr:"+username+":buddy:"+groupname,0,-1))
+    groupemail = ",".join(r.zrevrange("usr:" + username + ":buddy:" + groupname, 0, -1))
     emails = request.GET.get("emails", "")
     docids = request.GET.get("docids", "")
     otype = request.GET.get("o", "")
      
     
     robj = {}
-    if emails== "":
-        robj["message"] ="email must be not null !"
-        robj["success"] ="failed"
+    if emails == "":
+        robj["message"] = "email must be not null !"
+        robj["success"] = "failed"
         return HttpResponse(json.dumps(robj), mimetype="application/json")
     
-    quantity = log_typer(request, "sendemailfornews", emails+"->"+docids)
+    quantity = log_typer(request, "sendemailfornews", emails + "->" + docids)
 #     if quantity > getsysparm("QUANTITY"):
 #         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
-    def pushemail(emails,docids):
-        for email,docid in zip( emails.split(","),docids.split(";") ):
+    def pushemail(emails, docids):
+        for email, docid in zip(emails.split(","), docids.split(";")):
             pushQueue("sendemail", username, "byemail", tag=email, similarid=docid)
             
-    if otype=="service":
+    if otype == "service":
         if emails != "":
 #             pushQueue("sendemail", username, "byemail", tag=emails, similarid=docids.replace(",",";"))
-            pushemail(emails,docids.replace(",",";"))
-            robj["message"] = "send email to:"+emails 
+            pushemail(emails, docids.replace(",", ";"))
+            robj["message"] = "send email to:" + emails 
         else:
 #             pushQueue("sendemail", username, "byemail", tag=usr_email, similarid=docids.replace(",",";"))
-            pushemail(usr_email,docids.replace(",",";"))   
-            robj["message"] = "send email to:"+usr_email
-        if groupname !="": 
+            pushemail(usr_email, docids.replace(",", ";"))   
+            robj["message"] = "send email to:" + usr_email
+        if groupname != "": 
             robj["group"] = groupname
         robj["success"] = 'true'
         robj["docid"] = docids
         return HttpResponse(json.dumps(robj), mimetype="application/json")
     
     if emails != "":
-        sendemailbydocid(emails,docids)
+        sendemailbydocid(emails, docids)
     else: 
-        sendemailbydocid(usr_email,docids)
+        sendemailbydocid(usr_email, docids)
 #    urlstr = "http://www.gxdx168.com/research/svc?docid=" + docids
 #    udata=getDataByUrl(urlstr)
 #    if udata.has_key("docs"):
@@ -1619,28 +1046,28 @@ def captchalist(request, template_name="beacon/captcha.html"):
     if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     if captchaid != "":
-        r.hset("captcha:"+captchaid,"issendmail",True)
-        username = r.hget("captcha:"+captchaid,"crt_usr")
-        usr_email = r.hget("usr:"+username,"email")
-        url= "http://"+request.META['HTTP_HOST']+"/apply/?captcha="+captchaid 
+        r.hset("captcha:" + captchaid, "issendmail", True)
+        username = r.hget("captcha:" + captchaid, "crt_usr")
+        usr_email = r.hget("usr:" + username, "email")
+        url = "http://" + request.META['HTTP_HOST'] + "/apply/?captcha=" + captchaid 
 #        content=username+""",您好!\r\n欢迎您的注册,在访问过程中有任何疑问及建议可以给我们邮件或者在网站中提交建议,\r\n
 #        现在,您可以邀请您的朋友们通过以下链接来指极星注册:\r\n  """.decode("utf8")+url
-        content=username+",这是来自指极星的邀请，欢迎！\r\n\r\n指极星，帮助您在浩瀚空间中发现您关注的资讯。\r\n\r\n邀请码：".decode("utf8")+captchaid
-        content+="\r\n\r\n点击加入".decode("utf8")+url+" ，主观、客观、达观的共同探索。".decode("utf8")
-        sendemail(content,usr_email)
+        content = username + ",这是来自指极星的邀请，欢迎！\r\n\r\n指极星，帮助您在浩瀚空间中发现您关注的资讯。\r\n\r\n邀请码：".decode("utf8") + captchaid
+        content += "\r\n\r\n点击加入".decode("utf8") + url + " ，主观、客观、达观的共同探索。".decode("utf8")
+        sendemail(content, usr_email)
         return HttpResponseRedirect("/news/captchalist/")
 #    print request
     captchas = r.keys("captcha:*")
     captchaobjs = []
-    cdata={}
+    cdata = {}
     for cap in captchas:
         cdata = r.hgetall(cap)
-        tms= cdata["crt_tms"] if cdata.has_key("crt_tms") else "0"
-        cdata["id"] = cap.replace("captcha:","")
-        cdata["crt_tms"]=getTime(tms)
-        cdata["tms"]=tms
+        tms = cdata["crt_tms"] if cdata.has_key("crt_tms") else "0"
+        cdata["id"] = cap.replace("captcha:", "")
+        cdata["crt_tms"] = getTime(tms)
+        cdata["tms"] = tms
         captchaobjs.append(cdata)
-    captchaobjs = sorted(captchaobjs,key=lambda l:l["tms"],reverse = True)
+    captchaobjs = sorted(captchaobjs, key=lambda l:l["tms"], reverse=True)
     return render_to_response(template_name, { 
         "captchas": captchaobjs,
     }, context_instance=RequestContext(request))

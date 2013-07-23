@@ -300,23 +300,25 @@ def buddyhold(request):
         return HttpResponse("ok")
         
 
-def test(request, template_name="beacon/test.html"):
-    bkcolor = request.GET.get("bkcolor", "#f5f5f5") 
-    lineheight = request.GET.get("lineheight", "8.5px") 
-    fontsize = request.GET.get("fontsize", "18.5px") 
-    padding = request.GET.get("padding", "0px 9px 0px 9px") 
-    fontcolor = request.GET.get("fontcolor", "red") 
-    fontfamily = request.GET.get("fontfamily", """"Arial Hebrew","Microsoft Yahei","Luxi Sans","Helvetica Neue", "DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;""")
-    font = request.GET.get("font", "18.5px/1.8 Arial,\5FAE\8F6F\96C5\9ED1,\82F9\679C\4E3D\4E2D\9ED1;")
+def test(request, template_name="beacon/test.html"): 
+#     tempparmsobj = r.hgetall("tempparms")
+    bkcolor = r.hget("tempparms","bkcolor")
+    fontsize = r.hget("tempparms","fontsize")
+    padding = r.hget("tempparms","padding")
+    fontcolor = r.hget("tempparms","fontcolor")
+    fontfamily = r.hget("tempparms","fontfamily") 
+#     padding = request.GET.get("padding", "0px 9px 0px 9px") 
+#     fontcolor = request.GET.get("fontcolor", "red") 
+#     fontfamily = request.GET.get("fontfamily", """"Arial Hebrew","Microsoft Yahei";""")
+#     font = request.GET.get("font", "18.5px/1.8 Arial,\5FAE\8F6F\96C5\9ED1,\82F9\679C\4E3D\4E2D\9ED1;")
     print fontsize,padding,bkcolor
     return render_to_response(template_name, { 
-        'bkcolor': bkcolor,
-        'lineheight': lineheight,
+        'bkcolor': bkcolor, 
         'fontsize': fontsize,
         'padding':padding,
         'fontcolor':fontcolor,
         'fontfamily':fontfamily,
-        'font':font,
+#         'font':font,
     }, context_instance=RequestContext(request))  
 
 @login_required
@@ -500,48 +502,58 @@ def sysparms(request,template_name="beacon/sysparms.html"):
         return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
     if  request.method == 'GET':
         sysparmsobj = r.hgetall("sysparms")
+        tempparmsobj = r.hgetall("tempparms")
          
         return render_to_response(template_name, { 
             'username':username, 
+            'tempparmsobj':tempparmsobj,
             'sysparmsobj':sysparmsobj,
             'current_path': request.get_full_path(),
         }, context_instance=RequestContext(request)) 
     
-    if  request.method == 'POST':
-#         redis_host = request.POST.get("redis_host", "localhost");
-#         redis_port = request.POST.get("redis_port", "6379");
-        redis_expire = request.POST.get("redis_expire", "186400");
-        backend_domain = request.POST.get("backend_domain", "svc.zhijixing.com");
-        domain = request.POST.get("domain", "www.9cloudx.com");
-        doc_expire = request.POST.get("doc_expire","172800");
-        beacon_interval =request.POST.get("beacon_interval", "900");
-#         beacon_interval_remove = request.POST.get("beacon_interval_remove", "300");
-#         beacon_interval_remove_cnt =request.POST.get("beacon_interval_remove_cnt", "3");
-        beacon_news_num =request.POST.get("beacon_news_num", "300");
-        quantity = request.POST.get("quantity", "1500");
-        quantity_duration = request.POST.get("quantity_duration", "300"); 
-        loglevel = request.POST.get("loglevel", "info"); 
-        failed_retry_times = request.POST.get("failed_retry_times", "3"); 
-        
-        r.hset("sysparms","redis_expire",int(redis_expire))
-        r.hset("sysparms","backend_domain",backend_domain)
-        r.hset("sysparms","domain",domain)
-        r.hset("sysparms","doc_expire",int(doc_expire))
-        r.hset("sysparms","beacon_interval",int(beacon_interval))
-#         r.hset("sysparms","beacon_interval_remove",int(beacon_interval_remove))
-#         r.hset("sysparms","beacon_interval_remove_cnt",int(beacon_interval_remove_cnt))
-        r.hset("sysparms","beacon_news_num",int(beacon_news_num))
-        r.hset("sysparms","quantity",int(quantity))
-        r.hset("sysparms","quantity_duration",int(quantity_duration))
-        r.hset("sysparms","failed_retry_times",int(failed_retry_times))
-        r.hset("sysparms","loglevel",loglevel)
-        sysparmsobj = r.hgetall("sysparms")
-#         loginit(loglevel)
-#         print doc_expire
+    if  request.method == 'POST': 
+        parmtype = request.POST.get("parmtype", "system");
+        print parmtype 
+        if parmtype == "system":
+            redis_expire = request.POST.get("redis_expire", "186400");
+            backend_domain = request.POST.get("backend_domain", "svc.zhijixing.com");
+            domain = request.POST.get("domain", "www.9cloudx.com");
+            doc_expire = request.POST.get("doc_expire","172800");
+            beacon_interval =request.POST.get("beacon_interval", "900"); 
+            beacon_news_num =request.POST.get("beacon_news_num", "300");
+            quantity = request.POST.get("quantity", "1500");
+            quantity_duration = request.POST.get("quantity_duration", "300"); 
+            loglevel = request.POST.get("loglevel", "info"); 
+            failed_retry_times = request.POST.get("failed_retry_times", "3");  
+            r.hset("sysparms","redis_expire",int(redis_expire))
+            r.hset("sysparms","backend_domain",backend_domain)
+            r.hset("sysparms","domain",domain)
+            r.hset("sysparms","doc_expire",int(doc_expire))
+            r.hset("sysparms","beacon_interval",int(beacon_interval)) 
+            r.hset("sysparms","beacon_news_num",int(beacon_news_num))
+            r.hset("sysparms","quantity",int(quantity))
+            r.hset("sysparms","quantity_duration",int(quantity_duration))
+            r.hset("sysparms","failed_retry_times",int(failed_retry_times))
+            r.hset("sysparms","loglevel",loglevel)
+        elif parmtype == "template":
+            fontsize = request.POST.get("fontsize", "50px");
+            fontcolor = request.POST.get("fontcolor", "blue");
+            fontfamily = request.POST.get("fontfamily", """ "Arial Hebrew","Microsoft Yahei" """);
+            bkcolor = request.POST.get("bkcolor", "#f5f5f5");
+            padding = request.POST.get("padding", "0px 9px 6px 9px");
+            r.hset("tempparms","fontsize",fontsize)
+            r.hset("tempparms","fontcolor",fontcolor)
+            r.hset("tempparms","fontfamily",fontfamily)
+            r.hset("tempparms","bkcolor",bkcolor)
+            r.hset("tempparms","padding",padding)
+             
+        sysparmsobj = r.hgetall("sysparms") 
+        tempparmsobj = r.hgetall("tempparms")
         return render_to_response(template_name, {
             'err_message': "用户信息保存成功".decode("utf8"),
             'username':username, 
             'sysparmsobj':sysparmsobj,
+            'tempparmsobj':tempparmsobj,
             'current_path': request.get_full_path(),
         }, context_instance=RequestContext(request)) 
         

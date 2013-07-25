@@ -76,7 +76,7 @@ if __name__ == "__main__":
     parser.add_argument("-a", "--auto", dest="auto",default=0,type=int,
                     help="auto process every other second.")
     
-    parser.add_argument("-n", "--num", dest="num",default=20,type=int,
+    parser.add_argument("-n", "--num", dest="num",default=0,type=int,
                     help="fetchdata before date from backend (use in urls).")
     
     parser.add_argument("-f", "--force", dest="force",default=False,

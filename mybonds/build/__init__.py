@@ -350,24 +350,28 @@ def loginAndDo(parms=[]):
     page = url.read(200000)
     print page
     
-def getTime(tms):
+def getTime(parms):
     """ return the converted date & time 'yyyy-mm-dd hh:mm:ss' by input tms """
     addtimezone=False
     formatstr="%Y-%m-%d %H:%M:%S"
-    if type(tms).__name__ == "str":
-        if tms=="":
-            tms="0"
-        tms=float(tms) 
-    try:
-        if addtimezone:
-            tms=tms+3600*8
-        tdate = dt.datetime.fromtimestamp(tms).strftime(formatstr)
-    except:
-        print "Attembrough: i use getDate(%s,formatstr=%s) but it's report error..." % (tms,formatstr)
-        traceback.print_exc()
-        print "" 
-    else:
-        print tdate
+    if type(parms).__name__ == "str":
+        parms = (parms,) 
+    
+    for tms in parms:
+        if type(tms).__name__ == "str":
+            if tms=="":
+                tms="0"
+            tms=float(tms) 
+        try:
+            if addtimezone:
+                tms=tms+3600*8
+            tdate = dt.datetime.fromtimestamp(tms).strftime(formatstr)
+        except:
+            print "Attembrough: i use getDate(%s,formatstr=%s) but it's report error..." % (tms,formatstr)
+            traceback.print_exc()
+            print "" 
+        else:
+            print tdate
 
 def getUnixTime(tstr):
     """return unix timestamp input mustbe yyyymmdd"""

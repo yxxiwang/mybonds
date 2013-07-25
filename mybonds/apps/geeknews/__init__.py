@@ -650,6 +650,7 @@ def beaconUrl(beaconusr, beaconid,daybefore=0):
     today = dt.date.fromtimestamp(time.time())
     after = time.mktime(today.timetuple())
     after = after - daybefore*86400 
+    print after,daybefore
     after = (after+2*3600) * 1000
     before = time.time() * 1000
     if int(mindoc) <= 0 :

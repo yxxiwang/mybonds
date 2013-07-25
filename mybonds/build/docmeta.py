@@ -47,7 +47,8 @@ def channels():
         print "<-----proc %s:%s (%d of %d), time elaspe %s(%d sec) ------>" % (beaconusr,beaconid,i,cnt,elaspestr,diff)
         
 #         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
-        
+        if not r.exists("bmk:"+beaconusr+":"+beaconid):#如果该频道不存在
+            continue
         rt = refreshDocs(beaconusr, beaconid,daybefore=num,force=force)
         if not rt == SUCCESS:
             urlstr = beaconUrl(beaconusr, beaconid)

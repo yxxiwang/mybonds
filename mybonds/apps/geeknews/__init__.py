@@ -793,8 +793,11 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
             doc["tx"] = doc["text"]
         doc["text"] = subDocText(doc["text"])
         doc["title"] = doc["title"].decode("utf8")+u"\u3000"
-        doc["copyNum"] = str(doc["copyNum"]) 
-        doc["popularity"] = str(doc["popularity"])
+        doc["copyNum"] = str(doc["copyNum"])
+        if doc.has_key("popularity"):
+            doc["popularity"] = str(doc["popularity"])
+        else:
+            doc["popularity"] = "0"
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         docs.append(doc) 

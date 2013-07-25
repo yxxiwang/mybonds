@@ -418,14 +418,15 @@ def load_similars(request):
             udata["total"] = "0"  
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     else:  # 取某个灯塔的新闻
-        udata = buildBeaconData(beaconusr, beaconid, start=start , end=num, isapi=True)
-        r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
-        if udata.has_key("docs"):
-            udata["success"] = "true"
-            udata["message"] = "success retrive data"
-        else:
+        try:
+            udata = buildBeaconData(beaconusr, beaconid, start=start , end=num, isapi=True)
+            r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
+        except:
             udata["success"] = "false"
             udata["message"] = "no data" 
+        else:
+            udata["success"] = "true"
+            udata["message"] = "success retrive data"
         return HttpResponse(json.dumps(udata), mimetype="application/json")
         
      
@@ -762,8 +763,12 @@ def beaconnews(request, template_name="beacon/beacon_news.html"):
             if re.search(beaconname, beaconttl):
                 beacon_search.append(beaobj) 
                 
-    if beaconid != "":  
-        udata = buildBeaconData(beaconusr, beaconid, start=0 , end=100) 
+    if beaconid != "":
+        try:
+            udata = buildBeaconData(beaconusr, beaconid, start=0 , end=100) 
+        except:
+            logger.error("buildBeaconData(%s,%s) is error====" %(beaconusr, beaconid))
+            traceback.print_exc()
         beaconname = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
         beacondisname = r.hget("bmk:" + beaconusr + ":" + beaconid, "name") 
         r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())  # 增加用户关于该频道的最后跟新时间

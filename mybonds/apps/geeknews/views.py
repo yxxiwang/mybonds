@@ -389,7 +389,7 @@ def fllowbeacon_service(request):
     robj["beacon"] = beaobj
     return HttpResponse(json.dumps(robj), mimetype="application/json")
 
-@login_required
+# @login_required
 def load_similars(request):
     groupid = request.GET.get("groupid", "") 
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
@@ -409,6 +409,8 @@ def load_similars(request):
     beacons = []
     # modified by devwxi 临时使用..
     if groupid == getHashid("All"):
+        username = request.GET.get("u",username) 
+        username = username if r.sismember("character",username) else getUserName(request)
         udata = getAllBeaconDocsByUser(username, start=start , num=num, newscnt=1)
         udata["success"] = "true"
         udata["message"] = "success return data"

@@ -43,6 +43,7 @@ def get_captcha(request):
 
 def apply_service(request):
     username = request.GET.get("usr", "");
+    username = userneme.lower()
     password = request.GET.get("pwd", "");
     email = request.GET.get("email", "");
     captcha = request.GET.get("captcha", "");
@@ -137,6 +138,7 @@ def apply(request):
     
     if  request.method == 'POST':
         username = request.POST.get("username", "");
+        username = userneme.lower()
         password = request.POST.get("password", "");
         email = request.POST.get("email", "yxxiwang@gmail.com");
         captcha = request.POST.get("captcha", "111111");
@@ -686,6 +688,7 @@ def character(request, template_name="beacon/suggestion.html"):
     
 def login_service(request):
     username = request.GET.get("usr", "");
+    username = userneme.lower()
     password = request.GET.get("pwd", "");
     robj = {}
     if username == "" or password == "":
@@ -723,6 +726,7 @@ def login(request):
 
     if  request.method == 'POST':
         username = request.POST.get("username", "");
+        username = userneme.lower()
         password = request.POST.get("password", "");
         user = auth.authenticate(username=username, password=password)
         if user is not None and user.is_active:

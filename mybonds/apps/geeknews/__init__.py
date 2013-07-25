@@ -627,7 +627,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
 #     return udata   
     
 
-def beaconUrl(beaconusr, beaconid):
+def beaconUrl(beaconusr, beaconid,daybefore=0):
     """
                         根据频道所属用户及频道id生成从后台取频道的请求地址
     """
@@ -649,6 +649,7 @@ def beaconUrl(beaconusr, beaconid):
     channelparm = "channelid" if popularid == "0" else "popularid"
     today = dt.date.fromtimestamp(time.time())
     after = time.mktime(today.timetuple())
+    after = after - daybefore*86400 
     after = (after+2*3600) * 1000
     before = time.time() * 1000
     if int(mindoc) <= 0 :
@@ -657,7 +658,7 @@ def beaconUrl(beaconusr, beaconid):
         urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d&mindoc=%s" %(getsysparm("BACKEND_DOMAIN"),channelparm,channel,after,before,mindoc)
     return urlstr
 
-def refreshDocs(beaconusr, beaconid,force=False):
+def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
     """更新频道内容,该方法也会被异步调用"""
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info( "=====refreshDocs===="+key )
@@ -671,7 +672,7 @@ def refreshDocs(beaconusr, beaconid,force=False):
             logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % timediff )
             return 0 
     
-    urlstr = beaconUrl(beaconusr, beaconid)
+    urlstr = beaconUrl(beaconusr, beaconid,daybefore=daybefore)
     
     if not r.exists(key):
         logger.warn( "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key )
@@ -793,6 +794,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         doc["text"] = subDocText(doc["text"])
         doc["title"] = doc["title"].decode("utf8")+u"\u3000"
         doc["copyNum"] = str(doc["copyNum"]) 
+        doc["popularity"] = str(doc["popularity"])
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         docs.append(doc) 
@@ -1018,7 +1020,8 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                     ids=""
                     cnt = 0
                 if docAsChannel and headlineonly=="1":
-                    addBeacon("doc",getHashid(docid),docid,beaconname=doc["title"],tag="auto",headlineonly=headlineonly)
+                    beaconname = doc["label"] if doc.has_key("label") else docid
+                    addBeacon("doc",getHashid(docid),docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
             else:
                 pass
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
@@ -1027,9 +1030,12 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             title = strfilter(title)
             pipedoc.hset("doc:"+docid,"docid",docid)
             pipedoc.hset("doc:"+docid,"title",title)
+            if doc.has_key("label"):
+                pipedoc.hset("doc:"+docid,"label",doc["label"] ) 
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
+            pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
     #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
     #             pipedoc.hset("doc:"+docid,"host",doc["host"] )  

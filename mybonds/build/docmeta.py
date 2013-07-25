@@ -27,117 +27,6 @@ from mybonds.apps.newspubfunc import *
 import argparse
 
 num = 0
-# def saveFulltextById(ids,retrycnt=0):
-#     logger.info( "===saveFulltextById===%s" %  ids )
-#     if ids is None or ids =="":
-#         return {}
-#     if retrycnt>=2:
-#         logger.info( "saveFulltextById(%s) reach the maxium retrycnt :%d" % ( ids, retrycnt))
-#         return {}
-#     urlstr = "http://%s/research/svc?docid=%s" % (BACKEND_DOMAIN,ids)
-#     def fetchAndSave(docs):
-#         for doc in docs:
-#             if doc.has_key("fulltext"):
-#                 doc["_id"]=str(doc["docId"])
-#                 doc.pop("relatedDocs")
-#                 tftxs.save(doc) 
-#                 
-#                 docid = str(doc["docId"])
-# #                 rdoc.set("ftx:"+docid,json.dumps(doc["fulltext"]))
-# #                 rdoc.expire("ftx:"+docid,DOC_EXPIRETIME)
-#                 rdoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1])        
-#                 rdoc.hset("doc:"+docid,"domain",doc["domain"] )
-#     udata = bench(loadFromUrl,parms=urlstr)
-#     if udata.has_key("docs"):
-#         fetchAndSave(udata["docs"])
-#     else:
-#         logger.warn( "==%s udata haven't key docs ! do it again..retrycnt is %d" %(urlstr, retrycnt) )
-#         saveFulltextById(ids,retrycnt+1)
-#     return udata
-#         
-#                 
-# def saveData(udata,key):
-#     logger.info( "===saveData===%s" % key)
-#     pipedoc = rdoc.pipeline()
-#     ids=""
-#     doc_dcnt_key = key.replace("doc_cts","doc_dcnt")
-#     channel_cnt_key = key.replace("doc_cts","cnt") 
-#     for doc in udata["docs"]:
-#         if not doc["validTime"]:
-#             continue
-# #         docid = getHashid(doc["url"])
-#         docid= str(doc["docId"])
-#         tms = doc["create_time"]
-#         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
-# #         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
-#         r.hset("copynum",docid,doc["copyNum"])
-#         r.zadd(doc_dcnt_key,int(tdate),docid)
-# 
-# #         tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
-# #         num = int(json.loads(docstr)["num"])
-# #         if not rdoc.exists("doc:"+docid):
-# #             print "%s incr 1 ,num:%d ,key: doc:%s" %(tdate,doc["copyNum"],docid)
-# #             r.hincrby(doc_dcnt_key,tdate,1)
-# #             r.hincrby(doc_dnum_key,tdate,doc["copyNum"])
-#         
-#         if not rdoc.exists("doc:"+docid): 
-#             ids+=docid+";"
-#         pipedoc.hset("doc:"+docid,"docid",docid)
-#         pipedoc.hset("doc:"+docid,"title",doc["title"].replace(" ","")) 
-#         pipedoc.hset("doc:"+docid,"text",doc["text"].replace(" ",""))
-#         pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
-#         pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )    
-# #         pipedoc.hset("doc:"+docid,"url",doc["url"] )       
-# #         pipedoc.hset("doc:"+docid,"host",doc["host"] )  
-#         pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
-#         
-#         
-#         pipedoc.expire("doc:"+docid,DOC_EXPIRETIME)
-#         
-#     today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
-#     cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
-#     if cnt>0:
-#         r.zadd(channel_cnt_key,cnt,int(today))
-#     saveFulltextById(ids)
-#     pipedoc.execute()
-#     
-# def channelDocs(beaconusr,beaconid,rtycnt=0): 
-#     channel = getchannelByid(beaconusr,beaconid)
-#     if channel is None: 
-#         print "%s:%s haven't channel !" %(beaconusr,beaconid)
-#         return
-#     if rtycnt>=2 :
-#         print "%s:%s rtrcnt reach %d!" %(beaconusr,beaconid,rtycnt)
-#         return
-#     urlstr="http://"+BACKEND_DOMAIN+"/research/svc?channelid="+urllib2.quote(channel) +"&length="+str(num)
-#     udata = bench(loadFromUrl,parms=urlstr)
-#     key = "channel:"+beaconusr+":"+beaconid+":doc_cts"
-#     if udata.has_key("docs"): 
-#         saveData(udata,key)
-#         r.hset("bmk:" + beaconusr + ":" + beaconid, "last_touch", time.time())  # 更新本操作时间  
-#         bkey = "bmk:" + beaconusr + ":" + beaconid
-#         headlineonly = r.hget(bkey, "headlineonly")
-#         headlineonly = "0" if headlineonly is None else headlineonly
-#         
-#         if headlineonly=="0" and udata.has_key("docs"):
-#             docs =  udata["docs"]
-#         elif headlineonly=="1" and udata.has_key("headlines"):
-#             docs =  udata["headlines"]
-#             
-#         r.delete(bkey+":doc:tms")
-#         for doc in docs:
-#             if doc is None:
-#                 continue 
-#             r.zadd(bkey+":doc:tms",int(doc["create_time"]),str(doc["docId"]))
-#         r.hset(bkey, "last_update", time.time())  # 更新本操作时间  
-#         r.hset(bkey, "removecnt", 0)  # 更新本操作时间  
-#     else:
-#         print "%s:%s udata haven't key docs ! do it again.." %(beaconusr,beaconid)
-#         channelDocs(beaconusr,beaconid,rtycnt+1)
-# 
-# def doSum():
-#     pass
-
 def channels():
     start = time.time()
     cnt = r.zcard("bmk:doc:share")
@@ -159,7 +48,7 @@ def channels():
         
 #         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
         
-        rt = refreshDocs(beaconusr, beaconid)
+        rt = refreshDocs(beaconusr, beaconid,daybefore=num,force=force)
         if not rt == SUCCESS:
             urlstr = beaconUrl(beaconusr, beaconid)
             pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
@@ -173,7 +62,7 @@ def initProc(codes,force=False):
                 beaconusr,beaconid = code.split(":")
                 print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
 #                 channelDocs(beaconusr,beaconid)
-                refreshDocs(beaconusr, beaconid,force)
+                refreshDocs(beaconusr, beaconid,daybefore=num,force=force)
     
 
 if __name__ == "__main__":  
@@ -187,7 +76,7 @@ if __name__ == "__main__":
                     help="auto process every other second.")
     
     parser.add_argument("-n", "--num", dest="num",default=20,type=int,
-                    help="fetchdata length from backend (use in urls).")
+                    help="fetchdata before date from backend (use in urls).")
     
     parser.add_argument("-f", "--force", dest="force",default=False,
                     help="force flag")

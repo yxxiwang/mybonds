@@ -52,7 +52,7 @@ def channels():
         rt = refreshDocs(beaconusr, beaconid,daybefore=num,force=force)
         if not rt == SUCCESS:
             urlstr = beaconUrl(beaconusr, beaconid)
-            pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
+            pushQueue("beacon", beaconusr, "beaconfromdocmeta", beaconid,urlstr=urlstr)
 #         channelDocs(beaconusr,beaconid)
         
 def initProc(codes,force=False):

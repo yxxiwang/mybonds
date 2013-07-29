@@ -324,4 +324,54 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     qobj["id"] = getHashid(urlstr)
     r.lpush("queue:" + qtype, json.dumps(qobj))
     
+def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
+    key = "bmk:" + beaconusr + ":" + beaconid
+    print key
+    if r.exists(key):
+#         refreshBeacon(beaconusr, beaconid)
+        pass
+    else:
+        return {} 
+    udata = {}
+    docs = [] 
+    channels = []
+    channelfromtags = []
+    doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合 
+    print doc_lst
+    for docid in doc_lst:
+        subdocs = [] 
+        doc = rdoc.hgetall("doc:" + docid) 
+        if doc == {}:
+            continue
+        doc.pop("text")
+        doc.pop("copyNum")
+        if doc.has_key("popularity"):
+            doc.pop("popularity")
+#         doc["text"] = subDocText(doc["text"])
+        doc["title"] = doc["title"].decode("utf8")+u"\u3000"
+#         doc["copyNum"] = str(doc["copyNum"])
+#         if doc.has_key("popularity"):
+#             doc["popularity"] = str(doc["popularity"])
+#         else:
+#             doc["popularity"] = "0"
+        doc["tms"]=str(doc["create_time"])
+        doc["create_time"] = timeElaspe(doc["create_time"]) 
+        subkey = "bmk:doc:"+getHashid(docid)
+        print "subkey",subkey,docid
+        if r.exists(subkey):
+            subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,3)
+            for subdocid in subdoc_lst:
+                subdoc= rdoc.hgetall("doc:" + subdocid)
+                subdoc.pop("text")
+                subdoc.pop("copyNum")
+                subdoc.pop("popularity")
+                subdocs.append(subdoc)
+                
+        doc["subdocs"]=subdocs
+        docs.append(doc)
+            
+    udata["docs"] = docs
+    udata["total"] = str(len(udata["docs"]) )
+#     r.hset(key, "cnt", len(docs))
+    return udata
 

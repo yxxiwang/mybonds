@@ -579,7 +579,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
         beaconname = "" if beaconname is None  else beaconname
         lst = r.zrevrange(key+":doc:tms",0,newscnt-1)
 #         sim_lst += lst
-        newcnt = getBeaconNewsCnt(username,beaconusr,beaconid)
+#         newcnt = getBeaconNewsCnt(username,beaconusr,beaconid)
         for docid in lst:
             doc = rdoc.hgetall("doc:" + docid)
             if len(doc.keys()) == 0:
@@ -787,7 +787,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
     for docid in doc_lst:
         doc = rdoc.hgetall("doc:" + docid) 
-        if len(doc.keys()) == 0:
+        if doc == {}:
             continue  
         if not isapi:
             doc["tx"] = doc["text"]

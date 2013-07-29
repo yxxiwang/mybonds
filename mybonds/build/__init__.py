@@ -401,6 +401,9 @@ if __name__ == "__main__":
                   python %prog cleanBeacon {print|delete} 
                   python %prog makeDocDateCnt 
                   python %prog convUsrFllw 
+                  python %prog getTime 
+                  python %prog getUnixTime 
+                  python %prog cleanDocChannel  {print|delete} 
             """
     if len(sys.argv) >= 2:
         func = sys.argv[1] 

@@ -127,7 +127,7 @@ def research(request,template_name="beacon/fulltextnew.html"):
     
     fulldoc = tftxs.find_one({"_id":docid})
     if fulldoc is not None:
-        print fulldoc
+#         print fulldoc
         ftxlist = fulldoc["fulltext"] 
         url = fulldoc["urls"][0].split(",")[1]
     else:
@@ -397,7 +397,9 @@ def load_similars(request):
     obj = "all" if groupid != "" else beaconusr + ":" + beaconid
     quantity = log_typer(request, "load_similars", obj) 
     if quantity > getsysparm("QUANTITY"):
-        return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
      
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5") 

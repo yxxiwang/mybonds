@@ -45,7 +45,36 @@ def channelnews(request):
 
 
 @login_required
-def channels(request):
+def hotboard(request):
+    """获取 热点频道 面板"""
+    beaconid = request.GET.get("beaconid", "1968416984598300074")  
+    beaconusr = request.GET.get("beaconusr", "doc")
+    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
+    quantity = log_typer(request, "hotboard", obj)
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    if obj is None:
+        udata["success"] = "false"
+        udata["message"] = "it's not exists!" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+        
+    udata = {}
+    start = request.GET.get("start", "0")
+    num = request.GET.get("num", "5") 
+    username = getUserName(request)
+    try:
+        udata = buildHotBoardData(beaconusr, beaconid, start=start , end=num, isapi=True)
+    except:
+        traceback.print_exc()
+        udata["success"] = "false"
+        udata["message"] = "no data" 
+    else: 
+        udata["success"] = "true"
+        udata["message"] = "success retrive data"
+    return HttpResponse(json.dumps(udata), mimetype="application/json")
+    
     return HttpResponse("channels")
  
 @login_required

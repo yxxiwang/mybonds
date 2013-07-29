@@ -326,7 +326,7 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     
 def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     key = "bmk:" + beaconusr + ":" + beaconid
-    logger.info("key is :"+key)
+    logger.info("key is "+key)
     if r.exists(key):
 #         refreshBeacon(beaconusr, beaconid)
         pass
@@ -351,14 +351,14 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
 #         doc["text"] = subDocText(doc["text"])
         doc["title"] = doc["title"].decode("utf8")+u"\u3000"
 #         doc["copyNum"] = str(doc["copyNum"])
-#         if doc.has_key("popularity"):
-#             doc["popularity"] = str(doc["popularity"])
-#         else:
-#             doc["popularity"] = "0"
+        if doc.has_key("popularity"):
+            doc["popularity"] = str(doc["popularity"])
+        else:
+            doc["popularity"] = "0"
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         subkey = "bmk:doc:"+getHashid(docid)
-        logger.info( "subkey is:%s ; docid is: %s " %(subkey,docid) )
+        logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
         if r.exists(subkey):
             subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,3)
             for subdocid in subdoc_lst:

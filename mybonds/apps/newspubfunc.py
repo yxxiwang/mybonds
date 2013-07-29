@@ -326,7 +326,7 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     
 def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     key = "bmk:" + beaconusr + ":" + beaconid
-    print key
+    logger.info("key is :"+key)
     if r.exists(key):
 #         refreshBeacon(beaconusr, beaconid)
         pass
@@ -337,11 +337,12 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     channels = []
     channelfromtags = []
     doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合 
-    print doc_lst
+#     print doc_lst
     for docid in doc_lst:
         subdocs = [] 
         doc = rdoc.hgetall("doc:" + docid) 
         if doc == {}:
+            logger.warning("doc %s info is not exists!" % docid )
             continue
         doc.pop("text")
         doc.pop("copyNum")
@@ -363,6 +364,7 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
             for subdocid in subdoc_lst:
                 subdoc= rdoc.hgetall("doc:" + subdocid)
                 if subdoc == {}:
+                    logger.warning("subdoc %s info is not exists!" % subdocid ) 
                     continue
                 subdoc.pop("text")
                 subdoc.pop("copyNum")

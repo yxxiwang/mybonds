@@ -389,7 +389,7 @@ def fllowbeacon_service(request):
     robj["beacon"] = beaobj
     return HttpResponse(json.dumps(robj), mimetype="application/json")
 
-# @login_required
+@login_required
 def load_similars(request):
     groupid = request.GET.get("groupid", "") 
     beaconid = request.GET.get("beaconid", "1968416984598300074")  

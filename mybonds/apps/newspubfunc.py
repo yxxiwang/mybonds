@@ -346,8 +346,6 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
             continue
         doc.pop("text")
         doc.pop("copyNum")
-        if doc.has_key("popularity"):
-            doc.pop("popularity")
 #         doc["text"] = subDocText(doc["text"])
         doc["title"] = doc["title"].decode("utf8")+u"\u3000"
 #         doc["copyNum"] = str(doc["copyNum"])

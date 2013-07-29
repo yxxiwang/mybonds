@@ -51,6 +51,7 @@ def hotboard(request):
     beaconusr = request.GET.get("beaconusr", "doc")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
     quantity = log_typer(request, "hotboard", obj)
+    udata = {}
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -60,7 +61,6 @@ def hotboard(request):
         udata["message"] = "it's not exists!" 
         return HttpResponse(json.dumps(udata), mimetype="application/json")
         
-    udata = {}
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5") 
     username = getUserName(request)

@@ -357,11 +357,13 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         subkey = "bmk:doc:"+getHashid(docid)
-        print "subkey",subkey,docid
+        logger.info( "subkey is:%s ; docid is: %s " %(subkey,docid) )
         if r.exists(subkey):
             subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,3)
             for subdocid in subdoc_lst:
                 subdoc= rdoc.hgetall("doc:" + subdocid)
+                if subdoc == {}:
+                    continue
                 subdoc.pop("text")
                 subdoc.pop("copyNum")
                 subdoc.pop("popularity")

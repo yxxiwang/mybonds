@@ -1021,12 +1021,11 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                 if cnt == 20:
                     ids_lst.append(ids)
                     ids=""
-                    cnt = 0
-                if docAsChannel and headlineonly=="1":
-                    beaconname = doc["label"] if doc.has_key("label") else docid
-                    addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
-            else:
-                pass
+                    cnt = 0 
+            if docAsChannel and headlineonly=="1" and not r.exists("bmk:doc:"+docid) :
+                beaconname = doc["label"] if doc.has_key("label") else docid
+                addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
+            
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
             title = doc["title"]
 #             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()

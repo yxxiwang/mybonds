@@ -370,7 +370,15 @@ def getTime(parms):
         if type(tms).__name__ == "str":
             if tms=="":
                 tms="0"
-            tms=float(tms) 
+#             tms=float(tms)
+#             if tms/pow(10,10)>0: 
+            if len(tms) >10:
+                power = pow(10,len(tms)-10)
+                tms=float(tms)
+                tms = tms/power
+            else:
+                tms=float(tms)
+                
         try:
             if addtimezone:
                 tms=tms+3600*8

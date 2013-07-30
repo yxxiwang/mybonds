@@ -367,6 +367,8 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
                 subdoc.pop("text")
                 subdoc.pop("copyNum")
                 subdoc.pop("popularity")
+                subdoc["tms"]=str(subdoc["create_time"])
+                subdoc["create_time"] = timeElaspe(subdoc["create_time"])
                 subdocs.append(subdoc)
                 
         doc["subdocs"]=subdocs

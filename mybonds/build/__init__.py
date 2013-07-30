@@ -136,6 +136,15 @@ def cleanDocChannel(op="print"):
                 rdoc.delete("doc:"+ttl)
             
     
+def cleanBeaconData(parms):
+    """ 清理指定."""
+    if type(parms).__name__ == "str":
+        parms = (parms,) 
+    for beaconstr in parms: 
+        key = "bmk:"+beaconstr
+        r.delete(key+":doc:tms")
+        
+    
 def cleanBeacon(op="print"):
     """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""
 #     for bstr in r.zrevrange("bmk:doc:share",0,-1):

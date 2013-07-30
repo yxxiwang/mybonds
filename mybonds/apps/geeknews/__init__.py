@@ -1024,7 +1024,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                     cnt = 0
                 if docAsChannel and headlineonly=="1":
                     beaconname = doc["label"] if doc.has_key("label") else docid
-                    addBeacon("doc",getHashid(docid),docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
+                    addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
             else:
                 pass
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
@@ -1067,6 +1067,8 @@ def addBeacon(beaconusr,beaconid,beaconttl,beaconname="",desc="",beacontime="",m
     beaconname = beaconttl if beaconname=="" else beaconname
     beacontime = getTime(time.time(),formatstr="%Y%m%d%H%M%S") if beacontime=="" else beacontime
     mindoc = "0" if mindoc=="" else mindoc
+    
+    refreshBeacon(beaconusr, beaconid)
     
     key = "bmk:" + beaconusr + ":" + beaconid
     r.hset(key, "id", beaconid)

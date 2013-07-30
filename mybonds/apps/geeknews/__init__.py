@@ -1066,9 +1066,7 @@ def addBeacon(beaconusr,beaconid,beaconttl,beaconname="",desc="",beacontime="",m
     logger.info("--addBeacon--"+beaconttl)
     beaconname = beaconttl if beaconname=="" else beaconname
     beacontime = getTime(time.time(),formatstr="%Y%m%d%H%M%S") if beacontime=="" else beacontime
-    mindoc = "0" if mindoc=="" else mindoc
-    
-    refreshBeacon(beaconusr, beaconid)
+    mindoc = "0" if mindoc=="" else mindoc 
     
     key = "bmk:" + beaconusr + ":" + beaconid
     r.hset(key, "id", beaconid)
@@ -1088,6 +1086,8 @@ def addBeacon(beaconusr,beaconid,beaconttl,beaconname="",desc="",beacontime="",m
     r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
     r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
     r.zadd("bmk:doc:share:bynews",time.time() , beaconusr + "|-|" + beaconid)
+    
+    refreshBeacon(beaconusr, beaconid)
         
 def subDocText(s):
 #    us=unicode(s,"utf8")

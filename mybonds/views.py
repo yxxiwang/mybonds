@@ -363,7 +363,8 @@ def grouplist(request, template_name="beacon/group_list.html"):
             key = "bmk:"+bstr.replace("|-|",":")
             bttl = r.hget(key,"tag")
             bttl = "" if bttl is None else bttl
-            if re.search(gobj["name"],bttl): 
+#             if re.search(gobj["name"],bttl):
+            if gobj["name"] in bttl.split(","):
                 beacons.append(r.hgetall(key))
         
     groups = [] 

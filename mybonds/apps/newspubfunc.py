@@ -322,7 +322,7 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
 
     qobj["url"] = urlstr
     qobj["id"] = getHashid(urlstr)
-    r.lpush("queue:" + qtype, json.dumps(qobj))
+    r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))
     
 def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     key = "bmk:" + beaconusr + ":" + beaconid

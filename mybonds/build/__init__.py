@@ -25,22 +25,15 @@ from mybonds.apps.newspubfunc import *
 import argparse
  
 # logger = logging.getLogger(__name__)
-def convUsrFllw():
-    """ 将  用户关注的key 由 set 类型换成 zset 类型.
-                            该函数已经被执行过,即可以宣布作废(现在应该已经用不上了)
+def addPopularity():
+    """ 将所有新闻的popularity添加上,原来没有该字段的给 0
     """
-    keys = r.keys("usr:*:fllw")
+    keys = rdoc.keys("doc:*")
     for key in keys:
-        print "proc key %s" % key
-        beaconstrs = r.smembers(key)
-        for beaconstr in beaconstrs:
-            print "zadd %s into %s" %(beaconstr,key+":z")
-            r.zadd(key+":z",time.time(),beaconstr)
-            
-        print "delete key %s" %(key)
-        r.delete(key)
-        print "rename %s to %s" %(key+":z",key)
-        r.rename(key+":z",key) 
+#         print "proc key %s" % key
+        if not rdoc.hexists(key,"popularity"):
+            print "proc key %s" % key
+            rodc.hset(key,"popularity","0")
     return 0
 #     r.srem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
 

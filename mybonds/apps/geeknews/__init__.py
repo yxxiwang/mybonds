@@ -1044,7 +1044,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"domain",doc["domain"] ) 
             pipedoc.hset("doc:"+docid,"isheadline",headlineonly) 
                 
-            pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME") )
+#             pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME") )
         if len(ids_lst) > 0:
             for tids in ids_lst:
                 saveFulltextById(tids)

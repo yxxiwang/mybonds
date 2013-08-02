@@ -33,7 +33,7 @@ def addPopularity():
 #         print "proc key %s" % key
         if not rdoc.hexists(key,"popularity"):
             print "proc key %s" % key
-            rodc.hset(key,"popularity","0")
+            rdoc.hset(key,"popularity","0")
     return 0
 #     r.srem("usr:" + username+ ":fllw" , heartusr+"|-|"+heartid)
 

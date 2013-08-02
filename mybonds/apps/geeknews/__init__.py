@@ -784,7 +784,9 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     docs = [] 
     channels = []
     channelfromtags = []
-    doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+#     doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+    doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合
+    
     for docid in doc_lst:
         doc = rdoc.hgetall("doc:" + docid) 
         if doc == {}:
@@ -794,13 +796,15 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         doc["text"] = subDocText(doc["text"])
         doc["title"] = doc["title"].decode("utf8")+u"\u3000"
         doc["copyNum"] = str(doc["copyNum"])
-        if doc.has_key("popularity"):
-            doc["popularity"] = str(doc["popularity"])
-        else:
-            doc["popularity"] = "0"
+#         if doc.has_key("popularity"):
+#             doc["popularity"] = str(doc["popularity"])
+#         else:
+#             doc["popularity"] = "0"
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         docs.append(doc) 
+    
+    docs = sorted(docs,key=lambda l:(l["popularity"],l["tms"]),reverse = True)
     udata["docs"] = docs  
     channelstr = r.hget(key,"channels")
     if channelstr is not None and  channelstr !="" :
@@ -1023,7 +1027,8 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                     ids=""
                     cnt = 0 
             if docAsChannel and headlineonly=="1" and not r.exists("bmk:doc:"+docid) :
-                beaconname = doc["label"] if doc.has_key("label") else docid
+#                 beaconname = doc["label"] if doc.has_key("label") else docid
+                beaconname = doc.get("label",docid)
                 addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
             
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
@@ -1032,8 +1037,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             title = strfilter(title)
             pipedoc.hset("doc:"+docid,"docid",docid)
             pipedoc.hset("doc:"+docid,"title",title)
-            if doc.has_key("label"):
-                pipedoc.hset("doc:"+docid,"label",doc["label"] ) 
+            pipedoc.hset("doc:"+docid,"label",doc.get("label",title) ) 
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )

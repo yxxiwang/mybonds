@@ -47,6 +47,7 @@ def channelnews(request):
 @login_required
 def relatedoc(request):
     docid = request.GET.get("docid", "")
+    usecache = request.GET.get("usecache", "0")
     quantity = log_typer(request, "hotboard", docid)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
@@ -58,31 +59,28 @@ def relatedoc(request):
         udata["message"] = "it's not exists!" 
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
-    relatedurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),docid) 
-    logger.info("fetch url:"+relatedurl)
-    udata = bench(loadFromUrl,parms=relatedurl) 
-    if udata.has_key("docs"): 
-        udata["_id"]=docid
-        trelate.save(udata)
-        logger.info("save doc into mongdb :"+docid)
+    def getdoc(docid):
+        relatedurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),docid) 
+        logger.info("fetch url:"+relatedurl)
+        udata = bench(loadFromUrl,parms=relatedurl) 
+        if udata.has_key("docs"): 
+            udata["_id"]=docid
+            trelate.save(udata)
+            r.zadd("docrelated",time.time(),docid)
+            logger.info("save doc into mongdb :"+docid)
+        else:
+            udata = {}
+            udata["success"] = "false"
+            udata["message"] = "communication is error or data not exists!"
+        return udata
+    
+    if usecache=="1":
+        udata = trelate.find_one({"_id":docid})
+        if udata is None:
+            udata = getdoc(docid)
     else:
-        udata = {}
-        udata["success"] = "false"
-        udata["message"] = "communication is error or data not exists!"
-        #########  暂时 不缓存 直接从后台取 ###########
-#     udata = trelate.find_one({"_id":docid})
-#     if udata is None:
-#         relatedurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),docid) 
-#         logger.info("fetch url:"+relatedurl)
-#         udata = bench(loadFromUrl,parms=relatedurl) 
-#         if udata.has_key("docs"): 
-#             udata["_id"]=docid
-#             trelate.save(udata)
-#             logger.info("save doc into mongdb :"+docid)
-#         else:
-#             udata = {}
-#             udata["success"] = "false"
-#             udata["message"] = "communication is error or data not exists!"
+        udata = getdoc(docid)
+             
     return HttpResponse(json.dumps(udata), mimetype="application/json")
 
 @login_required

@@ -43,6 +43,48 @@ def channelnews(request):
 #     udata["total"] = str(udata["total"]) 
     return HttpResponse(json.dumps(udata), mimetype="application/json")
 
+@login_required
+def relatedchannel(request):
+    """获取 热点频道的相关频道"""
+    beaconid = request.GET.get("beaconid", "1968416984598300074")  
+    beaconusr = request.GET.get("beaconusr", "doc")
+    docid = request.GET.get("docid", "")
+    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
+    quantity = log_typer(request, "hotboard", obj)
+    udata = {}
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+#     if obj is None:
+#         udata["success"] = "false"
+#         udata["message"] = "it's not exists!" 
+#         return HttpResponse(json.dumps(udata), mimetype="application/json")
+        
+    start = request.GET.get("start", "0")
+    num = request.GET.get("num", "5")
+    username = getUserName(request)
+    if docid =="":
+        ttl = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
+        relatedid = ttl if ttl.isdigit() else getHashid(ttl)
+    else:
+        relatedid = docid
+        
+    try:
+        udata = trelate.find_one({"_id":relatedid})
+    except:
+        traceback.print_exc()
+        udata["success"] = "false"
+        udata["message"] = "no data" 
+    else:
+        if udata is None:
+            udata={}
+            udata["success"] = "false"
+            udata["message"] = "no data" 
+        else:
+            udata["success"] = "true"
+            udata["message"] = "success retrive data"
+    return HttpResponse(json.dumps(udata), mimetype="application/json") 
 
 @login_required
 def hotboard(request):
@@ -73,9 +115,7 @@ def hotboard(request):
     else: 
         udata["success"] = "true"
         udata["message"] = "success retrive data"
-    return HttpResponse(json.dumps(udata), mimetype="application/json")
-    
-    return HttpResponse("channels")
+    return HttpResponse(json.dumps(udata), mimetype="application/json") 
  
 @login_required
 def newsdetail(request):  

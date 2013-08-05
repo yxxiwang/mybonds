@@ -22,6 +22,7 @@ rdoc = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=1)
 connection = Connection() 
 mdoc = connection["doc"]
 tftxs = mdoc['tftxs']
+trelate = mdoc['trelate']
 
 sysparms_hkey = {
     "REDIS_EXPIRETIME":"redis_expire",
@@ -323,6 +324,24 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
     qobj["url"] = urlstr
     qobj["id"] = getHashid(urlstr)
     r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))
+    
+def buildRelatedChannel(relatedid):    
+    pass
+#     udata = trelate.find_one({"_id":relatedid})
+#     key = "bmk:" + beaconusr + ":" + beaconid
+#     logger.info("key is "+key)
+#     if r.exists(key): 
+#         pass
+#     else:
+#         return {} 
+#     udata = {}
+#     docs = [] 
+#     doc_lst = r.hget(key, "channels") # 主题文档集合 
+#     for docid in doc_lst:
+#         channelobj = r.hgetall("bmk:doc:"+docid)
+#     doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合 
+#     udata["docs"] = docs
+#     udata["total"] = str(len(udata["docs"]) )
     
 def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     key = "bmk:" + beaconusr + ":" + beaconid

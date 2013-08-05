@@ -686,8 +686,18 @@ def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
     else:
         udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=True)
     
-    if udata.has_key("channels"):
-        r.hset(key, "channels", ",".join(udata["channels"]) )
+    if headlineonly=="1" and not r.hget(key,"ttl").isdigit() :
+#     if headlineonly=="1":
+        relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),r.hget(key,"ttl"))
+        ttl = r.hget(key,"ttl")
+        ttl = ttl if ttl.isdigit() else getHashid(ttl)
+        relateids = saveRelatedDocs(relateurl,ttl)
+        logger.info("relateids:")
+        logger.info(relateids)
+        r.hset(key, "channels", ",".join(relateids))
+        
+#     if udata.has_key("channels"):
+#         r.hset(key, "channels", ",".join(udata["channels"]) )
         
 #     20130718 注释掉, 因为判断是否热点改为在beaconUrl中,不再需要在此处进行
 #     if headlineonly=="0" and udata.has_key("docs"):
@@ -929,9 +939,6 @@ def saveLocaltagDocs(relatedid,localtag):
     print "==============geeknews/saveLocaltagDocs============"  
     pass
 
-def saveRelatedDocs(relatedids):
-    print "==============geeknews/saveRelatedDocs============"  
-    pass
 #return docs
 def saveSimilarDocs(similarids):
     print "==============geeknews/saveSimilarDocs============"  
@@ -998,13 +1005,27 @@ def saveFulltextById(ids,retrycnt=0,url=""):
 #         if udata["docs"].has_key("relatedDocs"):
 #             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
 
+def saveRelatedDocs(relatedurl,relatedid):
+    logger.info( "=geeknews/saveRelatedDocs="+relatedurl)  
+    udata = bench(loadFromUrl,parms=relatedurl)
+    relateids = []
+    if not udata.has_key("docs"):
+        return relateids
+    
+    for doc in udata["docs"]:
+        if doc["validTime"]=="false" or not doc["validTime"]:
+            continue
+        docid = str(doc["docId"])
+        relateids.append(docid)
+        beaconname = doc.get("label",docid)
+        addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly="1") 
 
-def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False): 
-#     start = time.clock() 
-#     udata = loadFromUrl(urlstr) 
-#     urlstop = time.clock()  
-#     diff = urlstop - start
-#     print "loadFromUrl(%s) has taken %s" % (urlstr, str(diff)) 
+    udata["_id"]=relatedid
+    trelate.save(udata)
+    logger.info("save info in mongodb,relatedid="+relatedid)
+    return relateids
+
+def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
     logger.info( "===saveDocsByUrl==="+urlstr)
     udata = bench(loadFromUrl,parms=urlstr)
     pipedoc = rdoc.pipeline()

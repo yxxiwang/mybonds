@@ -92,12 +92,9 @@ def relatedchannel(request):
         
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5")
-    username = getUserName(request) 
-    ttl = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
-    relatedid = ttl if ttl.isdigit() else getHashid(ttl) 
-        
+    username = getUserName(request)   
     try:
-        udata = trelate.find_one({"_id":relatedid})
+        udata = trelate.find_one({"_id":beaconid})
     except:
         traceback.print_exc()
         udata["success"] = "false"

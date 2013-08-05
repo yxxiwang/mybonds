@@ -689,9 +689,7 @@ def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
     if headlineonly=="1" and not r.hget(key,"ttl").isdigit() :
 #     if headlineonly=="1":
         relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),r.hget(key,"ttl"))
-        ttl = r.hget(key,"ttl")
-        ttl = ttl if ttl.isdigit() else getHashid(ttl)
-        relateids = saveRelatedDocs(relateurl,ttl)
+        relateids = saveRelatedDocs(relateurl,beaconid)
         logger.info("relateids:")
         logger.info(relateids)
         r.hset(key, "channels", ",".join(relateids))

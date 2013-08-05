@@ -43,12 +43,39 @@ def channelnews(request):
 #     udata["total"] = str(udata["total"]) 
     return HttpResponse(json.dumps(udata), mimetype="application/json")
 
+
+@login_required
+def relatedoc(request):
+    docid = request.GET.get("docid", "")
+    quantity = log_typer(request, "hotboard", docid)
+    udata = {}
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    if docid is None:
+        udata["success"] = "false"
+        udata["message"] = "it's not exists!" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    
+    udata = trelate.find_one({"_id":docid})
+    if udata is None:
+        relatedurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),docid) 
+        udata = bench(loadFromUrl,parms=relatedurl) 
+        if udata.has_key("docs"): 
+            udata["_id"]=docid
+            trelate.save(udata)
+        else:
+            udata = {}
+            udata["success"] = "false"
+            udata["message"] = "communication is error or data not exists!"
+    return HttpResponse(json.dumps(udata), mimetype="application/json")
+
 @login_required
 def relatedchannel(request):
     """获取 热点频道的相关频道"""
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
-    beaconusr = request.GET.get("beaconusr", "doc")
-    docid = request.GET.get("docid", "")
+    beaconusr = request.GET.get("beaconusr", "doc") 
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
     quantity = log_typer(request, "hotboard", obj)
     udata = {}
@@ -63,12 +90,9 @@ def relatedchannel(request):
         
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5")
-    username = getUserName(request)
-    if docid =="":
-        ttl = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
-        relatedid = ttl if ttl.isdigit() else getHashid(ttl)
-    else:
-        relatedid = docid
+    username = getUserName(request) 
+    ttl = r.hget("bmk:"+beaconusr+":"+beaconid,"ttl")
+    relatedid = ttl if ttl.isdigit() else getHashid(ttl) 
         
     try:
         udata = trelate.find_one({"_id":relatedid})

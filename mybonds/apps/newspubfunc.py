@@ -323,7 +323,8 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
 
     qobj["url"] = urlstr
     qobj["id"] = getHashid(urlstr)
-    r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))
+#     r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))
+    r.lpush("queue:" + qtype, json.dumps(qobj))
     
 def buildRelatedChannel(relatedid):    
     pass

@@ -58,19 +58,31 @@ def relatedoc(request):
         udata["message"] = "it's not exists!" 
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
-    udata = trelate.find_one({"_id":docid})
-    if udata is None:
-        relatedurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),docid) 
-        logger.info("fetch url:"+relatedurl)
-        udata = bench(loadFromUrl,parms=relatedurl) 
-        if udata.has_key("docs"): 
-            udata["_id"]=docid
-            trelate.save(udata)
-            logger.info("save doc into mongdb :"+docid)
-        else:
-            udata = {}
-            udata["success"] = "false"
-            udata["message"] = "communication is error or data not exists!"
+    relatedurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),docid) 
+    logger.info("fetch url:"+relatedurl)
+    udata = bench(loadFromUrl,parms=relatedurl) 
+    if udata.has_key("docs"): 
+        udata["_id"]=docid
+        trelate.save(udata)
+        logger.info("save doc into mongdb :"+docid)
+    else:
+        udata = {}
+        udata["success"] = "false"
+        udata["message"] = "communication is error or data not exists!"
+        #########  暂时 不缓存 直接从后台取 ###########
+#     udata = trelate.find_one({"_id":docid})
+#     if udata is None:
+#         relatedurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),docid) 
+#         logger.info("fetch url:"+relatedurl)
+#         udata = bench(loadFromUrl,parms=relatedurl) 
+#         if udata.has_key("docs"): 
+#             udata["_id"]=docid
+#             trelate.save(udata)
+#             logger.info("save doc into mongdb :"+docid)
+#         else:
+#             udata = {}
+#             udata["success"] = "false"
+#             udata["message"] = "communication is error or data not exists!"
     return HttpResponse(json.dumps(udata), mimetype="application/json")
 
 @login_required

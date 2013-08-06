@@ -48,7 +48,7 @@ def channelnews(request):
 def relatedoc(request):
     docid = request.GET.get("docid", "")
     usecache = request.GET.get("usecache", "0")
-    quantity = log_typer(request, "hotboard", docid)
+    quantity = log_typer(request, "relatedoc", docid)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
@@ -89,7 +89,7 @@ def relatedchannel(request):
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "doc") 
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
-    quantity = log_typer(request, "hotboard", obj)
+    quantity = log_typer(request, "relatedchannel", obj)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"

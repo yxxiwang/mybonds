@@ -687,6 +687,38 @@ def character(request, template_name="beacon/suggestion.html"):
         "user": userobj,
     }, context_instance=RequestContext(request))
     
+def login_apply(request):
+    username = request.GET.get("usr", "");
+    username = username.lower()
+    password = request.GET.get("pwd", "");
+    robj = {}
+    if username == "" or password == "":
+        robj["success"] = 'false'
+        robj["message"] = "username or password is null"
+        robj["data"] = []
+        return HttpResponse(json.dumps(robj), mimetype="application/json")
+    user = auth.authenticate(username=username, password=password)
+    if user is not None and user.is_active: 
+        auth.login(request, user)
+        robj = r.hgetall("usr:" + username)
+        robj["success"] = 'true'
+        robj["message"] = "login is success" 
+    else:
+        if not r.exists("usr:"+username):        
+            User.objects.create_user(username=username, email="" , password=password)
+            r.hset("usr:" + username, "nm", username)
+#             r.hset("usr:" + username, "email", email) 
+            r.hset("usr:" + username, "crt_tms", time.time()) 
+            r.hset("usr:" + username, "fllw_bmk_cnt", 0) 
+            r.hset("usr:" + username, "fllw_bmk_cnt", 0) 
+            robj["success"] = 'true'
+            robj["message"] = "apply is success" 
+        else:    
+            robj["success"] = 'false'
+            robj["message"] = "login failed" 
+            robj["data"] = []
+    return HttpResponse(json.dumps(robj), mimetype="application/json")
+    
 def login_service(request):
     username = request.GET.get("usr", "");
     username = username.lower()

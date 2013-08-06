@@ -18,6 +18,7 @@ urlpatterns = patterns("",
     url(r'^apply/logout/$', 'mybonds.views.logout', name="logout"),
     url(r'^apply/slogin/$', 'mybonds.views.login_service', name="login_service"), 
     url(r'^apply/sapply/$', 'mybonds.views.apply_service', name="apply_service"),
+    url(r'^apply/flogin/$', 'mybonds.views.login_apply', name="login_apply"), 
     url(r'^feedback/get_captcha/$', 'mybonds.views.get_captcha', name="get_captcha"),
     
     url(r'^buddyhold/$', 'mybonds.views.buddyhold', name="buddyhold"),

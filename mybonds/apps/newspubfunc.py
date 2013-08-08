@@ -23,6 +23,7 @@ connection = Connection()
 mdoc = connection["doc"]
 tftxs = mdoc['tftxs']
 trelate = mdoc['trelate']
+ttrack = mdoc['ttrack']
 
 sysparms_hkey = {
     "REDIS_EXPIRETIME":"redis_expire",

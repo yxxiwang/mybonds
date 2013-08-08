@@ -627,7 +627,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
 #     return udata   
     
 
-def beaconUrl(beaconusr, beaconid,daybefore=0):
+def beaconUrl(beaconusr, beaconid,daybefore=1):
     """
                         根据频道所属用户及频道id生成从后台取频道的请求地址
     """
@@ -648,10 +648,12 @@ def beaconUrl(beaconusr, beaconid,daybefore=0):
     
     channelparm = "channelid" if popularid == "0" else "popularid"
     today = dt.date.fromtimestamp(time.time())
-    after = time.mktime(today.timetuple())
-    after = after - daybefore*86400 
-    after = (after+2*3600) * 1000
-    before = time.time() * 1000
+#     after = time.mktime(today.timetuple())
+#     after = after - daybefore*86400
+#     after = (after+2*3600) * 1000
+#     before = time.time() * 1000
+    after = int((time.time() - daybefore*86400) * 1000) 
+    before = int(time.time()*1000) 
     if int(mindoc) <= 0 :
         urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d" %(getsysparm("BACKEND_DOMAIN"),channelparm,channel,after,before)
     else:
@@ -681,12 +683,12 @@ def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
     headlineonly = r.hget(key, "headlineonly")
     headlineonly = "0" if headlineonly is None else headlineonly
     
-    if r.hget(key,"ttl").isdigit():#说明频道本身原来是新闻,docAsChannel 则为False
+    if r.hget(key,"crt_usr")=="doc":#说明频道本身原来是新闻,docAsChannel 则为False
         udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=False)
     else:
         udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=True)
     
-    if headlineonly=="1" and not r.hget(key,"ttl").isdigit() :
+    if headlineonly=="1" and r.hget(key,"crt_usr")!="doc":
 #     if headlineonly=="1":
         relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),r.hget(key,"ttl"))
         relateids = saveRelatedDocs(relateurl,beaconid)
@@ -792,8 +794,8 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     docs = [] 
     channels = []
     channelfromtags = []
-#     doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
-    doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合
+    doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+#     doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合
     
     for docid in doc_lst:
         doc = rdoc.hgetall("doc:" + docid) 
@@ -812,7 +814,7 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         docs.append(doc) 
     
-    docs = sorted(docs,key=lambda l:(l["popularity"],l["tms"]),reverse = True)
+#     docs = sorted(docs,key=lambda l:(l["popularity"],l["tms"]),reverse = True)
     udata["docs"] = docs  
     channelstr = r.hget(key,"channels")
     if channelstr is not None and  channelstr !="" :
@@ -883,14 +885,6 @@ def buildJsonData(username, docs, tags=None):
     if tags is not None:
         obj["tag"] = tags
     return obj
-
-def getNavTag(url): 
-    tag = r.hget("navi:ori", url)
-    return tag if tag is not None else url
-
-def getNavUrl(tag):
-    urlstr = r.hget("navi", tag) 
-    return urlstr if urlstr is not None else tag
 
 def beaconChangeName(key, beaconusr, beaconid): 
     srckey = "bmk:" + key
@@ -1097,7 +1091,7 @@ def addBeacon(beaconusr,beaconid,beaconttl,beaconname="",desc="",beacontime="",m
     r.hset(key, "desc", desc)
     r.hset(key, "crt_usr", beaconusr)
     r.hset(key, "crt_tms",  long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))) 
-    r.hset(key, "last_touch",0) 
+    r.hset(key, "last_touch",0 ) 
     r.hset(key, "last_update",0) 
     r.hset(key, "cnt",0) 
     r.hset(key, "mindoc",mindoc) 

@@ -45,9 +45,58 @@ def channelnews(request):
 
 
 @login_required
+def trackdoc(request):
+    docid = request.GET.get("docid", "")
+    usecache = request.GET.get("usecache", "0")
+    days = request.GET.get("days", "all")
+    ascii = request.GET.get("ascii", "1")
+    quantity = log_typer(request, "trackdoc", docid)
+    udata = {}
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    if docid is None:
+        udata["success"] = "false"
+        udata["message"] = "it's not exists!" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    
+    def getdoc(docid,url):
+        logger.info("fetch url:"+url)
+        udata = bench(loadFromUrl,parms=url) 
+        if udata.has_key("docs"): 
+            udata["_id"]=docid
+            ttrack.save(udata)
+            r.zadd("docrelated",time.time(),docid)
+            logger.info("save doc into mongdb :"+docid)
+        else:
+            udata = {}
+            udata["success"] = "false"
+            udata["message"] = "communication is error or data not exists!"
+        return udata
+    if days =="all":
+        after = 0 
+    else:
+        after = time.time() - 86400 * int(days)
+        after = after*1000
+    after = int(after)
+    before = int(time.time() * 1000)
+    url = "http://%s/research/svc?trackid=%s&after=%s&before=%s" %(getsysparm("BACKEND_DOMAIN"),docid,after,before) 
+    if usecache=="1":
+        udata = trelate.find_one({"_id":docid})
+        if udata is None:
+            udata = getdoc(docid,url)
+    else:
+        udata = getdoc(docid,url)
+             
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
+
+@login_required
 def relatedoc(request):
     docid = request.GET.get("docid", "")
     usecache = request.GET.get("usecache", "0")
+    days = request.GET.get("days", "all")
+    ascii = request.GET.get("ascii", "1")
     quantity = log_typer(request, "relatedoc", docid)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
@@ -59,10 +108,9 @@ def relatedoc(request):
         udata["message"] = "it's not exists!" 
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
-    def getdoc(docid):
-        relatedurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),docid) 
-        logger.info("fetch url:"+relatedurl)
-        udata = bench(loadFromUrl,parms=relatedurl) 
+    def getdoc(docid,url):
+        logger.info("fetch url:"+url)
+        udata = bench(loadFromUrl,parms=url) 
         if udata.has_key("docs"): 
             udata["_id"]=docid
             trelate.save(udata)
@@ -74,14 +122,23 @@ def relatedoc(request):
             udata["message"] = "communication is error or data not exists!"
         return udata
     
+    if days =="all":
+        after = 0
+    else:
+        after = time.time() - 86400 * int(days)
+        after = after*1000
+    after = int(after)
+    before = int(time.time()*1000) 
+#     print before
+    relatedurl = "http://%s/research/svc?extendid=%s&after=%s&before=%s" %(getsysparm("BACKEND_DOMAIN"),docid,after,before) 
     if usecache=="1":
         udata = trelate.find_one({"_id":docid})
         if udata is None:
-            udata = getdoc(docid)
+            udata = getdoc(docid,relatedurl)
     else:
-        udata = getdoc(docid)
+        udata = getdoc(docid,relatedurl)
              
-    return HttpResponse(json.dumps(udata), mimetype="application/json")
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
 def relatedchannel(request):

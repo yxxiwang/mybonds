@@ -66,6 +66,7 @@ pip install logging
 
 pip install fabric
 pip install paramiko
+pip install PyRSS2Gen
 
 ############ Installing rdbtools #########################
 pip install rdbtools

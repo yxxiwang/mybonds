@@ -801,8 +801,6 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     channelfromtags = []
     doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
 #     doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合
-    if len(doc_lst)==0:
-        doc_lst.append(beaconid)
     for docid in doc_lst:
         doc = rdoc.hgetall("doc:" + docid) 
         if doc == {}:

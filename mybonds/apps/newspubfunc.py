@@ -358,8 +358,6 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     channels = []
     channelfromtags = []
     doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合 
-    if len(doc_lst)==0:
-        doc_lst.append(beaconid)
 #     print doc_lst
     for docid in doc_lst:
         subdocs = [] 
@@ -382,6 +380,8 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
         if r.exists(subkey):
             subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,3)
+            if len(subdoc_lst)==0:
+                subdoc_lst.append(docid)
             for subdocid in subdoc_lst:
                 subdoc= rdoc.hgetall("doc:" + subdocid)
                 if subdoc == {}:

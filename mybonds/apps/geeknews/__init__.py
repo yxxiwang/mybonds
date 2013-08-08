@@ -660,7 +660,7 @@ def beaconUrl(beaconusr, beaconid,daybefore=1):
         urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d&mindoc=%s" %(getsysparm("BACKEND_DOMAIN"),channelparm,channel,after,before,mindoc)
     return urlstr
 
-def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
+def refreshDocs(beaconusr, beaconid,daybefore=1,force=False):
     """更新频道内容,该方法也会被异步调用"""
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info( "=====refreshDocs===="+key )
@@ -717,6 +717,10 @@ def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
     doc_tcnt_key = ctskey.replace("doc_cts","doc_tcnt")
     channel_cnt_key = ctskey.replace("doc_cts","cnt") 
 #     r.delete(key+":doc:tms")
+    rmfrom = (int(time.time())-daybefore*86400)*1000
+    rmto = float(r.hget(key, "last_update"))*1000
+    r.zremrangebyscore(key+":doc:tms",rmfrom,rmto)
+    logger.info("removenews %s  from %d to %d" %(key+":doc:tms",rmfrom,rmto) )
     for doc in docs:
         if doc is None:
             continue
@@ -724,8 +728,7 @@ def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
             pass
         else:
             if force:
-#                 print doc["docId"]
-                r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"])) 
+                r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
             r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
 ################ 统计信息   ############################
         docid= str(doc["docId"])

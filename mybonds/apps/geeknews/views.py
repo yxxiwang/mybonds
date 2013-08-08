@@ -517,7 +517,7 @@ def beaconsave(request, template_name="beacon_list.html"):
 #         r.hset(key, "crt_tms", time.time())
         r.hset(key, "crt_tms", getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")) 
         r.hset(key, "last_touch", 0 ) 
-        r.hset(key, "last_update", time.time() ) 
+        r.hset(key, "last_update", 0) 
         r.hset(key, "cnt", 0) 
         r.hset(key, "mindoc", beaconmindoc) 
         r.hset(key, "tag", beacontag) 
@@ -544,7 +544,6 @@ def beaconsave(request, template_name="beacon_list.html"):
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc", beaconmindoc) 
             r.hset(key, "tag", beacontag)
-            r.hset(key, "last_update", time.time() ) 
             r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
         else:  # modify desc and so on
             r.hset(key, "crt_usr", beaconusr)
@@ -554,7 +553,6 @@ def beaconsave(request, template_name="beacon_list.html"):
             r.hset(key, "name", beacondisplayname)
             r.hset(key, "headlineonly", headlineonly) 
             r.hset(key, "tag", beacontag) 
-            r.hset(key, "last_update", time.time() ) 
             r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
             
 #     if share == "1":

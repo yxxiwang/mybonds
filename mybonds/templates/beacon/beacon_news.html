@@ -112,7 +112,7 @@
             {% for doc in udata.docs %}
             <div class="span12" style="margin-left:0px;">
             <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
-             <p style="font-size: 13px;"><a target="_blank" href="/news/research/?docid={{doc.docid}}"><strong>{{doc.title}}</strong>&nbsp;&nbsp;</a>
+             <p style="font-size: 13px;"><a target="_blank" href="/news/research/?docid={{doc.docid}}"><strong>{{doc.title}}</strong>&nbsp;&nbsp;</a>{{doc.label}}
               {% if username == beaconusr %}
               {% if beaconid %}
               <a class="docremove" href="/newsvc/removedocfromchannel/?o=page&docid={{doc.docid}}&beaconid={{beaconid}}&beaconusr={{beaconusr}}"  rel="tooltip" title="移除文档" style="float:right;"  >

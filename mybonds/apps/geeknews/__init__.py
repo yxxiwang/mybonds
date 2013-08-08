@@ -723,7 +723,9 @@ def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
         if doc["validTime"]=="false" or not doc["validTime"]:
             pass
         else:
-#             r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"])) 
+            if force:
+#                 print doc["docId"]
+                r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"])) 
             r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
 ################ 统计信息   ############################
         docid= str(doc["docId"])
@@ -739,8 +741,8 @@ def refreshDocs(beaconusr, beaconid,daybefore=0,force=False):
         r.hset("copynum",docid,doc["copyNum"])
         r.zadd(doc_dcnt_key,int(tdate),docid)
     ##### end for #####
-#     if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
-#         r.rename(key+":doc:tms:bak",key+":doc:tms")
+    if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
+        r.rename(key+":doc:tms:bak",key+":doc:tms")
 #     today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
 #     cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
 #     if cnt>0:

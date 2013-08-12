@@ -823,9 +823,10 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"
     
 #     docs = sorted(docs,key=lambda l:(l["popularity"],l["tms"]),reverse = True)
     if orderby !="tms":
+        logger.info("buildBeaconData order by %s" % (orderby,) )
         docs = sorted(docs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
         docs = docs[start:end]
-    udata["docs"] = docs  
+    udata["docs"] = docs
     channelstr = r.hget(key,"channels")
     if channelstr is not None and  channelstr !="" :
         for cname in  channelstr.split(","):

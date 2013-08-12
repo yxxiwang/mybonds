@@ -719,16 +719,17 @@ def refreshDocs(beaconusr, beaconid,daybefore=1,force=False):
 #     r.delete(key+":doc:tms")
     rmfrom = (int(time.time())-daybefore*86400)*1000
     rmto = float(r.hget(key, "last_update"))*1000
-    r.zremrangebyscore(key+":doc:tms",rmfrom,rmto)
-    logger.info("removenews %s  from %d to %d" %(key+":doc:tms",rmfrom,rmto) )
+    ndel = r.zremrangebyscore(key+":doc:tms",rmfrom,rmto)
+    logger.info("removenews %s  from %d to %d and del %d" %(key+":doc:tms",rmfrom,rmto,ndel) )
+    logger.info("add new data len is %d"  %(len(docs),))
     for doc in docs:
         if doc is None:
             continue
         if doc["validTime"]=="false" or not doc["validTime"]:
             pass
         else:
-            if force:
-                r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
+#             if force:
+#                 r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
             r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
 ################ 统计信息   ############################
         docid= str(doc["docId"])

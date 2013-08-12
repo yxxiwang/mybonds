@@ -646,14 +646,14 @@ def beaconUrl(beaconusr, beaconid,daybefore=1):
     popularid = r.hget(key, "headlineonly")
     popularid = "0" if popularid is None else popularid
     
-    channelparm = "channelid" if popularid == "0" else "popularid"
+    channelparm = "channelid" if popularid == "0" else "channelpick"
     today = dt.date.fromtimestamp(time.time())
 #     after = time.mktime(today.timetuple())
 #     after = after - daybefore*86400
 #     after = (after+2*3600) * 1000
 #     before = time.time() * 1000
     after = int((time.time() - daybefore*86400) * 1000) 
-    before = int(time.time()*1000) 
+    before = int(time.time()*1000)
     if int(mindoc) <= 0 :
         urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d" %(getsysparm("BACKEND_DOMAIN"),channelparm,channel,after,before)
     else:

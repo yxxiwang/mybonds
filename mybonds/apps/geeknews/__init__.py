@@ -725,8 +725,8 @@ def refreshDocs(beaconusr, beaconid,daybefore=1,force=False):
     for doc in docs:
         if doc is None:
             continue
-        if doc["validTime"]=="false" or not doc["validTime"]:
-            continue 
+#         if doc["validTime"]=="false" or not doc["validTime"]:
+#             continue 
 #             if force:
 #                 r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
         r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 

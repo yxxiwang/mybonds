@@ -181,6 +181,7 @@ def hotboard(request):
     """获取 热点频道 面板"""
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "doc")
+    ascii = request.GET.get("ascii", "1")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
     quantity = log_typer(request, "hotboard", obj)
     udata = {}
@@ -205,7 +206,8 @@ def hotboard(request):
     else: 
         udata["success"] = "true"
         udata["message"] = "success retrive data"
-    return HttpResponse(json.dumps(udata), mimetype="application/json") 
+#     return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
  
 @login_required
 def newsdetail(request):  

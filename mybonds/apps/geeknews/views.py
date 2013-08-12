@@ -395,6 +395,7 @@ def load_similars(request):
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "ltb")
     orderby = request.GET.get("orderby", "tms")
+    ascii = request.GET.get("ascii", "1")
     obj = "all" if groupid != "" else beaconusr + ":" + beaconid
     quantity = log_typer(request, "load_similars", obj) 
     if quantity > getsysparm("QUANTITY"):
@@ -421,7 +422,8 @@ def load_similars(request):
             udata["total"] = str(len(udata["docs"]))
         else:
             udata["total"] = "0"  
-        return HttpResponse(json.dumps(udata), mimetype="application/json")
+#         return HttpResponse(json.dumps(udata), mimetype="application/json")
+        return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
     else:  # 取某个灯塔的新闻
         try:
             udata = buildBeaconData(beaconusr, beaconid, start=start , end=num, isapi=True,orderby=orderby)
@@ -432,7 +434,7 @@ def load_similars(request):
         else:
             udata["success"] = "true"
             udata["message"] = "success retrive data"
-        return HttpResponse(json.dumps(udata), mimetype="application/json")
+        return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
         
      
 

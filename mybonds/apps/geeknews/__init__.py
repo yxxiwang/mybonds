@@ -511,8 +511,8 @@ def getDataByUrl(urlstr,isservice=False):
         for doc in udata["docs"]:
             if doc is None:
                 continue
-            if doc["validTime"]=="false" or not doc["validTime"]:
-                continue
+#             if doc["validTime"]=="false" or not doc["validTime"]:
+#                 continue
 #            doc["id"] = getHashid(doc["url"])
 #             doc["docid"] = getHashid(doc["url"])
             doc["docid"] = str(doc["docId"])
@@ -1016,8 +1016,8 @@ def saveRelatedDocs(relatedurl,relatedid):
         return relateids
     
     for doc in udata["docs"]:
-        if doc["validTime"]=="false" or not doc["validTime"]:
-            continue
+#         if doc["validTime"]=="false" or not doc["validTime"]:
+#             continue
         docid = str(doc["docId"])
         relateids.append(docid)
         beaconname = doc.get("title",docid)
@@ -1039,8 +1039,8 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
         for doc in docs:
             if doc is None: 
                 continue 
-            if doc["validTime"]=="false" or not doc["validTime"]:
-                continue
+#             if doc["validTime"]=="false" or not doc["validTime"]:
+#                 continue
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
             if not rdoc.hexists("doc:"+docid,"url"):

@@ -789,7 +789,7 @@ def refreshBeacon(beaconusr, beaconid):
     else:
         logger.warn( "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt,getsysparm("KEY_UPTIME") ) )
         
-def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
+def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.exists(key):
         refreshBeacon(beaconusr, beaconid)
@@ -799,8 +799,11 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     docs = [] 
     channels = []
     channelfromtags = []
-    doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
-#     doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合
+    if orderby =="tms":
+        doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+    else:
+        doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合
+        
     for docid in doc_lst:
         doc = rdoc.hgetall("doc:" + docid) 
         if doc == {}:
@@ -810,15 +813,18 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         doc["text"] = subDocText(doc["text"])
         doc["title"] = doc["title"].decode("utf8")+u"\u3000"
         doc["copyNum"] = str(doc["copyNum"])
-#         if doc.has_key("popularity"):
-#             doc["popularity"] = str(doc["popularity"])
-#         else:
-#             doc["popularity"] = "0"
+        if doc.has_key("popularity"):
+            doc["popularity"] = str(doc["popularity"])
+        else:
+            doc["popularity"] = "0"
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"]) 
         docs.append(doc) 
     
 #     docs = sorted(docs,key=lambda l:(l["popularity"],l["tms"]),reverse = True)
+    if orderby !="tms":
+        docs = sorted(docs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
+        docs = docs[start:end]
     udata["docs"] = docs  
     channelstr = r.hget(key,"channels")
     if channelstr is not None and  channelstr !="" :
@@ -1013,7 +1019,7 @@ def saveRelatedDocs(relatedurl,relatedid):
             continue
         docid = str(doc["docId"])
         relateids.append(docid)
-        beaconname = doc.get("label",docid)
+        beaconname = doc.get("title",docid)
         addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly="1") 
 
     udata["_id"]=relatedid
@@ -1045,7 +1051,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                     cnt = 0 
             if docAsChannel and headlineonly=="1" and not r.exists("bmk:doc:"+docid) :
 #                 beaconname = doc["label"] if doc.has_key("label") else docid
-                beaconname = doc.get("label",docid)
+                beaconname = doc.get("title",docid)
                 addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
             
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
@@ -1054,7 +1060,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             title = strfilter(title)
             pipedoc.hset("doc:"+docid,"docid",docid)
             pipedoc.hset("doc:"+docid,"title",title)
-            pipedoc.hset("doc:"+docid,"label",doc.get("label",title) ) 
+#             pipedoc.hset("doc:"+docid,"label",doc.get("label",title) ) 
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )

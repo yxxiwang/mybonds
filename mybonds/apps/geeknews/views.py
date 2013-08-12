@@ -394,6 +394,7 @@ def load_similars(request):
     groupid = request.GET.get("groupid", "") 
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "ltb")
+    orderby = request.GET.get("orderby", "tms")
     obj = "all" if groupid != "" else beaconusr + ":" + beaconid
     quantity = log_typer(request, "load_similars", obj) 
     if quantity > getsysparm("QUANTITY"):
@@ -423,7 +424,7 @@ def load_similars(request):
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     else:  # 取某个灯塔的新闻
         try:
-            udata = buildBeaconData(beaconusr, beaconid, start=start , end=num, isapi=True)
+            udata = buildBeaconData(beaconusr, beaconid, start=start , end=num, isapi=True,orderby=orderby)
             r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
         except:
             udata["success"] = "false"
@@ -769,7 +770,7 @@ def beaconnews(request, template_name="beacon/beacon_news.html"):
                 
     if beaconid != "":
         try:
-            udata = buildBeaconData(beaconusr, beaconid, start=0 , end=100) 
+            udata = buildBeaconData(beaconusr, beaconid, start=0 , end=300,orderby=orderby) 
         except:
             logger.error("buildBeaconData(%s,%s) is error====" %(beaconusr, beaconid))
             traceback.print_exc()

@@ -1067,7 +1067,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
             
-            logger.debug("save doc:%s" % (docid,) )
+            logger.debug("save doc:%s, tms is %d" % (docid,tms) )
             
             title = doc["title"]
 #             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
@@ -1081,7 +1081,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
             pipedoc.hset("doc:"+docid,"utms",tms )
-            tms = tms+1
+            tms = tms +1
     #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
     #             pipedoc.hset("doc:"+docid,"host",doc["host"] )  
             pipedoc.hset("doc:"+docid,"domain",doc["domain"] ) 

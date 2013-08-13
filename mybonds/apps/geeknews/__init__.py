@@ -1041,7 +1041,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
     def saveText(docs):
         ids_lst=[]
         cnt=0
-        tms=0
+        tms=time.time()
         ids=""
         docs.reverse()
         for doc in docs:
@@ -1080,7 +1080,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
             pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
-            pipedoc.hset("doc:"+docid,"utms",time.time()+tms )
+            pipedoc.hset("doc:"+docid,"utms",tms )
             tms = tms+1
     #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
     #             pipedoc.hset("doc:"+docid,"host",doc["host"] )  

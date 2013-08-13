@@ -398,6 +398,7 @@ def load_similars(request):
     ascii = request.GET.get("ascii", "1")
     obj = "all" if groupid != "" else beaconusr + ":" + beaconid
     quantity = log_typer(request, "load_similars", obj) 
+    udata={}
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -426,7 +427,7 @@ def load_similars(request):
         return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
     else:  # 取某个灯塔的新闻
         try:
-            udata = buildBeaconData(beaconusr, beaconid, start=start , end=num, isapi=True,orderby=orderby)
+            udata = buildBeaconData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby)
             r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
         except:
             udata["success"] = "false"

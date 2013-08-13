@@ -345,7 +345,7 @@ def buildRelatedChannel(relatedid):
 #     udata["docs"] = docs
 #     udata["total"] = str(len(udata["docs"]) )
     
-def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
+def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"):
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info("key is "+key)
     if r.exists(key):
@@ -357,7 +357,10 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
     docs = [] 
     channels = []
     channelfromtags = []
-    doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合 
+    if orderby =="tms":
+        doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+    else:
+        doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合 
 #     print doc_lst
     for docid in doc_lst:
         subdocs = [] 
@@ -375,11 +378,15 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
         else:
             doc["popularity"] = "0"
         doc["tms"]=str(doc["create_time"])
-        doc["create_time"] = timeElaspe(doc["create_time"]) 
+        doc["create_time"] = timeElaspe(doc["create_time"])
+        doc["domain"] = doc["domain"].decode("utf8")
+        if not doc.has_key("utms"):
+            doc["utms"]=doc["tms"] 
+        
         subkey = "bmk:doc:"+docid
         logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
         if r.exists(subkey):
-            subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,3)
+            subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,10)
             if len(subdoc_lst)==0:
                 subdoc_lst.append(docid)
             for subdocid in subdoc_lst:
@@ -390,11 +397,25 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False):
                 subdoc.pop("text")
                 subdoc.pop("copyNum")
                 subdoc.pop("popularity")
+                subdoc["domain"] = subdoc["domain"].decode("utf8")
+                subdoc["title"] = subdoc["title"].decode("utf8")+u"\u3000"
                 subdoc["tms"]=str(subdoc["create_time"])
                 subdoc["create_time"] = timeElaspe(subdoc["create_time"])
+                if not subdoc.has_key("utms"):
+                    subdoc["utms"]=subdoc["tms"] 
                 subdocs.append(subdoc)
+                if orderby !="tms":
+                    logger.info("buildHotBoardData order by %s" % (orderby,) )
+                    subdocs = sorted(subdocs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
+                    subdocs = subdocs[0:3]
+        
         doc["subdocs"]=subdocs
         docs.append(doc)
+        
+    if orderby !="tms":
+        logger.info("buildHotBoardData order by %s" % (orderby,) )
+        docs = sorted(docs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
+        docs = docs[start:end]
             
     udata["docs"] = docs
     udata["total"] = str(len(udata["docs"]) )

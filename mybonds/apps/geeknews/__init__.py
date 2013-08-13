@@ -809,16 +809,22 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"
         if doc == {}:
             continue  
         if not isapi:
-            doc["tx"] = doc["text"]
-        doc["text"] = subDocText(doc["text"])
+            doc["tx"] = doc["text"].decode("utf8")
+        doc["text"] = subDocText(doc["text"]).decode("utf8")
         doc["title"] = doc["title"].decode("utf8")+u"\u3000"
+        doc["domain"] = doc["domain"].decode("utf8")+u"\u3000"
         doc["copyNum"] = str(doc["copyNum"])
         if doc.has_key("popularity"):
             doc["popularity"] = str(doc["popularity"])
         else:
             doc["popularity"] = "0"
         doc["tms"]=str(doc["create_time"])
-        doc["create_time"] = timeElaspe(doc["create_time"]) 
+        doc["create_time"] = timeElaspe(doc["create_time"])
+        
+        if doc.has_key("label"):
+            doc.pop("label")
+        if not doc.has_key("utms"):
+            doc["utms"]=doc["tms"]
         docs.append(doc) 
     
 #     docs = sorted(docs,key=lambda l:(l["popularity"],l["tms"]),reverse = True)
@@ -1035,7 +1041,9 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
     def saveText(docs):
         ids_lst=[]
         cnt=0
+        tms=0
         ids=""
+        docs.reverse()
         for doc in docs:
             if doc is None: 
                 continue 
@@ -1043,19 +1051,24 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
 #                 continue
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
+            
             if not rdoc.hexists("doc:"+docid,"url"):
                 ids+=docid+";"
                 cnt = cnt+1
                 if cnt == 20:
                     ids_lst.append(ids)
                     ids=""
-                    cnt = 0 
+                    cnt = 0
+                
             if docAsChannel and headlineonly=="1" and not r.exists("bmk:doc:"+docid) :
 #                 beaconname = doc["label"] if doc.has_key("label") else docid
                 beaconname = doc.get("title",docid)
                 addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
             
     #                     print "attembrough: i have nothing to do ,bcz ftx:"+docid +" is exists.." 
+            
+            logger.debug("save doc:%s" % (docid,) )
+            
             title = doc["title"]
 #             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
             title = strfilter(title)
@@ -1067,6 +1080,8 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
             pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
+            pipedoc.hset("doc:"+docid,"utms",time.time()+tms )
+            tms = tms+1
     #             pipedoc.hset("doc:"+docid,"url",doc["url"] )       
     #             pipedoc.hset("doc:"+docid,"host",doc["host"] )  
             pipedoc.hset("doc:"+docid,"domain",doc["domain"] ) 

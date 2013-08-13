@@ -182,6 +182,7 @@ def hotboard(request):
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "doc")
     ascii = request.GET.get("ascii", "1")
+    orderby = request.GET.get("orderby", "tms")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
     quantity = log_typer(request, "hotboard", obj)
     udata = {}
@@ -195,10 +196,10 @@ def hotboard(request):
         return HttpResponse(json.dumps(udata), mimetype="application/json")
         
     start = request.GET.get("start", "0")
-    num = request.GET.get("num", "5") 
+    num = request.GET.get("num", "20") 
     username = getUserName(request)
     try:
-        udata = buildHotBoardData(beaconusr, beaconid, start=start , end=num, isapi=True)
+        udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby)
     except:
         traceback.print_exc()
         udata["success"] = "false"

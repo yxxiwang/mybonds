@@ -646,7 +646,11 @@ def beaconUrl(beaconusr, beaconid,daybefore=1):
     popularid = r.hget(key, "headlineonly")
     popularid = "0" if popularid is None else popularid
     
-    channelparm = "channelid" if popularid == "0" else "channelpick"
+    if beaconusr == "doc":
+        channelparm = "channelpick"
+    else:
+        channelparm = "channelid" if popularid == "0" else "popularid"
+        
     today = dt.date.fromtimestamp(time.time())
 #     after = time.mktime(today.timetuple())
 #     after = after - daybefore*86400

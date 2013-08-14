@@ -390,7 +390,16 @@ def getUnixTime(tstr):
         print 0
     else:
         print rt 
-
+        
+def mongoproc(parms):
+    if type(parms).__name__ == "str":
+        parms = (parms,) 
+    fulldocs = tftxs.find({"title":"/"+"借壳".decode("utf8")+"/"},{"_id":1,"title":1})
+#     print "借壳".decode("utf8")
+    fulldocs = tftxs.find({},{"_id":1,"title":1}).limit(30)
+    for doc in fulldocs:
+        print doc
+    
 def reflect(functionname,parms=""):
     function = globals()[functionname]
     if parms =="":
@@ -406,6 +415,7 @@ if __name__ == "__main__":
                   python %prog cleanBeacon {print|delete} 
                   python %prog makeDocDateCnt 
                   python %prog convUsrFllw 
+                  python %prog deleteUser {user} 
                   python %prog getTime 
                   python %prog getUnixTime 
                   python %prog cleanDocChannel  {print|delete} 

@@ -396,7 +396,7 @@ def mongoproc(parms):
         parms = (parms,) 
     fulldocs = tftxs.find({"title":"/"+"借壳".decode("utf8")+"/"},{"_id":1,"title":1})
 #     print "借壳".decode("utf8")
-    fulldocs = tftxs.find({},{"_id":1,"title":1}).limit(30)
+#     fulldocs = tftxs.find({},{"_id":1,"title":1}).limit(30)
     for doc in fulldocs:
         print doc
     

@@ -88,6 +88,8 @@ def trackdoc(request):
             udata = getdoc(docid,url)
     else:
         udata = getdoc(docid,url)
+        
+    udata = dataProcForApi(udata)
              
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
@@ -138,6 +140,7 @@ def relatedoc(request):
     else:
         udata = getdoc(docid,relatedurl)
              
+    udata = dataProcForApi(udata)
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
@@ -215,6 +218,7 @@ def newsdetail(request):
     username = request.GET.get("u", getUserName(request)) 
     docid=request.GET.get("docid", "")
     rtype=request.GET.get("rtype", "string")
+    ascii = request.GET.get("ascii", "1")
 #     print request
     udata={}
     doc ={}
@@ -315,8 +319,8 @@ def newsdetail(request):
         doc["success"] = "true"
         doc["message"] = "success return data"
 #     print json.dumps(doc, ensure_ascii=False)
-#     return HttpResponse(json.dumps(doc,ensure_ascii=False), mimetype="application/json")
-    return HttpResponse(json.dumps(doc), mimetype="application/json")
+    return HttpResponse(json.dumps(doc,ensure_ascii=ascii=="1"), mimetype="application/json")
+#     return HttpResponse(json.dumps(doc), mimetype="application/json")
 
 @login_required
 def removeDocFromChannel(request):

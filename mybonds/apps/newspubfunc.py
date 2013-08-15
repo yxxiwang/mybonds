@@ -387,8 +387,6 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
         logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
         if r.exists(subkey):
             subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,10)
-            if len(subdoc_lst)==0:
-                subdoc_lst.append(docid)
             for subdocid in subdoc_lst:
                 subdoc= rdoc.hgetall("doc:" + subdocid)
                 if subdoc == {}:
@@ -422,3 +420,29 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
 #     r.hset(key, "cnt", len(docs))
     return udata
 
+def dataProcForApi(udata):
+    if not udata.has_key("docs"):
+        udata["success"] = "false"
+        udata["message"] = "communication is error or data not exists!"
+    else:
+        udata["success"] = "success"
+        udata["message"] = "get data okay"
+    udata["total"] = str(udata["total"]) if udata.has_key("total") else "0"
+    
+    def proc(doc):
+        doc["docId"]=str(doc["docId"])
+        doc["validTime"]=str(doc["validTime"])
+        doc["popularity"]=str(doc["popularity"])
+        doc["copyNum"]=str(doc["copyNum"])
+        doc["tms"]=str(doc["create_time"])
+        doc["create_time"] = timeElaspe(doc["create_time"])
+#         doc["text"] = subDocText(doc["text"]).decode("utf8")
+        return doc
+    
+    udata["docs"] =  [ proc(doc) for doc in udata["docs"] ]
+    
+        
+    return udata
+        
+        
+        

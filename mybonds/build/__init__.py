@@ -394,7 +394,7 @@ def getUnixTime(tstr):
 def mongoproc(parms):
     if type(parms).__name__ == "str":
         parms = (parms,) 
-    fulldocs = tftxs.find({"title":"/"+"借壳".decode("utf8")+"/"},{"_id":1,"title":1})
+    fulldocs = tftxs.find({"title":"/"+"借壳".decode("utf8")+"/"},{"_id":1,"title":1}).limit(10)
 #     print "借壳".decode("utf8")
 #     fulldocs = tftxs.find({},{"_id":1,"title":1}).limit(30)
     for doc in fulldocs:

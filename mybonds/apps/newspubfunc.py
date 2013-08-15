@@ -430,7 +430,7 @@ def dataProcForApi(udata):
     udata["total"] = str(udata["total"]) if udata.has_key("total") else "0"
     
     def proc(doc):
-        doc["docId"]=str(doc["docId"])
+        doc["docid"]=str(doc.pop("docId"))
         doc["validTime"]=str(doc["validTime"])
         doc["popularity"]=str(doc["popularity"])
         doc["copyNum"]=str(doc["copyNum"])

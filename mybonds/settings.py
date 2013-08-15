@@ -25,6 +25,7 @@ EMAIL_HOST_PASSWORD = 'romail0613'
 LOGIN_REDIRECT_URL = '/geeknews/'
 LOGIN_URL = '/apply/login/'
 
+DEFAULT_CHARSET="utf8"
 # django-compressor is turned off by default due to deployment overhead for
 # most users. See <URL> for more information
 COMPRESS = False

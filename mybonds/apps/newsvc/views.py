@@ -50,6 +50,7 @@ def trackdoc(request):
     usecache = request.GET.get("usecache", "0")
     days = request.GET.get("days", "all")
     ascii = request.GET.get("ascii", "1")
+    api = request.GET.get("api", "")
     quantity = log_typer(request, "trackdoc", docid)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
@@ -90,7 +91,7 @@ def trackdoc(request):
         udata = getdoc(docid,url)
         
     udata = dataProcForApi(udata)
-             
+    udata["api"]=api
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
@@ -99,6 +100,7 @@ def relatedoc(request):
     usecache = request.GET.get("usecache", "0")
     days = request.GET.get("days", "all")
     ascii = request.GET.get("ascii", "1")
+    api = request.GET.get("api", "")
     quantity = log_typer(request, "relatedoc", docid)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
@@ -141,6 +143,7 @@ def relatedoc(request):
         udata = getdoc(docid,relatedurl)
              
     udata = dataProcForApi(udata)
+    udata["api"]=api
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
@@ -148,6 +151,7 @@ def relatedchannel(request):
     """获取 热点频道的相关频道"""
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "doc") 
+    api = request.GET.get("api", "")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
     quantity = log_typer(request, "relatedchannel", obj)
     udata = {}
@@ -177,7 +181,8 @@ def relatedchannel(request):
         else:
             udata["success"] = "true"
             udata["message"] = "success retrive data"
-    return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    udata["api"]=api
+    return HttpResponse(json.dumps(udata), mimetype="application/json")
 
 @login_required
 def hotboard(request):
@@ -186,6 +191,7 @@ def hotboard(request):
     beaconusr = request.GET.get("beaconusr", "doc")
     ascii = request.GET.get("ascii", "1")
     orderby = request.GET.get("orderby", "tms")
+    api = request.GET.get("api", "")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
     quantity = log_typer(request, "hotboard", obj)
     udata = {}
@@ -211,6 +217,7 @@ def hotboard(request):
         udata["success"] = "true"
         udata["message"] = "success retrive data"
 #     return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    udata["api"]=api
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
  
 @login_required
@@ -219,7 +226,7 @@ def newsdetail(request):
     docid=request.GET.get("docid", "")
     rtype=request.GET.get("rtype", "string")
     ascii = request.GET.get("ascii", "1")
-#     print request
+    api = request.GET.get("api", "")
     udata={}
     doc ={}
     if docid =="":
@@ -319,6 +326,7 @@ def newsdetail(request):
         doc["success"] = "true"
         doc["message"] = "success return data"
 #     print json.dumps(doc, ensure_ascii=False)
+    doc["api"]=api
     return HttpResponse(json.dumps(doc,ensure_ascii=ascii=="1"), mimetype="application/json")
 #     return HttpResponse(json.dumps(doc), mimetype="application/json")
 
@@ -330,7 +338,8 @@ def removeDocFromChannel(request):
     op = request.GET.get("o", "service") 
     docid = request.GET.get("docid", "") 
     beaconusr = request.GET.get("beaconusr", "") 
-    beaconid = request.GET.get("beaconid", "") 
+    beaconid = request.GET.get("beaconid", "")
+    api = request.GET.get("api", "")
     
 #     beaconusr= "ltb"
 #     beaconid = "1968416984598300074"
@@ -365,23 +374,15 @@ def removeDocFromChannel(request):
     rdoc.delete("ftx:"+docid)
     rdoc.delete("doc:"+docid)
     udata["message"]="success remove docid[%s] in channel" % docid
-    udata["success"] = "true"
-# #     udata = bench(loadFromUrl,parms=urlstr)
-#     if udata=={}: 
-#         udata["message"]="somethings error occured docid[%s] in channel" % docid
-#         udata["success"] = "false"
-#     else:
-#         udata["message"]="success remove docid[%s] in channel" % docid
-#         udata["success"] = "true"
-#         r.zrem(key+":doc:tms",docid)
-    
+    udata["success"] = "true"    
     if op == "page":
         return HttpResponseRedirect('/news/beaconnews/?orderby=tms&beaconid=%s&beaconusr=%s' %(beaconid,beaconusr))
-    
+    udata["api"]=api
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     
 def channelsbygroup(request):
     groupid = request.GET.get("groupid", "") 
+    api = request.GET.get("api", "")
     username = request.GET.get("u", getUserName(request))
     udata={} 
     beacons = [] 
@@ -425,9 +426,11 @@ def channelsbygroup(request):
     udata["total"] = len(beacons)
     udata["message"]="success list beacons ." 
     udata["success"] = "true"
+    udata["api"]=api
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
         
 def grouplist(request):
+    api = request.GET.get("api", "")
     udata={} 
     groups = [] 
     g_lst = r.zrevrange("groups", 0,-1)  # 组集合
@@ -440,6 +443,7 @@ def grouplist(request):
     udata["total"] = len(groups)
     udata["message"]="success list groups ." 
     udata["success"] = "true"
+    udata["api"]=api
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     
 def channelcounts(request):

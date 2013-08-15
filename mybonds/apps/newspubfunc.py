@@ -441,7 +441,6 @@ def dataProcForApi(udata):
     
     udata["docs"] =  [ proc(doc) for doc in udata["docs"] ]
     
-        
     return udata
         
         

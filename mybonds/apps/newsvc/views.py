@@ -24,25 +24,51 @@ def index(request):
  
 @login_required
 def channelnews(request): 
-    orderby = request.GET.get("orderby", "news")
-    channel=request.GET.get("channel", "")
-    page=request.GET.get("page", "0")
-    length=request.GET.get("length", "20")
-    start=request.GET.get("start", "0")
-    num=request.GET.get("num", "20")
-    username = request.GET.get("u", getUserName(request)) 
-    
-    if channel !="":
-        channel = urllib2.quote(channel.encode("utf8"))
-    urlstr = "http://www.gxdx168.com/research/svc?channelid="+channel+"&page=%s&length=%s" %(page,length)
-    
-    udata=getDataByUrl(urlstr,True)
-    
-    udata["docs"] = udata["docs"][int(start): int(start) + int(num)] 
-#     udata["tags"] = udata["tags"][0: int(tagnum)] 
-#     udata["total"] = str(udata["total"]) 
-    return HttpResponse(json.dumps(udata), mimetype="application/json")
+    """获取频道新闻"""
+    beaconid = request.GET.get("beaconid", "1968416984598300074")  
+    beaconusr = request.GET.get("beaconusr", "doc") 
+    beaconname = request.GET.get("beaconname", "") 
+    usecache = request.GET.get("usecache", "1")
+    api = request.GET.get("api", "")
+    ascii = request.GET.get("ascii", "1")
+    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
+    quantity = log_typer(request, "channelnews", obj)
+    udata = {}
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+#     if obj is None:
+#         udata["success"] = "false"
+#         udata["message"] = "it's not exists!" 
+#         return HttpResponse(json.dumps(udata), mimetype="application/json")
 
+    udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days="all",usecache=usecache) 
+    udata = dataProcForApi(udata)
+    udata["api"]=api
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
+
+@login_required
+def popularychannel(request):
+    beaconid = request.GET.get("beaconid", "1968416984598300074")  
+    beaconusr = request.GET.get("beaconusr", "doc") 
+    beaconname = request.GET.get("beaconname", "") 
+    usecache = request.GET.get("usecache", "1")
+    days = request.GET.get("days", "all")
+    ascii = request.GET.get("ascii", "1")
+    api = request.GET.get("api", "")
+    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
+    quantity = log_typer(request, "popularchannel", obj)
+    udata = {}
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    
+    udata = procChannel("popularychannel",beaconusr,beaconid,beaconname,days,usecache)
+    udata = dataProcForApi(udata)
+    udata["api"]=api
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
 def trackdoc(request):
@@ -69,12 +95,7 @@ def trackdoc(request):
         if udata.has_key("docs"): 
             udata["_id"]=docid
             ttrack.save(udata)
-            r.zadd("docrelated",time.time(),docid)
-            logger.info("save doc into mongdb :"+docid)
-        else:
-            udata = {}
-            udata["success"] = "false"
-            udata["message"] = "communication is error or data not exists!"
+            logger.info("save doc into mongdb :"+docid) 
         return udata
     if days =="all":
         after = 0 
@@ -153,8 +174,11 @@ def relatedchannel(request):
     """获取 热点频道的相关频道"""
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "doc") 
+    beaconname = request.GET.get("beaconname", "") 
+    usecache = request.GET.get("usecache", "1")
     api = request.GET.get("api", "")
-    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
+    ascii = request.GET.get("ascii", "1")
+    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name") if beaconname =="" else beaconname
     quantity = log_typer(request, "relatedchannel", obj)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
@@ -165,36 +189,22 @@ def relatedchannel(request):
 #         udata["success"] = "false"
 #         udata["message"] = "it's not exists!" 
 #         return HttpResponse(json.dumps(udata), mimetype="application/json")
-        
-    start = request.GET.get("start", "0")
-    num = request.GET.get("num", "5")
-    username = getUserName(request)   
-    try:
-        udata = trelate.find_one({"_id":beaconid})
-    except:
-        traceback.print_exc()
-        udata["success"] = "false"
-        udata["message"] = "no data" 
-    else:
-        if udata is None:
-            udata={}
-            udata["success"] = "false"
-            udata["message"] = "no data" 
-        else:
-            udata["success"] = "true"
-            udata["message"] = "success retrive data"
+    udata = procChannel("relatedchannel",beaconusr,beaconid,beaconname,days="all",usecache=usecache) 
+    udata = dataProcForApi(udata)
     udata["api"]=api
-    return HttpResponse(json.dumps(udata), mimetype="application/json")
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
+           
 
 @login_required
 def hotboard(request):
     """获取 热点频道 面板"""
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "doc")
+    beaconname = request.GET.get("beaconname", "")
     ascii = request.GET.get("ascii", "1")
     orderby = request.GET.get("orderby", "tms")
     api = request.GET.get("api", "")
-    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
+    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name") if beaconname =="" else beaconname
     quantity = log_typer(request, "hotboard", obj)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
@@ -210,6 +220,11 @@ def hotboard(request):
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "20") 
     username = getUserName(request)
+    
+    if beaconname!="":
+        beaconid=getHashid(beaconname)
+        beaconusr="rd"
+    print beaconusr,beaconid
     try:
         udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby)
     except:

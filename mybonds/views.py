@@ -713,6 +713,18 @@ def login_apply(request):
             r.hset("usr:" + username, "fllw_bmk_cnt", 0) 
             robj["success"] = 'true'
             robj["message"] = "apply is success" 
+            
+            fllwkey="bmk:rd:1108470809:fllw"
+            if r.exists(fllwkey):
+                r.sadd(fllwkey,username) 
+                r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
+                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
+            
+            fllwkey="bmk:rd:954189947:fllw"
+            if r.exists(fllwkey):
+                r.sadd(fllwkey,username) 
+                r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
+                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
         else:    
             robj["success"] = 'false'
             robj["message"] = "login failed" 

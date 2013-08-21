@@ -265,95 +265,7 @@ def requestUrl(url):
     if response.status == 200:
         return 0
     return response.status
-    
-
-def getFlagName(type):
-    flagname = ""
-    if type == "ppl":  # 综览
-        flagname = "overview"
-    elif type == "pdg":  # 待读
-        flagname = "foucs"
-    elif type == "rcm":  # 推荐
-        flagname = "recomm"
-    elif type == "nav":  # 推荐
-        flagname = "navi"
-    elif type == "rdd":  # 已读
-        flagname = "history"
-    elif type == "beaconnews":  # 灯塔阅读
-        flagname = "beaconnews"
-    elif type == "todaynews":  # 今文观止
-        flagname = "todaynews"
-    return flagname
-
-def getOtype(type):
-    suffix = ""
-    if type == "ppl":
-        suffix = "0"
-    elif type == "nav":
-        suffix = "2"
-    elif type == "rcm":
-        suffix = "1"
-    elif type == "rdd":
-        suffix = "3"
-    return suffix
- 
-# def log_typer(the_func):
-#    """
-#    Make another a function more beautiful.
-#    """
-#    def _decorated(*args, **kwargs):
-#        print "====log_typer is work here===="
-# #        request = args[0]._get_request()
-# #        print type(request)
-# #        print request
-#        return the_func(*args, **kwargs)
-#    return _decorated
-def logexport():
-    import codecs
-    import datetime as dt
-    logs = r.zrevrange("log", 0, -1, withscores=True)
-    infos = ""
-    tms = time.time()
-    tt = time.gmtime(tms)
-    tdate = dt.date.fromtimestamp(tms).strftime('%Y%m%d')
-#    ttime = str(tt.tm_hour)+":"+str(tt.tm_min)+":"+str(tt.tm_sec) 
-    f = codecs.open("/etc/nginx/static/wangxi/log.csv" + tdate, "w")
-    f.write(codecs.BOM_UTF8)
-    # f.write( unicodeString.encode( "utf-8" ) )
-    for log, tms in logs:
-        logobj = json.loads(log)
-        ip = logobj["ip"]
-        user = logobj["usr"]
-        act = logobj["act"]
-        obj = logobj["o"]
-        url = "http://www.ip.cn/getip.php?action=queryip&ip_url=" + ip + "&from=web"
-        # rr= requests.get(url)
-        # r.hset("usrlst",logobj["usr"],rr.text)
-        if ip == "110.75.186.225":
-            r.zrem("log", log)
-            continue
-        if act == "reserch":
-            id = obj
-            obj = rdoc.hget("doc:" + id, "url")
-            infos = rdoc.hget("doc:" + id, "ttl")
-        else:
-            infos = ""
-        
-        if isinstance(obj, unicode):
-            print obj
-    #        obj = obj.decode("utf8")
-    #    r.hset("usrlst",user,ip)
-    #    r.hset("ips",ip,ip)
-        tt = time.gmtime(tms)
-        tdate = dt.date.fromtimestamp(tms).strftime('%Y%m%d')
-        ttime = str(tt.tm_hour) + ":" + str(tt.tm_min) + ":" + str(tt.tm_sec)
-        logstr = '%s,%s,%s,%s,%s,"%s","%s"' % (tdate, ttime, user, ip, act, obj, infos.decode("utf8"))
-        print logstr
-    #    f.write(logstr)
-        f.write(logstr.encode("utf-8"))
-        f.write("\n")
-    f.close()
-
+     
 def getGreeting():
     greetobjs = r.zrevrange("greeting", 0, 30, withscores=True)
     greets = []
@@ -381,29 +293,7 @@ def greeting_typer(username, act, obj):
     logobj["act"] = act
     logobj["o"] = obj
     r.zadd("greeting", time.time(), json.dumps(logobj)) 
-
-    
-# def log_typer(request, act, obj):
-#     quantity = 0 
-#     client_address = request.META['REMOTE_ADDR']
-# #    print "client_address===:" + client_address
-#     quantity = r.incr("quantity:" + client_address, 1)
-#     if quantity > QUANTITY:
-#         return quantity
-#     r.expire("quantity:" + client_address, QUANTITY_DURATION)
-#     username = getUserName(request)
-#     logobj = {}
-#     logobj["usr"] = username
-#     logobj["ip"] = client_address
-#     logobj["act"] = act
-#     logobj["o"] = obj
-#     logobj["url"] = request.get_full_path()
-#     logobj["tms"]=time.time()
-#     r.zadd("log", time.time(), json.dumps(logobj))
-#     r.hset("usrlst", username, json.dumps(logobj))
-#     return quantity
-#     
-    
+ 
 def refreshTagsUptime(username, otype, num, tagid=None):
     if tagid is None:
         keytms = "usr:%s:%s:taglst" % (username, otype)  # usr:wxi:rcm...
@@ -646,10 +536,18 @@ def beaconUrl(beaconusr, beaconid,daybefore=1):
     popularid = r.hget(key, "headlineonly")
     popularid = "0" if popularid is None else popularid
     
-    if beaconusr == "doc":
-        channelparm = "channelpick"
+    
+    if beaconusr == "rd":
+        channelparm = "channeleventpick"
     else:
-        channelparm = "channelid" if popularid == "0" else "popularid"
+        channelparm = "channelpick"
+        
+#     if beaconusr == "doc":
+#         channelparm = "channelpick"
+#     elif beaconusr == "rd":
+#         channelparm = "channeleventpick"
+#     else:
+#         channelparm = "channelid" if popularid == "0" else "popularid"
         
     today = dt.date.fromtimestamp(time.time())
 #     after = time.mktime(today.timetuple())
@@ -692,24 +590,15 @@ def refreshDocs(beaconusr, beaconid,daybefore=1,force=False):
     else:
         udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=True)
     
-    if headlineonly=="1" and r.hget(key,"crt_usr")!="doc":
-#     if headlineonly=="1":
-        relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),r.hget(key,"ttl"))
+    if r.hget(key,"crt_usr")!="doc":
+        ttl = r.hget(key,"ttl")
+        ttl = urllib2.quote(ttl)
+        relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),ttl)
         relateids = saveRelatedDocs(relateurl,beaconid)
         logger.info("relateids:")
         logger.info(relateids)
         r.hset(key, "channels", ",".join(relateids))
-        
-#     if udata.has_key("channels"):
-#         r.hset(key, "channels", ",".join(udata["channels"]) )
-        
-#     20130718 注释掉, 因为判断是否热点改为在beaconUrl中,不再需要在此处进行
-#     if headlineonly=="0" and udata.has_key("docs"):
-#         docs =  udata["docs"]
-#     elif headlineonly=="1" and udata.has_key("headlines"):
-#         docs =  udata["headlines"]
-#     else:
-#         return COMMUNICATERROR
+         
     if udata.has_key("docs"):
         docs = udata["docs"]
     else:
@@ -720,20 +609,20 @@ def refreshDocs(beaconusr, beaconid,daybefore=1,force=False):
     doc_dcnt_key = ctskey.replace("doc_cts","doc_dcnt")
     doc_tcnt_key = ctskey.replace("doc_cts","doc_tcnt")
     channel_cnt_key = ctskey.replace("doc_cts","cnt") 
-#     r.delete(key+":doc:tms")
-    rmfrom = (int(time.time())-daybefore*86400)*1000
-    rmto = float(r.hget(key, "last_update"))*1000
-    ndel = r.zremrangebyscore(key+":doc:tms",rmfrom,rmto)
-    logger.info("removenews %s  from %d to %d and del %d" %(key+":doc:tms",rmfrom,rmto,ndel) )
-    logger.info("add new data len is %d"  %(len(docs),))
+# #     r.delete(key+":doc:tms")
+#     rmfrom = (int(time.time())-daybefore*86400)*1000
+#     rmto = float(r.hget(key, "last_update"))*1000
+#     ndel = r.zremrangebyscore(key+":doc:tms",rmfrom,rmto)
+#     logger.info("removenews %s  from %d to %d and del %d" %(key+":doc:tms",rmfrom,rmto,ndel) )
+#     logger.info("add new data len is %d"  %(len(docs),))
     for doc in docs:
         if doc is None:
             continue
-#         if doc["validTime"]=="false" or not doc["validTime"]:
-#             continue 
-#             if force:
-#                 r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
-        r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
+        if beaconusr=="doc":
+            r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
+        else:
+            r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
+
 ################ 统计信息   ############################
         docid= str(doc["docId"])
         tms = doc["create_time"]
@@ -939,9 +828,6 @@ def getTag(displayTag):
         print "displaytag is not unicode,need decode.."
         return r.hget("tag:ori", displayTag.decode("utf8")) 
 
-def saveRelativeDocs(username, relativeid):
-    pass
-
 def saveDocsByIDS(docids):
     pass
     
@@ -1031,7 +917,9 @@ def saveRelatedDocs(relatedurl,relatedid):
         docid = str(doc["docId"])
         relateids.append(docid)
         beaconname = doc.get("title",docid)
-        addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly="1") 
+        eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
+        if eventid !="-1":
+            addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly="1") 
 
     udata["_id"]=relatedid
     trelate.save(udata)
@@ -1063,8 +951,9 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                     ids_lst.append(ids)
                     ids=""
                     cnt = 0
-                
-            if docAsChannel and headlineonly=="1" and not r.exists("bmk:doc:"+docid) :
+            
+            eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
+            if docAsChannel and eventid !="-1" and not r.exists("bmk:doc:"+docid) :
 #                 beaconname = doc["label"] if doc.has_key("label") else docid
                 beaconname = doc.get("title",docid)
                 addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
@@ -1091,7 +980,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"domain",doc["domain"] ) 
             pipedoc.hset("doc:"+docid,"isheadline",headlineonly) 
                 
-#             pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME") )
+            pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME")*3)
         if len(ids_lst) > 0:
             for tids in ids_lst:
                 saveFulltextById(tids)
@@ -1101,6 +990,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
     ################## saveText is over ##############################
 
     if udata.has_key("docs"):
+        logger.info("save docs and len is :" + str(len(udata["docs"])))
         saveText(udata["docs"])
             
 #     if udata.has_key("headlines"):

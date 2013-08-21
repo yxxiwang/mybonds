@@ -24,6 +24,8 @@ mdoc = connection["doc"]
 tftxs = mdoc['tftxs']
 trelate = mdoc['trelate']
 ttrack = mdoc['ttrack']
+tpopulary = mdoc['tpopulary']
+tchannel = mdoc['tchannel']
 
 sysparms_hkey = {
     "REDIS_EXPIRETIME":"redis_expire",
@@ -89,7 +91,7 @@ def loginit(LOGLEVEL):
 def getsysparm(parstr):
 #     REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire")) if r.hexists("sysparms","redis_expire") else 186400
     hval = r.hget("sysparms", sysparms_hkey[parstr.rstrip()])
-    return int(hval) if  hval.isdigit() else hval
+    return int(hval) if hval.isdigit() else hval
 
 logger = loginit(getsysparm("LOGLEVEL"))   
 def sendemail(content, rcv_email,title=""):
@@ -360,7 +362,7 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
     if orderby =="tms":
         doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
     else:
-        doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合 
+        doc_lst = r.zrevrange(key + ":doc:tms", 0,300)  # 主题文档集合 
 #     print doc_lst
     for docid in doc_lst:
         subdocs = [] 
@@ -421,16 +423,25 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
     return udata
 
 def dataProcForApi(udata):
-    if not udata.has_key("docs"):
+    if udata is None:
+        udata={}
         udata["success"] = "false"
-        udata["message"] = "communication is error or data not exists!"
-    else:
+        udata["message"] = "data is null,maybe communication is error."
+        return udata
+        
+    if udata.has_key("docs"):
         udata["success"] = "success"
         udata["message"] = "get data okay"
+    else:
+        udata["success"] = "false"
+        udata["message"] = "communication is error or data not exists!"
+        return udata
+        
     udata["total"] = str(udata["total"]) if udata.has_key("total") else "0"
     
     def proc(doc):
         doc["docid"]=str(doc.pop("docId"))
+        doc["eventid"]=str(doc.pop("eventId"))
         doc["validTime"]=str(doc["validTime"])
         doc["popularity"]=str(doc["popularity"])
         doc["copyNum"]=str(doc["copyNum"])
@@ -443,5 +454,52 @@ def dataProcForApi(udata):
     
     return udata
         
+def procChannel(datatype,beaconusr,beaconid,beaconname,days="1",usecache="1"):
+    udata={}
+    def getdoc(id,url,tmongo):
+        logger.info("fetch url:"+url)
+        udata = bench(loadFromUrl,parms=url) 
+        if udata.has_key("docs"): 
+            udata["_id"]=id
+            tmongo.save(udata)
+            logger.info("save doc into mongdb :"+id)
+        return udata
+    
+    if datatype =="popularychannel":
+        parm = "popularid"
+        tmongo = tpopulary
+    elif datatype =="relatedchannel":
+        parm = "relatedid"
+        tmongo = trelate
+    else:
+        parm = "channelid"
+        tmongo = tchannel
         
+    if days =="all":
+        after = 0 
+    else:
+        after = time.time() - 86400 * int(days)
+        after = after*1000
+    after = int(after)
+    before = int(time.time() * 1000)
+    
+    if beaconname!="":
+        beaconid = getHashid(beaconname)
+        ttl = urllib2.quote(beaconname.encode("utf8"))
+        print ttl
+    else:
+        key = "bmk:" + beaconusr + ":" + beaconid
+        ttl = r.hget(key,"ttl")
+        ttl = urllib2.quote(ttl)
         
+    url = "http://%s/research/svc?%s=%s&after=%s&before=%s" %(getsysparm("BACKEND_DOMAIN"),parm,ttl,after,before) 
+    print usecache
+    if usecache=="1":
+        udata = tmongo.find_one({"_id":beaconid})
+        if udata is None:
+            udata = getdoc(beaconid,url,tmongo)
+    else:
+        udata = getdoc(beaconid,url,tmongo)
+    return udata
+
+

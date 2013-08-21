@@ -60,6 +60,7 @@ def trackdoc(request):
     if docid is None:
         udata["success"] = "false"
         udata["message"] = "it's not exists!" 
+        udata["api"]=api
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
     def getdoc(docid,url):
@@ -110,6 +111,7 @@ def relatedoc(request):
     if docid is None:
         udata["success"] = "false"
         udata["message"] = "it's not exists!" 
+        udata["api"]=api
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
     def getdoc(docid,url):
@@ -202,6 +204,7 @@ def hotboard(request):
     if obj is None:
         udata["success"] = "false"
         udata["message"] = "it's not exists!" 
+        udata["api"]=api
         return HttpResponse(json.dumps(udata), mimetype="application/json")
         
     start = request.GET.get("start", "0")

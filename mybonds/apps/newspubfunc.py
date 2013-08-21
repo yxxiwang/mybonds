@@ -386,7 +386,7 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
         subkey = "bmk:doc:"+docid
         logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
         if r.exists(subkey):
-            subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,10)
+            subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,100)
             for subdocid in subdoc_lst:
                 subdoc= rdoc.hgetall("doc:" + subdocid)
                 if subdoc == {}:
@@ -405,7 +405,7 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
                 if orderby !="tms":
                     logger.info("buildHotBoardData order by %s" % (orderby,) )
                     subdocs = sorted(subdocs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
-                    subdocs = subdocs[0:3]
+                    subdocs = subdocs[0:6]
         
         doc["subdocs"]=subdocs
         docs.append(doc)

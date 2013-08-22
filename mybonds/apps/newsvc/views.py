@@ -30,6 +30,7 @@ def channelnews(request):
     beaconname = request.GET.get("beaconname", "") 
     usecache = request.GET.get("usecache", "1")
     api = request.GET.get("api", "")
+    days = request.GET.get("days", "1")
     ascii = request.GET.get("ascii", "1")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
     quantity = log_typer(request, "channelnews", obj)
@@ -43,18 +44,46 @@ def channelnews(request):
 #         udata["message"] = "it's not exists!" 
 #         return HttpResponse(json.dumps(udata), mimetype="application/json")
 
-    udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days="all",usecache=usecache) 
+    udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days,usecache) 
+    udata = dataProcForApi(udata)
+    udata["api"]=api
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
+
+@login_required
+def channelpick(request): 
+    """获取频道精选新闻"""
+    beaconid = request.GET.get("beaconid", "1968416984598300074")  
+    beaconusr = request.GET.get("beaconusr", "doc") 
+    beaconname = request.GET.get("beaconname", "") 
+    usecache = request.GET.get("usecache", "1")
+    api = request.GET.get("api", "")
+    days = request.GET.get("days", "1")
+    ascii = request.GET.get("ascii", "1")
+    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
+    quantity = log_typer(request, "channelnews", obj)
+    udata = {}
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+#     if obj is None:
+#         udata["success"] = "false"
+#         udata["message"] = "it's not exists!" 
+#         return HttpResponse(json.dumps(udata), mimetype="application/json")
+
+    udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days,usecache) 
     udata = dataProcForApi(udata)
     udata["api"]=api
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
 def popularychannel(request):
+    """获取频道自动聚类子频道"""
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "doc") 
     beaconname = request.GET.get("beaconname", "") 
     usecache = request.GET.get("usecache", "1")
-    days = request.GET.get("days", "all")
+    days = request.GET.get("days", "1")
     ascii = request.GET.get("ascii", "1")
     api = request.GET.get("api", "")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
@@ -81,6 +110,7 @@ def popularychannel(request):
         if doc.has_key("popularity") : doc.pop("popularity")
         if doc.has_key("validTime") : doc.pop("validTime")
         if doc.has_key("text") : doc.pop("text")
+        addBeacon("doc",doc["beaconid"],doc["beaconid"],beaconname=doc["beaconname"],tag="auto",headlineonly="1")
         return doc
         
     if udata.has_key("docs"):
@@ -194,6 +224,7 @@ def relatedchannel(request):
     beaconusr = request.GET.get("beaconusr", "doc") 
     beaconname = request.GET.get("beaconname", "") 
     usecache = request.GET.get("usecache", "1")
+    days = request.GET.get("days", "all")
     api = request.GET.get("api", "")
     ascii = request.GET.get("ascii", "1")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name") if beaconname =="" else beaconname
@@ -207,9 +238,27 @@ def relatedchannel(request):
 #         udata["success"] = "false"
 #         udata["message"] = "it's not exists!" 
 #         return HttpResponse(json.dumps(udata), mimetype="application/json")
-    udata = procChannel("relatedchannel",beaconusr,beaconid,beaconname,days="all",usecache=usecache) 
+    udata = procChannel("relatedchannel",beaconusr,beaconid,beaconname,days,usecache) 
     udata = dataProcForApi(udata)
     udata["api"]=api
+    def proc(doc):
+        doc["beaconid"]=doc.pop("docid")
+        doc["beaconusr"]="doc"
+        doc["beaconname"]=doc.pop("title")
+        if doc.has_key("domain") : doc.pop("domain")
+        if doc.has_key("eventid") : doc.pop("eventid")
+        if doc.has_key("copyNum") : doc.pop("copyNum")
+        if doc.has_key("dateStr") : doc.pop("dateStr") 
+        if doc.has_key("create_time") : doc.pop("create_time")
+        if doc.has_key("popularity") : doc.pop("popularity")
+        if doc.has_key("validTime") : doc.pop("validTime")
+        if doc.has_key("text") : doc.pop("text")
+        addBeacon("doc",doc["beaconid"],doc["beaconid"],beaconname=doc["beaconname"],tag="auto",headlineonly="1")
+        return doc
+        
+    if udata.has_key("docs"):
+        udata["docs"] =  [ proc(doc) for doc in udata["docs"] ]
+        
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
            
 

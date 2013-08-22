@@ -463,11 +463,13 @@ def queuelist(request,template_name="beacon/queue_list.html"):
     beaconqueue_list = r.lrange("queue:beacon:processing",0,-1) + r.lrange("queue:beacon",0,20)
     bqcnt= r.llen("queue:beacon")
     bqcnt = bqcnt+1 if bqcnt!=0 else 0#将正在处理的记录加上
+    bqcntdone= r.llen("queue:beacon:done")
     beaconqueue_done_list = r.lrange("queue:beacon:done",0,5)
     beaconqueue_list = [loadbeacon(obj) for obj in beaconqueue_list]
     beaconqueue_done_list = [loadbeacon(obj) for obj in beaconqueue_done_list]
     
     removeq_list = r.lrange("queue:removedoc:processing",0,-1) + r.lrange("queue:removedoc",0,20)
+    rqcntdone= r.llen("queue:removedoc:done")
     rqcnt= r.llen("queue:removedoc")
     rqcnt = rqcnt+1 if rqcnt!=0 else 0
     removeq_done_list = r.lrange("queue:removedoc:done",0,5)
@@ -475,6 +477,7 @@ def queuelist(request,template_name="beacon/queue_list.html"):
     removeq_done_list = [loadbeacon(obj,"remove")  for obj in removeq_done_list]
     
     sendemail_list = r.lrange("queue:sendemail:processing",0,-1) + r.lrange("queue:sendemail",0,20)
+    sqcntdone= r.llen("queue:sendemail:done")
     sqcnt= r.llen("queue:sendemail")
     sqcnt = sqcnt+1 if sqcnt!=0 else 0
     sendemail_done_list = r.lrange("queue:sendemail:done",0,5)
@@ -486,14 +489,17 @@ def queuelist(request,template_name="beacon/queue_list.html"):
         'beaconqueues':beaconqueue_list,
         'beaconqueuedones':beaconqueue_done_list,
         'bqcnt':bqcnt,
+        'bqcntdone':bqcntdone,
         
         'removeqs':removeq_list,
         'removeqdones':removeq_done_list,
         'rqcnt':rqcnt,
+        'rqcntdone':rqcntdone,
         
         'sendemailqs':sendemail_list,
         'sendemailqdones':sendemail_done_list,
         'sqcnt':sqcnt,
+        'sqcntdone':sqcntdone,
         'current_path': request.get_full_path(),
     }, context_instance=RequestContext(request)) 
 

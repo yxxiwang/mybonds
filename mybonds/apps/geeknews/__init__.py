@@ -541,7 +541,7 @@ def beaconUrl(beaconusr, beaconid,daybefore=1):
         channelparm = "channeleventpick"
     else:
         channelparm = "channelpick"
-        
+    
 #     if beaconusr == "doc":
 #         channelparm = "channelpick"
 #     elif beaconusr == "rd":
@@ -972,6 +972,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
             pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
+            pipedoc.hset("doc:"+docid,"eventid",doc["eventid"] )
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
             pipedoc.hset("doc:"+docid,"utms",tms )
             tms = tms +1

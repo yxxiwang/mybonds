@@ -68,6 +68,24 @@ def popularychannel(request):
     udata = procChannel("popularychannel",beaconusr,beaconid,beaconname,days,usecache)
     udata = dataProcForApi(udata)
     udata["api"]=api
+    
+    def proc(doc):
+        doc["beaconid"]=doc.pop("docid")
+        doc["beaconusr"]="doc"
+        doc["beaconname"]=doc.pop("title")
+        if doc.has_key("domain") : doc.pop("domain")
+        if doc.has_key("eventid") : doc.pop("eventid")
+        if doc.has_key("copyNum") : doc.pop("copyNum")
+        if doc.has_key("dateStr") : doc.pop("dateStr") 
+        if doc.has_key("create_time") : doc.pop("create_time")
+        if doc.has_key("popularity") : doc.pop("popularity")
+        if doc.has_key("validTime") : doc.pop("validTime")
+        if doc.has_key("text") : doc.pop("text")
+        return doc
+        
+    if udata.has_key("docs"):
+        udata["docs"] =  [ proc(doc) for doc in udata["docs"] ]
+    
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required

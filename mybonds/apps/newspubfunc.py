@@ -379,6 +379,12 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
             doc["popularity"] = str(doc["popularity"])
         else:
             doc["popularity"] = "0"
+            
+        if doc.has_key("eventid"):
+            doc["eventid"] = str(doc["eventid"])
+        else:
+            doc["eventid"] = "-1"
+            
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"])
         doc["domain"] = doc["domain"].decode("utf8")

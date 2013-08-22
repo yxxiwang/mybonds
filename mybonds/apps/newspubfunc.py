@@ -496,7 +496,7 @@ def procChannel(datatype,beaconusr,beaconid,beaconname,days="1",usecache="1"):
     else:
         key = "bmk:" + beaconusr + ":" + beaconid
         ttl = r.hget(key,"ttl")
-        ttl = urllib2.quote(ttl)
+        if ttl is not None:  ttl = urllib2.quote(ttl)
         
     url = "http://%s/research/svc?%s=%s&after=%s&before=%s" %(getsysparm("BACKEND_DOMAIN"),parm,ttl,after,before) 
     print usecache

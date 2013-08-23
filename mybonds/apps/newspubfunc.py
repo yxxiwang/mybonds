@@ -326,6 +326,83 @@ def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
 #     r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))
     r.lpush("queue:" + qtype, json.dumps(qobj))
     
+
+def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"):
+    key = "bmk:" + beaconusr + ":" + beaconid
+    if r.exists(key):
+        refreshBeacon(beaconusr, beaconid)
+    else:
+        return {}
+    udata = {}
+    docs = [] 
+    channels = []
+    channelfromtags = []
+    if orderby =="tms":
+        doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+    else:
+        doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合
+        
+    for docid in doc_lst:
+        doc = rdoc.hgetall("doc:" + docid) 
+        if doc == {}:
+            continue  
+        if not isapi:
+            doc["tx"] = doc["text"].decode("utf8")
+        doc["text"] = subDocText(doc["text"]).decode("utf8")
+        doc["title"] = doc["title"].decode("utf8")+u"\u3000"
+        doc["domain"] = doc["domain"].decode("utf8")+u"\u3000"
+        doc["copyNum"] = str(doc["copyNum"])
+        if doc.has_key("popularity"):
+            doc["popularity"] = str(doc["popularity"])
+        else:
+            doc["popularity"] = "0"
+        doc["tms"]=str(doc["create_time"])
+        doc["create_time"] = timeElaspe(doc["create_time"])
+        
+        if doc.has_key("label"):
+            doc.pop("label")
+        if not doc.has_key("utms"):
+            doc["utms"]=doc["tms"]
+        docs.append(doc) 
+    
+#     docs = sorted(docs,key=lambda l:(l["popularity"],l["tms"]),reverse = True)
+    if orderby !="tms":
+        logger.info("buildBeaconData order by %s" % (orderby,) )
+        docs = sorted(docs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
+        docs = docs[start:end]
+    udata["docs"] = docs
+    channelstr = r.hget(key,"channels")
+    if channelstr is not None and  channelstr !="" :
+        for cname in  channelstr.split(","):
+            if r.hexists("beacon:channel",cname):
+                cobj = {}
+                cobj["beaconttl"]=cname
+                ckey = r.hget("beacon:channel",cname)
+                cobj["beaconusr"]=ckey.split(":")[1]
+                cobj["beaconid"]=ckey.split(":")[2]
+                cobj["beaconname"]=r.hget("bmk:"+ckey.split(":")[1]+":"+ckey.split(":")[2],"name")
+                channels.append(cobj)
+                
+    if beaconusr+":"+beaconid in r.hvals("stock:channel"):#如果是概念频道
+        for bstr in r.zrevrange("bmk:doc:share",0,-1):
+            bkey = "bmk:"+bstr.replace("|-|",":")
+            tags = r.hget(bkey,"tag") 
+            tags = "" if tags is None else tags
+            if re.search(r.hget(key,"ttl"),tags): 
+                cobj={}
+                cobj["beaconttl"]=r.hget(bkey,"ttl")
+                cobj["beaconusr"]=r.hget(bkey,"crt_usr")
+                cobj["beaconid"]=r.hget(bkey,"id")
+                cobj["beaconname"]=r.hget(bkey,"name")
+                if cobj in channels:
+                    continue
+                channelfromtags.append(cobj)   
+            
+    udata["channels"] =  channels
+    udata["channelfromtags"] =  channelfromtags
+    udata["total"] = str(len(udata["docs"]) ) 
+    return udata
+
 def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"):
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info("key is "+key)

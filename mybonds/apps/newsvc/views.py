@@ -60,7 +60,7 @@ def channelpick(request):
     days = request.GET.get("days", "1")
     ascii = request.GET.get("ascii", "1")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
-    quantity = log_typer(request, "channelnews", obj)
+    quantity = log_typer(request, "channelpick", obj)
     udata = {}
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
@@ -70,10 +70,25 @@ def channelpick(request):
 #         udata["success"] = "false"
 #         udata["message"] = "it's not exists!" 
 #         return HttpResponse(json.dumps(udata), mimetype="application/json")
-
-    udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days,usecache) 
-    udata = dataProcForApi(udata)
-    udata["api"]=api
+    start = request.GET.get("start", "0")
+    num = request.GET.get("num", "5") 
+    orderby = request.GET.get("orderby", "tms")
+    username = getUserName(request)
+    print beaconusr, beaconid
+    try:
+        udata = buildBeaconData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby) 
+        r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
+    except:
+        traceback.print_exc()
+        udata["success"] = "false"
+        udata["message"] = "no data" 
+    else:
+        udata["success"] = "true"
+        udata["message"] = "success retrive data"
+    print udata
+#     udata = dataProcForApi(udata)
+    udata["api"]=api 
+#     udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days,usecache) 
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required

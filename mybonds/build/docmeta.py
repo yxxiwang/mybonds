@@ -82,6 +82,10 @@ def retriveData(qtype):
         elif qtype =="removedoc": 
             udata = bench(loadFromUrl,parms=url)
             rt= WARNNING if udata=={} else SUCCESS
+        elif qtype =="populary":
+            beaconid = qinfo["beacon"]
+            udata = procChannel("popularychannel",username,beaconid,"",usecache="0") 
+            rt = WARNNING if udata=={} or udata is None else SUCCESS
         elif qtype =="sendemail":
             if otype=="bybeacon":
                 hourbefore = qinfo["email"]

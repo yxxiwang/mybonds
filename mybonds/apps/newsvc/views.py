@@ -294,6 +294,7 @@ def hotboard(request):
     print beaconusr,beaconid
     try:
         udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby)
+#         print udata
     except:
         traceback.print_exc()
         udata["success"] = "false"
@@ -393,6 +394,7 @@ def newsdetail(request):
             doc={}
             doc["success"] = "false"
             doc["message"] = "have no data found."
+            doc["api"]=api
             return HttpResponse(json.dumps(doc), mimetype="application/json")
         doc["text"] = ""
         doc["relatedDocs"]=""

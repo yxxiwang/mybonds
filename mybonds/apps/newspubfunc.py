@@ -349,11 +349,12 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
         if doc == {}:
             logger.warning("doc %s info is not exists!" % docid )
             continue
-        doc.pop("text")
-        doc.pop("copyNum")
-#         doc["text"] = subDocText(doc["text"])
+#         doc.pop("text")
+#         doc.pop("copyNum")
+
+        doc["text"] = subDocText(doc["text"]).decode("utf8")
         doc["title"] = doc["title"].decode("utf8")+u"\u3000"
-#         doc["copyNum"] = str(doc["copyNum"])
+        doc["copyNum"] = str(doc["copyNum"])
         if doc.has_key("popularity"):
             doc["popularity"] = str(doc["popularity"])
         else:
@@ -364,44 +365,50 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
         else:
             doc["eventid"] = "-1"
             
+        doc["docid"]=docid
         doc["tms"]=str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"])
         doc["domain"] = doc["domain"].decode("utf8")
         if not doc.has_key("utms"):
             doc["utms"]=doc["tms"] 
-        
-        subkey = "bmk:doc:"+docid
-        logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
-        if r.exists(subkey):
-            subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,100)
-            for subdocid in subdoc_lst:
-                subdoc= rdoc.hgetall("doc:" + subdocid)
-                if subdoc == {}:
-                    logger.warning("subdoc %s info is not exists!" % subdocid ) 
-                    continue
-                subdoc.pop("text")
-                subdoc.pop("copyNum")
-                subdoc.pop("popularity")
-                subdoc["domain"] = subdoc["domain"].decode("utf8")
-                subdoc["title"] = subdoc["title"].decode("utf8")+u"\u3000"
-                subdoc["tms"]=str(subdoc["create_time"])
-                subdoc["create_time"] = timeElaspe(subdoc["create_time"])
-                if not subdoc.has_key("utms"):
-                    subdoc["utms"]=subdoc["tms"] 
-                subdocs.append(subdoc)
-                if orderby !="tms":
-                    logger.info("buildHotBoardData order by %s" % (orderby,) )
-                    subdocs = sorted(subdocs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
-                    subdocs = subdocs[0:6]
-        
-        doc["subdocs"]=subdocs
+            
+        if doc["eventid"] != "-1":
+            doc["beacon"] = {"beaconusr":"doc","beaconid":docid}
+            doc["isbeacon"] = "true"
+        else:
+            doc["isbeacon"] = "false"
+#         subkey = "bmk:doc:"+docid
+#         logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
+#         if r.exists(subkey):
+#             subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,100)
+#             for subdocid in subdoc_lst:
+#                 subdoc= rdoc.hgetall("doc:" + subdocid)
+#                 if subdoc == {}:
+#                     logger.warning("subdoc %s info is not exists!" % subdocid ) 
+#                     continue
+#                 subdoc.pop("text")
+#                 subdoc.pop("copyNum")
+#                 subdoc.pop("popularity")
+#                 subdoc["domain"] = subdoc["domain"].decode("utf8")
+#                 subdoc["title"] = subdoc["title"].decode("utf8")+u"\u3000"
+#                 subdoc["tms"]=str(subdoc["create_time"])
+#                 subdoc["create_time"] = timeElaspe(subdoc["create_time"])
+#                 if not subdoc.has_key("utms"):
+#                     subdoc["utms"]=subdoc["tms"] 
+#                 subdocs.append(subdoc)
+#                 if orderby !="tms":
+#                     logger.info("buildHotBoardData order by %s" % (orderby,) )
+#                     subdocs = sorted(subdocs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
+#                     subdocs = subdocs[0:6]
+#         
+#         doc["subdocs"]=subdocs
         docs.append(doc)
         
+    print docs
     if orderby !="tms":
         logger.info("buildHotBoardData order by %s" % (orderby,) )
         docs = sorted(docs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
         docs = docs[start:end]
-            
     udata["docs"] = docs
     udata["total"] = str(len(udata["docs"]) )
 #     r.hset(key, "cnt", len(docs))
@@ -565,12 +572,18 @@ def refreshBeacon(beaconusr, beaconid):
         logger.warn( "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt,getsysparm("KEY_UPTIME") ) )
         
 def addBeacon(beaconusr,beaconid,beaconttl,beaconname="",desc="",beacontime="",mindoc="",tag="",headlineonly="0"):
-    logger.info("--addBeacon--"+beaconttl)
+    key = "bmk:" + beaconusr + ":" + beaconid
+    if r.exists(key):
+        logger.info("--addBeacon-is exists."+beaconttl)
+        refreshBeacon(beaconusr, beaconid)
+        return
+    else:
+        logger.info("--addBeacon--"+beaconttl)
+        
     beaconname = beaconttl if beaconname=="" else beaconname
     beacontime = getTime(time.time(),formatstr="%Y%m%d%H%M%S") if beacontime=="" else beacontime
     mindoc = "0" if mindoc=="" else mindoc 
     
-    key = "bmk:" + beaconusr + ":" + beaconid
     r.hset(key, "id", beaconid)
     r.hset(key, "ttl", beaconttl)
     r.hset(key, "name", beaconname)

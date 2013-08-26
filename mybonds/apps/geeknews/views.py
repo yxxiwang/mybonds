@@ -124,7 +124,7 @@ def research(request,template_name="beacon/fulltextnew.html"):
     quantity = log_typer(request, "reserch", name)
     if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>') 
-    
+    ftxlist=[]
     fulldoc = tftxs.find_one({"_id":docid})
     if fulldoc is not None:
 #         print fulldoc
@@ -132,8 +132,8 @@ def research(request,template_name="beacon/fulltextnew.html"):
         url = fulldoc["urls"][0].split(",")[1]
     else:
         doc = rdoc.hgetall("doc:"+docid)
-        ftxlist = [].append(doc["text"])
-        url = doc["url"]
+        ftxlist.append(doc["text"])
+        url = doc["url"] if doc.has_key("url") else ""
     return render_to_response(template_name, {
         'ftxlist': ftxlist, 
         'url': url,

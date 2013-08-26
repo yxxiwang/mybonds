@@ -36,7 +36,7 @@
                 {% for bq in beaconqueuedones %} 
                 <tr class="info">
                   <td>{{bq.tms}}</td>
-                  <td>{{bq.usr}}:{{bq.beacon}}</td>
+                  <td>{{bq.beaconusr}}:{{bq.beaconid}}</td>
                   <td>{{bq.name}}</td>
                 </tr>
                 {% endfor %}
@@ -54,7 +54,7 @@
                 {% for bq in beaconqueues %} 
                 <tr class="info">
                   <td>{{bq.tms}}</td>
-                  <td>{{bq.usr}}:{{bq.beacon}}</td>
+                  <td>{{bq.beaconusr}}:{{bq.beaconid}}</td>
                   <td>{{bq.name}}</td>
                 </tr>
                 {% endfor %}

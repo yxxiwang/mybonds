@@ -470,7 +470,7 @@ def removeDocFromChannel(request):
 #     urlstr="http://www.gxdx168.com/research/svc?u="+urllib2.quote(channel) +"&o=2&likeid=-%s" %(docid)
 #     pushQueue("removedoc", key, "removedoc",tag=urllib2.quote(channel), similarid =docid)
     urlstr = "http://%s/research/svc?u=%s&o=2&likeid=-%s" % (getsysparm("BACKEND_DOMAIN"), urllib2.quote(channel), docid)
-    pushQueue("removedoc",{"urlstr":urlstr}) 
+    pushQueue("removedoc",{"urlstr":urlstr,"channel":channel}) 
 #     r.hincrby(key,"removecnt",1) 
     r.zrem(key+":doc:tms",docid)
     rdoc.delete("ftx:"+docid)

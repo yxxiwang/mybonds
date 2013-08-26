@@ -705,17 +705,16 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                 if cnt == 20:
                     ids_lst.append(ids)
                     ids=""
-                    cnt = 0 
+                    cnt = 0
+                logger.debug("save fulltext doc:%s, tms is %d" % (docid,tms) )
             else:
-                pass
+                logger.debug("save doc:%s, tms is %d" % (docid,tms) )
 
             eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
             if docAsChannel and eventid !="-1" and not r.exists("bmk:doc:"+docid) :
                 beaconname = doc.get("title",docid)
                 addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
-            
-            logger.debug("save doc:%s, tms is %d" % (docid,tms) )
-            
+                        
             title = doc["title"]
 #             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
             title = strfilter(title)

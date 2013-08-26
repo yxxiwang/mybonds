@@ -621,7 +621,8 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
             pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
-            if doc.has_key("eventId"): pipedoc.hset("doc:"+docid,"eventid",doc["eventId"] )
+            if doc.has_key("eventId") and doc["eventId"] != -1: 
+                pipedoc.hset("doc:"+docid,"eventid",doc["eventId"] )
             pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
             pipedoc.hset("doc:"+docid,"utms",tms )
             tms = tms +1 

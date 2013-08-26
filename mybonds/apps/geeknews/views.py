@@ -762,8 +762,8 @@ def beaconnews(request, template_name="beacon/beacon_news.html"):
         sharebeacon_list.append(beaobj)
           
         if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)
-            if beaobj.has_key("ttl"):
-                beaconttl = beaobj["ttl"]
+            if beaobj.has_key("name"):
+                beaconttl = beaobj["name"]
             else:
                 continue
             beaconname = to_unicode_or_bust(beaconname)

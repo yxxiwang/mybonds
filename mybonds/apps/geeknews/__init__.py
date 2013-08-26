@@ -450,14 +450,14 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
     else:
         udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=True)
     
-    if r.hget(key,"crt_usr")!="doc":
-        ttl = r.hget(key,"ttl")
-        ttl = urllib2.quote(ttl)
-        relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),ttl)
-        relateids = saveRelatedDocs(relateurl,beaconid)
-        logger.info("relateids:")
-        logger.info(relateids)
-        r.hset(key, "channels", ",".join(relateids))
+#     if r.hget(key,"crt_usr")!="doc":
+#         ttl = r.hget(key,"ttl")
+#         ttl = urllib2.quote(ttl)
+#         relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),ttl)
+#         relateids = saveRelatedDocs(relateurl,beaconid)
+#         logger.info("relateids:")
+#         logger.info(relateids)
+#         r.hset(key, "channels", ",".join(relateids))
          
     if udata is None or udata=={} :
         return COMMUNICATERROR

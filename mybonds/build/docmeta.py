@@ -117,6 +117,13 @@ def retriveData(qtype):
             beaconname = ""
             udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days=days,usecache="0") 
             rt = WARNNING if udata=={} or udata is None else SUCCESS
+        elif qtype =="relatedchannel":
+            beaconusr = qinfo["beaconusr"]
+            beaconid = qinfo["beaconid"]
+            days = qinfo["days"]
+            beaconname = ""
+            udata = procChannel("relatedchannel",beaconusr,beaconid,beaconname,days=days,usecache="0") 
+            rt = WARNNING if udata=={} or udata is None else SUCCESS
         elif qtype =="sendemail":
             emailtype = qinfo["emailtype"]
             if emailtype=="bybeacon":

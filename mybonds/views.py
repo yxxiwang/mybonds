@@ -455,7 +455,7 @@ def queuelist(request,template_name="beacon/queue_list.html"):
         if type == "beacon":
             bobj = json.loads(obj) 
     #         bobj["tms"] = bobj["tms"][0:19] 
-            bobj["name"] = r.hget("bmk:"+bobj["beaconusr"]+":"+bobj["beaconid"],"name")
+            bobj["name"] = r.hget("bmk:"+bobj["beaconusr"]+":"+bobj["beaconid"],"name").decode("utf8") +" --> days:"+bobj["days"]
         elif type=="remove": 
             bobj = json.loads(obj) 
 #             bobj["name"] = r.hget("bmk:"+bobj["beacon"],"name")

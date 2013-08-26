@@ -987,11 +987,9 @@ def sendemailforbeacon(request):
         return HttpResponse('<h1>只有管理用户才能访问该功能..</h1>')
     hourbefore = request.GET.get("hourbefore", "8")
     beaconid = request.GET.get("beacon", "allbeacons")
-    user = request.GET.get("u", username)
-    
+    user = request.GET.get("u", username) 
     pushQueue("sendemail", user, "bybeacon", tag=hourbefore, similarid=beaconid)
-    return HttpResponse("sendemail is okay.")
-    
+    return HttpResponse("sendemail is okay.") 
     
 @login_required
 def sendemailfornews(request):
@@ -1003,8 +1001,7 @@ def sendemailfornews(request):
     groupemail = ",".join(r.zrevrange("usr:" + username + ":buddy:" + groupname, 0, -1))
     emails = request.GET.get("emails", "")
     docids = request.GET.get("docids", "")
-    otype = request.GET.get("o", "")
-     
+    otype = request.GET.get("o", "") 
     
     robj = {}
     if emails == "":
@@ -1017,7 +1014,8 @@ def sendemailfornews(request):
 #         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>')
     def pushemail(emails, docids):
         for email, docid in zip(emails.split(","), docids.split(";")):
-            pushQueue("sendemail", username, "byemail", tag=email, similarid=docid)
+#             pushQueue("sendemail", username, "byemail", tag=email, similarid=docid)
+            pushQueue("sendemail",{"emailtype":"bydocid","email":email,"docid":docid})
             
     if otype == "service":
         if emails != "":

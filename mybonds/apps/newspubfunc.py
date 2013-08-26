@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*- 
 import json, urllib2, urllib
-import csv, string,random
-import sys, time,logging
+import csv, string, random
+import sys, time, logging
 import redis
 from pymongo import MongoClient
 from pymongo import Connection
@@ -56,16 +56,16 @@ sysparms_hkey = {
 # DOMAIN = r.hget("sysparms", "domain") if r.hexists("sysparms","domain") else "www.9cloudx.com"
 # LOGLEVEL = r.hget("sysparms", "loglevel") if r.hexists("sysparms","loglevel") else "info"
 
-if not r.hexists("sysparms","redis_expire"):
-    r.hset("sysparms", "redis_expire",186400) 
-    r.hset("sysparms", "doc_expire",86400*2) 
-    r.hset("sysparms", "beacon_interval",60*15) 
-    r.hset("sysparms", "beacon_news_num",300) 
-    r.hset("sysparms", "quantity",1500) 
-    r.hset("sysparms", "quantity_duration",300) 
-    r.hset("sysparms", "backend_domain","svc.zhijixing.com")
-    r.hset("sysparms", "domain","www.9cloudx.com")
-    r.hset("sysparms", "loglevel","info")
+if not r.hexists("sysparms", "redis_expire"):
+    r.hset("sysparms", "redis_expire", 186400) 
+    r.hset("sysparms", "doc_expire", 86400 * 2) 
+    r.hset("sysparms", "beacon_interval", 60 * 15) 
+    r.hset("sysparms", "beacon_news_num", 300) 
+    r.hset("sysparms", "quantity", 1500) 
+    r.hset("sysparms", "quantity_duration", 300) 
+    r.hset("sysparms", "backend_domain", "svc.zhijixing.com")
+    r.hset("sysparms", "domain", "www.9cloudx.com")
+    r.hset("sysparms", "loglevel", "info")
     
 def loginit(LOGLEVEL):
     if LOGLEVEL is None or LOGLEVEL == "" or LOGLEVEL.lower() == "info":
@@ -95,9 +95,9 @@ def getsysparm(parstr):
     return int(hval) if hval.isdigit() else hval
 
 logger = loginit(getsysparm("LOGLEVEL"))   
-def sendemail(content, rcv_email,title=""):
+def sendemail(content, rcv_email, title=""):
     from django.core.mail import send_mail
-    logger.info( "================sendemail============================")
+    logger.info("================sendemail============================")
     import smtplib, mimetypes
     from smtplib import SMTPException
     from email.mime.text import MIMEText
@@ -113,7 +113,7 @@ def sendemail(content, rcv_email,title=""):
     msg = MIMEMultipart()
     msg['From'] = "灯塔资讯".decode("utf8")
     msg['To'] = rcv_email
-    if title!="":
+    if title != "":
         msg['Subject'] = Header(title, charset='UTF-8')  # 中文主题 
     else:
         msg['Subject'] = Header('欢迎来到指极星', charset='UTF-8')  # 中文主题 
@@ -139,10 +139,10 @@ def sendemail(content, rcv_email,title=""):
        smtpObj.starttls()
        smtpObj.login('admin@zhijixing.com', 'software91') 
        smtpObj.sendmail(sender, receivers, msg.as_string())      
-       logger.info( "Successfully sent email")
+       logger.info("Successfully sent email")
        return 0
     except SMTPException:
-       logger.exception( "Error: unable to send email")
+       logger.exception("Error: unable to send email")
        traceback.print_exc()
        return 8
     else:
@@ -176,12 +176,12 @@ def timeElaspe(create_time, real=False):
         elaspestr = str(daybefore) + "天前"
     return elaspestr.decode("utf8")
 
-def getDataByUrl(urlstr,isservice=False):
+def getDataByUrl(urlstr, isservice=False):
     start = time.clock()
     udata = loadFromUrl(urlstr) 
     urlstop = time.clock()  
     diff = urlstop - start  
-    logger.info( "loadFromUrl(%s) has taken %s" % (urlstr,str(diff)))
+    logger.info("loadFromUrl(%s) has taken %s" % (urlstr, str(diff)))
     docs = []
     if udata.has_key("docs"):
         for doc in udata["docs"]:
@@ -191,16 +191,16 @@ def getDataByUrl(urlstr,isservice=False):
 #                 continue
 #            doc["id"] = getHashid(doc["url"])
             doc["docid"] = getHashid(doc["url"])
-            doc["title"] = doc["title"].replace(" ","")
-            doc["tx"] = doc["text"].replace(" ","")
+            doc["title"] = doc["title"].replace(" ", "")
+            doc["tx"] = doc["text"].replace(" ", "")
             doc["text"] = subDocText(doc["text"])
             doc["copyNum"] = str(doc["copyNum"])
             doc["validTime"] = str(doc["validTime"])
-            doc["tms"]=str(doc["create_time"])
+            doc["tms"] = str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"]) 
             docs.append(doc)
         udata["docs"] = docs  
-        udata["total"] = str(len(udata["docs"]) )
+        udata["total"] = str(len(udata["docs"]))
     else:
         udata["total"] = "0"
         udata["docs"] = []
@@ -214,7 +214,7 @@ def log_typer(request, act, obj):
     quantity = r.incr("quantity:" + client_address, 1)
     if quantity > getsysparm("QUANTITY"):
         return quantity
-    r.expire("quantity:" + client_address, getsysparm("QUANTITY_DURATION") )
+    r.expire("quantity:" + client_address, getsysparm("QUANTITY_DURATION"))
     username = getUserName(request)
     logobj = {}
     logobj["usr"] = username
@@ -234,7 +234,7 @@ def getFullDocByUrl(urlstr):
     udata = loadFromUrl(urlstr) 
     urlstop = time.clock()  
     diff = urlstop - start  
-    logger.info( "loadFromUrl(%s) has taken %s" % (urlstr,str(diff)))
+    logger.info("loadFromUrl(%s) has taken %s" % (urlstr, str(diff)))
     docs = []
     if udata.has_key("docs"):
         for doc in udata["docs"]:
@@ -245,14 +245,14 @@ def getFullDocByUrl(urlstr):
             doc.pop("urls")
             doc.pop("relatedDocs")
             doc["docid"] = getHashid(doc["url"])
-            doc["title"] = doc["title"].replace(" ","") 
+            doc["title"] = doc["title"].replace(" ", "") 
             doc["copyNum"] = str(doc["copyNum"])
             doc["validTime"] = str(doc["validTime"])
-            doc["tms"]=str(doc["create_time"])
+            doc["tms"] = str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"]) 
             docs.append(doc)
         udata["docs"] = docs  
-        udata["total"] = str(len(udata["docs"]) )
+        udata["total"] = str(len(udata["docs"]))
         return doc
     else:
         udata["total"] = "0"
@@ -262,72 +262,43 @@ def getFullDocByUrl(urlstr):
 def subDocText(s):
 #    us=unicode(s,"utf8")
 #    return s
-    if s =="":
+    if s == "":
         return s
     s = s.replace(" ", "")
 #    .replace(",", "，".decode("utf8"))
-    us=to_unicode_or_bust(s)
-    lc=us[-1]
-    dot="。".decode("utf8")
+    us = to_unicode_or_bust(s)
+    lc = us[-1]
+    dot = "。".decode("utf8")
     comma = "，".decode("utf8")
-    ellipsis=" ......".decode("utf8")
-    if lc == dot or lc ==".": #从尾部判断，如果最后一个字符是"。"或者"." 则返回原始文本
+    ellipsis = " ......".decode("utf8")
+    if lc == dot or lc == ".":  # 从尾部判断，如果最后一个字符是"。"或者"." 则返回原始文本
         return s
-    else:#否则开始进行截取
-        slst=us.split(dot)
-        if len(slst[-1]) <55:#如果最后一段在"。"之后文本长度小于35,则截断之
-            return dot.join(slst[0:-1]+[""]).encode("utf8")
-        else:#如果 最后一段文字数大于35个，则从尾部开始，截断到最近一个标点符合，包括，
-            clst=slst[-1].split(comma)
-            return (dot.join(slst[0:-1]+[""])+comma.join(clst[0:-1]+[""] ) ).encode("utf8")
+    else:  # 否则开始进行截取
+        slst = us.split(dot)
+        if len(slst[-1]) < 55:  # 如果最后一段在"。"之后文本长度小于35,则截断之
+            return dot.join(slst[0:-1] + [""]).encode("utf8")
+        else:  # 如果 最后一段文字数大于35个，则从尾部开始，截断到最近一个标点符合，包括，
+            clst = slst[-1].split(comma)
+            return (dot.join(slst[0:-1] + [""]) + comma.join(clst[0:-1] + [""])).encode("utf8")
     return s
 
-def getchannelByid(beaconusr,beaconid): 
-    return r.hget("bmk:" + beaconusr + ":" + beaconid,"ttl") 
+def getchannelByid(beaconusr, beaconid): 
+    return r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl") 
     # if r.exists("bmk:" + beaconusr + ":" + beaconid) else ""
     
 def strfilter(istr):
-    return istr.replace("&ldquo;","").replace("&rdquo;","").replace("&amp;","&").replace("&#215;","X")
+    return istr.replace("&ldquo;", "").replace("&rdquo;", "").replace("&amp;", "&").replace("&#215;", "X")
     
-def pushQueue(qtype, username, otype, tag=None, similarid=None,urlstr=None):
-    qobj = {}
-    qobj["usr"] = username
-    qobj["o"] = otype
+def pushQueue(qtype,qobj):
+    """ push Queue by qobj """
+    logger.info("qtype in pushQueue is "+qtype) 
     qobj["tms"] = "%s" % dt.datetime.now()
-    qobj["type"] = qtype 
-#     if qtype in ["tag", "navtag"]:
-#         if isinstance(tag, unicode): 
-#             urlstr = "http://www.gxdx168.com/research/svc?u=%s&o=%s&tag=%s" % (username, getOtype(otype), tag)
-#         else:
-#             urlstr = "http://http://www.gxdx168.com.com/research/svc?u=%s&o=%s&tag=%s" % (username, getOtype(otype), tag.decode("utf8"))
-#         qobj[qtype] = tag 
-#     elif qtype in ["ppl", "rdd", "rcm", "nav"]:
-#         urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&o=" + getOtype(otype)
-    if qtype == "read":
-        urlstr = "http://www.gxdx168.com/research?u=" + username + "&likeid=" + similarid
-    elif qtype == "beacon":
-#         urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
-        qobj[qtype] = tag 
-    elif qtype == "fulltext":
-#         urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
-#         qobj[qtype] = tag 
-        qobj[qtype] = tag
-    elif qtype == "sendemail":
-        qobj["docid"] = similarid
-        qobj["email"] = tag 
-#         qobj[qtype] = tag
-    elif qtype == "removedoc":
-        urlstr="http://%s/research/svc?u=%s&o=2&likeid=-%s" %(getsysparm("BACKEND_DOMAIN"),tag,similarid)
-        qobj["docid"] = similarid
-        qobj[qtype] = tag 
-
-    qobj["url"] = urlstr
-    qobj["id"] = getHashid(urlstr)
+    qobj["type"] = qtype    
 #     r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))
+    logger.info("qobj is "+ json.dumps(qobj) ) 
     r.lpush("queue:" + qtype, json.dumps(qobj))
     
-
-def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"):
+def buildBeaconData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms"):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.exists(key):
         refreshBeacon(beaconusr, beaconid)
@@ -337,10 +308,10 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"
     docs = [] 
     channels = []
     channelfromtags = []
-    if orderby =="tms":
-        doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+    if orderby == "tms":
+        doc_lst = r.zrevrange(key + ":doc:tms", start, end)  # 主题文档集合
     else:
-        doc_lst = r.zrevrange(key + ":doc:tms", 0,500)  # 主题文档集合
+        doc_lst = r.zrevrange(key + ":doc:tms", 0, 500)  # 主题文档集合
         
     for docid in doc_lst:
         doc = rdoc.hgetall("doc:" + docid) 
@@ -349,63 +320,63 @@ def buildBeaconData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"
         if not isapi:
             doc["tx"] = doc["text"].decode("utf8")
         doc["text"] = subDocText(doc["text"]).decode("utf8")
-        doc["title"] = doc["title"].decode("utf8")+u"\u3000"
-        doc["domain"] = doc["domain"].decode("utf8")+u"\u3000"
+        doc["title"] = doc["title"].decode("utf8") + u"\u3000"
+        doc["domain"] = doc["domain"].decode("utf8") + u"\u3000"
         doc["copyNum"] = str(doc["copyNum"])
         if doc.has_key("popularity"):
             doc["popularity"] = str(doc["popularity"])
         else:
             doc["popularity"] = "0"
-        doc["tms"]=str(doc["create_time"])
+        doc["tms"] = str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"])
         
         if doc.has_key("label"):
             doc.pop("label")
         if not doc.has_key("utms"):
-            doc["utms"]=doc["tms"]
+            doc["utms"] = doc["tms"]
         docs.append(doc) 
     
 #     docs = sorted(docs,key=lambda l:(l["popularity"],l["tms"]),reverse = True)
-    if orderby !="tms":
-        logger.info("buildBeaconData order by %s" % (orderby,) )
-        docs = sorted(docs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
+    if orderby != "tms":
+        logger.info("buildBeaconData order by %s" % (orderby,))
+        docs = sorted(docs, key=lambda l:(l[orderby], l["tms"]), reverse=True)
         docs = docs[start:end]
     udata["docs"] = docs
-    channelstr = r.hget(key,"channels")
-    if channelstr is not None and  channelstr !="" :
+    channelstr = r.hget(key, "channels")
+    if channelstr is not None and  channelstr != "" :
         for cname in  channelstr.split(","):
-            if r.hexists("beacon:channel",cname):
+            if r.hexists("beacon:channel", cname):
                 cobj = {}
-                cobj["beaconttl"]=cname
-                ckey = r.hget("beacon:channel",cname)
-                cobj["beaconusr"]=ckey.split(":")[1]
-                cobj["beaconid"]=ckey.split(":")[2]
-                cobj["beaconname"]=r.hget("bmk:"+ckey.split(":")[1]+":"+ckey.split(":")[2],"name")
+                cobj["beaconttl"] = cname
+                ckey = r.hget("beacon:channel", cname)
+                cobj["beaconusr"] = ckey.split(":")[1]
+                cobj["beaconid"] = ckey.split(":")[2]
+                cobj["beaconname"] = r.hget("bmk:" + ckey.split(":")[1] + ":" + ckey.split(":")[2], "name")
                 channels.append(cobj)
                 
-    if beaconusr+":"+beaconid in r.hvals("stock:channel"):#如果是概念频道
-        for bstr in r.zrevrange("bmk:doc:share",0,-1):
-            bkey = "bmk:"+bstr.replace("|-|",":")
-            tags = r.hget(bkey,"tag") 
+    if beaconusr + ":" + beaconid in r.hvals("stock:channel"):  # 如果是概念频道
+        for bstr in r.zrevrange("bmk:doc:share", 0, -1):
+            bkey = "bmk:" + bstr.replace("|-|", ":")
+            tags = r.hget(bkey, "tag") 
             tags = "" if tags is None else tags
-            if re.search(r.hget(key,"ttl"),tags): 
-                cobj={}
-                cobj["beaconttl"]=r.hget(bkey,"ttl")
-                cobj["beaconusr"]=r.hget(bkey,"crt_usr")
-                cobj["beaconid"]=r.hget(bkey,"id")
-                cobj["beaconname"]=r.hget(bkey,"name")
+            if re.search(r.hget(key, "ttl"), tags): 
+                cobj = {}
+                cobj["beaconttl"] = r.hget(bkey, "ttl")
+                cobj["beaconusr"] = r.hget(bkey, "crt_usr")
+                cobj["beaconid"] = r.hget(bkey, "id")
+                cobj["beaconname"] = r.hget(bkey, "name")
                 if cobj in channels:
                     continue
                 channelfromtags.append(cobj)   
             
-    udata["channels"] =  channels
-    udata["channelfromtags"] =  channelfromtags
-    udata["total"] = str(len(udata["docs"]) ) 
+    udata["channels"] = channels
+    udata["channelfromtags"] = channelfromtags
+    udata["total"] = str(len(udata["docs"])) 
     return udata
 
-def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tms"):
+def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms"):
     key = "bmk:" + beaconusr + ":" + beaconid
-    logger.info("key is "+key)
+    logger.info("key is " + key)
     if r.exists(key):
         refreshBeacon(beaconusr, beaconid)
         pass
@@ -415,22 +386,22 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
     docs = [] 
     channels = []
     channelfromtags = []
-    if orderby =="tms":
-        doc_lst = r.zrevrange(key + ":doc:tms", start,end)  # 主题文档集合
+    if orderby == "tms":
+        doc_lst = r.zrevrange(key + ":doc:tms", start, end)  # 主题文档集合
     else:
-        doc_lst = r.zrevrange(key + ":doc:tms", 0,300)  # 主题文档集合 
+        doc_lst = r.zrevrange(key + ":doc:tms", 0, 300)  # 主题文档集合 
 #     print doc_lst
     for docid in doc_lst:
         subdocs = [] 
         doc = rdoc.hgetall("doc:" + docid) 
         if doc == {}:
-            logger.warning("doc %s info is not exists!" % docid )
+            logger.warning("doc %s info is not exists!" % docid)
             continue
 #         doc.pop("text")
 #         doc.pop("copyNum")
 
         doc["text"] = subDocText(doc["text"]).decode("utf8")
-        doc["title"] = doc["title"].decode("utf8")+u"\u3000"
+        doc["title"] = doc["title"].decode("utf8") + u"\u3000"
         doc["copyNum"] = str(doc["copyNum"])
         if doc.has_key("popularity"):
             doc["popularity"] = str(doc["popularity"])
@@ -442,15 +413,15 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
         else:
             doc["eventid"] = "-1"
             
-        doc["docid"]=docid
-        doc["tms"]=str(doc["create_time"])
+        doc["docid"] = docid
+        doc["tms"] = str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"])
         doc["domain"] = doc["domain"].decode("utf8")
         if not doc.has_key("utms"):
-            doc["utms"]=doc["tms"] 
+            doc["utms"] = doc["tms"] 
             
         if doc["eventid"] != "-1":
-            doc["beacon"] = {"beaconusr":"doc","beaconid":docid}
+            doc["beacon"] = {"beaconusr":"doc", "beaconid":docid}
             doc["isbeacon"] = "true"
         else:
             doc["isbeacon"] = "false"
@@ -480,20 +451,20 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
 #         
 #         doc["subdocs"]=subdocs
         docs.append(doc)
-        
+
 #     print docs
-    if orderby !="tms":
-        logger.info("buildHotBoardData order by %s" % (orderby,) )
-        docs = sorted(docs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
+    if orderby != "tms":
+        logger.info("buildHotBoardData order by %s" % (orderby,))
+        docs = sorted(docs, key=lambda l:(l[orderby], l["tms"]), reverse=True)
         docs = docs[start:end]
     udata["docs"] = docs
-    udata["total"] = str(len(udata["docs"]) )
+    udata["total"] = str(len(udata["docs"]))
 #     r.hset(key, "cnt", len(docs))
     return udata
 
 def dataProcForApi(udata):
     if udata is None:
-        udata={}
+        udata = {}
         udata["success"] = "false"
         udata["message"] = "data is null,maybe communication is error."
         return udata
@@ -509,69 +480,69 @@ def dataProcForApi(udata):
     udata["total"] = str(udata["total"]) if udata.has_key("total") else "0"
     
     def proc(doc):
-        doc["docid"]=str(doc.pop("docId"))
-        doc["eventid"]=str(doc.pop("eventId"))
-        doc["validTime"]=str(doc["validTime"])
-        doc["popularity"]=str(doc["popularity"])
-        doc["copyNum"]=str(doc["copyNum"])
-        doc["tms"]=str(doc["create_time"])
+        doc["docid"] = str(doc.pop("docId"))
+        doc["eventid"] = str(doc.pop("eventId"))
+        doc["validTime"] = str(doc["validTime"])
+        doc["popularity"] = str(doc["popularity"])
+        doc["copyNum"] = str(doc["copyNum"])
+        doc["tms"] = str(doc["create_time"])
         doc["create_time"] = timeElaspe(doc["create_time"])
 #         doc["text"] = subDocText(doc["text"]).decode("utf8")
         return doc
     
-    udata["docs"] =  [ proc(doc) for doc in udata["docs"] ]
+    udata["docs"] = [ proc(doc) for doc in udata["docs"] ]
     
     return udata
         
-def procChannel(datatype,beaconusr,beaconid,beaconname,days="1",usecache="1"):
-    udata={}
-    def getdoc(id,url,tmongo):
-        logger.info("fetch url:"+url)
-        udata = bench(loadFromUrl,parms=url) 
+def procChannel(datatype, beaconusr, beaconid, beaconname, days="1", usecache="1"):
+    udata = {}
+    def getdoc(id, url, tmongo):
+        logger.info("fetch url:" + url)
+        udata = bench(loadFromUrl, parms=url) 
         if udata.has_key("docs"): 
-            udata["_id"]=id
+            udata["_id"] = id
             tmongo.save(udata)
-            logger.info("save doc into mongdb :"+id)
+            logger.info("save doc into mongdb :" + id)
         return udata
     
-    if datatype =="popularychannel":
+    if datatype == "popularychannel":
         parm = "popularid"
         tmongo = tpopulary
-    elif datatype =="relatedchannel":
+    elif datatype == "relatedchannel":
         parm = "relatedid"
         tmongo = trelate
-    else:
+    elif datatype == "channelnews":
         parm = "channelid"
         tmongo = tchannel
         
-    if days =="all":
+    if days == "all":
         after = 0 
     else:
         after = time.time() - 86400 * int(days)
-        after = after*1000
+        after = after * 1000
     after = int(after)
     before = int(time.time() * 1000)
     
-    if beaconname!="":
+    if beaconname != "":
         beaconid = getHashid(beaconname)
         ttl = urllib2.quote(beaconname.encode("utf8"))
         print ttl
     else:
         key = "bmk:" + beaconusr + ":" + beaconid
-        ttl = r.hget(key,"ttl")
+        ttl = r.hget(key, "ttl")
         if ttl is not None:  ttl = urllib2.quote(ttl)
         
-    url = "http://%s/research/svc?%s=%s&after=%s&before=%s" %(getsysparm("BACKEND_DOMAIN"),parm,ttl,after,before) 
+    url = "http://%s/research/svc?%s=%s&after=%s&before=%s" % (getsysparm("BACKEND_DOMAIN"), parm, ttl, after, before) 
     print usecache
-    if usecache=="1":
+    if usecache == "1":
         udata = tmongo.find_one({"_id":beaconid})
         if udata is None:
-            udata = getdoc(beaconid,url,tmongo)
+            udata = getdoc(beaconid, url, tmongo)
     else:
-        udata = getdoc(beaconid,url,tmongo)
+        udata = getdoc(beaconid, url, tmongo)
     return udata
 
-def beaconUrl(beaconusr, beaconid,daybefore=1):
+def beaconUrl(beaconusr, beaconid, daybefore=1):
     """
                         根据频道所属用户及频道id生成从后台取频道的请求地址
     """
@@ -580,11 +551,11 @@ def beaconUrl(beaconusr, beaconid,daybefore=1):
 #         length=CHANNEL_NEWS_NUM
 #     else:
 #         length = 20 
-    length=getsysparm("CHANNEL_NEWS_NUM")
+    length = getsysparm("CHANNEL_NEWS_NUM")
     key = "bmk:" + beaconusr + ":" + beaconid
-    channel = r.hget(key,"ttl")
+    channel = r.hget(key, "ttl")
     channel = "" if channel is None else channel
-    mindoc = r.hget(key,"mindoc") 
+    mindoc = r.hget(key, "mindoc") 
     mindoc = 0 if mindoc is None else mindoc 
     
     popularid = r.hget(key, "headlineonly")
@@ -608,12 +579,12 @@ def beaconUrl(beaconusr, beaconid,daybefore=1):
 #     after = after - daybefore*86400
 #     after = (after+2*3600) * 1000
 #     before = time.time() * 1000
-    after = int((time.time() - daybefore*86400) * 1000) 
-    before = int(time.time()*1000)
+    after = int((time.time() - daybefore * 86400) * 1000) 
+    before = int(time.time() * 1000)
     if int(mindoc) <= 0 :
-        urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d" %(getsysparm("BACKEND_DOMAIN"),channelparm,channel,after,before)
+        urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel, after, before)
     else:
-        urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d&mindoc=%s" %(getsysparm("BACKEND_DOMAIN"),channelparm,channel,after,before,mindoc)
+        urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d&mindoc=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel, after, before, mindoc)
     return urlstr
 
 def refreshBeacon(beaconusr, beaconid):
@@ -621,63 +592,66 @@ def refreshBeacon(beaconusr, beaconid):
     key = "bmk:" + beaconusr + ":" + beaconid
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
     updt = timeDiff(r.hget(key, "last_update"), time.time())
-    dt = dt if dt<updt else updt 
+    dt = dt if dt < updt else updt 
     
     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     
-    urlstr = beaconUrl(beaconusr, beaconid)
+#     urlstr = beaconUrl(beaconusr, beaconid)
     
-    if not r.hexists(key, "last_touch"):#如果不存在上次更新时间,视为未更新过
-        logger.warn( key + "'s 'last_touch' is not exists,retrivedocs from backend..." )
+    if not r.hexists(key, "last_touch"):  # 如果不存在上次更新时间,视为未更新过
+        logger.warn(key + "'s 'last_touch' is not exists,retrivedocs from backend...")
         if r.exists(key): 
-            pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
-        else:#如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
-            logger.warn( key + " maybe deleted via front  so we ignore it..." )
+#             pushQueue("beacon", beaconusr, "beacon", beaconid, urlstr=urlstr)
+            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        else:  # 如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
+            logger.warn(key + " maybe deleted via front  so we ignore it...")
             
-    elif not r.exists("bmk:"+beaconusr+":"+beaconid+":doc:tms"):#如果频道文章列表不存在,重新刷新数据
-#         refreshDocs(beaconusr, beaconid)
-        pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
+    elif not r.exists("bmk:" + beaconusr + ":" + beaconid + ":doc:tms"):  # 如果频道文章列表不存在,重新刷新数据 
+        pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+        pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
 #     elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
 #         logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
 #         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
 #         pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
-    elif dt > getsysparm("KEY_UPTIME"):#如果上次更新时间过久,则重新刷新数据
-        logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
+    elif dt > getsysparm("KEY_UPTIME"):  # 如果上次更新时间过久,则重新刷新数据
+        logger.warn("data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt))
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
-        pushQueue("beacon", beaconusr, "beacon", beaconid,urlstr=urlstr)
+        pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+        pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
     else:
-        logger.warn( "Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt,getsysparm("KEY_UPTIME") ) )
+        logger.warn("Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt, getsysparm("KEY_UPTIME")))
         
-def addBeacon(beaconusr,beaconid,beaconttl,beaconname="",desc="",beacontime="",mindoc="",tag="",headlineonly="0"):
+def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.exists(key):
-        logger.info("--addBeacon-is exists."+beaconttl)
+        logger.info("--addBeacon-is exists." + beaconttl)
         refreshBeacon(beaconusr, beaconid)
         return
     else:
-        logger.info("--addBeacon--"+beaconttl)
+        logger.info("--addBeacon--" + beaconttl)
         
-    beaconname = beaconttl if beaconname=="" else beaconname
-    beacontime = getTime(time.time(),formatstr="%Y%m%d%H%M%S") if beacontime=="" else beacontime
-    mindoc = "0" if mindoc=="" else mindoc 
+    beaconname = beaconttl if beaconname == "" else beaconname
+    beacontime = getTime(time.time(), formatstr="%Y%m%d%H%M%S") if beacontime == "" else beacontime
+    mindoc = "0" if mindoc == "" else mindoc 
     
     r.hset(key, "id", beaconid)
     r.hset(key, "ttl", beaconttl)
     r.hset(key, "name", beaconname)
     r.hset(key, "desc", desc)
     r.hset(key, "crt_usr", beaconusr)
-    r.hset(key, "crt_tms",  long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S"))) 
-    r.hset(key, "last_touch",0 ) 
-    r.hset(key, "last_update",0) 
-    r.hset(key, "cnt",0) 
-    r.hset(key, "mindoc",mindoc) 
-    r.hset(key, "tag",tag) 
-    r.hset(key, "headlineonly",headlineonly) 
+    r.hset(key, "crt_tms", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S"))) 
+    r.hset(key, "last_touch", 0) 
+    r.hset(key, "last_update", 0) 
+    r.hset(key, "cnt", 0) 
+    r.hset(key, "mindoc", mindoc) 
+    r.hset(key, "tag", tag) 
+    r.hset(key, "headlineonly", headlineonly) 
     
-    r.zadd("usr:" + beaconusr+":fllw",time.time(),beaconusr+"|-|"+beaconid)
-    r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime,"%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
+    r.zadd("usr:" + beaconusr + ":fllw", time.time(), beaconusr + "|-|" + beaconid)
+    r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
     r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
-    r.zadd("bmk:doc:share:bynews",time.time() , beaconusr + "|-|" + beaconid)
+    r.zadd("bmk:doc:share:bynews", time.time() , beaconusr + "|-|" + beaconid)
     
     refreshBeacon(beaconusr, beaconid)
 

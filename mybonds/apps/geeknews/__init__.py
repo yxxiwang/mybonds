@@ -293,103 +293,7 @@ def greeting_typer(username, act, obj):
     logobj["act"] = act
     logobj["o"] = obj
     r.zadd("greeting", time.time(), json.dumps(logobj)) 
- 
-def refreshTagsUptime(username, otype, num, tagid=None):
-    if tagid is None:
-        keytms = "usr:%s:%s:taglst" % (username, otype)  # usr:wxi:rcm...
-    else:
-        keytms = "usr:%s:%s:tag:%s:taglst" % (username, otype, tagid)  # usr:wxi:rcm:tag:10086 ...
-    tags = r.lrange(keytms , 0, num)  # 更新tag
-    for tag in tags:
-        keytms = "usr:%s:%s:tag:%s" % (username, otype, getHashid(tag))
-        ct = "0" if r.get(keytms) is None else r.get(keytms)
-        dt = timeDiff(ct, time.time())
-        if dt > getsysparm("KEY_UPTIME"):
-            print "tag %s timediff is %d,last uptime is %s" % (tag, dt, ct)
-            if otype == "nav":
-                pushQueue("navtag", username, otype, tag)
-            else:
-                pushQueue("tag", username, otype, tag)
-            r.set(keytms, time.time())
-
-def checkTagUptime(username, otype, num, tag, tagid):
-    rt = 0
-    keytms = "usr:%s:%s:tag:%s" % (username, otype, tagid)  # usr:wxi:rcm:tag:10086 ...
-    td = timeDiff(r.get(keytms), time.time())
-    if not r.exists(keytms): 
-        if isinstance(username, unicode): 
-            print keytms.encode("utf8") + " is not exists,retrivedocs from backend..."
-        else:
-            print keytms + " is not exists,retrivedocs from backend..."
-        rt = saveTagdoc(username, otype, tag)
-    elif td > getsysparm("KEY_UPTIME"):
-#        if isinstance(username, unicode): 
-#            print "data is old,pushQueue(retirveTAG).%s,%s,%d" % (username.encode("utf8"), otype, td)
-#        else:
-        print "data is old,pushQueue(retirveTAG).%s,%s,%d" % (username, otype, td)
-        r.set(keytms, time.time())  # 更新本操作时间
-        if rt == 0:
-            pushQueue("tag", username, otype, tag)
-            refreshTagsUptime(username, otype, num, tagid)
-    return rt
-
-def checkUptime(username, otype, num):  
-    rt = 0
-    try:
-        keytms = "usr:%s:%s:uptms" % (username, otype)  # usr:wxi:rcm... 
-        dt = timeDiff(r.get(keytms), time.time())
-        if not r.exists(keytms):
-            logger.warn( keytms + " is not exists,retrivedocs from backend..." )
-            rt = saveDocs(username, otype) 
-        elif dt > getsysparm("KEY_UPTIME"):
-            logger.warn( "data is old,pushQueue(retirvePPL)..%s,%s,%d" % (username, otype, dt) )
-            r.set(keytms, time.time())  # 更新本操作时间 
-            pushQueue(otype, username, otype)       
-        if rt == 0 :   
-            refreshTagsUptime(username, otype, num)
-    except: 
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        traceback.print_exception(exc_type, exc_value, exc_traceback,
-                          limit=2, file=sys.stdout) 
-    return rt
-
-# def pushQueue(qtype, username, otype, tag=None, similarid=None):
-# #    if isinstance(username, unicode): 
-# #        print "--pushQueue-[qtype=%s;username=%s;otype=%s;]" % (qtype, username, otype)
-# #    else:
-# #        print "--pushQueue-[qtype=%s;username=%s;otype=%s;]" % (qtype, username.decode("utf8"), otype)
-#     qobj = {}
-#     qobj["usr"] = username
-#     qobj["o"] = otype
-#     qobj["tms"] = time.time()
-#     qobj["type"] = qtype 
-# #     if qtype in ["tag", "navtag"]:
-# #         if isinstance(tag, unicode): 
-# #             urlstr = "http://www.gxdx168.com/research/svc?u=%s&o=%s&tag=%s" % (username, getOtype(otype), tag)
-# #         else:
-# #             urlstr = "http://http://www.gxdx168.com.com/research/svc?u=%s&o=%s&tag=%s" % (username, getOtype(otype), tag.decode("utf8"))
-# #         qobj[qtype] = tag 
-# #     elif qtype in ["ppl", "rdd", "rcm", "nav"]:
-# #         urlstr = "http://www.gxdx168.com/research/svc?u=" + username + "&o=" + getOtype(otype)
-#     if qtype == "read":
-#         urlstr = "http://www.gxdx168.com/research?u=" + username + "&likeid=" + similarid
-#     elif qtype == "beacon":
-#         urlstr = "http://www.gxdx168.com/research/svc?channelid=getchannel(%s)" % (tag)
-#         qobj[qtype] = tag 
-#     elif qtype == "sendemail":
-#         urlstr = "http://www.gxdx168.com/research?u=" + username + "&docid=" + similarid
-#         qobj["docid"] = similarid
-#         qobj[qtype] = tag 
-#     elif qtype == "removedoc":
-#         urlstr="http://www.gxdx168.com/research/svc?u="+tag+"&o=2&likeid=-%s" %(similarid)
-#         qobj["docid"] = similarid
-#         qobj[qtype] = tag 
-# 
-#     qobj["url"] = urlstr
-#     qobj["id"] = getHashid(urlstr)
-#     r.lpush("queue:" + qtype, json.dumps(qobj))
-
-
+     
 def getDataByUrl(urlstr,isservice=False):
     start = time.clock()
     udata = loadFromUrl(urlstr) 
@@ -518,7 +422,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     
 
 
-def refreshDocs(beaconusr, beaconid,daybefore=1,force=False):
+def refreshDocs(beaconusr, beaconid,days="1",force=False):
     """更新频道内容,该方法也会被异步调用"""
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info( "=====refreshDocs===="+key )
@@ -531,7 +435,7 @@ def refreshDocs(beaconusr, beaconid,daybefore=1,force=False):
         if timediff < getsysparm("KEY_UPTIME"):#如果上次更新时间才过去不久,则不重复更新
             logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % timediff )
             return 0 
-    
+    daybefore = int(days)
     urlstr = beaconUrl(beaconusr, beaconid,daybefore=daybefore)
     
     if not r.exists(key):
@@ -555,10 +459,12 @@ def refreshDocs(beaconusr, beaconid,daybefore=1,force=False):
         logger.info(relateids)
         r.hset(key, "channels", ",".join(relateids))
          
-    if udata.has_key("docs"):
+    if udata is None or udata=={} :
+        return COMMUNICATERROR
+    elif udata.has_key("docs"):
         docs = udata["docs"]
     else:
-        return COMMUNICATERROR
+        return SUCCESS
      
 #      if len(docs) >0:
     ctskey = "channel:"+beaconusr+":"+beaconid+":doc_cts"
@@ -705,7 +611,8 @@ def saveFulltextById(ids,retrycnt=0,url=""):
         urlstr = url
     if retrycnt >=getsysparm("RETRY_TIMES"):
         logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt )
-        pushQueue("fulltext", "", "fulltext", "",urlstr=urlstr)
+#         pushQueue("fulltext", "", "fulltext", "",urlstr=urlstr) 
+        pushQueue("fulltext",{"urlstr":urlstr}) 
         return udata
     udata = bench(loadFromUrl,parms=urlstr)
     if udata.has_key("docs"):

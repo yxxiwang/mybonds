@@ -31,6 +31,7 @@ def channels(num):
     start = time.time()
     cnt = r.zcard("bmk:doc:share")
     i = 0
+    udata={}
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
         i= i+1
         beaconusr,beaconid = beaconstr.split("|-|")
@@ -48,12 +49,29 @@ def channels(num):
         
 #         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
         if not r.exists("bmk:"+beaconusr+":"+beaconid):#如果该频道不存在
+            logger.warnning("bmk:%s:%s is not exist!" %(beaconusr,beaconid) )
             continue
-        rt = refreshDocs(beaconusr, beaconid,daybefore=num,force=force)
+        
+        rt = refreshDocs(beaconusr, beaconid,days="7",force=force)
         if not rt == SUCCESS:
-            urlstr = beaconUrl(beaconusr, beaconid)
-            pushQueue("beacon", beaconusr, "beaconfromdocmeta", beaconid,urlstr=urlstr)
-#         channelDocs(beaconusr,beaconid)
+            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+            
+        rt = refreshDocs(beaconusr, beaconid,days="1",force=force)
+        if not rt == SUCCESS:
+            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+             
+        udata = procChannel("popularychannel",beaconusr,beaconid,"",days=str(num),usecache="0") 
+        rt = WARNNING if udata=={} or udata is None else SUCCESS
+        if not rt == SUCCESS:
+            print udata
+            pushQueue("popularychannel",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+            
+        udata = procChannel("channelnews",beaconusr,beaconid,"",days=str(num),usecache="0") 
+        rt = WARNNING if udata=={} or udata is None else SUCCESS
+        if not rt == SUCCESS:
+            print udata
+            pushQueue("channelnews",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        
 def retriveData(qtype):
     qobj = r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")
     if qobj is None:
@@ -67,36 +85,51 @@ def retriveData(qtype):
         logger.info("processing data:\n")
         logger.info(qobj)
         qinfo = json.loads(qobj)
-        username = qinfo["usr"]
-        otype = qinfo["o"]
-        url = qinfo["url"] 
+#         username = qinfo["usr"]
+#         otype = qinfo["o"]
+#         url = qinfo["url"] 
         if qtype =="read": 
             rt = requestUrl(url)
         elif qtype =="beacon": 
-            beacon = qinfo["beacon"]
-            rt = refreshDocs(username, beacon) 
-        elif qtype =="fulltext": 
-            ids = qinfo["fulltext"]
-            udata = saveFulltextById(ids,retrycnt=0,url=url) 
-            rt= WARNNING if udata=={} else SUCCESS
+            beaconusr = qinfo["beaconusr"]
+            beaconid = qinfo["beaconid"]
+            days = qinfo["days"]
+            rt = refreshDocs(beaconusr, beaconid,days) 
+        elif qtype =="fulltext":  
+            urlstr = qinfo["urlstr"]
+            udata = saveFulltextById("",retrycnt=0,url=urlstr) 
+            rt= WARNNING if udata=={} or udata is None else SUCCESS
         elif qtype =="removedoc": 
-            udata = bench(loadFromUrl,parms=url)
+            urlstr = qinfo["urlstr"]
+            udata = bench(loadFromUrl,parms=urlstr)
             rt= WARNNING if udata=={} else SUCCESS
-        elif qtype =="populary":
-            beaconid = qinfo["beacon"]
-            udata = procChannel("popularychannel",username,beaconid,"",usecache="0") 
+        elif qtype =="popularychannel":
+            beaconusr = qinfo["beaconusr"]
+            beaconid = qinfo["beaconid"]
+            days = qinfo["days"]
+            beaconname = ""
+            udata = procChannel("popularychannel",beaconusr,beaconid,beaconname,days=days,usecache="0") 
+            rt = WARNNING if udata=={} or udata is None else SUCCESS
+        elif qtype =="channelnews":
+            beaconusr = qinfo["beaconusr"]
+            beaconid = qinfo["beaconid"]
+            days = qinfo["days"]
+            beaconname = ""
+            udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days=days,usecache="0") 
             rt = WARNNING if udata=={} or udata is None else SUCCESS
         elif qtype =="sendemail":
-            if otype=="bybeacon":
+            emailtype = qinfo["emailtype"]
+            if emailtype=="bybeacon":
                 hourbefore = qinfo["email"]
-                rt = sendEmailFromUserBeacon(username,hourbefore,otype)
-            elif otype=="lostkey":
+                rt = sendEmailFromUserBeacon(username,hourbefore,emailtype)
+            elif emailtype=="lostkey":
                 email = qinfo["email"]
                 rt = sendEmailFindKey(username,email,url)
-            else:
+            elif emailtype=="bydocid":
                 email = qinfo["email"]
-                rt = sendemailbydocid(email,qinfo["docid"],otype)
-        else: 
+                docid = qinfo["docid"]
+                rt = sendemailbydocid(email,docid)
+        else:
             logger.error( "error qtype %s " % qtype)
             rt = 0  
     except:
@@ -142,7 +175,7 @@ def loadData(codes,num,force=False):
         for code in codes:
             beaconusr,beaconid = code.split(":")
             print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
-            refreshDocs(beaconusr, beaconid,daybefore=num,force=force)
+            refreshDocs(beaconusr, beaconid,days=str(num),force=force)
             
 def initProc(types,codes,num,force=False): 
     """type should be one of load,beacon,fulltext,sendemail,removedoc """

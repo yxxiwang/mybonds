@@ -627,7 +627,7 @@ def refreshBeacon(beaconusr, beaconid):
         
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid
-    if r.exists(key):
+    if r.hexists(key,"ttl"):
         logger.info("--Beacon is exists." + beaconttl)
         refreshBeacon(beaconusr, beaconid)
         return

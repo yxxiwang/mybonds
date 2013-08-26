@@ -422,95 +422,6 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     
 
 
-def refreshDocs(beaconusr, beaconid,days="1",force=False):
-    """更新频道内容,该方法也会被异步调用"""
-    key = "bmk:" + beaconusr + ":" + beaconid
-    logger.info( "=====refreshDocs===="+key )
-    if not r.exists(key):
-        logger.warn( "attembrough: i have nothing to do .key:%s is not exists " % key)
-        return -1
-#     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
-    if r.hexists(key, "last_update") and not force:#
-        timediff = timeDiff(r.hget(key, "last_update"), time.time()) 
-        if timediff < getsysparm("KEY_UPTIME"):#如果上次更新时间才过去不久,则不重复更新
-            logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % timediff )
-            return 0 
-    daybefore = int(days)
-    urlstr = beaconUrl(beaconusr, beaconid,daybefore=daybefore)
-    
-    if not r.exists(key):
-        logger.warn( "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key )
-        return -1
-    
-    headlineonly = r.hget(key, "headlineonly")
-    headlineonly = "0" if headlineonly is None else headlineonly
-    
-    if r.hget(key,"crt_usr")=="doc":#说明频道本身原来是新闻,docAsChannel 则为False
-        udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=False)
-    else:
-        udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=True)
-    
-#     if r.hget(key,"crt_usr")!="doc":
-#         ttl = r.hget(key,"ttl")
-#         ttl = urllib2.quote(ttl)
-#         relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),ttl)
-#         relateids = saveRelatedDocs(relateurl,beaconid)
-#         logger.info("relateids:")
-#         logger.info(relateids)
-#         r.hset(key, "channels", ",".join(relateids))
-         
-    if udata is None or udata=={} :
-        return COMMUNICATERROR
-    elif udata.has_key("docs"):
-        docs = udata["docs"]
-    else:
-        return SUCCESS
-     
-#      if len(docs) >0:
-    ctskey = "channel:"+beaconusr+":"+beaconid+":doc_cts"
-    doc_dcnt_key = ctskey.replace("doc_cts","doc_dcnt")
-    doc_tcnt_key = ctskey.replace("doc_cts","doc_tcnt")
-    channel_cnt_key = ctskey.replace("doc_cts","cnt") 
-# #     r.delete(key+":doc:tms")
-#     rmfrom = (int(time.time())-daybefore*86400)*1000
-#     rmto = float(r.hget(key, "last_update"))*1000
-#     ndel = r.zremrangebyscore(key+":doc:tms",rmfrom,rmto)
-#     logger.info("removenews %s  from %d to %d and del %d" %(key+":doc:tms",rmfrom,rmto,ndel) )
-#     logger.info("add new data len is %d"  %(len(docs),))
-    for doc in docs:
-        if doc is None:
-            continue
-        if beaconusr=="doc":
-            r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
-        else:
-            r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
-
-################ 统计信息   ############################
-        docid= str(doc["docId"])
-        tms = doc["create_time"]
-        if tms is None or tms==0:
-            continue
-        
-        tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
-#         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
-        tms=getTime(int(tms)/1000)
-        tms = re.sub(r":|-|\s", "", tms)
-        r.zadd(doc_tcnt_key,long(tms),docid)
-        r.hset("copynum",docid,doc["copyNum"])
-        r.zadd(doc_dcnt_key,int(tdate),docid)
-    ##### end for #####
-    if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
-        r.rename(key+":doc:tms:bak",key+":doc:tms")
-#     today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
-#     cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
-#     if cnt>0:
-#         r.zadd(channel_cnt_key,cnt,int(today))
-################ 统计信息  over ############################
-            
-    r.hset(key, "last_update", time.time())  # 更新本操作时间  
-    r.hset(key, "removecnt", 0)  # 更新本操作时间  
-    return SUCCESS
-
 
 
 def buildJsonData(username, docs, tags=None):
@@ -581,24 +492,7 @@ def getTag(displayTag):
     else:
         print "displaytag is not unicode,need decode.."
         return r.hget("tag:ori", displayTag.decode("utf8")) 
-
-def saveDocsByIDS(docids):
-    pass
-    
-def hsetDocs(docs):
-    pass
-
-def saveLocaltagDocs(relatedid,localtag):
-    print "==============geeknews/saveLocaltagDocs============"  
-    pass
-
-#return docs
-def saveSimilarDocs(similarids):
-    print "==============geeknews/saveSimilarDocs============"  
-    pass  
-            
-def saveTagdoc(username, otype, tag, fromdaemon=False):   
-    return 0
+ 
 
 def saveFulltextById(ids,retrycnt=0,url=""):
     logger.info( "===saveFulltextById==="+url )
@@ -701,7 +595,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             
             if not rdoc.hexists("doc:"+docid,"url"):
                 if tms - long(doc["create_time"])/1000 > 86400*60:#如果是一个月以前的新闻
-                    logger.debug("fulltext doc:%s, sub tms is %d" % (docid,tms - long(doc["create_time"])/1000) )
+                    logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid,tms - long(doc["create_time"])/1000) )
                 else:
                     ids+=docid+";"
                     cnt = cnt+1
@@ -716,8 +610,8 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
             if docAsChannel and eventid !="-1" and not r.exists("bmk:doc:"+docid) :
                 beaconname = doc.get("title",docid)
-                addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
-                        
+                addBeacon("doc",eventid,eventid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
+
             title = doc["title"]
 #             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
             title = strfilter(title)
@@ -747,11 +641,97 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
     if udata.has_key("docs"):
         logger.info("save docs and len is :" + str(len(udata["docs"])))
         saveText(udata["docs"])
-            
-#     if udata.has_key("headlines"):
-#         saveText(udata["headlines"],isheadline=True)
-        
+             
     return udata
+
+def refreshDocs(beaconusr, beaconid,days="1",force=False):
+    """更新频道内容,该方法也会被异步调用"""
+    key = "bmk:" + beaconusr + ":" + beaconid
+    logger.info( "=====refreshDocs===="+key )
+    if not r.exists(key):
+        logger.warn( "attembrough: i have nothing to do .key:%s is not exists " % key)
+        return -1
+#     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
+    if r.hexists(key, "last_update") and not force:#
+        timediff = timeDiff(r.hget(key, "last_update"), time.time()) 
+        if timediff < getsysparm("KEY_UPTIME"):#如果上次更新时间才过去不久,则不重复更新
+            logger.warn( "attembrough: i have nothing to do .bcz current last_update diff is %d second, " % timediff )
+            return 0 
+    daybefore = int(days)
+    urlstr = beaconUrl(beaconusr, beaconid,daybefore=daybefore)
+    
+    if not r.exists(key):
+        logger.warn( "attembrough: i have nothing to do .key:%s is not exists ,maybe it be deleted." % key )
+        return -1
+    
+    headlineonly = r.hget(key, "headlineonly")
+    headlineonly = "0" if headlineonly is None else headlineonly
+    
+    if r.hget(key,"crt_usr")=="doc":#说明频道本身原来是新闻,docAsChannel 则为False
+        udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=False)
+    else:
+        udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=True)
+    
+#     if r.hget(key,"crt_usr")!="doc":
+#         ttl = r.hget(key,"ttl")
+#         ttl = urllib2.quote(ttl)
+#         relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),ttl)
+#         relateids = saveRelatedDocs(relateurl,beaconid)
+#         logger.info("relateids:")
+#         logger.info(relateids)
+#         r.hset(key, "channels", ",".join(relateids))
+         
+    if udata is None or udata=={} :
+        return COMMUNICATERROR
+    elif udata.has_key("docs"):
+        docs = udata["docs"]
+    else:
+        return SUCCESS
+     
+#      if len(docs) >0:
+    ctskey = "channel:"+beaconusr+":"+beaconid+":doc_cts"
+    doc_dcnt_key = ctskey.replace("doc_cts","doc_dcnt")
+    doc_tcnt_key = ctskey.replace("doc_cts","doc_tcnt")
+    channel_cnt_key = ctskey.replace("doc_cts","cnt") 
+# #     r.delete(key+":doc:tms")
+#     rmfrom = (int(time.time())-daybefore*86400)*1000
+#     rmto = float(r.hget(key, "last_update"))*1000
+#     ndel = r.zremrangebyscore(key+":doc:tms",rmfrom,rmto)
+#     logger.info("removenews %s  from %d to %d and del %d" %(key+":doc:tms",rmfrom,rmto,ndel) )
+#     logger.info("add new data len is %d"  %(len(docs),))
+    for doc in docs:
+        if doc is None:
+            continue
+        if beaconusr=="doc":
+            r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
+        else:
+            r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
+
+################ 统计信息   ############################
+        docid= str(doc["docId"])
+        tms = doc["create_time"]
+        if tms is None or tms==0:
+            continue
+        
+        tdate = dt.date.fromtimestamp(float(tms)/1000).strftime('%Y%m%d')
+#         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
+        tms=getTime(int(tms)/1000)
+        tms = re.sub(r":|-|\s", "", tms)
+        r.zadd(doc_tcnt_key,long(tms),docid)
+        r.hset("copynum",docid,doc["copyNum"])
+        r.zadd(doc_dcnt_key,int(tdate),docid)
+    ##### end for #####
+    if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
+        r.rename(key+":doc:tms:bak",key+":doc:tms")
+#     today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
+#     cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
+#     if cnt>0:
+#         r.zadd(channel_cnt_key,cnt,int(today))
+################ 统计信息  over ############################
+            
+    r.hset(key, "last_update", time.time())  # 更新本操作时间  
+    r.hset(key, "removecnt", 0)  # 更新本操作时间  
+    return SUCCESS
 
         
 def subDocText(s):

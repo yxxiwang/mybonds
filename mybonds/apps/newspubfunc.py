@@ -481,7 +481,7 @@ def buildHotBoardData(beaconusr, beaconid,start=0,end=-1,isapi=False,orderby="tm
 #         doc["subdocs"]=subdocs
         docs.append(doc)
         
-    print docs
+#     print docs
     if orderby !="tms":
         logger.info("buildHotBoardData order by %s" % (orderby,) )
         docs = sorted(docs,key=lambda l:(l[orderby],l["tms"]),reverse = True)

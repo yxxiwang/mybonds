@@ -421,7 +421,7 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
             doc["utms"] = doc["tms"] 
             
         if doc["eventid"] != "-1":
-            doc["beacon"] = {"beaconusr":"doc", "beaconid":docid}
+            doc["beacon"] = {"beaconusr":"doc", "beaconid":doc["eventid"]}
             doc["isbeacon"] = "true"
         else:
             doc["isbeacon"] = "false"

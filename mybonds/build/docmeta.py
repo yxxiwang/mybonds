@@ -188,9 +188,9 @@ def initProc(types,codes,num,force=False):
     """type should be one of load,beacon,fulltext,sendemail,removedoc """
     for type in types:
         if type == "load":
-            loadData(codes,num,force=False)
+            loadData(codes,num,force)
         else:
-            procQueue(type,codes,num,force=False) 
+            procQueue(type,codes,num,force) 
 
 if __name__ == "__main__":  
     usage = """ eg: %s -c all -a 3600 -n 200 -t load|beacon|fulltext|sendemail|removedoc

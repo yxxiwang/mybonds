@@ -700,13 +700,16 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             docid = str(doc["docId"])
             
             if not rdoc.hexists("doc:"+docid,"url"):
-                ids+=docid+";"
-                cnt = cnt+1
+                if tms - long(doc["create_time"])/1000 > 86400*60:#如果是一个月以前的新闻
+                    logger.debug("fulltext doc:%s, sub tms is %d" % (docid,tms - long(doc["create_time"])/1000) )
+                else:
+                    ids+=docid+";"
+                    cnt = cnt+1
+                    logger.debug("save fulltext doc:%s, tms is %d" % (docid,tms) )
                 if cnt == 20:
                     ids_lst.append(ids)
                     ids=""
                     cnt = 0
-                logger.debug("save fulltext doc:%s, tms is %d" % (docid,tms) )
             else:
                 logger.debug("save doc:%s, tms is %d" % (docid,tms) )
 
@@ -732,7 +735,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"isheadline",headlineonly) 
                 
             pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME")*3)
-        print "ids_lst",ids_lst
+        print "ids_lst",ids_lst,ids
         if len(ids_lst) > 0:
             for tids in ids_lst:
                 saveFulltextById(tids)

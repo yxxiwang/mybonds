@@ -681,7 +681,7 @@ def hotboard(request, template_name="beacon/hotboard.html"):
     rdbeacon_list = []
     isadmin = "1" if username in ["ltb", "wxi", "sj"] else "0"  
     
-    udata = buildHotBoardData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby="tms")
+    udata = buildHotBoardData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby=orderby)
     if udata.has_key("docs"):
         beacondisname = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
         for doc in udata["docs"]:
@@ -692,6 +692,7 @@ def hotboard(request, template_name="beacon/hotboard.html"):
                     logger.info("beacon not exist of doc:"+doc["eventid"])
                     continue
                 docbeacon_list.append(beaobj)
+                break
     
     rdbeacons = r.zrevrange("usr:rd:fllw", 0, -1) 
     for beaconstr in rdbeacons:

@@ -692,7 +692,8 @@ def hotboard(request, template_name="beacon/hotboard.html"):
                     logger.info("beacon not exist of doc:"+doc["eventid"])
                     continue
                 docbeacon_list.append(beaobj)
-                break
+                if beaconusr =="doc":
+                    break
     
     rdbeacons = r.zrevrange("usr:rd:fllw", 0, -1) 
     for beaconstr in rdbeacons:

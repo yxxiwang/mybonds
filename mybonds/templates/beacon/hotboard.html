@@ -1,0 +1,169 @@
+
+  {% extends 'beacon/admin.html' %}
+
+    
+{% block navbar %} 
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <!--a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a-->
+          <div class="nav-collapse collapse row-fluid">
+          <div class="span3">
+          </div>
+          <div class="span8">
+            <ul class="nav"> 
+              <li><a class="brand" href="/news/"><img class="img-rounded" src="/site_media/static/news/logo1x.png" alt="指极星"></a></li>
+              <li><a href="/news/beaconnews" title="灯塔阅读"><h5 style="color:white;margin-top: 3px;font-size: 13px;">灯塔阅读</h5></a></li> 
+              <!--li><a href="/news/?o=ppl" title="今日热点"><h5 style="margin-top: 3px;font-size: 13px;">今日热点</h5></a></li> 
+              <li><a href="/news/?o=rdd" title="我的足迹"><h5 style="margin-top: 3px;font-size: 13px;">我的足迹</h5></a></li--> 
+            
+            </ul>
+            <p class="navbar-text pull-right">{% if isadmin == "1" %}<a href="/news/adm">控制面板</a>&nbsp;&nbsp;{% endif %}
+            <a href="/usermodify/">{{user.username}}</a>&nbsp;&nbsp;
+            <a href="/apply/logout">离开</a></p> 
+          </div> 
+          <div class="span1">
+          </div>
+
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
+  {% block content %} 
+  <div class="container-fluid"> 
+  	<div class="row-fluid">
+
+      <div class="span12">
+        <!--div class="row-fluid">
+          <div class="span2" style="border-style: dotted;border-width:0px;border-color:#CBDEF1;"> 
+          </div>
+            <div id="beacon-container" class="beacon-container row span9" style="border-bottom-style: dotted;border-width:1px;border-color:#CBDEF1;">
+
+            </div> 
+        </div--><!-- /row-fluid -->
+  
+        <div class="row-fluid"><!-- 左边  -->
+          <div class="span3" style="border-style: dotted;border-width:0px;border-color:#CBDEF1;">
+            <div class="span12" style="margin-left:0px;">
+              <div class="well_wxi span12"  style="margin-left:0px;">
+             <span id='' name='{{user.username}}' class="label label-wxi" style="font-size: 13px;"><strong> 全部灯塔  <span class="badge badge-info">{{rdbeacon_list|length}}</span></strong></span>
+              </div>   
+            </div> 
+            {% for beacon in rdbeacon_list %}
+              <div class="well_wxi span12"  style="margin-left:0px;">
+                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi" style="font-size: 13px;">{{beacon.name}}</span>
+                   <span class="badge-wxi"><abbr title="未看文章数">{{beacon.new_cnt}}</abbr></span>
+                   <!--span class="badge-wxi"><abbr title="文章数">{{beacon.cnt}}</abbr></span-->
+                   <span class="badge-wxi-green"><abbr title="建设者">{{beacon.crt_usr}}</abbr></span>
+                  &nbsp;<a class="heartremove" href="/news/hotboard/?orderby={{orderby}}&heartopt=remove&heartid={{beacon.id}}&heartusr={{beacon.crt_usr}}"  rel="tooltip" title="取消收集" style="float:right;"  ></a>
+              </div>  
+            {% endfor %}    
+          </div>
+
+          <div class="span6"><!-- 中间灯塔similar文档 -->
+            <div class="span12" style="margin-left:0px;"> 
+            <blockquote> 
+              <div class="span3" style="margin-left:0px;">
+              <span style="color:red">{{ beacondisname }} &nbsp;  </span> 
+              </div>
+              {% for channel in udata.channels %}
+              <div class="span3" style="margin-left:0px;">
+              <p style="font-size: 13px;"><a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:green">{{ channel.beaconname }} &nbsp;  </span> </a>
+              </div>
+              {% endfor %}  
+              {% for channel in udata.channelfromtags %}
+              <div class="span3" style="margin-left:0px;">
+              <p style="font-size: 13px;"><a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:orange">{{ channel.beaconname }} &nbsp;  </span> </a>
+              </div>
+              {% endfor %}  
+            </blockquote>        
+            </div>
+            {% for doc in udata.docs %}
+            <div class="span12" style="margin-left:0px;">
+            <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">
+             <p style="font-size: 13px;"><a target="_blank" href="/news/research/?docid={{doc.docid}}"><strong>{{doc.title}}</strong>&nbsp;&nbsp;</a> 
+              {% if username == beaconusr %}
+              {% if beaconid %}
+              <a class="docremove" href="/newsvc/removedocfromchannel/?o=page&docid={{doc.docid}}&beaconid={{beaconid}}&beaconusr={{beaconusr}}"  rel="tooltip" title="移除文档" style="float:right;"  >
+                <button class="badge badge-info" type="button">-</button>
+              </a>
+              {% endif %}
+              {% endif %}</p>
+             <p ><small>{{doc.domain}}&nbsp;  {{doc.create_time}}&nbsp;{"docid":{{doc.docid}},&nbsp;"eventid":{{doc.eventid}} } <span style="color:green"> {{doc.beaconttl}}&nbsp;  </span> 
+             </small></p> 
+              {{doc.text}}
+               <!--br><br>{{doc.tx}} <br-->
+            </blockquote> 
+            </div>
+            {% endfor %}          
+          </div>
+
+          <div class="control-group span3" id="beacon-box">   
+            <div class="span12" style="margin-left:0px;">  
+              <strong>子频道  <span class="badge badge-info">{{docbeacon_list|length}}</span> </strong>  
+            </div>  
+
+            <div class="span12" style="margin-left:0px;border-style: dotted;border-width:1px;border-color:#CBDEF1;">  
+              {% for beacon in docbeacon_list %}
+              <div class="well_wxi span12 "  style="margin-left:0px;"> 
+                  <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-wxi"  style="font-size: 13px;">{{beacon.name}}</span>
+                  <!--p style="font-size: 12px;">{{beacon.desc}}</p-->
+                   <span class="badge-wxi"><abbr title="文章数">{{beacon.cnt}}</abbr></span>
+                   <span class="badge-wxi-green"><abbr title="建设者">{{beacon.crt_usr}}</abbr></span>
+                  &nbsp;
+              </div>
+              {% endfor %} 
+    
+            </div>
+
+          </div>
+        </div><!-- /row-fluid -->
+      </div><!-- /span10 -->
+  </div> <!-- /row-fluid -->
+
+ </div> <!-- /container -->
+ 
+
+{% endblock %} 
+{% block script %} 
+<script > 
+  var beacons = ""
+  var delete_beacon = ""
+  var delete_id =""
+  var tag_unchk = new Array()
+  var doc_unchk = new Array()
+
+  // $("#beacon_desc").keydown(function(event){ 
+  //   if(event.keyCode==13 )
+  //         window.location.href = '/news/savebeacon/?similarid={{similarid}}&beacon='+$(this).text() ;
+  // })
+
+  $('#{{beaconid}}').attr('class', 'label label-wxi-selected');
+
+  beacon_proc = function() {
+      $tag_list_box = $('div.beacon-container');
+      $('.label').css('cursor', 'pointer');
+      $('.label').click(function(){
+        if($(this).attr('class')=='label label-info'){
+          // $(this).attr('class', 'label label-info');
+        }else{ 
+          $(this).attr('class', 'label label-wxi-selected');  
+          window.location.href = '/news/hotboard/?orderby={{orderby}}&beaconid='+$(this).attr('id')+'&beaconusr='+$(this).attr('name') ;
+        } 
+      });
+  } 
+  beacon_proc(); 
+
+  $("#beaconsearch").keydown(function(event){ 
+    if(event.keyCode==13 )
+     window.location.href = encodeURI('/news/beaconnews/?beaconname='+$('#beaconsearch').val().trim());
+  })
+   
+</script>
+{% endblock %}

@@ -669,6 +669,56 @@ def mybeacons(request, template_name="beacon/mybeacons.html"):
     }, context_instance=RequestContext(request)) 
 
 @login_required
+def hotboard(request, template_name="beacon/hotboard.html"):
+    beaconid = request.GET.get("beaconid", "")  
+    beaconname = request.GET.get("beaconname", "")  
+    beaconusr = request.GET.get("beaconusr", "")  
+    orderby = request.GET.get("orderby", "tms")   
+    beacondisname = ""
+    username = getUserName(request)
+    udata={}
+    docbeacon_list = []
+    rdbeacon_list = []
+    isadmin = "1" if username in ["ltb", "wxi", "sj"] else "0"  
+    
+    udata = buildHotBoardData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby="tms")
+    if udata.has_key("docs"):
+        beacondisname = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
+        for doc in udata["docs"]:
+            if doc["isbeacon"] == "true":
+                beaobj = r.hgetall("bmk:doc:" + doc["eventid"])
+                beaobj["id"] = doc["eventid"]
+                if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
+                    logger.info("beacon not exist of doc:"+doc["eventid"])
+                    continue
+                docbeacon_list.append(beaobj)
+    
+    rdbeacons = r.zrevrange("usr:rd:fllw", 0, -1) 
+    for beaconstr in rdbeacons:
+        beausr, beaid = beaconstr.split("|-|") 
+        beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
+#         beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid + ":fllw")
+#         beaobj["new_cnt"] = getBeaconNewsCnt(username, beausr, beaid)
+        beaobj["id"] = beaid
+        if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
+            continue
+        rdbeacon_list.append(beaobj)
+    
+    return render_to_response(template_name, {
+        'udata': udata, 
+        'beaconid':beaconid,  # 当前灯塔的ID
+        'beaconusr':beaconusr,  # 当前灯塔的ID
+        'beaconname':beaconname,  # 当前灯塔的名称
+        'beacondisname':beacondisname,  # 当前灯塔的名称
+        'rdbeacon_list':rdbeacon_list,
+        'docbeacon_list':docbeacon_list,
+#         "greetings":getGreeting(),
+        'orderby':orderby,
+        'isadmin':isadmin,
+        'username':username,
+    }, context_instance=RequestContext(request))    
+
+@login_required
 def beaconnews(request, template_name="beacon/beacon_news.html"):  
     start = time.clock()
     

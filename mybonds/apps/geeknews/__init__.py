@@ -608,7 +608,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                 logger.debug("save doc:%s, tms is %d" % (docid,tms) )
 
             eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
-            if docAsChannel and eventid !="-1" and not r.exists("bmk:doc:"+docid) :
+            if docAsChannel and eventid !="-1" and not r.exists("bmk:doc:"+eventid) :
                 beaconname = doc.get("title",docid)
                 addBeacon("doc",eventid,eventid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
 

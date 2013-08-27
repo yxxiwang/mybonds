@@ -291,7 +291,7 @@ def strfilter(istr):
     
 def pushQueue(qtype,qobj):
     """ push Queue by qobj """
-    logger.info("qtype in pushQueue is "+qtype) 
+#     logger.info("qtype in pushQueue is "+qtype) 
     qobj["tms"] = "%s" % dt.datetime.now()
     qobj["type"] = qtype    
 #     r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))

@@ -16,11 +16,12 @@
           </div>
           <div class="span8">
             <ul class="nav"> 
-              <li><a class="brand" href="/news/"><img class="img-rounded" src="/site_media/static/news/logo1x.png" alt="指极星"></a></li>
-              <li><a href="/news/beaconnews" title="灯塔阅读"><h5 style="color:white;margin-top: 3px;font-size: 13px;">灯塔阅读</h5></a></li> 
-              <!--li><a href="/news/?o=ppl" title="今日热点"><h5 style="margin-top: 3px;font-size: 13px;">今日热点</h5></a></li> 
-              <li><a href="/news/?o=rdd" title="我的足迹"><h5 style="margin-top: 3px;font-size: 13px;">我的足迹</h5></a></li--> 
-            
+              <li><a class="brand" href="/news/hotboard/"><img class="img-rounded" src="/site_media/static/news/logo1x.png" alt="指极星"></a></li>
+              <li><a href="/news/hotboard/" title="热点面板"><h5 style="color:white;margin-top: 3px;font-size: 13px;">热点面板</h5></a></li> 
+              <li><a href="/news/beaconnews/" title="灯塔阅读"><h5 style="color:white;margin-top: 3px;font-size: 13px;">灯塔阅读</h5></a></li> 
+              <li><a href="#" title="频道关联"><h5 style="color:white;margin-top: 3px;font-size: 13px;">频道关联</h5></a></li> 
+              <li><a href="#" title="populary"><h5 style="color:white;margin-top: 3px;font-size: 13px;">populary</h5></a></li> 
+              <li><a href="#" title="channelnews"><h5 style="color:white;margin-top: 3px;font-size: 13px;">channelnews</h5></a></li> 
             </ul>
             <p class="navbar-text pull-right">{% if isadmin == "1" %}<a href="/news/adm">控制面板</a>&nbsp;&nbsp;{% endif %}
             <a href="/usermodify/">{{user.username}}</a>&nbsp;&nbsp;
@@ -67,23 +68,6 @@
           </div>
 
           <div class="span6"><!-- 中间灯塔similar文档 -->
-            <div class="span12" style="margin-left:0px;"> 
-            <blockquote> 
-              <div class="span3" style="margin-left:0px;">
-              <span style="color:red">{{ beacondisname }} &nbsp;  </span> 
-              </div>
-              {% for channel in udata.channels %}
-              <div class="span3" style="margin-left:0px;">
-              <p style="font-size: 13px;"><a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:green">{{ channel.beaconname }} &nbsp;  </span> </a>
-              </div>
-              {% endfor %}  
-              {% for channel in udata.channelfromtags %}
-              <div class="span3" style="margin-left:0px;">
-              <p style="font-size: 13px;"><a href="/news/beaconnews/?orderby=tms&beaconid={{channel.beaconid}}&beaconusr={{channel.beaconusr}}"> <span style="color:orange">{{ channel.beaconname }} &nbsp;  </span> </a>
-              </div>
-              {% endfor %}  
-            </blockquote>        
-            </div>
             {% for doc in udata.docs %}
             <div class="span12" style="margin-left:0px;">
             <blockquote style="margin:0px;padding-bottom:12px;font-family: "Microsoft Yahei","Helvetica Neue","Luxi Sans","DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;  font: 13px/1.231 sans-serif;">

@@ -673,7 +673,7 @@ def hotboard(request, template_name="beacon/hotboard.html"):
     beaconid = request.GET.get("beaconid", "")  
     beaconname = request.GET.get("beaconname", "")  
     beaconusr = request.GET.get("beaconusr", "")  
-    orderby = request.GET.get("orderby", "tms")   
+    orderby = request.GET.get("orderby", "utms")   
     beacondisname = ""
     username = getUserName(request)
     udata={}
@@ -686,10 +686,10 @@ def hotboard(request, template_name="beacon/hotboard.html"):
         beacondisname = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
         for doc in udata["docs"]:
             if doc["isbeacon"] == "true":
-                beaobj = r.hgetall("bmk:doc:" + doc["eventid"])
-                beaobj["id"] = doc["eventid"]
+                beaobj = r.hgetall("bmk:doc:" + doc["beaconid"])
+                beaobj["id"] = doc["beaconid"]
                 if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
-                    logger.info("beacon not exist of doc:"+doc["eventid"])
+                    logger.info("beacon not exist of doc:"+doc["beaconid"])
                     continue
                 docbeacon_list.append(beaobj)
                 if beaconusr =="doc":

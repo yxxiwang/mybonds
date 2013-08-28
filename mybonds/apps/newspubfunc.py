@@ -421,10 +421,12 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
             doc["utms"] = doc["tms"] 
             
         if doc["eventid"] != "-1":
-            doc["beacon"] = {"beaconusr":"doc", "beaconid":doc["eventid"]}
+            doc["beaconusr"] = "doc"
+            doc["beaconid"]  = doc.pop("eventid")
             doc["isbeacon"] = "true"
         else:
             doc["isbeacon"] = "false"
+            doc.pop("eventid")
 #         subkey = "bmk:doc:"+docid
 #         logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
 #         if r.exists(subkey):

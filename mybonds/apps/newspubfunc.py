@@ -455,7 +455,7 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
 #     print docs
     if orderby != "tms":
         logger.info("buildHotBoardData order by %s" % (orderby,))
-        docs = sorted(docs, key=lambda l:(l[orderby], l["tms"]), reverse=True)
+        docs = sorted(docs, key=lambda l:(l[orderby]), reverse=True)
         docs = docs[start:end]
     udata["docs"] = docs
     udata["total"] = str(len(udata["docs"]))

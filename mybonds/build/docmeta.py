@@ -59,7 +59,7 @@ def channels(num):
         rt = refreshDocs(beaconusr, beaconid,days="1",force=force)
         if not rt == SUCCESS:
             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
-#              
+                
 #         udata = procChannel("popularychannel",beaconusr,beaconid,"",days=str(num),usecache="0") 
 #         rt = WARNNING if udata=={} or udata is None else SUCCESS
 #         if not rt == SUCCESS:
@@ -93,7 +93,7 @@ def retriveData(qtype):
         elif qtype =="beacon": 
             beaconusr = qinfo["beaconusr"]
             beaconid = qinfo["beaconid"]
-            days = qinfo["days"]
+            days = qinfo["days"] 
             rt = refreshDocs(beaconusr, beaconid,days) 
         elif qtype =="fulltext":  
             urlstr = qinfo["urlstr"]
@@ -103,6 +103,11 @@ def retriveData(qtype):
             urlstr = qinfo["urlstr"]
             udata = bench(loadFromUrl,parms=urlstr)
             rt= WARNNING if udata=={} else SUCCESS
+        elif qtype =="channelpick": 
+            beaconusr = qinfo["beaconusr"]
+            beaconid = qinfo["beaconid"]
+            days = qinfo["days"]
+            rt = refreshDocs(beaconusr, beaconid,days) 
         elif qtype =="popularychannel":
             beaconusr = qinfo["beaconusr"]
             beaconid = qinfo["beaconid"]

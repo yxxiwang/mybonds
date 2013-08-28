@@ -563,19 +563,11 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     
     popularid = r.hget(key, "headlineonly")
     popularid = "0" if popularid is None else popularid
-    
-    
+  
     if beaconusr == "rd":
         channelparm = "channeleventpick"
     else:
-        channelparm = "channelpick"
-    
-#     if beaconusr == "doc":
-#         channelparm = "channelpick"
-#     elif beaconusr == "rd":
-#         channelparm = "channeleventpick"
-#     else:
-#         channelparm = "channelid" if popularid == "0" else "popularid"
+        channelparm = "channelpick" 
         
     today = dt.date.fromtimestamp(time.time())
 #     after = time.mktime(today.timetuple())
@@ -590,16 +582,19 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
         urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d&mindoc=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel, after, before, mindoc)
     return urlstr
 
-def refreshBeacon(beaconusr, beaconid):
+def refreshBeacon(beaconusr, beaconid,type=""):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
     key = "bmk:" + beaconusr + ":" + beaconid
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
     updt = timeDiff(r.hget(key, "last_update"), time.time())
-    dt = dt if dt < updt else updt 
-    
-    removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
+    dt = dt if dt < updt else updt  
+#     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     
 #     urlstr = beaconUrl(beaconusr, beaconid)
+    if type =="newbeaconadd":#newbeaconadd
+        pushQueue("channelpick",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+        pushQueue("channelpick",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        return
     
     if not r.hexists(key, "last_touch"):  # 如果不存在上次更新时间,视为未更新过
         logger.warn(key + "'s 'last_touch' is not exists,retrivedocs from backend...")
@@ -656,5 +651,5 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
     r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
     r.zadd("bmk:doc:share:bynews", time.time() , beaconusr + "|-|" + beaconid)
     
-    refreshBeacon(beaconusr, beaconid)
+    refreshBeacon(beaconusr, beaconid,type="newbeaconadd")
 

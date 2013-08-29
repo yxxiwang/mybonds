@@ -700,14 +700,20 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
 #     ndel = r.zremrangebyscore(key+":doc:tms",rmfrom,rmto)
 #     logger.info("removenews %s  from %d to %d and del %d" %(key+":doc:tms",rmfrom,rmto,ndel) )
 #     logger.info("add new data len is %d"  %(len(docs),))
+    utms = time.time()*1000
+#     docs.reverse()#已经reverse过了.
     for doc in docs:
         if doc is None:
             continue
         if beaconusr=="doc":
-            r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"])) 
+            r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))  
         else:
             r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
-
+        
+        if beaconusr=="rd":
+            r.zadd(key+":doc:utms:bak",utms,str(doc["docId"])) 
+            utms = utms +1
+            
 ################ 统计信息   ############################
         docid= str(doc["docId"])
         tms = doc["create_time"]
@@ -724,6 +730,9 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
     ##### end for #####
     if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
         r.rename(key+":doc:tms:bak",key+":doc:tms")
+        
+    if r.exists(key+":doc:utms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
+        r.rename(key+":doc:utms:bak",key+":doc:utms")
 #     today = (dt.date.today() - timedelta(0)).strftime('%Y%m%d')
 #     cnt = r.zcount(doc_dcnt_key,int(today),int(today)) 
 #     if cnt>0:

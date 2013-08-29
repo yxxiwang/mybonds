@@ -388,6 +388,8 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
     channelfromtags = []
     if orderby == "tms":
         doc_lst = r.zrevrange(key + ":doc:tms", start, end)  # 主题文档集合
+    elif beaconusr =="rd" and orderby == "utms":
+        doc_lst = r.zrevrange(key + ":doc:utms", start, end)  # 主题文档集合
     else:
         doc_lst = r.zrevrange(key + ":doc:tms", 0, 300)  # 主题文档集合 
 #     print doc_lst
@@ -454,11 +456,15 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
 #         doc["subdocs"]=subdocs
         docs.append(doc)
 
-#     print docs
-    if orderby != "tms":
+    if orderby == "tms":
+        pass
+    elif beaconusr =="rd" and orderby == "utms":
+        pass
+    else:
         logger.info("buildHotBoardData order by %s" % (orderby,))
         docs = sorted(docs, key=lambda l:(l[orderby]), reverse=True)
         docs = docs[start:end]
+#     print docs 
     udata["docs"] = docs
     udata["total"] = str(len(udata["docs"]))
 #     r.hset(key, "cnt", len(docs))

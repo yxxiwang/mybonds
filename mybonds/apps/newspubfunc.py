@@ -624,7 +624,9 @@ def refreshBeacon(beaconusr, beaconid,type=""):
     elif dt > getsysparm("KEY_UPTIME"):  # 如果上次更新时间过久,则重新刷新数据
         logger.warn("data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt))
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
-        pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+        
+        if beaconusr!="rd":
+            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
         pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
     else:
         logger.warn("Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt, getsysparm("KEY_UPTIME")))

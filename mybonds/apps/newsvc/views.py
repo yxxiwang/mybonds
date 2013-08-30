@@ -114,17 +114,22 @@ def popularychannel(request):
     udata["api"]=api
     
     def proc(doc):
-        doc["beaconid"]=doc.pop("docid")
+        doc["beaconid"]=doc["docid"]
         doc["beaconusr"]="doc"
-        doc["beaconname"]=doc.pop("title")
-        if doc.has_key("domain") : doc.pop("domain")
+        doc["beaconname"]=doc["title"]
+  
+#         doc["domain"] = doc["domain"].decode("utf8")
+        if not doc.has_key("utms"):
+            doc["utms"] = doc["tms"]  
+        doc["copyNum"] = str(doc["copyNum"]) 
+#         if doc.has_key("domain") : doc.pop("domain")
         if doc.has_key("eventid") : doc.pop("eventid")
-        if doc.has_key("copyNum") : doc.pop("copyNum")
-        if doc.has_key("dateStr") : doc.pop("dateStr") 
-        if doc.has_key("create_time") : doc.pop("create_time")
-        if doc.has_key("popularity") : doc.pop("popularity")
-        if doc.has_key("validTime") : doc.pop("validTime")
-        if doc.has_key("text") : doc.pop("text")
+#         if doc.has_key("copyNum") : doc.pop("copyNum")
+#         if doc.has_key("dateStr") : doc.pop("dateStr") 
+#         if doc.has_key("create_time") : doc.pop("create_time")
+#         if doc.has_key("popularity") : doc.pop("popularity")
+#         if doc.has_key("validTime") : doc.pop("validTime")
+#         if doc.has_key("text") : doc.pop("text")
         addBeacon("doc",doc["beaconid"],doc["beaconid"],beaconname=doc["beaconname"],tag="auto",headlineonly="1")
         return doc
         

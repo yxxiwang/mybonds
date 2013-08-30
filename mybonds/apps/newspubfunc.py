@@ -566,6 +566,7 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     key = "bmk:" + beaconusr + ":" + beaconid
     channel = r.hget(key, "ttl")
     channel = "" if channel is None else channel
+    channel = channel.decode("utf8")
     mindoc = r.hget(key, "mindoc") 
     mindoc = 0 if mindoc is None else mindoc 
     

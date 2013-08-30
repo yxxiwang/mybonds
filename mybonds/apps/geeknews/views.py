@@ -425,6 +425,7 @@ def load_similars(request):
         else:
             udata["total"] = "0"  
 #         return HttpResponse(json.dumps(udata), mimetype="application/json")
+        udata["api"]=api
         return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
     else:  # 取某个灯塔的新闻
         try:

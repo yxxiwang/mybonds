@@ -52,9 +52,10 @@ def channels(num):
             logger.warnning("bmk:%s:%s is not exist!" %(beaconusr,beaconid) )
             continue
         
-        rt = refreshDocs(beaconusr, beaconid,days="7",force=force)
-        if not rt == SUCCESS:
-            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+        if beaconusr!="rd":
+            rt = refreshDocs(beaconusr, beaconid,days="7",force=force)
+            if not rt == SUCCESS:
+                pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
             
         rt = refreshDocs(beaconusr, beaconid,days="1",force=force)
         if not rt == SUCCESS:

@@ -391,6 +391,7 @@ def fllowbeacon_service(request):
 
 @login_required
 def load_similars(request):
+    api = request.GET.get("api", "")
     groupid = request.GET.get("groupid", "") 
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "ltb")
@@ -435,6 +436,7 @@ def load_similars(request):
         else:
             udata["success"] = "true"
             udata["message"] = "success retrive data"
+        udata["api"]=api
         return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
         
      

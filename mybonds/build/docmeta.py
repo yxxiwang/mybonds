@@ -60,18 +60,19 @@ def channels(num):
         rt = refreshDocs(beaconusr, beaconid,days="1",force=force)
         if not rt == SUCCESS:
             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
-                
-#         udata = procChannel("popularychannel",beaconusr,beaconid,"",days=str(num),usecache="0") 
-#         rt = WARNNING if udata=={} or udata is None else SUCCESS
-#         if not rt == SUCCESS:
-#             print udata
-#             pushQueue("popularychannel",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
-#             
-#         udata = procChannel("channelnews",beaconusr,beaconid,"",days=str(num),usecache="0") 
-#         rt = WARNNING if udata=={} or udata is None else SUCCESS
-#         if not rt == SUCCESS:
-#             print udata
-#             pushQueue("channelnews",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+            
+        if beaconusr =="rd":         
+            udata = procChannel("popularychannel",beaconusr,beaconid,"",days=str(num),usecache="0") 
+            rt = WARNNING if udata=={} or udata is None else SUCCESS
+            if not rt == SUCCESS:
+                print udata
+                pushQueue("popularychannel",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+                 
+            udata = procChannel("channelnews",beaconusr,beaconid,"",days=str(num),usecache="0") 
+            rt = WARNNING if udata=={} or udata is None else SUCCESS
+            if not rt == SUCCESS:
+                print udata
+                pushQueue("channelnews",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         
 def retriveData(qtype):
     qobj = r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")

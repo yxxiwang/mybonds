@@ -307,24 +307,16 @@ def saveFulltextById(ids,url=""):
         idstr = ""
         retrycnt = 0
         while len(idlist)>0: 
+            logger.info("len(ids) is %d"  % len(idlist) )
             for i in range(20):
-                if len(idlist)>0 : idstr += idlist.pop()+";" 
+                if len(idlist)>0 : idstr = idstr + idlist.pop() + ";" 
+                
             urlstr = "http://%s/research/svc?docid=%s" %(getsysparm("BACKEND_DOMAIN"),idstr) 
-            
-            udata = saveFile(urlstr)
-            if udata.has_key("docs"):
-                retrycnt = 0
-                return udata
-            else:
-                logger.warn( "udata is empty...retrycntis %d" % retrycnt)
-                retrycnt = retrycnt +1 
-                if retrycnt >=getsysparm("RETRY_TIMES"):
-                    logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt ) 
-                    pushQueue("fulltext",{"urlstr":urlstr}) 
-                    return {}
-                udata = saveFile(urlstr)
+            idstr=""
+            udata = saveFile(urlstr) 
+        return udata
     
-    def saveFile(urlstr):
+    def saveFile(urlstr,retrycnt=0):
         logger.info("proc url="+urlstr)
         udata = bench(loadFromUrl,parms=urlstr)
         if udata.has_key("docs"):
@@ -362,6 +354,15 @@ def saveFulltextById(ids,url=""):
                 pipedoc.hset("doc:"+docid,"host","")
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
             pipedoc.execute()
+        else:
+            logger.warn( "udata is empty...retrycntis %d" % retrycnt)
+            if retrycnt >=getsysparm("RETRY_TIMES"):
+                logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt ) 
+                pushQueue("fulltext",{"urlstr":urlstr}) 
+                return udata
+            else:
+                udata = saveFile(urlstr,retrycnt = retrycnt +1 )
+            
         return udata
     
     if url!="" :

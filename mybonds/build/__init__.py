@@ -196,7 +196,7 @@ def beaconNameHash(op="print"):
             r.hset("beacon:channel:bak",ttl,bkey)
     r.rename("beacon:channel:bak","beacon:channel")
 
-def saveFulltext(ids):
+def saveFullText(ids):
     """保存单个或者多个id到后台(mongodb或其他)"""
     saveFulltextById(ids)
 
@@ -416,6 +416,7 @@ if __name__ == "__main__":
                   python %prog makeDocDateCnt 
                   python %prog convUsrFllw 
                   python %prog deleteUser {user} 
+                  python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
                   python %prog cleanDocChannel  {print|delete} 

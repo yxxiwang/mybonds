@@ -97,8 +97,9 @@ def retriveData(qtype):
             days = qinfo["days"] 
             rt = refreshDocs(beaconusr, beaconid,days) 
         elif qtype =="fulltext":  
-            urlstr = qinfo["urlstr"]
-            udata = saveFulltextById("",retrycnt=0,url=urlstr) 
+            urlstr = qinfo["urlstr"] if qinfo.has_key("urlstr") else ""
+            ids = qinfo["ids"] if qinfo.has_key("ids") else ""
+            udata = saveFulltextById(ids,url=urlstr) 
             rt= WARNNING if udata=={} or udata is None else SUCCESS
         elif qtype =="removedoc": 
             urlstr = qinfo["urlstr"]

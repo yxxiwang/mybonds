@@ -175,3 +175,22 @@ SET PASSWORD FOR 'root'@'localhost' = PASSWORD('secret_password');
 如果要reboot自启动：
 
 chkconfig --levels 345 mysqld on
+
+
+====================nodejs=============================
+yum install openssl-devel
+wget http://nodejs.org/dist/node-latest.tar.gz
+tar -xvf node-latest.tar.gz
+cd node-v0.10.17/           
+./configure
+make 
+make install
+
+node -v
+npm -version
+
+npm install express
+npm install socket.io
+npm install redis
+安装完后运行以下命令以查看module结构：
+npm list

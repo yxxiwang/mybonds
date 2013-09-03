@@ -297,6 +297,81 @@ def pushQueue(qtype,qobj):
 #     r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))
     logger.info("qobj is "+ json.dumps(qobj) ) 
     r.lpush("queue:" + qtype, json.dumps(qobj))
+
+def saveFulltextById(ids,url=""):
+    udata={}
+    
+    def procids(ids):# 截断ids,并以每20个id为一组 向后台提交请求
+        if ids is None or ids =="": return {}
+        idlist = ids.split(";")
+        idstr = ""
+        retrycnt = 0
+        while len(idlist)>0: 
+            for i in range(20):
+                if len(idlist)>0 : idstr += idlist.pop()+";" 
+            urlstr = "http://%s/research/svc?docid=%s" %(getsysparm("BACKEND_DOMAIN"),idstr) 
+            
+            udata = saveFile(urlstr)
+            if udata.has_key("docs"):
+                retrycnt = 0
+                return udata
+            else:
+                logger.warn( "udata is empty...retrycntis %d" % retrycnt)
+                retrycnt = retrycnt +1 
+                if retrycnt >=getsysparm("RETRY_TIMES"):
+                    logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt ) 
+                    pushQueue("fulltext",{"urlstr":urlstr}) 
+                    return {}
+                udata = saveFile(urlstr)
+    
+    def saveFile(urlstr):
+        logger.info("proc url="+urlstr)
+        udata = bench(loadFromUrl,parms=urlstr)
+        if udata.has_key("docs"):
+            pipedoc = rdoc.pipeline()
+            txt=""
+            for doc in udata["docs"]:
+                if doc is None :
+                    continue
+                if doc.has_key("fulltext"):
+                    txt = doc["fulltext"]
+                else:
+                    continue  
+                
+                doc["_id"]=str(doc["docId"])
+                doc["title"] = strfilter(doc["title"])
+                doc.pop("relatedDocs")
+                logger.info("save fulltext in mongodb:"+doc["_id"])
+                tftxs.save(doc) 
+                
+                docid = str(doc["docId"])
+    #             pipedoc.set("ftx:"+docid,json.dumps(txt))
+    #             pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
+                if not r.hexists("doc:"+docid,"docid"):
+                    pipedoc.hset("doc:"+docid,"docid",docid)
+                if not r.hexists("doc:"+docid,"title"):
+                    pipedoc.hset("doc:"+docid,"title",doc["title"].rstrip() ) 
+                if not r.hexists("doc:"+docid,"text"):
+                    pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
+                if not r.hexists("doc:"+docid,"copyNum"):
+                    pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
+                if not r.hexists("doc:"+docid,"create_time"):
+                    pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
+                
+                pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
+                pipedoc.hset("doc:"+docid,"host","")
+                pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
+            pipedoc.execute()
+        return udata
+    
+    if url!="" :
+        urlstr = url
+        logger.info( "=saveFulltextById==="+urlstr )
+        udata = saveFile(urlstr)
+    else:
+        logger.info( "=saveFulltextById==="+ids )
+        udata = procids(ids)
+    return udata 
     
 def buildBeaconData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms"):
     key = "bmk:" + beaconusr + ":" + beaconid
@@ -511,6 +586,17 @@ def procChannel(datatype, beaconusr, beaconid, beaconname, days="1", usecache="1
             udata["_id"] = id
             tmongo.save(udata)
             logger.info("save doc into mongdb :" + id)
+        else:
+            return udata
+        
+        ########## 保存每个文档的全文 信息 ####################
+        ids = [] 
+        for doc in udata["docs"]:
+#             if rdoc.exists("doc:"+doc["docid"]): continue
+            if rdoc.hexists("doc:"+str(doc["docId"]),"url"): continue
+            ids.append(str(doc["docId"]))
+        if len(ids)>0:
+            pushQueue("fulltext",{"urlstr":"","ids":";".join(ids)}) 
         return udata
     
     if datatype == "popularychannel":

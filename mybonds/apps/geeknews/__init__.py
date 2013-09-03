@@ -485,74 +485,7 @@ def beaconChangeName(key, beaconusr, beaconid):
     
     from mybonds.build import beaconNameHash
     beaconNameHash()
-
-def getTag(displayTag):
-    if isinstance(displayTag, unicode): 
-        return r.hget("tag:ori", displayTag) 
-    else:
-        print "displaytag is not unicode,need decode.."
-        return r.hget("tag:ori", displayTag.decode("utf8")) 
  
-
-def saveFulltextById(ids,retrycnt=0,url=""):
-    logger.info( "===saveFulltextById==="+url )
-    udata={}
-    if url=="" :
-        if ids is None or ids =="":
-            return udata
-        urlstr = "http://%s/research/svc?docid=%s" %(getsysparm("BACKEND_DOMAIN"),ids)
-    else:
-        urlstr = url
-    if retrycnt >=getsysparm("RETRY_TIMES"):
-        logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt )
-#         pushQueue("fulltext", "", "fulltext", "",urlstr=urlstr) 
-        pushQueue("fulltext",{"urlstr":urlstr}) 
-        return udata
-    udata = bench(loadFromUrl,parms=urlstr)
-    if udata.has_key("docs"):
-        pipedoc = rdoc.pipeline()
-        txt=""
-        for doc in udata["docs"]:
-            if doc is None :
-                continue
-            if doc.has_key("fulltext"):
-                txt = doc["fulltext"]
-            else:
-                continue
-#             elif doc.has_key("text"):
-#                 txt = doc["text"]
-#                 id = getHashid(doc["url"])
-
-            doc["_id"]=str(doc["docId"])
-            doc["title"] = strfilter(doc["title"])
-            doc.pop("relatedDocs")
-            tftxs.save(doc) 
-            
-            docid = str(doc["docId"])
-#             pipedoc.set("ftx:"+docid,json.dumps(txt))
-#             pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
-            if not r.hexists("doc:"+docid,"docid"):
-                pipedoc.hset("doc:"+docid,"docid",docid)
-            if not r.hexists("doc:"+docid,"title"):
-                pipedoc.hset("doc:"+docid,"title",doc["title"].rstrip() ) 
-            if not r.hexists("doc:"+docid,"text"):
-                pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
-            if not r.hexists("doc:"+docid,"copyNum"):
-                pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
-            if not r.hexists("doc:"+docid,"create_time"):
-                pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
-            
-            pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
-            pipedoc.hset("doc:"+docid,"host","")
-            pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
-        pipedoc.execute()
-    else:
-        logger.warn( "udata is empty...retrycntis %d" % retrycnt)
-        udata = saveFulltextById(ids,retrycnt+1)
-    return udata
-#         if udata["docs"].has_key("relatedDocs"):
-#             rdoc.set("rltdoc:"+id,json.dumps(udata["docs"]["relatedDocs"])) 
-
 def saveRelatedDocs(relatedurl,relatedid):
     logger.info( "=geeknews/saveRelatedDocs="+relatedurl)  
     udata = bench(loadFromUrl,parms=relatedurl)
@@ -581,7 +514,6 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
     pipedoc = rdoc.pipeline()
     def saveText(docs):
         ids_lst=[]
-        cnt=0
         tms=time.time()
         ids=""
         docs.reverse()
@@ -598,12 +530,7 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
                     logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid,tms - long(doc["create_time"])/1000) )
                 else:
                     ids+=docid+";"
-                    cnt = cnt+1
                     logger.debug("save fulltext doc:%s, tms is %d" % (docid,tms) )
-                if cnt == 20:
-                    ids_lst.append(ids)
-                    ids=""
-                    cnt = 0
             else:
                 logger.debug("save doc:%s, tms is %d" % (docid,tms) )
 
@@ -630,12 +557,8 @@ def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
             pipedoc.hset("doc:"+docid,"isheadline",headlineonly) 
                 
             pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME")*3)
-        print "ids_lst",ids_lst,ids
-        if len(ids_lst) > 0:
-            for tids in ids_lst:
-                saveFulltextById(tids)
-        else:
-            saveFulltextById(ids)
+#         print "to be save fulltext_ids is ",ids 
+        if len(ids) > 0: saveFulltextById(ids)
         pipedoc.execute()
     ################## saveText is over ##############################
 

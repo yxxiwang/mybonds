@@ -308,9 +308,8 @@ def saveFulltextById(ids,url=""):
         retrycnt = 0
         while len(idlist)>0: 
             logger.info("len(ids) left %d"  % len(idlist) )
-#             for i in range(20):
-#                 if len(idlist)>0 : idstr = idstr + idlist.pop() + ";" 
-            idstr =  idlist.pop() 
+            for i in range(20):
+                if len(idlist)>0 : idstr = idstr + idlist.pop() + ";" 
             urlstr = "http://%s/research/svc?docid=%s" %(getsysparm("BACKEND_DOMAIN"),idstr) 
             idstr=""
             udata = saveFile(urlstr) 

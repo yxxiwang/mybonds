@@ -307,7 +307,7 @@ def saveFulltextById(ids,url=""):
         idstr = ""
         retrycnt = 0
         while len(idlist)>0: 
-            logger.info("len(ids) is %d"  % len(idlist) )
+            logger.info("len(ids) left %d"  % len(idlist) )
             for i in range(20):
                 if len(idlist)>0 : idstr = idstr + idlist.pop() + ";" 
                 
@@ -332,7 +332,7 @@ def saveFulltextById(ids,url=""):
                 
                 doc["_id"]=str(doc["docId"])
                 doc["title"] = strfilter(doc["title"])
-                doc.pop("relatedDocs")
+#                 doc.pop("relatedDocs")
                 logger.info("save fulltext in mongodb:"+doc["_id"])
                 tftxs.save(doc) 
                 

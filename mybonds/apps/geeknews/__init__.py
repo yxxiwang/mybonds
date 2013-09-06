@@ -635,6 +635,7 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
         
         if beaconusr=="rd":
             r.zadd(key+":doc:utms:bak",utms,str(doc["docId"])) 
+            rdoc.hset("doc:"+str(doc["docId"]),"eventid",doc["eventId"])
             utms = utms +1
             
 ################ 统计信息   ############################

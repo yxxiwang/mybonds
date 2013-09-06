@@ -373,38 +373,7 @@ def newsdetail(request):
 #         doc["success"] = "true"
 #         doc["message"] = "success return data"
 #         print json.dumps(doc)
-        return HttpResponse(json.dumps(doc), mimetype="application/json")
-    
-    if rdoc.exists("doc:"+docid) and rdoc.exists("ftx:"+docid):
-        doc = rdoc.hgetall("doc:"+docid) 
-        if rtype =="string":
-            #在每个段落之前插入两个中文全角空格: \u3000
-            txstr = rdoc.get("ftx:"+docid).replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")
-            ftx = "\r\n".join(json.loads(txstr))
-            doc["fulltext"] = list2dict([ftx],"txt")
-        else:
-            txstr = rdoc.get("ftx:"+docid).replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")
-            doc["fulltext"] = list2dict(json.loads(txstr),"txt")
-#         doc["text"] = subDocText(doc["text"])
-        doc["text"] = ""
-        doc["copyNum"] = str(doc["copyNum"])
-        doc["tms"]=str(doc["create_time"])
-        doc["create_time"] = timeElaspe(doc["create_time"]) 
-        doc["success"] = "true"
-        doc["message"] = "success return data"
-#     elif rdoc.exists("doc:"+docid): 
-#         doc = rdoc.hgetall("doc:"+docid)
-#         ftx = doc["text"]
-#         doc["text"] = ""
-#         if rtype =="string":
-#             doc["fulltext"] = list2dict([ftx],"txt")
-#         else:
-#             doc["fulltext"] = list2dict([ftx],"txt")
-#         doc["copyNum"] = str(doc["copyNum"])
-#         doc["tms"]=str(doc["create_time"]) 
-#         doc["create_time"] = timeElaspe(doc["create_time"]) 
-#         doc["success"] = "true"
-#         doc["message"] = "success return data"
+        return HttpResponse(json.dumps(doc), mimetype="application/json") 
     else:
         print "fetch fulltext from mongodb,docid=" +docid
         logger.info("fetch fulltext from mongodb,docid=" +docid)

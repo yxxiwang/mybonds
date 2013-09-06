@@ -454,7 +454,6 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
     logger.info("key is " + key)
     if r.exists(key):
         refreshBeacon(beaconusr, beaconid)
-        pass
     else:
         return {} 
     udata = {}
@@ -503,32 +502,8 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
             doc["isbeacon"] = "true"
         else:
             doc["isbeacon"] = "false"
-            doc.pop("eventid")
-#         subkey = "bmk:doc:"+docid
-#         logger.info( "subkey is %s ; docid is %s " %(subkey,docid) )
-#         if r.exists(subkey):
-#             subdoc_lst = r.zrevrange(subkey + ":doc:tms", 0,100)
-#             for subdocid in subdoc_lst:
-#                 subdoc= rdoc.hgetall("doc:" + subdocid)
-#                 if subdoc == {}:
-#                     logger.warning("subdoc %s info is not exists!" % subdocid ) 
-#                     continue
-#                 subdoc.pop("text")
-#                 subdoc.pop("copyNum")
-#                 subdoc.pop("popularity")
-#                 subdoc["domain"] = subdoc["domain"].decode("utf8")
-#                 subdoc["title"] = subdoc["title"].decode("utf8")+u"\u3000"
-#                 subdoc["tms"]=str(subdoc["create_time"])
-#                 subdoc["create_time"] = timeElaspe(subdoc["create_time"])
-#                 if not subdoc.has_key("utms"):
-#                     subdoc["utms"]=subdoc["tms"] 
-#                 subdocs.append(subdoc)
-#                 if orderby !="tms":
-#                     logger.info("buildHotBoardData order by %s" % (orderby,) )
-#                     subdocs = sorted(subdocs,key=lambda l:(l[orderby],l["tms"]),reverse = True)
-#                     subdocs = subdocs[0:6]
-#         
-#         doc["subdocs"]=subdocs
+            doc.pop("eventid") 
+            
         docs.append(doc)
 
     if orderby == "tms":
@@ -620,14 +595,12 @@ def procChannel(datatype, beaconusr, beaconid, beaconname, days="1", usecache="1
     if beaconname != "":
         beaconid = getHashid(beaconname)
         ttl = urllib2.quote(beaconname.encode("utf8"))
-        print ttl
     else:
         key = "bmk:" + beaconusr + ":" + beaconid
         ttl = r.hget(key, "ttl")
         if ttl is not None:  ttl = urllib2.quote(ttl)
         
     url = "http://%s/research/svc?%s=%s&after=%s&before=%s" % (getsysparm("BACKEND_DOMAIN"), parm, ttl, after, before) 
-    print usecache
     if usecache == "1":
         udata = tmongo.find_one({"_id":beaconid})
         if udata is None:

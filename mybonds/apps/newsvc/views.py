@@ -348,59 +348,55 @@ def newsdetail(request):
             rtlst.append(di)
         return rtlst
     
-    if rtype =="mongodb":
-        logger.info("fetch fulltext from mongodb,docid=" +docid)
-        doc = tftxs.find_one({"_id":docid})
-        if doc is None:
-            logger.warn("mongodb has no key too,docid=" +docid)
-            doc={}
-            doc["success"] = "false"
-            doc["message"] = "have no data found."
-            return HttpResponse(json.dumps(doc), mimetype="application/json")
-        doc["text"] = ""
-        doc["relatedDocs"]=""
-        ftx = doc["fulltext"] 
-        txstr = json.dumps(ftx)
-        txstr = txstr.replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""") 
-        ftx = json.loads(txstr) 
-        doc["fulltext"] = list2dict(ftx,"txt")
-        doc["copyNum"] = str(doc["copyNum"])
-        doc["tms"]=str(doc["create_time"]) 
-        doc["create_time"] = timeElaspe(doc["create_time"])
-        doc["urls"] = doc["urls"][0].split(",")[1]  
-        doc["success"] = "true"
-        doc["message"] = "success return data"
-#         doc["success"] = "true"
-#         doc["message"] = "success return data"
-#         print json.dumps(doc)
-        return HttpResponse(json.dumps(doc), mimetype="application/json") 
-    else:
-        print "fetch fulltext from mongodb,docid=" +docid
-        logger.info("fetch fulltext from mongodb,docid=" +docid)
-        doc = tftxs.find_one({"_id":docid})
-        if doc is None:
-            logger.warn("mongodb has no key too,docid=" +docid)
-            doc={}
-            doc["success"] = "false"
-            doc["message"] = "have no data found."
-            doc["api"]=api
-            return HttpResponse(json.dumps(doc), mimetype="application/json")
-        doc["text"] = ""
-        doc["relatedDocs"]=""
-        ftx = doc["fulltext"] 
-        txstr = json.dumps(ftx)
-        txstr = txstr.replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")
-        txstr = txstr.replace("""\", ""","""\\u3000\",""").replace("""\"]""","""\\u3000\"]""")
+    cnt = tftxs.find({"_id":docid}).limit(1).count()
+#     if cnt ==0 and rdoc.exists("doc:"+docid):
+    if cnt ==0:
+        logger.info("fulltext is not exsists, pushQueue: "+docid)
+        pushQueue("fulltext",{"urlstr":"","ids":docid}) 
+
+    print "fetch fulltext from mongodb,docid=" +docid
+    logger.info("fetch fulltext from mongodb,docid=" +docid)
+    doc = tftxs.find_one({"_id":docid})
+    if doc is None:
+        logger.warn("mongodb has no key ,docid=" +docid)
+        doc={}
+        doc["success"] = "false"
+        doc["message"] = "have no data found."
+        doc["api"]=api
+        return HttpResponse(json.dumps(doc), mimetype="application/json")
+    doc["text"] = ""
+    doc["relatedDocs"]=""
+    ftx = doc["fulltext"] 
+    txstr = json.dumps(ftx)
+    txstr = txstr.replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")
+    txstr = txstr.replace("""\", ""","""\\u3000\",""").replace("""\"]""","""\\u3000\"]""")
 #         print txstr
 #         txstr = txstr.replace("&ldquo;","").replace("&rdquo;","")
-        ftx = json.loads(txstr)
-        doc["fulltext"] = list2dict(ftx,"txt")
-        doc["copyNum"] = str(doc["copyNum"])
-        doc["tms"]=str(doc["create_time"])
-        doc["create_time"] = timeElaspe(doc["create_time"])
-        doc["url"] = doc["urls"][0].split(",")[1]
-        doc["success"] = "true"
-        doc["message"] = "success return data"
+    ftx = json.loads(txstr)
+    doc["fulltext"] = list2dict(ftx,"txt")
+    doc["copyNum"] = str(doc["copyNum"])
+    doc["tms"]=str(doc["create_time"])
+    doc["create_time"] = timeElaspe(doc["create_time"])
+    doc["url"] = doc["urls"][0].split(",")[1]
+    beacon_lst = []
+    if doc.has_key("relatedSites"):
+        for site in doc["relatedSites"]:
+            bobj={}
+            bobj["beaconname"]=site[0]
+            bobj["beaconid"]=str(docid)+getHashid(site[0])
+            bobj["total"]=site[2]
+            beacon_lst.append(bobj)
+        doc["beacons"] = beacon_lst
+        
+    if doc.has_key("relatedSites"): doc.pop("relatedSites")
+    if doc.has_key("relatedDocs"): doc.pop("relatedDocs")
+    if doc.has_key("relatedEvent"): doc.pop("relatedEvent")
+    if doc.has_key("urls"): doc.pop("urls")
+    if doc.has_key("eventId"): doc.pop("eventId")
+    if doc.has_key("docId"): doc["docid"] = docid
+    
+    doc["success"] = "true"
+    doc["message"] = "success return data"
 #     print json.dumps(doc, ensure_ascii=False)
     doc["api"]=api
     return HttpResponse(json.dumps(doc,ensure_ascii=ascii=="1"), mimetype="application/json")

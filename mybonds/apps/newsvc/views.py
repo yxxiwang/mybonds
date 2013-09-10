@@ -74,7 +74,7 @@ def channelpick(request):
     num = request.GET.get("num", "5") 
     orderby = request.GET.get("orderby", "tms")
     username = getUserName(request)
-    print beaconusr, beaconid
+#     print beaconusr, beaconid
     try:
         udata = buildBeaconData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby) 
         r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
@@ -85,7 +85,7 @@ def channelpick(request):
     else:
         udata["success"] = "true"
         udata["message"] = "success retrive data"
-    print udata
+#     print udata
 #     udata = dataProcForApi(udata)
     udata["api"]=api 
 #     udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days,usecache) 
@@ -311,7 +311,7 @@ def hotboard(request):
     if beaconname!="":
         beaconid=getHashid(beaconname)
         beaconusr="rd"
-    print beaconusr,beaconid
+#     print beaconusr,beaconid
     try:
         udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby)
 #         print udata

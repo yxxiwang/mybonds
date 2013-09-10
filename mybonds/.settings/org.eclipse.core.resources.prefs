@@ -1,5 +1,6 @@
 eclipse.preferences.version=1
 encoding//apps/__init__.py=utf-8
+encoding//apps/beacon.py=utf-8
 encoding//apps/geeknews/__init__.py=utf-8
 encoding//apps/geeknews/daemon.py=UTF-8
 encoding//apps/geeknews/daemonProcess.py=utf-8

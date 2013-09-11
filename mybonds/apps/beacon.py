@@ -9,7 +9,6 @@ import traceback
 import datetime as dt
 from datetime import timedelta
 from mybonds.apps.newspubfunc import *
-from gdata.contentforshopping.data import Channel
 from pip.download import geturl
 
 class Beacon:

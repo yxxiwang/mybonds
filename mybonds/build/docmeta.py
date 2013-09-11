@@ -45,7 +45,7 @@ def channels(num):
             elaspestr = str(minbefore) + " minites "
         else:
             elaspestr = str(hourbefore) + " hours "
-        print "<-----proc %s:%s (%d of %d), time elaspe %s(%d sec) ------>" % (beaconusr,beaconid,i,cnt,elaspestr,diff)
+        logger.info( "<-----proc %s:%s (%d of %d), time elaspe %s(%d sec) ------>" % (beaconusr,beaconid,i,cnt,elaspestr,diff) )
         
 #         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
         if not r.exists("bmk:"+beaconusr+":"+beaconid):#如果该频道不存在
@@ -65,13 +65,13 @@ def channels(num):
             udata = procChannel("popularychannel",beaconusr,beaconid,"",days=str(num),usecache="0") 
             rt = WARNNING if udata=={} or udata is None else SUCCESS
             if not rt == SUCCESS:
-                print udata
+#                 print udata
                 pushQueue("popularychannel",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
                  
             udata = procChannel("channelnews",beaconusr,beaconid,"",days=str(num),usecache="0") 
             rt = WARNNING if udata=={} or udata is None else SUCCESS
             if not rt == SUCCESS:
-                print udata
+#                 print udata
                 pushQueue("channelnews",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         
 def retriveData(qtype):
@@ -189,7 +189,7 @@ def loadData(codes,num,force=False):
     else:
         for code in codes:
             beaconusr,beaconid = code.split(":")
-            print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
+            logger.info( "proc %s:%s and num is %d" %(beaconusr,beaconid,num) )
             refreshDocs(beaconusr, beaconid,days=str(num),force=force)
             
 def initProc(types,codes,num,force=False): 

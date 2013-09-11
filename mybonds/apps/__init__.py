@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*- 
-import json, urllib2, urllib
+import json,cookielib, urllib2, urllib
 import csv, string,random
 import sys, time,os
 import redis,numpy
@@ -209,6 +209,22 @@ def dayDiff(create_time):
     return daybefore
 
 def loadFromUrl(url):
+    udata = {}
+    try:
+        req2 = urllib2.Request(url)
+        response = urllib2.urlopen(req2)
+    except: 
+        traceback.print_exc()
+        return {}
+    else:
+        if response is not None :
+            rstr =  response.readlines()[0].decode("utf8")
+            udata = json.loads(rstr)
+        else:
+            print "Error: return content is null!!" 
+    return udata
+    
+def loadFromUrlbak(url):
     headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json; charset=UTF-8'

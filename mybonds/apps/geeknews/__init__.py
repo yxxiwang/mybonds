@@ -508,66 +508,6 @@ def saveRelatedDocs(relatedurl,relatedid):
     logger.info("save info in mongodb,relatedid="+relatedid)
     return relateids
 
-def saveDocsByUrl(urlstr,headlineonly="0",docAsChannel=False):
-    logger.info( "===saveDocsByUrl==="+urlstr)
-    udata = bench(loadFromUrl,parms=urlstr)
-    pipedoc = rdoc.pipeline()
-    def saveText(docs):
-        ids_lst=[]
-        tms=time.time()
-        ids=""
-        docs.reverse()
-        for doc in docs:
-            if doc is None: 
-                continue 
-#             if doc["validTime"]=="false" or not doc["validTime"]:
-#                 continue
-    #             docid = getHashid(doc["url"]) 
-            docid = str(doc["docId"])
-            
-            if not rdoc.hexists("doc:"+docid,"url"):
-                if tms - long(doc["create_time"])/1000 > 86400*60:#如果是一个月以前的新闻
-                    logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid,tms - long(doc["create_time"])/1000) )
-                else:
-                    ids+=docid+";"
-                    logger.debug("save fulltext doc:%s, tms is %d" % (docid,tms) )
-            else:
-                logger.debug("save doc:%s, tms is %d" % (docid,tms) )
-
-            eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
-            if docAsChannel and eventid !="-1" and not r.exists("bmk:doc:"+eventid) :
-                beaconname = doc.get("title",docid)
-                addBeacon("doc",eventid,eventid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
-
-            title = doc["title"]
-#             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
-            title = strfilter(title)
-            pipedoc.hset("doc:"+docid,"docid",docid)
-            pipedoc.hset("doc:"+docid,"title",title)
-    #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
-            pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
-            pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
-            pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
-            if doc.has_key("eventId") and doc["eventId"] != -1: 
-                pipedoc.hset("doc:"+docid,"eventid",doc["eventId"] )
-            pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
-            pipedoc.hset("doc:"+docid,"utms",tms )
-            tms = tms +1 
-            pipedoc.hset("doc:"+docid,"domain",doc["domain"] ) 
-            pipedoc.hset("doc:"+docid,"isheadline",headlineonly) 
-                
-            pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME")*3)
-#         print "to be save fulltext_ids is ",ids 
-        if len(ids) > 0: saveFulltextById(ids)
-        pipedoc.execute()
-    ################## saveText is over ##############################
-
-    if udata.has_key("docs"):
-        logger.info("save docs and len is :" + str(len(udata["docs"])))
-        saveText(udata["docs"])
-             
-    return udata
-
 def refreshDocs(beaconusr, beaconid,days="1",force=False):
     """更新频道内容,该方法也会被异步调用"""
     key = "bmk:" + beaconusr + ":" + beaconid
@@ -590,20 +530,8 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
     
     headlineonly = r.hget(key, "headlineonly")
     headlineonly = "0" if headlineonly is None else headlineonly
-    
-    if r.hget(key,"crt_usr")=="doc":#说明频道本身原来是新闻,docAsChannel 则为False
-        udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=False)
-    else:
-        udata = saveDocsByUrl(urlstr,headlineonly=headlineonly,docAsChannel=True)
-    
-#     if r.hget(key,"crt_usr")!="doc":
-#         ttl = r.hget(key,"ttl")
-#         ttl = urllib2.quote(ttl)
-#         relateurl = "http://%s/research/svc?relatedid=%s" %(getsysparm("BACKEND_DOMAIN"),ttl)
-#         relateids = saveRelatedDocs(relateurl,beaconid)
-#         logger.info("relateids:")
-#         logger.info(relateids)
-#         r.hset(key, "channels", ",".join(relateids))
+     
+    udata = saveDocsByUrl(urlstr,headlineonly=headlineonly) 
          
     if udata is None or udata=={} :
         return COMMUNICATERROR
@@ -628,7 +556,7 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
     for doc in docs:
         if doc is None:
             continue
-        if beaconusr=="doc":
+        if beaconusr=="doc" or beaconusr=="stockmarket" :
             r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))  
         else:
             r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))
@@ -637,6 +565,11 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
             r.zadd(key+":doc:utms:bak",utms,str(doc["docId"])) 
             rdoc.hset("doc:"+str(doc["docId"]),"eventid",doc["eventId"])
             utms = utms +1
+            
+            eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
+            if eventid !="-1" and not r.exists("bmk:doc:"+eventid) :
+                beaconname = doc.get("title",str(doc["docId"]))
+                addBeacon("doc",eventid,eventid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
             
 ################ 统计信息   ############################
         docid= str(doc["docId"])

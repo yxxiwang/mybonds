@@ -5,6 +5,7 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('newsvc.views',
     url(r'^$', 'index', name="index"),
     url(r'^hotboard/$', 'hotboard', name="hotboard"),   
+    url(r'^channeleventpick/$', 'channeleventpick', name="channeleventpick"),
     url(r'^relatedchannel/$', 'relatedchannel', name="relatedchannel"),  
     url(r'^popularychannel/$', 'popularychannel', name="popularychannel"),   
     url(r'^channelnews/$', 'channelnews', name="channelnews"),

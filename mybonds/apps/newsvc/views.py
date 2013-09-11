@@ -17,7 +17,7 @@ import redis
 from mybonds.apps.newspubfunc import *
 from newspubfunc import *
 from mybonds.apps.newsvc import *
-
+from mybonds.apps.beacon import Beacon
 
 def index(request):     
     return HttpResponse("hello index")
@@ -50,6 +50,43 @@ def channelnews(request):
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
+def channeleventpick(request): 
+    beaconid = request.GET.get("beaconid", "1968416984598300074")  
+    beaconusr = request.GET.get("beaconusr", "doc") 
+    beaconname = request.GET.get("beaconname", "") 
+    api = request.GET.get("api", "")
+    days = request.GET.get("days", "1")
+    ascii = request.GET.get("ascii", "1")
+    obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
+    quantity = log_typer(request, "channelpick", obj)
+    udata = {}
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    start = request.GET.get("start", "0")
+    num = request.GET.get("num", "50") 
+    orderby = request.GET.get("orderby", "utms")
+    username = getUserName(request)
+    
+    try:
+        bea = Beacon(beaconusr,beaconid)
+        udata = bea.getEventPicklist()
+        r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
+    except:
+        traceback.print_exc()
+        udata["success"] = "false"
+        udata["message"] = "no data" 
+    else:
+        udata["success"] = "true"
+        udata["message"] = "success retrive data"
+#     print udata
+#     udata = dataProcForApi(udata)
+    udata["api"]=api 
+#     udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days,usecache) 
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
+    
+@login_required
 def channelpick(request): 
     """获取频道精选新闻"""
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
@@ -76,7 +113,11 @@ def channelpick(request):
     username = getUserName(request)
 #     print beaconusr, beaconid
     try:
-        udata = buildBeaconData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby) 
+        if beaconusr == "rd":
+            udata = procChannel("channelpick",beaconusr,beaconid,beaconname,days,usecache)
+            udata = dataProcForApi(udata)
+        else:
+            udata = buildBeaconData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby) 
         r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
     except:
         traceback.print_exc()
@@ -382,8 +423,10 @@ def newsdetail(request):
     if doc.has_key("relatedSites"):
         for site in doc["relatedSites"]:
             bobj={}
+            bobj["beaconusr"]="extend"
             bobj["beaconname"]=site[0]
             bobj["beaconid"]=str(docid)+getHashid(site[0])
+            bobj["host"]=site[1]
             bobj["total"]=site[2]
             beacon_lst.append(bobj)
         doc["beacons"] = beacon_lst

@@ -27,6 +27,7 @@ ttrack = mdoc['ttrack']
 tpopulary = mdoc['tpopulary']
 tchannel = mdoc['tchannel']
 tchannelpick = mdoc['tchannelpick']
+textend = mdoc['textend']
 
 sysparms_hkey = {
     "REDIS_EXPIRETIME":"redis_expire",
@@ -373,7 +374,7 @@ def saveFulltextById(ids,url=""):
         udata = procids(ids)
     return udata 
     
-def buildBeaconData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms"):
+def buildBeaconData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby="tms"):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.exists(key):
         refreshBeacon(beaconusr, beaconid)
@@ -447,6 +448,61 @@ def buildBeaconData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby=
     udata["channels"] = channels
     udata["channelfromtags"] = channelfromtags
     udata["total"] = str(len(udata["docs"])) 
+    return udata
+
+def saveDocsByUrl(urlstr,headlineonly="0"):
+    logger.info( "===saveDocsByUrl==="+urlstr)
+    udata = bench(loadFromUrl,parms=urlstr)
+    pipedoc = rdoc.pipeline()
+    def saveText(docs):
+        ids_lst=[]
+        tms=time.time()
+        ids=""
+        docs.reverse()
+        for doc in docs:
+            if doc is None: 
+                continue 
+#             if doc["validTime"]=="false" or not doc["validTime"]:
+#                 continue
+    #             docid = getHashid(doc["url"]) 
+            docid = str(doc["docId"])
+            
+            if not rdoc.hexists("doc:"+docid,"url"):
+                if tms - long(doc["create_time"])/1000 > 86400*60:#如果是一个月以前的新闻
+                    logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid,tms - long(doc["create_time"])/1000) )
+                else:
+                    ids+=docid+";"
+                    logger.debug("save fulltext doc:%s, tms is %d" % (docid,tms) )
+            else:
+                logger.debug("save doc:%s, tms is %d" % (docid,tms) )
+
+            title = doc["title"]
+#             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
+            title = strfilter(title)
+            pipedoc.hset("doc:"+docid,"docid",docid)
+            pipedoc.hset("doc:"+docid,"title",title)
+    #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
+            pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
+            pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
+            pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
+            if doc.has_key("eventId") and doc["eventId"] != -1: 
+                pipedoc.hset("doc:"+docid,"eventid",doc["eventId"] )
+            pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
+            pipedoc.hset("doc:"+docid,"utms",tms )
+            tms = tms +1 
+            pipedoc.hset("doc:"+docid,"domain",doc["domain"] ) 
+            pipedoc.hset("doc:"+docid,"isheadline",headlineonly) 
+                
+            pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME")*3)
+#         print "to be save fulltext_ids is ",ids 
+        if len(ids) > 0: saveFulltextById(ids)
+        pipedoc.execute()
+    ################## saveText is over ##############################
+
+    if udata.has_key("docs"):
+        logger.info("save docs and len is :" + str(len(udata["docs"])))
+        saveText(udata["docs"])
+             
     return udata
 
 def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms"):
@@ -583,7 +639,10 @@ def procChannel(datatype, beaconusr, beaconid, beaconname, days="1", usecache="1
     elif datatype == "channelnews":
         parm = "channelid"
         tmongo = tchannel
-        
+    elif datatype == "channelpick":
+        parm = "channelpick"
+        tmongo = tchannelpick
+    
     if days == "all":
         after = 0 
     else:
@@ -622,7 +681,7 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
 #     else:
 #         length = 20 
     length = getsysparm("CHANNEL_NEWS_NUM")
-    key = "bmk:" + beaconusr + ":" + beaconid
+    key = "bmk:%s:%s" % (beaconusr,beaconid)
     channel = r.hget(key, "ttl")
     channel = "" if channel is None else channel
     channel = channel.decode("utf8")
@@ -634,8 +693,10 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
   
     if beaconusr == "rd":
         channelparm = "channeleventpick"
+    elif beaconusr == "stockmarket":
+        channelparm = "channelid"
     else:
-        channelparm = "channelpick" 
+        channelparm = "channelpick"
         
     today = dt.date.fromtimestamp(time.time())
 #     after = time.mktime(today.timetuple())

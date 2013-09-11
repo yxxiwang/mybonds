@@ -4,6 +4,7 @@ import json, urllib2, urllib
 import csv, string, random
 import sys, time, logging
 import redis
+import re
 from pymongo import MongoClient
 from pymongo import Connection
 import numpy

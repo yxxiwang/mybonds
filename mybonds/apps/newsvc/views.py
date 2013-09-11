@@ -57,6 +57,7 @@ def channeleventpick(request):
     api = request.GET.get("api", "")
     days = request.GET.get("days", "1")
     ascii = request.GET.get("ascii", "1")
+    usecache = request.GET.get("usecache", "1")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
     quantity = log_typer(request, "channelpick", obj)
     udata = {}
@@ -71,6 +72,7 @@ def channeleventpick(request):
     
     try:
         bea = Beacon(beaconusr,beaconid)
+        bea.setUsecache(usecache)
         udata = bea.getEventPicklist()
         r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
     except:

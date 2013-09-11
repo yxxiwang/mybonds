@@ -16,6 +16,7 @@ class Beacon:
     beaconusr = ""
     beaconname = ""
     key = ""
+    usecache = "1"
     bobj = {}
     def __init__(self, beaconusr, beaconid):
         self.beaconid = beaconid
@@ -32,7 +33,7 @@ class Beacon:
         beaconusr = self.beaconusr
         beaconid = self.beaconid
         
-        channel = self.getchannel() 
+        channel = self.getchannelforurl() 
         mindoc = self.getmindoc() 
         
         if channelparm == "extendid":
@@ -66,6 +67,12 @@ class Beacon:
         channel = channel.decode("utf8")
         return channel
     
+    def getchannelforurl(self):
+        channel = r.hget(self.key, "ttl")
+        channel = "" if channel is None else channel
+        channel = urllib2.quote(channel)
+        return channel
+    
     def getmindoc(self):
         mindoc = r.hget(self.key, "mindoc")
         mindoc = 0 if mindoc is None else mindoc
@@ -79,6 +86,9 @@ class Beacon:
     def getobject(self):
         return r.hgetall(self.key)
     
+    def setUsecache(self,usecache):
+        self.usecache = usecache
+        
     def refresh(self):
         key = self.key
         beaconusr = self.beaconusr
@@ -163,8 +173,8 @@ class Beacon:
         
     def getPopularylist(self):    
         udata = tpopulary.find_one({"_id":self.beaconid})
-        if udata is None:
-            udata = savePopularyData()
+        if udata is None or self.usecache=="0" :
+            udata = self.savePopularyData()
         return udata
     
     def savePopularyData(self):
@@ -174,7 +184,7 @@ class Beacon:
     def getChannelpicklist(self):
         if self.beaconusr == "rd":
             udata = tchannelpick.find_one({"_id":self.beaconid})
-            if udata is None:
+            if udata is None  or self.usecache=="0" :
                 udata = self.saveChannelpickData()
         else:
             udata = buildBeaconData(self.beaconusr, self.beaconid, start=0, end=100, isapi=True,orderby="utms") 

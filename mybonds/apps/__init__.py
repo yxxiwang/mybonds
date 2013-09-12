@@ -218,8 +218,7 @@ def loadFromUrl(url):
         return {}
     else:
         if response is not None :
-            rstr =  response.readlines()[0]
-            rstr = rstr.decode("utf8")
+            rstr =  response.readlines()[0].decode("utf8")
 #             print rstr
             udata = json.loads(rstr)
         else:

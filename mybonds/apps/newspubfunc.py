@@ -278,10 +278,12 @@ def subDocText(s):
     else:  # 否则开始进行截取
         slst = us.split(dot)
         if len(slst[-1]) < 55:  # 如果最后一段在"。"之后文本长度小于35,则截断之
-            return dot.join(slst[0:-1] + [""]).encode("utf8")
+            rs= dot.join(slst[0:-1] + [""]).encode("utf8")
+            return rs if rs!="" else s
         else:  # 如果 最后一段文字数大于35个，则从尾部开始，截断到最近一个标点符合，包括，
             clst = slst[-1].split(comma)
-            return (dot.join(slst[0:-1] + [""]) + comma.join(clst[0:-1] + [""])).encode("utf8")
+            rs= (dot.join(slst[0:-1] + [""]) + comma.join(clst[0:-1] + [""])).encode("utf8")
+            return rs if rs!="" else s
     return s
 
 def getchannelByid(beaconusr, beaconid): 
@@ -685,7 +687,8 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     key = "bmk:%s:%s" % (beaconusr,beaconid)
     channel = r.hget(key, "ttl")
     channel = "" if channel is None else channel
-    channel = channel.decode("utf8")
+#     channel = channel.decode("utf8")
+    channel = urllib2.quote(channel)
     mindoc = r.hget(key, "mindoc") 
     mindoc = 0 if mindoc is None else mindoc 
     

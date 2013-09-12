@@ -228,11 +228,19 @@ def trackdoc(request):
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
+def docextend(request):
+    pass
+
+@login_required
 def relatedoc(request):
     docid = request.GET.get("docid", "")
     usecache = request.GET.get("usecache", "0")
     days = request.GET.get("days", "all")
     ascii = request.GET.get("ascii", "1")
+    host= request.GET.get("host", "")
+    beaconusr= request.GET.get("beaconusr", "")
+    beaconid= request.GET.get("beaconid", "")
+    
     api = request.GET.get("api", "")
     quantity = log_typer(request, "relatedoc", docid)
     udata = {}
@@ -275,7 +283,10 @@ def relatedoc(request):
             udata = getdoc(docid,relatedurl)
     else:
         udata = getdoc(docid,relatedurl)
-             
+    
+#     beacon = Beacon(beaconusr,beaconid)
+#     beacon.add(docid, beaconname="", desc=host, beacontime="", mindoc="", tag="", headlineonly="0")
+#     udata = beacon.getExtendData()
     udata = dataProcForApi(udata)
     udata["api"]=api
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
@@ -283,7 +294,7 @@ def relatedoc(request):
 @login_required
 def relatedchannel(request):
     """获取 热点频道的相关频道"""
-    beaconid = request.GET.get("beaconid", "1968416984598300074")  
+    beaconid = request.GET.get("beaconid", "1152493")
     beaconusr = request.GET.get("beaconusr", "doc") 
     beaconname = request.GET.get("beaconname", "") 
     usecache = request.GET.get("usecache", "1")

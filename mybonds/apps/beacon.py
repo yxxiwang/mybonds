@@ -160,13 +160,13 @@ class Beacon:
         self.refresh()
         
     def getExtendlist(self):    
-        udata = textend.find_one({"_id":beaconid})
-        if udata is None:
-            udata = saveExtendData()
+        udata = textend.find_one({"_id":self.beaconid})
+        if udata is None or self.usecache=="0" :
+            udata = self.saveExtendData()
         return udata
     
     def saveExtendData(self): 
-        udata = self.getdoc(beaconid, self.getExtendUrl(), textend)
+        udata = self.getdoc(self.beaconid, self.getExtendUrl(), textend)
         if not r.exists(self.key):
             self.add(beaconttl, beaconname, desc, beacontime, mindoc, tag, headlineonly)
         return udata

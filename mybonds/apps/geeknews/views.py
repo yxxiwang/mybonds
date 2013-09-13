@@ -129,6 +129,7 @@ def research(request,template_name="beacon/fulltextnew.html"):
     if fulldoc is not None:
 #         print fulldoc
         ftxlist = fulldoc["fulltext"] 
+        relatedsites = fulldoc["relatedSites"] 
         url = fulldoc["urls"][0].split(",")[1]
     else:
         doc = rdoc.hgetall("doc:"+docid)
@@ -136,6 +137,8 @@ def research(request,template_name="beacon/fulltextnew.html"):
         url = doc["url"] if doc.has_key("url") else ""
     return render_to_response(template_name, {
         'ftxlist': ftxlist, 
+        'relatedsites': relatedsites, 
+        'docid': docid, 
         'url': url,
         'tempparmsobj':r.hgetall("tempparms"),
     }, context_instance=RequestContext(request))    

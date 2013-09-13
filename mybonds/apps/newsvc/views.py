@@ -229,7 +229,37 @@ def trackdoc(request):
 
 @login_required
 def docextend(request):
-    pass
+    host= request.GET.get("host", "")
+    docid= request.GET.get("docid", "")
+    usecache = request.GET.get("usecache", "1")
+    api = request.GET.get("api", "")
+    ascii = request.GET.get("ascii", "1")
+    
+    quantity = log_typer(request, "docextend", docid)
+    udata = {}
+    if quantity > getsysparm("QUANTITY"):
+        udata["success"] = "false"
+        udata["message"] = "you request too many times. pls wait a moments" 
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    if docid is None:
+        udata["success"] = "false"
+        udata["message"] = "it's not exists!" 
+        udata["api"]=api
+        return HttpResponse(json.dumps(udata), mimetype="application/json")
+    
+    beaconname = rdoc.hget("doc:"+docid,"title")
+    beaconname = beaconname if beaconname is not None else ""
+    if r.hget("navi:ori",host) is not None: beaconname = "%s-->%s" %(beaconname ,r.hget("navi:ori",host))
+    
+    beaconusr= "extend"
+    beaconid= docid+getHashid(host)
+    beacon = Beacon(beaconusr,beaconid)
+    beacon.setUsecache(usecache)
+    beacon.add(docid, beaconname=beaconname, desc=host, beacontime="", mindoc="", tag="", headlineonly="0")
+    udata = beacon.getExtendlist()
+    udata = dataProcForApi(udata)
+    udata["api"]=api
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
 def relatedoc(request):
@@ -237,9 +267,6 @@ def relatedoc(request):
     usecache = request.GET.get("usecache", "0")
     days = request.GET.get("days", "all")
     ascii = request.GET.get("ascii", "1")
-    host= request.GET.get("host", "")
-    beaconusr= request.GET.get("beaconusr", "")
-    beaconid= request.GET.get("beaconid", "")
     
     api = request.GET.get("api", "")
     quantity = log_typer(request, "relatedoc", docid)
@@ -284,9 +311,6 @@ def relatedoc(request):
     else:
         udata = getdoc(docid,relatedurl)
     
-#     beacon = Beacon(beaconusr,beaconid)
-#     beacon.add(docid, beaconname="", desc=host, beacontime="", mindoc="", tag="", headlineonly="0")
-#     udata = beacon.getExtendData()
     udata = dataProcForApi(udata)
     udata["api"]=api
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
@@ -433,16 +457,22 @@ def newsdetail(request):
     doc["create_time"] = timeElaspe(doc["create_time"])
     doc["url"] = doc["urls"][0].split(",")[1]
     beacon_lst = []
-    if doc.has_key("relatedSites"):
-        for site in doc["relatedSites"]:
-            bobj={}
-            bobj["beaconusr"]="extend"
-            bobj["beaconname"]=site[0]
-            bobj["beaconid"]=str(docid)+getHashid(site[0])
-            bobj["host"]=site[1]
-            bobj["total"]=site[2]
-            beacon_lst.append(bobj)
-        doc["beacons"] = beacon_lst
+    if doc.has_key("relatedSites"): doc["relatedsites"] = doc.pop("relatedSites")
+    for site in doc["relatedsites"]:
+        host=site[1]
+        domain=site[0]
+        r.hset("navi:ori",host,domain)
+            
+    
+#         for site in doc["relatedSites"]:
+#             bobj={}
+#             bobj["beaconusr"]="extend"
+#             bobj["beaconname"]=site[0]
+#             bobj["beaconid"]=str(docid)+getHashid(site[0])
+#             bobj["host"]=site[1]
+#             bobj["total"]=site[2]
+#             beacon_lst.append(bobj)
+#         doc["beacons"] = beacon_lst
         
     if doc.has_key("relatedSites"): doc.pop("relatedSites")
     if doc.has_key("relatedDocs"): doc.pop("relatedDocs")

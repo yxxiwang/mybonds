@@ -94,8 +94,15 @@
     {% for ftx in ftxlist %}
     <p class="lead" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ftx}}  
     {% endfor %}
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{{ url }}" title="灯塔阅读"><h4 style="color:white;margin-bottem: 23px;font-size: 15px;">查看原文</h4> </a> </p>
   </div> <!-- fulltext -->
+    <div class="row-fluid">
+    {% for site in relatedsites %}
+    <a href="/newsvc/docextend/?docid={{docid}}&host={{site.1}}&ascii=0&usecache=1" title="灯塔阅读"> {{site.0}} ({{site.2}})</a> &nbsp;&nbsp;
+    {% endfor %}
+    </div> <!-- /row-fluid -->
+    <div class="row-fluid">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{{ url }}" title="灯塔阅读"><h4 style="color:white;margin-bottem: 23px;font-size: 15px;">查看原文</h4> </a> </p>
+    </div> <!-- /row-fluid -->
   </div> <!-- /row-fluid -->
 
 </div> <!-- /container --> 

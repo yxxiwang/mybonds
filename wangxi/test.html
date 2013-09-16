@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+    <title>test</title> 
+    <style>
+        body {
+          /*行间距*/
+            line-height:8.5px;
+          /*背景色 ,可以是简单的red,black之类的颜色描述,也可以是 #f5f5f5 这样的颜色代码*/
+            background-color: #f5f5f5;
+          /*字体大小*/
+            font-size: 100%;
+
+            -webkit-text-size-adjust: 100%;
+        } 
+
+        p {
+          /* 边距定义: 依次定义:上 右 下 左 的边距*/
+            padding: 0px 9px 0px 9px;
+            /*字体颜色定义 可以是简单的red,black之类的颜色描述,也可以是 #f5f5f5 这样的颜色代码*/
+            color: red;
+            /*中西文字体定义(第一个为微软雅黑)
+            font-family:"Arial Hebrew","Microsoft Yahei","Luxi Sans","Helvetica Neue", "DejaVu Sans",Tahoma,"Hiragino Sans GB",STHeiti !important;*/
+            font:1.8 Arial,\5FAE\8F6F\96C5\9ED1,\82F9\679C\4E3D\4E2D\9ED1;
+        }
+    </style>
+  </head>
+  <body>
+    <p>this is a test html.
+    <p>基于HTML5 websocket的实时信息聊天室
+    <div id="mytext" style="margin-left:0px;"> 
+    </div> 
+    <!--input id='chat' type="text"-->
+    <textarea id="chat" rows="3"  placeholder="pls input sth.." style=" width: 500px; "></textarea>
+    <button onclick='send()'>Send</button>
+    <table id='message'></table>
+  </body>
+
+<script src="http://cdn.socket.io/stable/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+</html>
+
+<script> 
+  var ws = new WebSocket("ws://localhost:8888/websocket");
+  ws.onopen = function() {
+  	 //ws.close();
+     //ws.send("Hello, world");
+  };
+  //ws.onmessage = function (evt) {
+     //alert(evt.data);
+  //   var odata = $('#mytext').text()
+  //   $('#mytext').text(odata+evt.data);
+  //};
+  
+  $("#chat").keydown(function(event){ 
+    if(event.keyCode==13 )
+     send();
+  })
+  
+  function send() {
+    ws.send(document.getElementById('chat').value);
+    document.getElementById('chat').value = '';
+  }
+	ws.onmessage = function(evt) {
+		var table = document.getElementById('message');
+		var data = eval('(' + evt.data + ')');
+    ({
+        'sys': function() {
+            var cell = table.insertRow().insertCell();
+            cell.colSpan = 2;
+            //cell.style = "color:red";
+            cell.style.color = "red";
+            cell.innerHTML = data['message'];
+        },
+        'his': function() {
+            var cell = table.insertRow().insertCell();
+            cell.colSpan = 2;
+            cell.style.color = "blue";
+            cell.innerHTML = data['message'];
+        },
+        'user': function() {
+            var row = table.insertRow();
+            row.insertCell().innerHTML = data['message'];
+            row.insertCell().innerHTML = data['id'];
+            row.insertCell().innerHTML = data['type'];
+        },
+    }[data['type']])();
+		//table.insertRow().insertCell().innerHTML = evt.data;
+	};
+
+</script> 

@@ -558,6 +558,7 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
             
         if doc["eventid"] != "-1":
             doc["beaconusr"] = "doc"
+            doc["beaconname"] = doc["title"]
             doc["beaconid"]  = doc.pop("eventid")
             doc["isbeacon"] = "true"
         else:

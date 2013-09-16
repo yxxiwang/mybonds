@@ -17,6 +17,7 @@ class Beacon:
     beaconname = ""
     key = ""
     usecache = "1"
+    days = 1
     bobj = {}
     def __init__(self, beaconusr, beaconid):
         self.beaconid = beaconid
@@ -49,17 +50,17 @@ class Beacon:
             urlstr = "http://%s/research/svc?%s&after=%d&before=%d&mindoc=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, after, before, mindoc)
         return urlstr
     
-    def getChannelpickUrl(self,daybefore=1):
-        return self.beaconUrl("channelpick",daybefore)
+    def getChannelpickUrl(self):
+        return self.beaconUrl("channelpick",self.days)
     
-    def getEleventpickUrl(self,daybefore=1):
-        return self.beaconUrl("channeleventpick",daybefore)
+    def getEleventpickUrl(self):
+        return self.beaconUrl("channeleventpick",self.days)
     
-    def getPopularyUrl(self,daybefore=1):
-        return self.beaconUrl("popularid",daybefore)
+    def getPopularyUrl(self):
+        return self.beaconUrl("popularid",self.days)
     
-    def getExtendUrl(self,daybefore=1):
-        return self.beaconUrl("extendid",daybefore)
+    def getExtendUrl(self):
+        return self.beaconUrl("extendid",self.days)
 
     def getchannel(self):
         channel = r.hget(self.key, "ttl")
@@ -88,6 +89,9 @@ class Beacon:
     
     def setUsecache(self,usecache):
         self.usecache = usecache
+        
+    def setDays(self,days):
+        self.days = days
         
     def refresh(self):
         key = self.key

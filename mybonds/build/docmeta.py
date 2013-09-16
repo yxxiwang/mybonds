@@ -25,6 +25,7 @@ else:#os.name=="posix"
 
 from mybonds.apps.geeknews import *  
 from mybonds.apps.newspubfunc import *  
+from mybonds.apps.beacon import Beacon
 import argparse
  
 def channels(num):
@@ -121,9 +122,10 @@ def retriveData(qtype):
         elif qtype =="docextend":
             beaconusr = qinfo["beaconusr"]
             beaconid = qinfo["beaconid"]
-            days = qinfo["days"]
-            beaconname = ""
-            udata = procChannel("docextend",beaconusr,beaconid,beaconname,days=days,usecache="0") 
+            days = qinfo["days"] if qinfo.has_key("days") else "1"
+            beacon = Beacon(beaconusr,beaconid)
+            beacon.setDays(int(days))
+            udata = beacon.saveExtendData() 
             rt = WARNNING if udata=={} or udata is None else SUCCESS 
         elif qtype =="sendemail":
             emailtype = qinfo["emailtype"]

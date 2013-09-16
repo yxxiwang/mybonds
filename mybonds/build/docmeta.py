@@ -53,7 +53,7 @@ def channels(num):
             logger.warnning("bmk:%s:%s is not exist!" %(beaconusr,beaconid) )
             continue
         
-        if beaconusr!="rd":
+        if beaconusr not in ["rd","extend"]:
             rt = refreshDocs(beaconusr, beaconid,days="7",force=force)
             if not rt == SUCCESS:
                 pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
@@ -61,6 +61,9 @@ def channels(num):
         rt = refreshDocs(beaconusr, beaconid,days="1",force=force)
         if not rt == SUCCESS:
             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+
+        if beaconusr =="extend":
+            pushQueue("docextend",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
             
         if beaconusr =="rd":         
             udata = procChannel("popularychannel",beaconusr,beaconid,"",days=str(num),usecache="0") 

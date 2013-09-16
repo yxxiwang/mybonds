@@ -400,7 +400,8 @@ def buildBeaconData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby="
             doc["tx"] = doc["text"].decode("utf8")
         doc["text"] = subDocText(doc["text"]).decode("utf8")
         doc["title"] = doc["title"].decode("utf8") + u"\u3000"
-        doc["domain"] = doc["domain"].decode("utf8") + u"\u3000"
+#         doc["domain"] = doc["domain"].decode("utf8") + u"\u3000"
+        doc["domain"] = doc["domain"].decode("utf8")
         doc["copyNum"] = str(doc["copyNum"])
         if doc.has_key("popularity"):
             doc["popularity"] = str(doc["popularity"])

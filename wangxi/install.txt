@@ -153,8 +153,14 @@ http://openresty.org/cn/index.html
 
  --with-luajit --with-http_iconv_module
  
+############## install parallel#####################
+wget http://ftpmirror.gnu.org/parallel/parallel-20130222.tar.bz2
+bzip2 -dc parallel-20130222.tar.bz2 | tar xvf -
+cd parallel-20130222
+./configure --prefix=$HOME && make && make install
+########### end ##################################
  
- 
+
 yum install mysql
 yum install mysql-server
 yum install mysql-devel

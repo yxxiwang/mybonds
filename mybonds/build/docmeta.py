@@ -111,27 +111,20 @@ def retriveData(qtype):
             beaconid = qinfo["beaconid"]
             days = qinfo["days"]
             rt = refreshDocs(beaconusr, beaconid,days) 
-        elif qtype =="popularychannel":
+        elif qtype in ["popularychannel","channelnews","relatedchannel"]:
             beaconusr = qinfo["beaconusr"]
             beaconid = qinfo["beaconid"]
             days = qinfo["days"]
             beaconname = ""
-            udata = procChannel("popularychannel",beaconusr,beaconid,beaconname,days=days,usecache="0") 
+            udata = procChannel(qtype,beaconusr,beaconid,beaconname,days=days,usecache="0") 
             rt = WARNNING if udata=={} or udata is None else SUCCESS
-        elif qtype =="channelnews":
+        elif qtype =="docextend":
             beaconusr = qinfo["beaconusr"]
             beaconid = qinfo["beaconid"]
             days = qinfo["days"]
             beaconname = ""
-            udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days=days,usecache="0") 
-            rt = WARNNING if udata=={} or udata is None else SUCCESS
-        elif qtype =="relatedchannel":
-            beaconusr = qinfo["beaconusr"]
-            beaconid = qinfo["beaconid"]
-            days = qinfo["days"]
-            beaconname = ""
-            udata = procChannel("relatedchannel",beaconusr,beaconid,beaconname,days=days,usecache="0") 
-            rt = WARNNING if udata=={} or udata is None else SUCCESS
+            udata = procChannel("docextend",beaconusr,beaconid,beaconname,days=days,usecache="0") 
+            rt = WARNNING if udata=={} or udata is None else SUCCESS 
         elif qtype =="sendemail":
             emailtype = qinfo["emailtype"]
             if emailtype=="bybeacon":

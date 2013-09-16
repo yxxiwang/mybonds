@@ -558,8 +558,8 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
             
         if doc["eventid"] != "-1":
             doc["beaconusr"] = "doc"
-            doc["beaconid"]  = doc.pop("eventid")
-            doc["beaconname"] = r.hget("bmk:doc:"+doc["beaconid"], "name")
+            doc["beaconid"]  = doc.pop("eventid")            
+            doc["beaconname"] = r.hget("bmk:doc:"+doc["beaconid"], "name").decode("utf8")
             doc["isbeacon"] = "true"
         else:
             doc["isbeacon"] = "false"

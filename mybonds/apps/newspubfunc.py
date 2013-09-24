@@ -484,7 +484,7 @@ def saveDocsByUrl(urlstr,headlineonly="0"):
 #             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
             title = strfilter(title)
             pipedoc.hset("doc:"+docid,"docid",docid)
-            pipedoc.hset("doc:"+docid,"title",title)
+#             pipedoc.hset("doc:"+docid,"title",title)
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )

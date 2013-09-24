@@ -344,8 +344,8 @@ def saveFulltextById(ids,url=""):
     #             pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
                 if not r.hexists("doc:"+docid,"docid"):
                     pipedoc.hset("doc:"+docid,"docid",docid)
-                if not r.hexists("doc:"+docid,"title"):
-                    pipedoc.hset("doc:"+docid,"title",doc["title"].rstrip() ) 
+#                 if not r.hexists("doc:"+docid,"title"):
+                pipedoc.hset("doc:"+docid,"title",doc["title"].rstrip() ) 
                 if not r.hexists("doc:"+docid,"text"):
                     pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
                 if not r.hexists("doc:"+docid,"copyNum"):

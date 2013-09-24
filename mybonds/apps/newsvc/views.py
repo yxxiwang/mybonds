@@ -35,6 +35,7 @@ def channelnews(request):
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
     quantity = log_typer(request, "channelnews", obj)
     udata = {}
+    udata["api"]=api 
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -61,6 +62,7 @@ def channeleventpick(request):
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
     quantity = log_typer(request, "channelpick", obj)
     udata = {}
+    udata["api"]=api 
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -101,6 +103,7 @@ def channelpick(request):
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
     quantity = log_typer(request, "channelpick", obj)
     udata = {}
+    udata["api"]=api 
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -147,6 +150,7 @@ def popularychannel(request):
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name")  if beaconname =="" else beaconname
     quantity = log_typer(request, "popularchannel", obj)
     udata = {}
+    udata["api"]=api
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -154,7 +158,6 @@ def popularychannel(request):
     
     udata = procChannel("popularychannel",beaconusr,beaconid,beaconname,days,usecache)
     udata = dataProcForApi(udata)
-    udata["api"]=api
     
     def proc(doc):
         doc["beaconid"]=doc["docid"]
@@ -178,7 +181,8 @@ def popularychannel(request):
         
     if udata.has_key("docs"):
         udata["docs"] =  [ proc(doc) for doc in udata["docs"] ]
-    
+        
+    udata["api"]=api
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
 
 @login_required
@@ -190,6 +194,7 @@ def trackdoc(request):
     api = request.GET.get("api", "")
     quantity = log_typer(request, "trackdoc", docid)
     udata = {}
+    udata["api"]=api
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -237,6 +242,7 @@ def docextend(request):
     
     quantity = log_typer(request, "docextend", docid)
     udata = {}
+    udata["api"]=api
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -271,14 +277,14 @@ def relatedoc(request):
     api = request.GET.get("api", "")
     quantity = log_typer(request, "relatedoc", docid)
     udata = {}
+    udata["api"]=api
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     if docid is None:
         udata["success"] = "false"
-        udata["message"] = "it's not exists!" 
-        udata["api"]=api
+        udata["message"] = "it's not exists!"
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
     def getdoc(docid,url):
@@ -328,6 +334,7 @@ def relatedchannel(request):
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name") if beaconname =="" else beaconname
     quantity = log_typer(request, "relatedchannel", obj)
     udata = {}
+    udata["api"]=api
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -372,6 +379,7 @@ def hotboard(request):
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name") if beaconname =="" else beaconname
     quantity = log_typer(request, "hotboard", obj)
     udata = {}
+    udata["api"]=api
     if quantity > getsysparm("QUANTITY"):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
@@ -379,7 +387,6 @@ def hotboard(request):
     if obj is None:
         udata["success"] = "false"
         udata["message"] = "it's not exists!" 
-        udata["api"]=api
         return HttpResponse(json.dumps(udata), mimetype="application/json")
         
     start = request.GET.get("start", "0")
@@ -413,6 +420,7 @@ def newsdetail(request):
     api = request.GET.get("api", "")
     udata={}
     doc ={}
+    udata["api"]=api
     if docid =="":
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
@@ -561,6 +569,7 @@ def channelsbygroup(request):
     if gobj is None:
         udata["message"]="group is not exsist !" 
         udata["success"] = "false"
+        udata["api"]=api
         return HttpResponse(json.dumps(udata), mimetype="application/json") 
     gobj["groupid"]=groupid
 #         gname = "" if gname is None else gname

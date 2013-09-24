@@ -212,7 +212,7 @@ def loadFromUrl(url):
     udata = {}
     try:
         req2 = urllib2.Request(url)
-        response = urllib2.urlopen(req2)
+        response = urllib2.urlopen(req2,timeout=60)
     except: 
         traceback.print_exc()
         return {}

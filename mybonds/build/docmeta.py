@@ -192,11 +192,16 @@ def loadData(codes,num,force=False):
             
 def initProc(types,codes,num,force=False): 
     """type should be one of load,beacon,fulltext,sendemail,removedoc """
-    for type in types:
-        if type == "load":
-            loadData(codes,num,force)
-        else:
-            procQueue(type,codes,num,force) 
+    try:
+        for type in types:
+            if type == "load":
+                loadData(codes,num,force)
+            else:
+                procQueue(type,codes,num,force) 
+    except:
+        traceback.print_exc() 
+    else:
+        logger.info("initProc is over,time to sleep......")
 
 if __name__ == "__main__":  
     usage = """ eg: %s -c all -a 3600 -n 200 -t load|beacon|fulltext|sendemail|removedoc

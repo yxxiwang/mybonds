@@ -212,9 +212,10 @@ def loadFromUrl(url):
     udata = {}
     try:
         req2 = urllib2.Request(url)
-        response = urllib2.urlopen(req2,timeout=60)
-    except: 
+        response = urllib2.urlopen(req2,timeout=4)
+    except urllib2.URLError, e: 
         traceback.print_exc()
+        response.close()
         return {}
     else:
         if response is not None :
@@ -223,6 +224,7 @@ def loadFromUrl(url):
             udata = json.loads(rstr)
         else:
             print "Error: return content is null!!" 
+        response.close()
     return udata
     
 def loadFromUrlbak(url):

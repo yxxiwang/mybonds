@@ -354,7 +354,7 @@ def relatedchannel(request):
         if doc.has_key("eventid") : doc.pop("eventid")
         if doc.has_key("copyNum") : doc.pop("copyNum")
         if doc.has_key("dateStr") : doc.pop("dateStr") 
-        if doc.has_key("create_time") : doc.pop("create_time")
+#         if doc.has_key("create_time") : doc.pop("create_time")
         if doc.has_key("popularity") : doc.pop("popularity")
         if doc.has_key("validTime") : doc.pop("validTime")
         if doc.has_key("text") : doc.pop("text")
@@ -398,7 +398,7 @@ def hotboard(request):
         beaconusr="rd"
 #     print beaconusr,beaconid
     try:
-        udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby)
+        udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby,username=username)
 #         print udata
     except:
         traceback.print_exc()

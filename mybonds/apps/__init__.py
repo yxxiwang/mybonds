@@ -214,6 +214,12 @@ def loadFromUrl(url):
         req2 = urllib2.Request(url)
         response = urllib2.urlopen(req2,timeout=4)
     except urllib2.URLError, e: 
+        print type(e)
+        traceback.print_exc()
+        response.close()
+        return {}
+    except :
+        print "loadFromUrl error.."
         traceback.print_exc()
         response.close()
         return {}

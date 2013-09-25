@@ -509,7 +509,7 @@ def saveDocsByUrl(urlstr,headlineonly="0"):
              
     return udata
 
-def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms"):
+def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms",username=""):
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info("key is " + key)
     if r.exists(key):
@@ -561,6 +561,12 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
             doc["beaconid"]  = doc.pop("eventid")            
             doc["beaconname"] = r.hget("bmk:doc:"+doc["beaconid"], "name").decode("utf8")
             doc["isbeacon"] = "true"
+            if username != "":
+                beaconstr = "doc|-|"+doc["beaconid"] 
+                if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
+                    doc["beaconisfllw"] = "true"
+                else:
+                    doc["beaconisfllw"] = "false"
         else:
             doc["isbeacon"] = "false"
             doc.pop("eventid") 

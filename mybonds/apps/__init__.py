@@ -210,9 +210,12 @@ def dayDiff(create_time):
 
 def loadFromUrl(url):
     udata = {}
+    rstr=""
     try:
         req2 = urllib2.Request(url)
-        response = urllib2.urlopen(req2,timeout=4)
+        response = urllib2.urlopen(req2,timeout=20)
+        if response is not None :
+            rstr =  response.readlines()[0].decode("utf8")
     except urllib2.URLError, e: 
         print type(e)
         traceback.print_exc()
@@ -223,13 +226,8 @@ def loadFromUrl(url):
         traceback.print_exc()
 #         response.close()
         return {}
-    else:
-        if response is not None :
-            rstr =  response.readlines()[0].decode("utf8")
-#             print rstr
-            udata = json.loads(rstr)
-        else:
-            print "Error: return content is null!!" 
+    else: 
+        udata = json.loads(rstr) 
         response.close()
     return udata
     

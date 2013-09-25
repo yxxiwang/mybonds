@@ -216,12 +216,12 @@ def loadFromUrl(url):
     except urllib2.URLError, e: 
         print type(e)
         traceback.print_exc()
-        response.close()
+#         response.close()
         return {}
     except :
         print "loadFromUrl error.."
         traceback.print_exc()
-        response.close()
+#         response.close()
         return {}
     else:
         if response is not None :

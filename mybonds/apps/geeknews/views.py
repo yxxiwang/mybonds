@@ -363,7 +363,9 @@ def fllowbeacon_service(request):
     heartid = request.GET.get("beaconid", "")  
     heartopt = request.GET.get("fllwopt", "")
     username = request.GET.get("u", getUserName(request))
+    api = request.GET.get("api", "")
     robj = {}
+    robj["api"]=api
     beaobj = {}
     fllwkey = ""
     if r.exists("bmk:" + heartusr + ":" + heartid):
@@ -390,6 +392,7 @@ def fllowbeacon_service(request):
     beaobj["fllw_cnt"] = str(r.scard(fllwkey))
     beaobj["beaconid"] = heartid
     robj["beacon"] = beaobj
+    robj["api"]=api
     return HttpResponse(json.dumps(robj), mimetype="application/json")
 
 @login_required

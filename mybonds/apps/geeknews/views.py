@@ -282,10 +282,12 @@ def listbeacons_service(request):
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5")
     btype = request.GET.get("btype", "notfllw")  # fllw,notfllw,all
+    api = request.GET.get("api", "")
     sharebeacons = []
     sharebeacon_list = []
     mybeacons = []
     robj = {}
+    robj["api"]=api
     beaobj = {}
     
 #     if orderby=="tms":

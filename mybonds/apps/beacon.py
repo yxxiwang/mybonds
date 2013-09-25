@@ -42,7 +42,11 @@ class Beacon:
         else:
             channelparm = "%s=%s" % (channelparm,channel)
         today = dt.date.fromtimestamp(time.time()) 
-        after = int((time.time() - daybefore * 86400) * 1000) 
+        if daybefore == -1:
+            after = 0
+        else:
+            after = int((time.time() - daybefore * 86400) * 1000)
+            
         before = int(time.time() * 1000)
         if int(mindoc) <= 0 :
             urlstr = "http://%s/research/svc?%s&after=%d&before=%d" % (getsysparm("BACKEND_DOMAIN"), channelparm, after, before)

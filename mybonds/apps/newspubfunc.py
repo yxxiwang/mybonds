@@ -710,7 +710,10 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
 #     after = after - daybefore*86400
 #     after = (after+2*3600) * 1000
 #     before = time.time() * 1000
-    after = int((time.time() - daybefore * 86400) * 1000) 
+    if daybefore == -1:
+        after = 0
+    else:
+        after = int((time.time() - daybefore * 86400) * 1000) 
     before = int(time.time() * 1000)
     if int(mindoc) <= 0 :
         urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel, after, before)

@@ -54,9 +54,9 @@ def channels(num):
             continue
         
         if beaconusr not in ["rd","extend"]:
-            rt = refreshDocs(beaconusr, beaconid,days="7",force=force)
+            rt = refreshDocs(beaconusr, beaconid,days="-1",force=force)
             if not rt == SUCCESS:
-                pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+                pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"-1"})
             
         rt = refreshDocs(beaconusr, beaconid,days="1",force=force)
         if not rt == SUCCESS:

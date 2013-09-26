@@ -465,18 +465,18 @@ def newsdetail(request):
     doc["create_time"] = timeElaspe(doc["create_time"])
     doc["url"] = doc["urls"][0].split(",")[1]
     beacon_lst = []
-#     if doc.has_key("relatedSites"): doc["relatedsites"] = doc.pop("relatedSites")
-    for site in doc["relatedSites"]:
-        host=site[1]
-        domain=site[0]
-        total=site[2]
-        r.hset("navi:ori",host,domain)
-        sobj={}
-        sobj["domain"]=domain
-        sobj["site"]=host
-        sobj["total"]=total
-        beacon_lst.append(sobj)
-    doc["relatedsites"] = beacon_lst
+    if doc.has_key("relatedSites"):  
+        for site in doc["relatedSites"]:
+            host=site[1]
+            domain=site[0]
+            total=site[2]
+            r.hset("navi:ori",host,domain)
+            sobj={}
+            sobj["domain"]=domain
+            sobj["site"]=host
+            sobj["total"]=total
+            beacon_lst.append(sobj)
+        doc["relatedsites"] = beacon_lst
             
     
 #         for site in doc["relatedSites"]:

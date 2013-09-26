@@ -357,7 +357,7 @@ def saveFulltextById(ids,url=""):
                 pipedoc.hset("doc:"+docid,"host","")
                 pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
                 domain=doc["domain"]
-                host = hget("navi",domain)
+                host = r.hget("navi",domain)
                 host = "" if host is None else host
                 addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
             pipedoc.execute()

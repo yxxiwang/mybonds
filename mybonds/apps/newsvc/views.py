@@ -473,6 +473,10 @@ def newsdetail(request):
     doc["tms"]=str(doc["create_time"])
     doc["create_time"] = timeElaspe(doc["create_time"])
     doc["url"] = doc["urls"][0].split(",")[1]
+    if doc.has_key("domain") :
+        doc["beaconid"] =getHashid(doc["domain"])
+        doc["beaconusr"]="news"
+        doc["beaconname"]=doc["domain"]
     beacon_lst = []
     if doc.has_key("relatedSites"):  
         for site in doc["relatedSites"]:

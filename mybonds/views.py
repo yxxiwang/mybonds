@@ -47,7 +47,9 @@ def apply_service(request):
     password = request.GET.get("pwd", "");
     email = request.GET.get("email", "");
     captcha = request.GET.get("captcha", "");
+    api = request.GET.get("api", "")
     robj = {}
+    robj["api"]=api
     if username == "" or password == "" or email == "" or captcha == "":
         robj["success"] = 'false'
         robj["message"] = "username or password or email or captcha is null"
@@ -113,6 +115,7 @@ def apply_service(request):
         robj["success"] = 'false'
         robj["message"] = "disabled account!" 
         robj["data"] = []
+    robj["api"]=api
     return HttpResponse(json.dumps(robj), mimetype="application/json")
 
 @csrf_protect
@@ -600,7 +603,9 @@ def user_modify(request,template_name="beacon/usermodify.html"):
     displayname = request.GET.get("displayname", "");
     email = request.GET.get("email", "");
     rssuser = request.GET.get("rssuser", "");
+    api = request.GET.get("api", "")
     robj={}
+    robj["api"]=api
     if  request.method == 'GET':
         if optype =="service":
             if newpwd !="": 
@@ -629,6 +634,7 @@ def user_modify(request,template_name="beacon/usermodify.html"):
             robj["rssuser"]= "1" if r.sismember("rssuser",username) else "0"
             robj["success"] = 'true'
             robj["message"] = "user modify is success"
+            robj["api"]=api
             return HttpResponse(json.dumps(robj), mimetype="application/json")
         else:
             email = r.hget("usr:"+username,"email")
@@ -699,7 +705,9 @@ def login_apply(request):
     username = request.GET.get("usr", "");
     username = username.lower()
     password = request.GET.get("pwd", "");
+    api = request.GET.get("api", "")
     robj = {}
+    robj["api"]=api
     if username == "" or password == "":
         robj["success"] = 'false'
         robj["message"] = "username or password is null"
@@ -737,13 +745,16 @@ def login_apply(request):
             robj["success"] = 'false'
             robj["message"] = "login failed" 
             robj["data"] = []
+    robj["api"]=api
     return HttpResponse(json.dumps(robj), mimetype="application/json")
     
 def login_service(request):
     username = request.GET.get("usr", "");
     username = username.lower()
     password = request.GET.get("pwd", "");
+    api = request.GET.get("api", "")
     robj = {}
+    robj["api"]=api
     if username == "" or password == "":
         robj["success"] = 'false'
         robj["message"] = "username or password is null"
@@ -759,6 +770,7 @@ def login_service(request):
         robj["success"] = 'false'
         robj["message"] = "login failed" 
         robj["data"] = []
+    robj["api"]=api
     return HttpResponse(json.dumps(robj), mimetype="application/json")
                                   
 @csrf_protect

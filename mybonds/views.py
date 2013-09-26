@@ -248,7 +248,9 @@ def buddyhold(request):
     groupname = request.GET.get("group", "all")
     username = getUserName(request)
 #    username = request.GET.get("u", getUserName(request))
-    robj={}
+    api = request.GET.get("api", "")
+    robj = {}
+    robj["api"]=api
     if optype =="service":
         if acttype == "list":
             emails = r.zrevrange("usr:"+username+":buddy:"+groupname,0 ,-1)

@@ -485,6 +485,7 @@ def newsdetail(request):
             sobj["site"]=host
             sobj["total"]=total
             beacon_lst.append(sobj)
+            addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
         doc["relatedsites"] = beacon_lst
             
     

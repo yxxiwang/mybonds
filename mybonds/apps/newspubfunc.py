@@ -328,16 +328,16 @@ def saveFulltextById(ids,url=""):
             for doc in udata["docs"]:
                 if doc is None :
                     continue
-                if doc.has_key("fulltext"):
-                    txt = doc["fulltext"]
-                else:
-                    continue  
                 
                 doc["_id"]=str(doc["docId"])
                 doc["title"] = strfilter(doc["title"])
-#                 doc.pop("relatedDocs")
-                logger.info("save fulltext in mongodb:"+doc["_id"])
-                tftxs.save(doc) 
+                if doc.has_key("fulltext"):
+                    txt = doc["fulltext"]
+    #                 doc.pop("relatedDocs")
+                    logger.info("save fulltext in mongodb:"+doc["_id"])
+                    tftxs.save(doc) 
+                else:
+                    pass
                 
                 docid = str(doc["docId"])
     #             pipedoc.set("ftx:"+docid,json.dumps(txt))

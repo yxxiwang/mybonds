@@ -346,10 +346,19 @@ def relatedchannel(request):
     udata = procChannel("relatedchannel",beaconusr,beaconid,beaconname,days,usecache) 
     udata = dataProcForApi(udata)
     udata["api"]=api
+    username = getUserName(request)
     def proc(doc):
         doc["beaconid"]=doc.pop("docid")
         doc["beaconusr"]="doc"
         doc["beaconname"]=doc.pop("title")
+        
+        if username != "":
+            beaconstr = "doc|-|"+doc["beaconid"] 
+            if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
+                doc["beaconisfllw"] = "true"
+            else:
+                doc["beaconisfllw"] = "false"
+                
         if doc.has_key("domain") : doc.pop("domain")
         if doc.has_key("eventid") : doc.pop("eventid")
         if doc.has_key("copyNum") : doc.pop("copyNum")

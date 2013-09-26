@@ -125,11 +125,12 @@ def research(request,template_name="beacon/fulltextnew.html"):
     if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>') 
     ftxlist=[]
+    relatedsites= []
     fulldoc = tftxs.find_one({"_id":docid})
     if fulldoc is not None:
 #         print fulldoc
         ftxlist = fulldoc["fulltext"] 
-        relatedsites = fulldoc["relatedSites"] 
+        if fulldoc.has_key("relatedSites"): relatedsites = fulldoc["relatedSites"] 
         url = fulldoc["urls"][0].split(",")[1]
     else:
         doc = rdoc.hgetall("doc:"+docid)

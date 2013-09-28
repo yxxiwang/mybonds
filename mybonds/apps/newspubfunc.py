@@ -359,7 +359,8 @@ def saveFulltextById(ids,url=""):
                 domain=doc["domain"]
                 host = r.hget("navi",domain)
                 host = "" if host is None else host
-                addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
+                if not r.exists("bmk:news:"+getHashid(domain)):
+                    addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
             pipedoc.execute()
         else:
             logger.warn( "udata is empty...retrycntis %d" % retrycnt)
@@ -488,7 +489,7 @@ def saveDocsByUrl(urlstr,headlineonly="0"):
 #             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
             title = strfilter(title)
             pipedoc.hset("doc:"+docid,"docid",docid)
-#             pipedoc.hset("doc:"+docid,"title",title)
+            pipedoc.hset("doc:"+docid,"title",title)
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
             pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
             pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
@@ -774,7 +775,7 @@ def refreshBeacon(beaconusr, beaconid,type=""):
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.hexists(key,"ttl"):
-        logger.info("--Beacon is exists, refreshBeacon" + beaconttl)
+        logger.info("--Beacon is exists, refreshBeacon: " + beaconttl)
         refreshBeacon(beaconusr, beaconid)
         return
     else:

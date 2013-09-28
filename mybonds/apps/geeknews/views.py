@@ -1066,12 +1066,15 @@ def sendemailfornews(request):
     emails = request.GET.get("emails", "")
     docids = request.GET.get("docids", "")
     otype = request.GET.get("o", "") 
-    
+    api = request.GET.get("api", "") 
     robj = {}
-    if emails == "":
-        robj["message"] = "email must be not null !"
-        robj["success"] = "failed"
-        return HttpResponse(json.dumps(robj), mimetype="application/json")
+    robj["api"]=api
+    
+#     if emails == "" : emails = usr_email
+#     if emails == "" or emails is None:
+#         robj["message"] = "email must be not null !"
+#         robj["success"] = "failed"
+#         return HttpResponse(json.dumps(robj), mimetype="application/json")
     
     quantity = log_typer(request, "sendemailfornews", emails + "->" + docids)
 #     if quantity > getsysparm("QUANTITY"):
@@ -1083,11 +1086,9 @@ def sendemailfornews(request):
             
     if otype == "service":
         if emails != "":
-#             pushQueue("sendemail", username, "byemail", tag=emails, similarid=docids.replace(",",";"))
             pushemail(emails, docids.replace(",", ";"))
             robj["message"] = "send email to:" + emails 
         else:
-#             pushQueue("sendemail", username, "byemail", tag=usr_email, similarid=docids.replace(",",";"))
             pushemail(usr_email, docids.replace(",", ";"))   
             robj["message"] = "send email to:" + usr_email
         if groupname != "": 

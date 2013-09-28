@@ -106,8 +106,8 @@ def sendemail(content, rcv_email, title=""):
     from email.mime.multipart import MIMEMultipart
     from email.Header import Header
     from email.mime.image import MIMEImage
-#     sender = 'admin@zhijixing.com'
-    sender = 'yxxiwang@163.com'
+    sender = 'admin@zhijixing.com'
+#     sender = 'yxxiwang@163.com'
 #     sender = '蓝海资讯'
     if rcv_email == "":
         rcv_email = 'yxxiwang@gmail.com'
@@ -137,20 +137,21 @@ def sendemail(content, rcv_email, title=""):
 #      ])
     try:
 #       message = MIMEText(message,_subtype='plain',_charset='gb2312')
-       smtpObj = smtplib.SMTP('smtp.gmail.com')
-       smtpObj.ehlo()
-       smtpObj.starttls()
-#        smtpObj.login('admin@zhijixing.com', 'software91') 
-       smtpObj.login('yxxiwang@163.com', 'litchi0613')
-       smtpObj.sendmail(sender, receivers, msg.as_string())      
-       logger.info("Successfully sent email")
-       return 0
+        smtpObj = smtplib.SMTP('smtp.gmail.com') 
+#         smtpObj = smtplib.SMTP('smtp.163.com')
+        smtpObj.ehlo()
+        smtpObj.starttls()
+        smtpObj.login('admin@zhijixing.com', 'software91') 
+#         smtpObj.login('yxxiwang@163.com', 'litchi0613')
+        smtpObj.sendmail(sender, receivers, msg.as_string())      
+        logger.info("Successfully sent email")
+        return 0
     except SMTPException:
-       logger.exception("Error: unable to send email")
-       traceback.print_exc()
-       return 8
+        logger.exception("Error: unable to send email")
+        traceback.print_exc()
+        return 8
     else:
-       pass
+        pass
 #        print "sent email again.."
 #        smtpObj.sendmail(sender, receivers, msg.as_string())
     finally:

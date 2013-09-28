@@ -106,7 +106,8 @@ def sendemail(content, rcv_email, title=""):
     from email.mime.multipart import MIMEMultipart
     from email.Header import Header
     from email.mime.image import MIMEImage
-    sender = 'admin@zhijixing.com'
+#     sender = 'admin@zhijixing.com'
+    sender = 'yxxiwang@163.com'
 #     sender = '蓝海资讯'
     if rcv_email == "":
         rcv_email = 'yxxiwang@gmail.com'
@@ -139,7 +140,8 @@ def sendemail(content, rcv_email, title=""):
        smtpObj = smtplib.SMTP('smtp.gmail.com')
        smtpObj.ehlo()
        smtpObj.starttls()
-       smtpObj.login('admin@zhijixing.com', 'software91') 
+#        smtpObj.login('admin@zhijixing.com', 'software91') 
+       smtpObj.login('yxxiwang@163.com', 'litchi0613')
        smtpObj.sendmail(sender, receivers, msg.as_string())      
        logger.info("Successfully sent email")
        return 0

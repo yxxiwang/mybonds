@@ -104,7 +104,7 @@ def retriveData(qtype):
         elif qtype =="fulltext":  
             urlstr = qinfo["urlstr"] if qinfo.has_key("urlstr") else ""
             ids = qinfo["ids"] if qinfo.has_key("ids") else ""
-            udata = saveFulltextById(ids,url=urlstr) 
+            udata = saveFulltextById(ids,url=urlstr,frombackend=True) 
             rt= WARNNING if udata=={} or udata is None else SUCCESS
         elif qtype =="removedoc": 
             urlstr = qinfo["urlstr"]

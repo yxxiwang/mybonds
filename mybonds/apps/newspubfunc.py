@@ -305,7 +305,7 @@ def pushQueue(qtype,qobj):
     logger.info("qobj is "+ json.dumps(qobj) ) 
     r.lpush("queue:" + qtype, json.dumps(qobj))
 
-def saveFulltextById(ids,url=""):
+def saveFulltextById(ids,url="",frombackend=False):
     udata={}
     
     def procids(ids):# 截断ids,并以每20个id为一组 向后台提交请求
@@ -369,7 +369,8 @@ def saveFulltextById(ids,url=""):
             logger.warn( "udata is empty...retrycntis %d" % retrycnt)
             if retrycnt >=getsysparm("RETRY_TIMES"):
                 logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt ) 
-                pushQueue("fulltext",{"urlstr":urlstr}) 
+                if not frombackend:
+                    pushQueue("fulltext",{"urlstr":urlstr}) 
                 return udata
             else:
                 udata = saveFile(urlstr,retrycnt = retrycnt +1 )

@@ -213,7 +213,7 @@ def loadFromUrl(url):
     rstr=""
     try:
         req2 = urllib2.Request(url)
-        response = urllib2.urlopen(req2,timeout=20)
+        response = urllib2.urlopen(req2,timeout=60)
         if response is not None :
             rstr =  response.readlines()[0].decode("utf8")
     except urllib2.URLError, e: 

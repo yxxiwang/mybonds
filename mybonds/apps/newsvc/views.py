@@ -382,6 +382,7 @@ def hotboard(request):
     beaconid = request.GET.get("beaconid", "1968416984598300074")  
     beaconusr = request.GET.get("beaconusr", "doc")
     beaconname = request.GET.get("beaconname", "")
+    usecache = request.GET.get("usecache", "1")
     ascii = request.GET.get("ascii", "1")
     orderby = request.GET.get("orderby", "tms")
     api = request.GET.get("api", "")
@@ -407,7 +408,8 @@ def hotboard(request):
         beaconusr="rd"
 #     print beaconusr,beaconid
     try:
-        udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby,username=username)
+#         udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby,username=username)
+        udata = newHotBoardData(beaconusr, beaconid,username=username,usecache=usecache)
 #         print udata
     except:
         traceback.print_exc()

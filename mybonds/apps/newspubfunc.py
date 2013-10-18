@@ -29,6 +29,7 @@ tpopulary = mdoc['tpopulary']
 tchannel = mdoc['tchannel']
 tchannelpick = mdoc['tchannelpick']
 textend = mdoc['textend']
+thotboard = mdoc['thotboard']
 
 sysparms_hkey = {
     "REDIS_EXPIRETIME":"redis_expire",
@@ -517,6 +518,75 @@ def saveDocsByUrl(urlstr,headlineonly="0"):
         saveText(udata["docs"])
              
     return udata
+
+def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
+    urlstr="http://svc.zhijixing.com/research/svc?hottopicid=%E8%B4%A2%E7%BB%8F"
+#     beaconusr="rd"
+#     beaconid="1152493"
+    key = "bmk:" + beaconusr + ":" + beaconid
+    logger.info("key is " + key)
+    if r.exists(key):
+#         refreshBeacon(beaconusr, beaconid) 
+        pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+    else:
+        return {} 
+    udata = {}
+    docs = []
+    def procdata(input):
+        for channelinfo in input:
+#             print "===="
+#             print channelinfo
+#             print "===="
+            (beaconid,title,tms) = channelinfo
+            doc = {}
+            doc["isheadline"]="1"
+            doc["tms"]=tms
+            doc["docid"]=getHashid(title)
+            doc["title"]=title
+            doc["url"]=""
+            doc["utms"]=""
+            doc["domain"]=""
+            doc["copyNum"]=""
+            doc["text"]=""
+            doc["host"]=""
+            doc["create_time"] = timeElaspe(tms)
+            
+            doc["beaconusr"] = "doc"
+            doc["beaconid"]  = beaconid          
+            doc["beaconname"] = r.hget("bmk:doc:"+beaconid, "name").decode("utf8")
+            doc["isbeacon"] = "true"
+            docs.append(doc)
+            addBeacon("doc", beaconid, title, title, title, tms)
+#         udata["docs"]=docs
+        return docs
+            
+    udata = thotboard.find_one({"_id":beaconid})
+#     udata = None
+    if udata is None or usecache=="0": 
+        logger.info("fetch url:" + urlstr)
+        data = bench(loadFromUrl, parms=urlstr)
+#         print data
+        if data is not None:
+            udata={}
+            udata["_id"] = beaconid
+            udata["docs"]=procdata(data)
+            thotboard.save(udata)
+            logger.info("save doc into mongdb :" + beaconid)
+    
+    
+    def proc(doc):
+        beaconstr = "doc|-|"+doc["beaconid"] 
+        if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
+            doc["beaconisfllw"] = "true"
+        else:
+            doc["beaconisfllw"] = "false" 
+        return doc 
+    
+    if udata.has_key("docs") and username != "": 
+        udata["docs"] = [ proc(doc) for doc in udata["docs"] ]  
+#     udata["docs"]=procdata(udata["docs"])
+    return udata
+    
 
 def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms",username=""):
     key = "bmk:" + beaconusr + ":" + beaconid

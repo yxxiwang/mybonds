@@ -66,16 +66,19 @@ def channels(num):
             pushQueue("docextend",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
             
         if beaconusr =="rd":         
+            udata = newHotBoardData(beaconusr,beaconid,username="",usecache="0") 
+            rt = WARNNING if udata=={} or udata is None else SUCCESS
+            if not rt == SUCCESS:
+                pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+                
             udata = procChannel("popularychannel",beaconusr,beaconid,"",days=str(num),usecache="0") 
             rt = WARNNING if udata=={} or udata is None else SUCCESS
             if not rt == SUCCESS:
-#                 print udata
                 pushQueue("popularychannel",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
                  
             udata = procChannel("channelnews",beaconusr,beaconid,"",days=str(num),usecache="0") 
             rt = WARNNING if udata=={} or udata is None else SUCCESS
             if not rt == SUCCESS:
-#                 print udata
                 pushQueue("channelnews",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         
 def retriveData(qtype):
@@ -115,6 +118,11 @@ def retriveData(qtype):
             beaconid = qinfo["beaconid"]
             days = qinfo["days"]
             rt = refreshDocs(beaconusr, beaconid,days) 
+        elif qtype =="hotboard": 
+            beaconusr = qinfo["beaconusr"]
+            beaconid = qinfo["beaconid"]
+            days = qinfo["days"]
+            rt = newHotBoardData(beaconusr, beaconid,username="",usecache="0") 
         elif qtype in ["popularychannel","channelnews","relatedchannel"]:
             beaconusr = qinfo["beaconusr"]
             beaconid = qinfo["beaconid"]
@@ -188,7 +196,10 @@ def loadData(codes,num,force=False):
         for code in codes:
             beaconusr,beaconid = code.split(":")
             logger.info( "proc %s:%s and num is %d" %(beaconusr,beaconid,num) )
-            refreshDocs(beaconusr, beaconid,days=str(num),force=force)
+            if beaconusr=="rd":
+                newHotBoardData(beaconusr, beaconid,username="",usecache="0") 
+            else:
+                refreshDocs(beaconusr, beaconid,days=str(num),force=force)
             
 def initProc(types,codes,num,force=False): 
     """type should be one of load,beacon,fulltext,sendemail,removedoc """

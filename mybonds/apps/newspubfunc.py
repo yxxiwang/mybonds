@@ -551,12 +551,12 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
             doc["host"]=""
             doc["create_time"] = timeElaspe(tms)
             
+            addBeacon("doc", beaconid, title, title, title, tms)
             doc["beaconusr"] = "doc"
             doc["beaconid"]  = beaconid          
             doc["beaconname"] = r.hget("bmk:doc:"+beaconid, "name").decode("utf8")
             doc["isbeacon"] = "true"
             docs.append(doc)
-            addBeacon("doc", beaconid, title, title, title, tms)
 #         udata["docs"]=docs
         return docs
             

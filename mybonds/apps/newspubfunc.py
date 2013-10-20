@@ -526,8 +526,9 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info("key is " + key)
     if r.exists(key):
+        pass
 #         refreshBeacon(beaconusr, beaconid) 
-        pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+#         pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
     else:
         return {} 
     udata = {}
@@ -566,16 +567,15 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
         logger.info("fetch url:" + urlstr)
         data = bench(loadFromUrl, parms=urlstr)
 #         print data
-        if data is not None:
+        if data is None or data=={}:
+            logger.info("data is null :" + beaconid)
+        else:
             udata={}
             udata["_id"] = beaconid
             udata["docs"]=procdata(data)
             thotboard.save(udata)
             logger.info("save doc into mongdb :" + beaconid)
-            logger.info(data)
-        else:
-            logger.info("data is null :" + beaconid)
-            
+#             logger.info(data)
     
     def proc(doc):
         beaconstr = "doc|-|"+doc["beaconid"] 

@@ -122,7 +122,8 @@ def retriveData(qtype):
             beaconusr = qinfo["beaconusr"]
             beaconid = qinfo["beaconid"]
             days = qinfo["days"]
-            rt = newHotBoardData(beaconusr, beaconid,username="",usecache="0") 
+            udata = newHotBoardData(beaconusr, beaconid,username="",usecache="0") 
+            rt = WARNNING if udata=={} or udata is None else SUCCESS
         elif qtype in ["popularychannel","channelnews","relatedchannel"]:
             beaconusr = qinfo["beaconusr"]
             beaconid = qinfo["beaconid"]

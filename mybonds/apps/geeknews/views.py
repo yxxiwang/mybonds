@@ -694,9 +694,11 @@ def hotboard(request, template_name="beacon/hotboard.html"):
     rdbeacon_list = []
     isadmin = "1" if username in ["ltb", "wxi", "sj"] else "0"  
     
-#     udata = buildHotBoardData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby=orderby)
-    
-    udata = newHotBoardData(beaconusr, beaconid,username=username,usecache=usecache)
+    if beaconusr=="rd":
+        udata = newHotBoardData(beaconusr, beaconid,username=username,usecache=usecache)
+    else:
+        udata = buildHotBoardData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby=orderby)
+        
     if udata.has_key("docs"):
         beacondisname = r.hget("bmk:"+beaconusr+":"+beaconid,"name")
         for doc in udata["docs"]:

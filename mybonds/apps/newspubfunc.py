@@ -572,7 +572,10 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
             udata["docs"]=procdata(data)
             thotboard.save(udata)
             logger.info("save doc into mongdb :" + beaconid)
-    
+            logger.info(data)
+        else:
+            logger.info("data is null :" + beaconid)
+            
     
     def proc(doc):
         beaconstr = "doc|-|"+doc["beaconid"] 

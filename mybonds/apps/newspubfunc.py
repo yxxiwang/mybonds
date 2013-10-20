@@ -757,7 +757,7 @@ def procChannel(datatype, beaconusr, beaconid, beaconname, days="1", usecache="1
         udata = tmongo.find_one({"_id":beaconid})
         if udata is None:
             udata = getdoc(beaconid, url, tmongo)
-        pushQueue(datatype,{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+#         pushQueue(datatype,{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
     elif usecache == "0":
         udata = getdoc(beaconid, url, tmongo)
     elif usecache == "2":

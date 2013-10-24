@@ -38,8 +38,8 @@ class Beacon:
         channel = self.getchannelforurl() 
         mindoc = self.getmindoc() 
         
-        if beaconusr=="rd":
-            channelparm = "%s=%s" % ("hottopicid",channel)
+#         if beaconusr=="rd":
+#             channelparm = "%s=%s" % ("hottopicid",channel)
             
         if channelparm == "extendid":
             channelparm= "%s=%s:%s" % (channelparm,channel,self.getdesc())

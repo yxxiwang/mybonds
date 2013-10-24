@@ -159,6 +159,59 @@ def getCPinfo(parms=[]):
     else:
         return json.dumps(cp_data["name"])
 
+def sendemail(parms=[]):
+#     (email,title,contents)=parms 
+    rcv_email = parms[0]
+    title = parms[1]
+    content = " ".join(parms[2:])
+#     rcv_email = "yxxiwang@gmail.com"
+#     content = "testtest"
+#     title = "title"
+    print "email is :" + rcv_email
+    print "title is :" + title
+    print "content is :" + content
+    from django.core.mail import send_mail
+    print( "================sendemail============================")
+    import smtplib, mimetypes
+    from smtplib import SMTPException
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.Header import Header
+    from email.mime.image import MIMEImage
+    sender = 'admin@zhijixing.com'
+    if rcv_email == "":
+        rcv_email = 'yxxiwang@gmail.com'
+    receivers = [rcv_email]
+
+    msg = MIMEMultipart()
+    msg['From'] = "灯塔资讯".decode("utf8")
+    #msg['From'] = "dengtazixun"
+    msg['To'] = rcv_email
+    if title!="":
+        msg['Subject'] = Header(title, charset='UTF-8')  # 中文主题
+    else:
+        msg['Subject'] = Header('欢迎来到指极星', charset='UTF-8')  # 中文主题
+
+    txt = MIMEText(content, _subtype='html', _charset='UTF-8')
+    msg.attach(txt)
+    try:
+        smtpObj = smtplib.SMTP('smtp.gmail.com')       
+        smtpObj.ehlo()
+        smtpObj.starttls()
+        smtpObj.login('admin@zhijixing.com', 'software91')
+        smtpObj.sendmail(sender, receivers, msg.as_string())
+        print( "Successfully sent email")
+        return "0"
+    except SMTPException:
+       print( "Error: unable to send email")
+       traceback.print_exc()
+       return "-1"
+    else:
+       pass 
+    finally:
+       smtpObj.quit()
+    return "-1"
+
 def initData(parms=[]):
     context = zmq.Context()   
     socket = context.socket(zmq.REQ)  
@@ -216,6 +269,7 @@ def initData(parms=[]):
         message = socket.recv()
 #         print message
         cp_stock_data[cpcode] = json.loads(message)
+    print "initData is over......"
     
 class functionMapping:
   def __init__(self):
@@ -227,6 +281,7 @@ class functionMapping:
       'getNewsCoypNumsFromDate': getNewsCoypNumsFromDate,
       'getChannelStock': getChannelStock,
       'getCPinfo': getCPinfo,
+      'sendemail': sendemail,
       #'/logout/':logout,
     }
 

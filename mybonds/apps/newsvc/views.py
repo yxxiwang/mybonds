@@ -75,6 +75,7 @@ def channeleventpick(request):
     try:
         bea = Beacon(beaconusr,beaconid)
         bea.setUsecache(usecache)
+        bea.setUsername(username)
         udata = bea.getEventPicklist()
         r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
     except:

@@ -33,60 +33,42 @@ if __name__ == '__main__':
 #     #  Do 10 requests, waiting each time for a response  
 #     for request in range (1,10):  
     print "Sending request ","..."
-#     print "============getNewsCnts================"
-#     
-#     socket.send ("getNewsCnts stock schema cp990001 -28 -7 140000") 
-#     message = socket.recv()
-#     print message 
-#     socket.send ("getNewsCnts stock data cp990001  -28 -7 140000")  
-#     message = socket.recv()
-#     print message
-#     
-#     print "===========getNewsCoypNums================="
-#     
-#     socket.send ("getNewsCoypNums stock schema cp990001 -28 -7 140000")   
-#     message = socket.recv()
-#     print message 
-#     socket.send ("getNewsCoypNums stock data cp990001  -28 -7 140000")  
-#     message = socket.recv()
-#     print message
-# #     
+ 
+    print "===============send email============="  
+    socket.send ("""sendemail  yxxiwang@gmail.com mytitle  testacontentaaaa ddd  """)   
+    message = socket.recv()
+    print message  
+     
     print "============getNewsCntsFromDate================"
-    
+     
     socket.send ("getNewsCntsFromDate stock schema sh600792 20130709 -20 140000")   
     message = socket.recv()
     print message
     socket.send ("getNewsCntsFromDate stock data sh600792  20130709 -20 140000")  
     message = socket.recv()
     print message
-    
-    print "===========getNewsCoypNumsFromDate================="
-    
-    socket.send ("getNewsCoypNumsFromDate stock schema sh600792 20130709 -20 140000")
-    message = socket.recv()
-    print message
-    socket.send ("getNewsCoypNumsFromDate stock data sh600792  20130709 -20 140000")  
-    message = socket.recv()
-    print message
-    
-    print "===============getCPinfo=============" 
-    socket.send ("getCPinfo schema ")   
-    message = socket.recv()
-    print message 
-    socket.send ("getCPinfo data ")  
-    message = socket.recv()
-    print message
-    
-    print "===============getChannelStock=============" 
-    socket.send ("getChannelStock cp990002 ")   
-    message = socket.recv()
-    print message  
-    
 #     
-#     socket.send ("getChannelNewsCountsList stock sh600001  7  ")   
+#     print "===========getNewsCoypNumsFromDate================="
+#     
+#     socket.send ("getNewsCoypNumsFromDate stock schema sh600792 20130709 -20 140000")
+#     message = socket.recv()
+#     print message
+#     socket.send ("getNewsCoypNumsFromDate stock data sh600792  20130709 -20 140000")  
+#     message = socket.recv()
+#     print message
+#     
+#     print "===============getCPinfo=============" 
+#     socket.send ("getCPinfo schema ")   
 #     message = socket.recv()
 #     print message 
-#     print "Received reply ", "[", message, "]"  
+#     socket.send ("getCPinfo data ")  
+#     message = socket.recv()
+#     print message
+#     
+#     print "===============getChannelStock=============" 
+#     socket.send ("getChannelStock cp990002 ")   
+#     message = socket.recv()
+#     print message   
     
     
     

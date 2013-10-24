@@ -17,6 +17,7 @@ class Beacon:
     beaconname = ""
     key = ""
     usecache = "1"
+    username=""
     days = 1
     bobj = {}
     def __init__(self, beaconusr, beaconid):
@@ -37,6 +38,9 @@ class Beacon:
         channel = self.getchannelforurl() 
         mindoc = self.getmindoc() 
         
+        if beaconusr=="rd":
+            channelparm = "%s=%s" % ("hottopicid",channel)
+            
         if channelparm == "extendid":
             channelparm= "%s=%s:%s" % (channelparm,channel,self.getdesc())
         else:
@@ -93,6 +97,9 @@ class Beacon:
     
     def setUsecache(self,usecache):
         self.usecache = usecache
+        
+    def setUsername(self,username):
+        self.username = username
         
     def setDays(self,days):
         self.days = days
@@ -180,11 +187,18 @@ class Beacon:
         return udata
         
     def getPopularylist(self):    
-        udata = tpopulary.find_one({"_id":self.beaconid})
-        if udata is None or self.usecache=="0" :
-            udata = self.savePopularyData()
+#         udata = tpopulary.find_one({"_id":self.beaconid})
+#         if udata is None or self.usecache=="0" :
+#             udata = self.savePopularyData()
+#         return udata
+        beaconusr = self.beaconusr
+        beaconid = self.beaconid
+        username = self.username
+        usecache = self.usecache
+        
+        udata = newHotBoardData(beaconusr, beaconid,username=username,usecache=usecache)
         return udata
-    
+
     def savePopularyData(self):
         udata = self.getdoc(self.beaconid, self.getPopularyUrl(), tpopulary)
         return udata
@@ -250,7 +264,7 @@ class Beacon:
             return doc
             
         udata = self.getPopularylist()
-        udata = dataProcForApi(udata)
+#         udata = dataProcForApi(udata)
         if udata.has_key("docs"):
             udata["docs"] =  [ proc(doc) for doc in udata["docs"] ]
             

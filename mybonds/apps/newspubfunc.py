@@ -789,6 +789,7 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
   
     if beaconusr == "rd":
         channelparm = "hottopicid"
+#         channelparm = "channeleventpick"
     elif beaconusr == "stockmarket":
         channelparm = "channelid"
     else:

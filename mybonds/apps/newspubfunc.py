@@ -689,7 +689,10 @@ def dataProcForApi(udata):
     
     def proc(doc):
         doc["docid"] = str(doc.pop("docId"))
-        doc["eventid"] = str(doc.pop("eventId"))
+        if doc.has_key("eventId"):
+            doc["eventid"] = str(doc.pop("eventId"))
+        else:
+            doc["eventid"] = ""
         doc["validTime"] = str(doc["validTime"])
         doc["popularity"] = str(doc["popularity"])
         doc["copyNum"] = str(doc["copyNum"])

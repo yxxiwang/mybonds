@@ -520,9 +520,10 @@ def saveDocsByUrl(urlstr,headlineonly="0"):
     return udata
 
 def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
-    urlstr="http://svc.zhijixing.com/research/svc?hottopicid=%E8%B4%A2%E7%BB%8F"
+#     urlstr="http://svc.zhijixing.com/research/svc?hottopicid=%E8%B4%A2%E7%BB%8F"
 #     beaconusr="rd"
 #     beaconid="1152493"
+    urlstr = beaconUrl(beaconusr, beaconid,daybefore=1)
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info("key is " + key)
     if r.exists(key):
@@ -787,7 +788,7 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     popularid = "0" if popularid is None else popularid
   
     if beaconusr == "rd":
-        channelparm = "channeleventpick"
+        channelparm = "hottopicid"
     elif beaconusr == "stockmarket":
         channelparm = "channelid"
     else:

@@ -485,7 +485,7 @@ def newsdetail(request):
         for site in doc["relatedSites"]:
             host=site[1]
             domain=site[0]
-            total=site[2]
+            total=site[2] if len(site)>2 else "0"
             r.hset("navi:ori",host,domain)
             sobj={}
             sobj["domain"]=domain

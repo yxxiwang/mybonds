@@ -803,7 +803,7 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
 #     after = after - daybefore*86400
 #     after = (after+2*3600) * 1000
 #     before = time.time() * 1000
-    if daybefore == -1:
+    if daybefore == -1 or beaconusr == "rd":
         after = 0
     else:
         after = int((time.time() - daybefore * 86400) * 1000) 

@@ -431,7 +431,8 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
-                  python %prog cleanDocChannel  {print|delete} 
+                  python %prog cleanDocChannel  {print|delete}
+                  python %prog replaceStormarketTitle  {print|replace} 
             """
     if len(sys.argv) >= 2:
         func = sys.argv[1] 

@@ -123,10 +123,11 @@ def cleanDocChannel(op="print"):
         bkey = "bmk:"+bstr.replace("|-|",":")
         ttl = r.hget(bkey,"ttl") 
 #         if ttl is None or (ttl.isdigit() and len(ttl) > 6 ):
-        print "%s ---> %s" % (bkey,ttl)
-        if op=="delete" :
-            deleteBeacon(bstr.split("|-|")[0],bstr.split("|-|")[1])
-            if ttl is not None : rdoc.delete("doc:"+ttl) 
+        if bstr.split("|-|")[0] == "doc":
+            print "%s ---> %s" % (bkey,ttl)
+            if op=="delete" :
+                deleteBeacon(bstr.split("|-|")[0],bstr.split("|-|")[1])
+                if ttl is not None : rdoc.delete("doc:"+ttl) 
             
     
 def cleanCopynum(parms):

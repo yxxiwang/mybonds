@@ -553,7 +553,8 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
             doc["host"]=""
             doc["create_time"] = timeElaspe(tms)
             
-            addBeacon("doc", beaconid, title, title, title, tms)
+#             addBeacon("doc", beaconid, title, title, title, tms)
+            addBeacon("doc", beaconid, beaconid, title, title)
             doc["beaconusr"] = "doc"
             doc["beaconid"]  = beaconid          
             doc["beaconname"] = r.hget("bmk:doc:"+beaconid, "name").decode("utf8")

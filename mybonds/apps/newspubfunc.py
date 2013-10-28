@@ -828,7 +828,7 @@ def refreshBeacon(beaconusr, beaconid,type=""):
     
 #     urlstr = beaconUrl(beaconusr, beaconid)
     if type =="newbeaconadd":#newbeaconadd
-        pushQueue("channelpick",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+#         pushQueue("channelpick",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
         pushQueue("channelpick",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         return
     
@@ -836,13 +836,13 @@ def refreshBeacon(beaconusr, beaconid,type=""):
         logger.warn(key + "'s 'last_touch' is not exists,retrivedocs from backend...")
         if r.exists(key): 
 #             pushQueue("beacon", beaconusr, "beacon", beaconid, urlstr=urlstr)
-            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+#             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         else:  # 如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             logger.warn(key + " maybe deleted via front  so we ignore it...")
             
     elif not r.exists("bmk:" + beaconusr + ":" + beaconid + ":doc:tms"):  # 如果频道文章列表不存在,重新刷新数据 
-        pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+#         pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
         pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
 #     elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
 #         logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
@@ -852,8 +852,8 @@ def refreshBeacon(beaconusr, beaconid,type=""):
         logger.warn("data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt))
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
         
-        if beaconusr!="rd":
-            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
+#         if beaconusr!="rd":
+#             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
         pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
     else:
         logger.warn("Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt, getsysparm("KEY_UPTIME")))

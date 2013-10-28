@@ -129,6 +129,17 @@ def cleanDocChannel(op="print"):
                 deleteBeacon(bstr.split("|-|")[0],bstr.split("|-|")[1])
                 if ttl is not None : rdoc.delete("doc:"+ttl) 
             
+def replaceStormarketTitle(op="print"):        
+    import re   
+    for bstr in r.zrevrange("bmk:doc:share",0,-1):
+        bkey = "bmk:"+bstr.replace("|-|",":")
+#         ttl = r.hget(bkey,"ttl") 
+        name = r.hget(bkey,"name") 
+        if bstr.split("|-|")[0] == "stockmarket":
+            ttl = re.sub("\(|\d|\)","",name)
+            print "%s => %s ---> %s" % (bkey,name,ttl)
+            if op=="replace" :
+                r.hset(bkey,"ttl",ttl) 
     
 def cleanCopynum(parms):
     """清理copynum里面的过时的docid的数据"""

@@ -104,7 +104,7 @@ def cleanChannelCnt(op="print"):
             if op=="delete":
                 r.delete(bstr) 
                 
-def cleanDocChannel(op="print"):
+def cleanDocChannel(parms=("doc","print")):
     """ 清理由热点新闻所建立频道,并将其从用户的关注列表中清理掉."""
     def deleteBeacon(beaconusr,beaconid):            
         r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid)
@@ -119,15 +119,22 @@ def cleanDocChannel(op="print"):
         r.delete(key + ":fllw")
         r.delete(key)
     ###########deleteBeacon is over######################
-    for bstr in r.zrevrange("bmk:doc:share",0,-1):
-        bkey = "bmk:"+bstr.replace("|-|",":")
-        ttl = r.hget(bkey,"ttl") 
-#         if ttl is None or (ttl.isdigit() and len(ttl) > 6 ):
-        if bstr.split("|-|")[0] == "doc":
-            print "%s ---> %s" % (bkey,ttl)
-            if op=="delete" :
-                deleteBeacon(bstr.split("|-|")[0],bstr.split("|-|")[1])
-                if ttl is not None : rdoc.delete("doc:"+ttl) 
+    
+    if type(parms).__name__ == "str":
+        parms = (parms,) 
+    op=parms[-1]
+    for usr in parms[:-1]:
+        if usr=="" : usr="doc" 
+        
+        for bstr in r.zrevrange("bmk:doc:share",0,-1):
+            bkey = "bmk:"+bstr.replace("|-|",":")
+            ttl = r.hget(bkey,"ttl") 
+    #         if ttl is None or (ttl.isdigit() and len(ttl) > 6 ):
+            if bstr.split("|-|")[0] == usr:
+                print "%s ---> %s" % (bkey,ttl)
+                if op=="delete" :
+                    deleteBeacon(bstr.split("|-|")[0],bstr.split("|-|")[1])
+                    if ttl is not None : rdoc.delete("doc:"+ttl) 
             
 def replaceStormarketTitle(op="print"):        
     import re   

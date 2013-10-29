@@ -363,8 +363,8 @@ def saveFulltextById(ids, url="", frombackend=False):
                 domain = doc["domain"]
                 host = r.hget("navi", domain)
                 host = "" if host is None else host
-                if not r.exists("bmk:news:" + getHashid(domain)):
-                    addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
+#                 if not r.exists("bmk:news:" + getHashid(domain)):
+#                     addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
             pipedoc.execute()
         else:
             logger.warn("udata is empty...retrycntis %d" % retrycnt)

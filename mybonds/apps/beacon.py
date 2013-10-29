@@ -252,10 +252,10 @@ class Beacon:
      
     def getEventPicklist(self):   
         def proc(doc): 
-            doc["beaconid"]=doc["docid"]
-            doc["beaconusr"]="doc"
-            doc["beaconname"]=doc["title"]
-            doc["isbeacon"]="true"
+#             doc["beaconid"]=doc["beaconid"]
+#             doc["beaconusr"]="doc"
+#             doc["beaconname"]=doc["title"]
+#             doc["isbeacon"]="true"
             if not doc.has_key("utms"):
                 doc["utms"] = doc["tms"]  
             doc["copyNum"] = str(doc["copyNum"])  

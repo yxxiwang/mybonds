@@ -282,12 +282,12 @@ def subDocText(s):
     else:  # 否则开始进行截取
         slst = us.split(dot)
         if len(slst[-1]) < 55:  # 如果最后一段在"。"之后文本长度小于35,则截断之
-            rs= dot.join(slst[0:-1] + [""]).encode("utf8")
-            return rs if rs!="" else s
+            rs = dot.join(slst[0:-1] + [""]).encode("utf8")
+            return rs if rs != "" else s
         else:  # 如果 最后一段文字数大于35个，则从尾部开始，截断到最近一个标点符合，包括，
             clst = slst[-1].split(comma)
-            rs= (dot.join(slst[0:-1] + [""]) + comma.join(clst[0:-1] + [""])).encode("utf8")
-            return rs if rs!="" else s
+            rs = (dot.join(slst[0:-1] + [""]) + comma.join(clst[0:-1] + [""])).encode("utf8")
+            return rs if rs != "" else s
     return s
 
 def getchannelByid(beaconusr, beaconid): 
@@ -297,48 +297,48 @@ def getchannelByid(beaconusr, beaconid):
 def strfilter(istr):
     return istr.replace("&ldquo;", "").replace("&rdquo;", "").replace("&amp;", "&").replace("&#215;", "X")
     
-def pushQueue(qtype,qobj):
+def pushQueue(qtype, qobj):
     """ push Queue by qobj """
 #     logger.info("qtype in pushQueue is "+qtype) 
     qobj["tms"] = "%s" % dt.datetime.now()
     qobj["type"] = qtype    
 #     r.lpush("queue:" + qtype, json.dumps(qobj,ensure_ascii=False))
-    logger.info("qobj is "+ json.dumps(qobj) ) 
+    logger.info("qobj is " + json.dumps(qobj)) 
     r.lpush("queue:" + qtype, json.dumps(qobj))
 
-def saveFulltextById(ids,url="",frombackend=False):
-    udata={}
+def saveFulltextById(ids, url="", frombackend=False):
+    udata = {}
     
-    def procids(ids):# 截断ids,并以每20个id为一组 向后台提交请求
-        if ids is None or ids =="": return {}
+    def procids(ids):  # 截断ids,并以每20个id为一组 向后台提交请求
+        if ids is None or ids == "": return {}
         idlist = ids.split(";")
         idstr = ""
         retrycnt = 0
-        while len(idlist)>0: 
-            logger.info("len(ids) left %d"  % len(idlist) )
+        while len(idlist) > 0: 
+            logger.info("len(ids) left %d" % len(idlist))
             for i in range(20):
-                if len(idlist)>0 : idstr = idstr + idlist.pop() + ";" 
-            urlstr = "http://%s/research/svc?docid=%s" %(getsysparm("BACKEND_DOMAIN"),idstr) 
-            idstr=""
+                if len(idlist) > 0 : idstr = idstr + idlist.pop() + ";" 
+            urlstr = "http://%s/research/svc?docid=%s" % (getsysparm("BACKEND_DOMAIN"), idstr) 
+            idstr = ""
             udata = saveFile(urlstr) 
         return udata
     
-    def saveFile(urlstr,retrycnt=0):
-        logger.info("proc url="+urlstr)
-        udata = bench(loadFromUrl,parms=urlstr)
+    def saveFile(urlstr, retrycnt=0):
+        logger.info("proc url=" + urlstr)
+        udata = bench(loadFromUrl, parms=urlstr)
         if udata.has_key("docs"):
             pipedoc = rdoc.pipeline()
-            txt=""
+            txt = ""
             for doc in udata["docs"]:
                 if doc is None :
                     continue
                 
-                doc["_id"]=str(doc["docId"])
+                doc["_id"] = str(doc["docId"])
                 doc["title"] = strfilter(doc["title"])
                 if doc.has_key("fulltext"):
                     txt = doc["fulltext"]
     #                 doc.pop("relatedDocs")
-                    logger.info("save fulltext in mongodb:"+doc["_id"])
+                    logger.info("save fulltext in mongodb:" + doc["_id"])
                     tftxs.save(doc) 
                 else:
                     pass
@@ -346,48 +346,48 @@ def saveFulltextById(ids,url="",frombackend=False):
                 docid = str(doc["docId"])
     #             pipedoc.set("ftx:"+docid,json.dumps(txt))
     #             pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
-                if not r.hexists("doc:"+docid,"docid"):
-                    pipedoc.hset("doc:"+docid,"docid",docid)
+                if not r.hexists("doc:" + docid, "docid"):
+                    pipedoc.hset("doc:" + docid, "docid", docid)
 #                 if not r.hexists("doc:"+docid,"title"):
-                pipedoc.hset("doc:"+docid,"title",doc["title"].rstrip() ) 
-                if not r.hexists("doc:"+docid,"text"):
-                    pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
-                if not r.hexists("doc:"+docid,"copyNum"):
-                    pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )  
-                if not r.hexists("doc:"+docid,"create_time"):
-                    pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
+                pipedoc.hset("doc:" + docid, "title", doc["title"].rstrip()) 
+                if not r.hexists("doc:" + docid, "text"):
+                    pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
+                if not r.hexists("doc:" + docid, "copyNum"):
+                    pipedoc.hset("doc:" + docid, "copyNum", doc["copyNum"])  
+                if not r.hexists("doc:" + docid, "create_time"):
+                    pipedoc.hset("doc:" + docid, "create_time", doc["create_time"])
                 
-                pipedoc.hset("doc:"+docid,"url",doc["urls"][0].split(",")[1] )
-                pipedoc.hset("doc:"+docid,"host","")
-                pipedoc.hset("doc:"+docid,"domain",doc["domain"] )
-                domain=doc["domain"]
-                host = r.hget("navi",domain)
+                pipedoc.hset("doc:" + docid, "url", doc["urls"][0].split(",")[1])
+                pipedoc.hset("doc:" + docid, "host", "")
+                pipedoc.hset("doc:" + docid, "domain", doc["domain"])
+                domain = doc["domain"]
+                host = r.hget("navi", domain)
                 host = "" if host is None else host
-                if not r.exists("bmk:news:"+getHashid(domain)):
+                if not r.exists("bmk:news:" + getHashid(domain)):
                     addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
             pipedoc.execute()
         else:
-            logger.warn( "udata is empty...retrycntis %d" % retrycnt)
-            if retrycnt >=getsysparm("RETRY_TIMES"):
-                logger.warn( "Attembrough: it's failed again..retrycnt is %d" % retrycnt ) 
+            logger.warn("udata is empty...retrycntis %d" % retrycnt)
+            if retrycnt >= getsysparm("RETRY_TIMES"):
+                logger.warn("Attembrough: it's failed again..retrycnt is %d" % retrycnt) 
                 if not frombackend:
-                    pushQueue("fulltext",{"urlstr":urlstr}) 
+                    pushQueue("fulltext", {"urlstr":urlstr}) 
                 return udata
             else:
-                udata = saveFile(urlstr,retrycnt = retrycnt +1 )
+                udata = saveFile(urlstr, retrycnt=retrycnt + 1)
             
         return udata
     
-    if url!="" :
+    if url != "" :
         urlstr = url
-        logger.info( "=saveFulltextById==="+urlstr )
+        logger.info("=saveFulltextById===" + urlstr)
         udata = saveFile(urlstr)
     else:
-        logger.info( "=saveFulltextById==="+ids )
+        logger.info("=saveFulltextById===" + ids)
         udata = procids(ids)
     return udata 
     
-def buildBeaconData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby="tms"):
+def buildBeaconData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms"):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.exists(key):
         refreshBeacon(beaconusr, beaconid)
@@ -464,14 +464,14 @@ def buildBeaconData(beaconusr, beaconid, start=0, end=-1, isapi=False, orderby="
     udata["total"] = str(len(udata["docs"])) 
     return udata
 
-def saveDocsByUrl(urlstr,headlineonly="0"):
-    logger.info( "===saveDocsByUrl==="+urlstr)
-    udata = bench(loadFromUrl,parms=urlstr)
+def saveDocsByUrl(urlstr, headlineonly="0"):
+    logger.info("===saveDocsByUrl===" + urlstr)
+    udata = bench(loadFromUrl, parms=urlstr)
     pipedoc = rdoc.pipeline()
     def saveText(docs):
-        ids_lst=[]
-        tms=time.time()
-        ids=""
+        ids_lst = []
+        tms = time.time()
+        ids = ""
         docs.reverse()
         for doc in docs:
             if doc is None: 
@@ -481,49 +481,49 @@ def saveDocsByUrl(urlstr,headlineonly="0"):
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
             
-            if not rdoc.hexists("doc:"+docid,"url"):
-                if tms - long(doc["create_time"])/1000 > 86400*60:#如果是一个月以前的新闻
-                    logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid,tms - long(doc["create_time"])/1000) )
+            if not rdoc.hexists("doc:" + docid, "url"):
+                if tms - long(doc["create_time"]) / 1000 > 86400 * 60:  # 如果是一个月以前的新闻
+                    logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid, tms - long(doc["create_time"]) / 1000))
                 else:
-                    ids+=docid+";"
-                    logger.debug("save fulltext doc:%s, tms is %d" % (docid,tms) )
+                    ids += docid + ";"
+                    logger.debug("save fulltext doc:%s, tms is %d" % (docid, tms))
             else:
-                logger.debug("save doc:%s, tms is %d" % (docid,tms) )
+                logger.debug("save doc:%s, tms is %d" % (docid, tms))
 
             title = doc["title"]
 #             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
             title = strfilter(title)
-            pipedoc.hset("doc:"+docid,"docid",docid)
-            pipedoc.hset("doc:"+docid,"title",title)
+            pipedoc.hset("doc:" + docid, "docid", docid)
+            pipedoc.hset("doc:" + docid, "title", title)
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
-            pipedoc.hset("doc:"+docid,"text",doc["text"].rstrip() )
-            pipedoc.hset("doc:"+docid,"copyNum",doc["copyNum"] )
-            pipedoc.hset("doc:"+docid,"popularity",doc["popularity"] )
+            pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
+            pipedoc.hset("doc:" + docid, "copyNum", doc["copyNum"])
+            pipedoc.hset("doc:" + docid, "popularity", doc["popularity"])
             if doc.has_key("eventId") and doc["eventId"] != -1: 
-                pipedoc.hset("doc:"+docid,"eventid",doc["eventId"] )
-            pipedoc.hset("doc:"+docid,"create_time",doc["create_time"] )
-            pipedoc.hset("doc:"+docid,"utms",tms )
-            tms = tms +1 
-            pipedoc.hset("doc:"+docid,"domain",doc["domain"] ) 
-            pipedoc.hset("doc:"+docid,"isheadline",headlineonly) 
+                pipedoc.hset("doc:" + docid, "eventid", doc["eventId"])
+            pipedoc.hset("doc:" + docid, "create_time", doc["create_time"])
+            pipedoc.hset("doc:" + docid, "utms", tms)
+            tms = tms + 1 
+            pipedoc.hset("doc:" + docid, "domain", doc["domain"]) 
+            pipedoc.hset("doc:" + docid, "isheadline", headlineonly) 
                 
-            pipedoc.expire("doc:"+docid,getsysparm("DOC_EXPIRETIME")*3)
+            pipedoc.expire("doc:" + docid, getsysparm("DOC_EXPIRETIME") * 3)
 #         print "to be save fulltext_ids is ",ids 
         if len(ids) > 0: saveFulltextById(ids)
         pipedoc.execute()
     ################## saveText is over ##############################
 
-    if udata.has_key("docs"):
+    if udata is not None and udata.has_key("docs"):
         logger.info("save docs and len is :" + str(len(udata["docs"])))
         saveText(udata["docs"])
              
     return udata
 
-def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
+def newHotBoardData(beaconusr, beaconid, username="", usecache="1"):
 #     urlstr="http://svc.zhijixing.com/research/svc?hottopicid=%E8%B4%A2%E7%BB%8F"
 #     beaconusr="rd"
 #     beaconid="1152493"
-    urlstr = beaconUrl(beaconusr, beaconid,daybefore=1)
+    urlstr = beaconUrl(beaconusr, beaconid, daybefore=1)
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info("key is " + key)
     if r.exists(key):
@@ -539,26 +539,32 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
 #             print "===="
 #             print channelinfo
 #             print "===="
-            (beaconid,title,tms) = channelinfo
+#             (beaconid,title,tms) = channelinfo
+            if channelinfo is None : continue
             doc = {}
-            doc["isheadline"]="1"
-            doc["tms"]=tms
+            beaconid = channelinfo["channelId"] if channelinfo.has_key("channelId") else ""
+            beaconname = channelinfo["channelName"] if channelinfo.has_key("channelName") else ""
+            title = channelinfo["title"] if channelinfo.has_key("title") else ""
+            tms = channelinfo["docCreateTime"] if channelinfo.has_key("docCreateTime") else "0"
+            doc["isheadline"] = "1"
+            doc["tms"] = tms
 #             doc["docid"]=getHashid(title)
-            doc["docid"]=beaconid
-            doc["title"]=title
-            doc["url"]=""
-            doc["utms"]=""
-            doc["domain"]=""
-            doc["copyNum"]=""
-            doc["text"]=""
-            doc["host"]=""
+            doc["docid"] = channelinfo["docId"] if channelinfo.has_key("docId") else ""
+            doc["title"] = title
+            doc["url"] = ""
+            doc["utms"] = ""
+            doc["domain"] = ""
+            doc["copyNum"] = ""
+            doc["text"] = ""
+            doc["host"] = ""
             doc["create_time"] = timeElaspe(tms)
             
 #             addBeacon("doc", beaconid, title, title, title, tms)
-            addBeacon("doc", beaconid, beaconid, title, title,tms)
+            addBeacon("doc", beaconid, beaconid, beaconname, title, tms)
             doc["beaconusr"] = "doc"
-            doc["beaconid"]  = beaconid          
-            doc["beaconname"] = r.hget("bmk:doc:"+beaconid, "name").decode("utf8")
+            doc["beaconid"] = beaconid          
+#             doc["beaconname"] = r.hget("bmk:doc:"+beaconid, "name").decode("utf8")
+            doc["beaconname"] = beaconname
             doc["isbeacon"] = "true"
             docs.append(doc)
 #         udata["docs"]=docs
@@ -566,23 +572,23 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
             
     udata = thotboard.find_one({"_id":beaconid})
 #     udata = None
-    if udata is None or usecache=="0": 
+    if udata is None or usecache == "0": 
         logger.info("fetch url:" + urlstr)
         data = bench(loadFromUrl, parms=urlstr)
 #         print data
-        if data is None or data=={}:
+        if data is None or data == {}:
             logger.info("data is null :" + beaconid)
         else:
-            udata={}
+            udata = {}
             udata["_id"] = beaconid
-            udata["docs"]=procdata(data)
+            udata["docs"] = procdata(data)
             thotboard.save(udata)
             logger.info("save doc into mongdb :" + beaconid)
 #             logger.info(data)
     
     def proc(doc):
-        beaconstr = "doc|-|"+doc["beaconid"] 
-        if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
+        beaconstr = "doc|-|" + doc["beaconid"] 
+        if r.zscore("usr:" + username + ":fllw", beaconstr) is not None:  # 频道已经被该用户关注
             doc["beaconisfllw"] = "true"
         else:
             doc["beaconisfllw"] = "false" 
@@ -594,7 +600,7 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
     return udata
     
 
-def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms",username=""):
+def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms", username=""):
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info("key is " + key)
     if r.exists(key):
@@ -607,7 +613,7 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
     channelfromtags = []
     if orderby == "tms":
         doc_lst = r.zrevrange(key + ":doc:tms", start, end)  # 主题文档集合
-    elif beaconusr =="rd" and orderby == "utms":
+    elif beaconusr == "rd" and orderby == "utms":
         doc_lst = r.zrevrange(key + ":doc:utms", start, end)  # 主题文档集合
     else:
         doc_lst = r.zrevrange(key + ":doc:tms", 0, 300)  # 主题文档集合 
@@ -643,12 +649,12 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
             
         if doc["eventid"] != "-1":
             doc["beaconusr"] = "doc"
-            doc["beaconid"]  = doc.pop("eventid")            
-            doc["beaconname"] = r.hget("bmk:doc:"+doc["beaconid"], "name").decode("utf8")
+            doc["beaconid"] = doc.pop("eventid")            
+            doc["beaconname"] = r.hget("bmk:doc:" + doc["beaconid"], "name").decode("utf8")
             doc["isbeacon"] = "true"
             if username != "":
-                beaconstr = "doc|-|"+doc["beaconid"] 
-                if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
+                beaconstr = "doc|-|" + doc["beaconid"] 
+                if r.zscore("usr:" + username + ":fllw", beaconstr) is not None:  # 频道已经被该用户关注
                     doc["beaconisfllw"] = "true"
                 else:
                     doc["beaconisfllw"] = "false"
@@ -660,7 +666,7 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
 
     if orderby == "tms":
         pass
-    elif beaconusr =="rd" and orderby == "utms":
+    elif beaconusr == "rd" and orderby == "utms":
         pass
     else:
         logger.info("buildHotBoardData order by %s" % (orderby,))
@@ -723,10 +729,10 @@ def procChannel(datatype, beaconusr, beaconid, beaconname, days="1", usecache="1
         ids = [] 
         for doc in udata["docs"]:
 #             if rdoc.exists("doc:"+doc["docid"]): continue
-            if rdoc.hexists("doc:"+str(doc["docId"]),"url"): continue
+            if rdoc.hexists("doc:" + str(doc["docId"]), "url"): continue
             ids.append(str(doc["docId"]))
-        if len(ids)>0:
-            pushQueue("fulltext",{"urlstr":"","ids":";".join(ids)}) 
+        if len(ids) > 0:
+            pushQueue("fulltext", {"urlstr":"", "ids":";".join(ids)}) 
         return udata
     
     if datatype == "popularychannel":
@@ -768,7 +774,7 @@ def procChannel(datatype, beaconusr, beaconid, beaconname, days="1", usecache="1
         udata = getdoc(beaconid, url, tmongo)
     elif usecache == "2":
         udata = tmongo.find_one({"_id":beaconid})
-        pushQueue(datatype,{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        pushQueue(datatype, {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
     return udata
 
 def beaconUrl(beaconusr, beaconid, daybefore=1):
@@ -781,7 +787,7 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
 #     else:
 #         length = 20 
     length = getsysparm("CHANNEL_NEWS_NUM")
-    key = "bmk:%s:%s" % (beaconusr,beaconid)
+    key = "bmk:%s:%s" % (beaconusr, beaconid)
     channel = r.hget(key, "ttl")
     channel = "" if channel is None else channel
 #     channel = channel.decode("utf8")
@@ -816,11 +822,11 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     else:
         urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d&mindoc=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel, after, before, mindoc)
     
-    if beaconusr == "rd" or beaconusr=="doc":
-        urlstr = "http://%s/research/svc?%s=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel)
+#     if beaconusr == "rd" or beaconusr=="doc":
+#         urlstr = "http://%s/research/svc?%s=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel)
     return urlstr
 
-def refreshBeacon(beaconusr, beaconid,type=""):
+def refreshBeacon(beaconusr, beaconid, type=""):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
     key = "bmk:" + beaconusr + ":" + beaconid
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
@@ -829,9 +835,9 @@ def refreshBeacon(beaconusr, beaconid,type=""):
 #     removecnt = 0 if r.hget(key, "removecnt") is None else int(r.hget(key, "removecnt"))
     
 #     urlstr = beaconUrl(beaconusr, beaconid)
-    if type =="newbeaconadd":#newbeaconadd
+    if type == "newbeaconadd":  # newbeaconadd
 #         pushQueue("channelpick",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
-        pushQueue("channelpick",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        pushQueue("channelpick", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
         return
     
     if not r.hexists(key, "last_touch"):  # 如果不存在上次更新时间,视为未更新过
@@ -839,13 +845,13 @@ def refreshBeacon(beaconusr, beaconid,type=""):
         if r.exists(key): 
 #             pushQueue("beacon", beaconusr, "beacon", beaconid, urlstr=urlstr)
 #             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
-            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+            pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
         else:  # 如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             logger.warn(key + " maybe deleted via front  so we ignore it...")
             
     elif not r.exists("bmk:" + beaconusr + ":" + beaconid + ":doc:tms"):  # 如果频道文章列表不存在,重新刷新数据 
 #         pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
-        pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
 #     elif removecnt > REMOVE_CNT and dt > REMOVE_KEYUPTIME:
 #         logger.warn( "data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt) )
 #         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
@@ -856,13 +862,13 @@ def refreshBeacon(beaconusr, beaconid,type=""):
         
 #         if beaconusr!="rd":
 #             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
-        pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
     else:
         logger.warn("Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt, getsysparm("KEY_UPTIME")))
         
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid
-    if r.hexists(key,"ttl"):
+    if r.hexists(key, "ttl"):
         logger.info("--Beacon is exists, refreshBeacon: " + beaconttl)
         refreshBeacon(beaconusr, beaconid)
         return
@@ -871,7 +877,7 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
         
     beaconname = beaconttl if beaconname == "" else beaconname
 #     beacontime = getTime(time.time(), formatstr="%Y%m%d%H%M%S") if beacontime == "" else beacontime
-    beacontime = time.time()*1000 if beacontime == "" else beacontime
+    beacontime = time.time() * 1000 if beacontime == "" else beacontime
     mindoc = "0" if mindoc == "" else mindoc 
     
     r.hset(key, "id", beaconid)
@@ -893,5 +899,5 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
     r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
     r.zadd("bmk:doc:share:bynews", time.time() , beaconusr + "|-|" + beaconid)
     
-    refreshBeacon(beaconusr, beaconid,type="newbeaconadd")
+    refreshBeacon(beaconusr, beaconid, type="newbeaconadd")
 

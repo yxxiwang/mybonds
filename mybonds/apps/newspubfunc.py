@@ -869,7 +869,8 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
         logger.info("--addBeacon--" + beaconttl)
         
     beaconname = beaconttl if beaconname == "" else beaconname
-    beacontime = getTime(time.time(), formatstr="%Y%m%d%H%M%S") if beacontime == "" else beacontime
+#     beacontime = getTime(time.time(), formatstr="%Y%m%d%H%M%S") if beacontime == "" else beacontime
+    beacontime = time.time()*1000 if beacontime == "" else beacontime
     mindoc = "0" if mindoc == "" else mindoc 
     
     r.hset(key, "id", beaconid)
@@ -877,7 +878,8 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
     r.hset(key, "name", beaconname)
     r.hset(key, "desc", desc)
     r.hset(key, "crt_usr", beaconusr)
-    r.hset(key, "crt_tms", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S"))) 
+#     r.hset(key, "crt_tms", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S"))) 
+    r.hset(key, "crt_tms", long(beacontime)) 
     r.hset(key, "last_touch", 0) 
     r.hset(key, "last_update", 0) 
     r.hset(key, "cnt", 0) 
@@ -886,7 +888,7 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
     r.hset(key, "headlineonly", headlineonly) 
     
     r.zadd("usr:" + beaconusr + ":fllw", time.time(), beaconusr + "|-|" + beaconid)
-    r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
+    r.zadd("bmk:doc:share", long(beacontime), beaconusr + "|-|" + beaconid)
     r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
     r.zadd("bmk:doc:share:bynews", time.time() , beaconusr + "|-|" + beaconid)
     

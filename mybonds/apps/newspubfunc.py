@@ -543,7 +543,8 @@ def newHotBoardData(beaconusr, beaconid,username="",usecache="1"):
             doc = {}
             doc["isheadline"]="1"
             doc["tms"]=tms
-            doc["docid"]=getHashid(title)
+#             doc["docid"]=getHashid(title)
+            doc["docid"]=beaconid
             doc["title"]=title
             doc["url"]=""
             doc["utms"]=""

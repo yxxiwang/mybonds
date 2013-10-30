@@ -342,10 +342,12 @@ def saveFulltextById(ids, url="", frombackend=False):
                     tftxs.save(doc) 
                 if doc.has_key("relatedChannel"):
                     for rc in doc["relatedChannel"]:
-                        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=rc["channelName"], desc=rc["channelName"])
+                        beaconname = rc["channelName"][1:] if rc["channelName"].startswith("*") else rc["channelName"]
+                        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
                 if doc.has_key("category"):
                     rc = doc["category"]
-                    addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=rc["channelName"], desc=rc["channelName"])
+                    beaconname = rc["channelName"][1:] if rc["channelName"].startswith("*") else rc["channelName"]
+                    addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
                     
                 docid = str(doc["docId"])
     #             pipedoc.set("ftx:"+docid,json.dumps(txt))

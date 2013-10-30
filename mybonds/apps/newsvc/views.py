@@ -500,13 +500,13 @@ def newsdetail(request):
             rcobj={}
             rcobj["beaconusr"]="doc"
             rcobj["beaconid"]=getHashid(rc["channelId"])
-            rcobj["beaconname"]=rc["channelName"]
+            rcobj["beaconname"]= r.hget("bmk:doc:"+rcobj["beaconid"], "name").decode("utf8")
             rc_lst.append(rcobj)
         doc["relatedchannel"] = rc_lst
     if doc.has_key("category"):
         doc["category"]["beaconusr"]="doc"
         doc["category"]["beaconid"]=getHashid(doc["category"]["channelId"])
-        doc["category"]["beaconname"]=doc["category"]["channelName"]
+        doc["category"]["beaconname"]=r.hget("bmk:doc:"+doc["category"]["beaconid"], "name").decode("utf8")
         if doc["category"].has_key("channelId") : doc["category"].pop("channelId")
         if doc["category"].has_key("channelName") : doc["category"].pop("channelName")
         if doc["category"].has_key("docId") : doc["category"].pop("docId")

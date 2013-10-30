@@ -570,8 +570,8 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1"):
             addBeacon("doc", beaconid, beaconid, beaconname, title, tms)
             doc["beaconusr"] = "doc"
             doc["beaconid"] = beaconid          
-#             doc["beaconname"] = r.hget("bmk:doc:"+beaconid, "name").decode("utf8")
-            doc["beaconname"] = beaconname
+            doc["beaconname"] = r.hget("bmk:doc:"+beaconid, "name").decode("utf8")
+#             doc["beaconname"] = beaconname
             doc["isbeacon"] = "true"
             docs.append(doc)
 #         udata["docs"]=docs

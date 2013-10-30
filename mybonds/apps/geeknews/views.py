@@ -125,12 +125,27 @@ def research(request,template_name="beacon/fulltextnew.html"):
     if quantity > getsysparm("QUANTITY"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>') 
     ftxlist=[]
-    relatedsites= []
+    relatedsites= [] 
     fulldoc = tftxs.find_one({"_id":docid})
     if fulldoc is not None:
 #         print fulldoc
         ftxlist = fulldoc["fulltext"] 
-        if fulldoc.has_key("relatedSites"): relatedsites = fulldoc["relatedSites"] 
+        if fulldoc.has_key("relatedSites"): relatedsites = fulldoc["relatedSites"]       
+        if fulldoc.has_key("relatedChannel"):
+            rc_lst=[]
+            for rc in fulldoc["relatedChannel"]:
+                rcobj={}
+                rcobj["beaconusr"]="doc"
+                rcobj["beaconid"]=getHashid(rc["channelId"])
+                rcobj["beaconname"]=rc["channelName"]
+                rc_lst.append(rcobj)
+            fulldoc["relatedchannel"] = rc_lst
+        
+        if fulldoc.has_key("category"):
+            fulldoc["category"]["beaconusr"]="doc"
+            fulldoc["category"]["beaconid"]=getHashid(fulldoc["category"]["channelId"])
+            fulldoc["category"]["beaconname"]=fulldoc["category"]["channelName"] 
+            
         url = fulldoc["urls"][0].split(",")[1]
     else:
         doc = rdoc.hgetall("doc:"+docid)
@@ -139,6 +154,8 @@ def research(request,template_name="beacon/fulltextnew.html"):
     return render_to_response(template_name, {
         'ftxlist': ftxlist, 
         'relatedsites': relatedsites, 
+        'relatedchannel': fulldoc["relatedchannel"], 
+        'category': fulldoc["category"], 
         'docid': docid, 
         'url': url,
         'tempparmsobj':r.hgetall("tempparms"),

@@ -99,6 +99,11 @@
     {% for site in relatedsites %}
     <a href="/newsvc/docextend/?docid={{docid}}&host={{site.1}}&ascii=0&usecache=1" title="灯塔阅读"> {{site.0}} ({{site.2}})</a> &nbsp;&nbsp;
     {% endfor %}
+
+    {% for rc in relatedchannel %}
+    <a href="/newsvc/channelpick/?beaconid={{rc.beaconid}}&beaconusr=doc&ascii=0&usecache=1" title="灯塔阅读"> {{rc.beaconname}}</a> &nbsp;&nbsp;
+    {% endfor %}
+    <a href="/newsvc/channelpick/?beaconid={{category.beaconid}}&beaconusr=doc&ascii=0&usecache=1" title="灯塔阅读"> {{category.beaconname}}</a> &nbsp;&nbsp;
     </div> <!-- /row-fluid -->
     <div class="row-fluid">
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{{ url }}" title="灯塔阅读"><h4 style="color:white;margin-bottem: 23px;font-size: 15px;">查看原文</h4> </a> </p>

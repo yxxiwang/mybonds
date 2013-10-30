@@ -494,18 +494,27 @@ def newsdetail(request):
             beacon_lst.append(sobj)
             addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
         doc["relatedsites"] = beacon_lst
-            
-    
-#         for site in doc["relatedSites"]:
-#             bobj={}
-#             bobj["beaconusr"]="extend"
-#             bobj["beaconname"]=site[0]
-#             bobj["beaconid"]=str(docid)+getHashid(site[0])
-#             bobj["host"]=site[1]
-#             bobj["total"]=site[2]
-#             beacon_lst.append(bobj)
-#         doc["beacons"] = beacon_lst
+    rc_lst=[]
+    if doc.has_key("relatedChannel"):
+        for rc in doc["relatedChannel"]:
+            rcobj={}
+            rcobj["beaconusr"]="doc"
+            rcobj["beaconid"]=getHashid(rc["channelId"])
+            rcobj["beaconname"]=rc["channelName"]
+            rc_lst.append(rcobj)
+        doc["relatedchannel"] = rc_lst
+    if doc.has_key("category"):
+        doc["category"]["beaconusr"]="doc"
+        doc["category"]["beaconid"]=getHashid(doc["category"]["channelId"])
+        doc["category"]["beaconname"]=doc["category"]["channelName"]
+        if doc["category"].has_key("channelId") : doc["category"].pop("channelId")
+        if doc["category"].has_key("channelName") : doc["category"].pop("channelName")
+        if doc["category"].has_key("docId") : doc["category"].pop("docId")
+        if doc["category"].has_key("docCreateTime") : doc["category"].pop("docCreateTime")
         
+    if doc.has_key("relatedChannel"): doc.pop("relatedChannel") 
+    if doc.has_key("relatedDocs2"): doc.pop("relatedDocs2")
+    
     if doc.has_key("relatedSites"): doc.pop("relatedSites")
     if doc.has_key("relatedDocs"): doc.pop("relatedDocs")
     if doc.has_key("relatedEvent"): doc.pop("relatedEvent")

@@ -340,9 +340,13 @@ def saveFulltextById(ids, url="", frombackend=False):
     #                 doc.pop("relatedDocs")
                     logger.info("save fulltext in mongodb:" + doc["_id"])
                     tftxs.save(doc) 
-                else:
-                    pass
-                
+                if doc.has_key("relatedChannel"):
+                    for rc in doc["relatedChannel"]:
+                        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=rc["channelName"], desc=rc["channelName"])
+                if doc.has_key("category"):
+                    rc = doc["category"]
+                    addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=rc["channelName"], desc=rc["channelName"])
+                    
                 docid = str(doc["docId"])
     #             pipedoc.set("ftx:"+docid,json.dumps(txt))
     #             pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)
@@ -363,6 +367,7 @@ def saveFulltextById(ids, url="", frombackend=False):
                 domain = doc["domain"]
                 host = r.hget("navi", domain)
                 host = "" if host is None else host
+                
 #                 if not r.exists("bmk:news:" + getHashid(domain)):
 #                     addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
             pipedoc.execute()

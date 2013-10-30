@@ -57,11 +57,7 @@ def channels(num):
             rt = refreshDocs(beaconusr, beaconid,days="-1",force=force)
             if not rt == SUCCESS:
                 pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"-1"})
-            
-        rt = refreshDocs(beaconusr, beaconid,days="1",force=force)
-        if not rt == SUCCESS:
-            pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
-
+             
         if beaconusr =="extend":
             pushQueue("docextend",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
             
@@ -80,6 +76,10 @@ def channels(num):
             rt = WARNNING if udata=={} or udata is None else SUCCESS
             if not rt == SUCCESS:
                 pushQueue("channelnews",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        else:
+            rt = refreshDocs(beaconusr, beaconid,days="1",force=force)
+            if not rt == SUCCESS:
+                pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         
 def retriveData(qtype):
     qobj = r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")

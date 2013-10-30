@@ -571,6 +571,7 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1"):
             doc["beaconusr"] = "doc"
             doc["beaconid"] = beaconid          
             doc["beaconname"] = r.hget("bmk:doc:"+beaconid, "name").decode("utf8")
+#             print  doc["beaconname"]
 #             doc["beaconname"] = beaconname
             doc["isbeacon"] = "true"
             docs.append(doc)
@@ -599,6 +600,8 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1"):
             doc["beaconisfllw"] = "true"
         else:
             doc["beaconisfllw"] = "false" 
+        
+        doc["beaconname"] = r.hget("bmk:doc:"+doc["beaconid"] , "name").decode("utf8")
         return doc 
     
     if udata.has_key("docs") and username != "": 

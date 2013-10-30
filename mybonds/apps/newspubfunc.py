@@ -835,6 +835,8 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
 
 def refreshBeacon(beaconusr, beaconid, type=""):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
+    if beaconusr=="rd":
+        return 0
     key = "bmk:" + beaconusr + ":" + beaconid
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
     updt = timeDiff(r.hget(key, "last_update"), time.time())

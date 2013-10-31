@@ -839,6 +839,8 @@ def refreshBeacon(beaconusr, beaconid, type=""):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
     
     key = "bmk:" + beaconusr + ":" + beaconid
+    logger.info("refreshBeacon "+key)
+    
     dt = timeDiff(r.hget(key, "last_touch"), time.time())
     updt = timeDiff(r.hget(key, "last_update"), time.time())
     dt = dt if dt < updt else updt  

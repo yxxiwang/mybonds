@@ -534,8 +534,7 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1"):
     key = "bmk:" + beaconusr + ":" + beaconid
     logger.info("key is " + key)
     if r.exists(key):
-        pass
-#         refreshBeacon(beaconusr, beaconid) 
+        refreshBeacon(beaconusr, beaconid) 
 #         pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
     else:
         return {} 
@@ -855,9 +854,10 @@ def refreshBeacon(beaconusr, beaconid, type=""):
     if not r.hexists(key, "last_touch"):  # 如果不存在上次更新时间,视为未更新过
         logger.warn(key + "'s 'last_touch' is not exists,retrivedocs from backend...")
         if r.exists(key): 
-#             pushQueue("beacon", beaconusr, "beacon", beaconid, urlstr=urlstr)
-#             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
-            pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
+            if beaconusr=="rd":
+                pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+            else:
+                pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
         else:  # 如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             logger.warn(key + " maybe deleted via front  so we ignore it...")
             
@@ -871,10 +871,11 @@ def refreshBeacon(beaconusr, beaconid, type=""):
     elif dt > getsysparm("KEY_UPTIME"):  # 如果上次更新时间过久,则重新刷新数据
         logger.warn("data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt))
         r.hset(key, "last_touch", time.time())  # 更新本操作时间  
-        
-#         if beaconusr!="rd":
-#             pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"7"})
-        pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
+         
+        if beaconusr=="rd":
+            pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+        else:
+            pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
     else:
         logger.warn("Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt, getsysparm("KEY_UPTIME")))
         

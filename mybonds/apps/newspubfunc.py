@@ -323,6 +323,57 @@ def saveFulltextById(ids, url="", frombackend=False):
             udata = saveFile(urlstr) 
         return udata
     
+    def saveText(docs):
+        ids_lst = []
+        tms = time.time()
+        ids = ""
+        docs.reverse()
+        pipedoc = rdoc.pipeline()
+        for doc in docs:
+            if doc is None: 
+                continue 
+#             if doc["validTime"]=="false" or not doc["validTime"]:
+#                 continue
+    #             docid = getHashid(doc["url"]) 
+            docid = str(doc["docId"])
+            
+            if not rdoc.hexists("doc:" + docid, "url"):
+                if tms - long(doc["create_time"]) / 1000 > 86400 * 60:  # 如果是一个月以前的新闻
+                    logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid, tms - long(doc["create_time"]) / 1000))
+                else:
+                    ids += docid + ";"
+                    logger.debug("save fulltext doc:%s, tms is %d" % (docid, tms))
+            else:
+                logger.debug("save doc:%s, tms is %d" % (docid, tms))
+
+            title = doc["title"]
+#             title = title.replace("&ldquo;","").replace("&rdquo;","").rstrip()
+            title = strfilter(title)
+            pipedoc.hset("doc:" + docid, "docid", docid)
+            pipedoc.hset("doc:" + docid, "title", title)
+    #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
+            pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
+            pipedoc.hset("doc:" + docid, "copyNum", doc["copyNum"])
+            pipedoc.hset("doc:" + docid, "popularity", doc["popularity"])
+            if doc.has_key("eventId") and doc["eventId"] != -1: 
+                pipedoc.hset("doc:" + docid, "eventid", doc["eventId"])
+            pipedoc.hset("doc:" + docid, "create_time", doc["create_time"])
+            pipedoc.hset("doc:" + docid, "utms", tms)
+            tms = tms + 1 
+            if doc.has_key("host"): 
+                pipedoc.hset("doc:" + docid, "host", doc["host"])
+            pipedoc.hset("doc:" + docid, "domain", doc["domain"]) 
+#             pipedoc.hset("doc:" + docid, "isheadline", headlineonly) 
+                
+            pipedoc.expire("doc:" + docid, getsysparm("DOC_EXPIRETIME") * 3)
+#         print "to be save fulltext_ids is ",ids 
+        if len(ids) > 0: 
+            urlstr = "http://%s/research/svc?docid=%s" % (getsysparm("BACKEND_DOMAIN"), ids)
+            pushQueue("fulltext", {"urlstr":urlstr}) 
+#             saveFulltextById(ids)
+        pipedoc.execute()
+    ################## saveText is over ##############################
+    
     def saveFile(urlstr, retrycnt=0):
         logger.info("proc url=" + urlstr)
         udata = bench(loadFromUrl, parms=urlstr)
@@ -348,7 +399,9 @@ def saveFulltextById(ids, url="", frombackend=False):
                     rc = doc["category"]
                     beaconname = rc["channelName"][1:] if rc["channelName"].startswith("*") else rc["channelName"]
                     addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
-                    
+                if doc.has_key("relatedDocs"):
+                    saveText(doc["relatedDocs"])
+                
                 docid = str(doc["docId"])
     #             pipedoc.set("ftx:"+docid,json.dumps(txt))
     #             pipedoc.expire("ftx:"+docid,DOC_EXPIRETIME)

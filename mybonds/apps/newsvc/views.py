@@ -463,7 +463,7 @@ def newsdetail(request):
         doc["api"]=api
         return HttpResponse(json.dumps(doc), mimetype="application/json")
     doc["text"] = ""
-    doc["relatedDocs"]=""
+#     doc["relatedDocs"]=""
     ftx = doc["fulltext"] 
     txstr = json.dumps(ftx)
     txstr = txstr.replace(""", \"""",""", \"\\u3000\\u3000""").replace("""[\"""","""[\"\\u3000\\u3000""")
@@ -511,12 +511,29 @@ def newsdetail(request):
         if doc["category"].has_key("channelName") : doc["category"].pop("channelName")
         if doc["category"].has_key("docId") : doc["category"].pop("docId")
         if doc["category"].has_key("docCreateTime") : doc["category"].pop("docCreateTime")
-        
+    dc_lst=[]
+    if doc.has_key("relatedDocs"):
+        for dc in doc["relatedDocs"]:
+            dc = rdoc.hgetall("doc:" + str(dc["docId"])) 
+            if dc == {}: continue   
+            dc["text"] = subDocText(dc["text"]).decode("utf8")
+            if dc.has_key("title"): dc["title"] = dc["title"].decode("utf8") + u"\u3000" 
+            dc["domain"] = dc["domain"].decode("utf8")
+            dc["copyNum"] = str(dc["copyNum"])
+            dc["popularity"] = str(dc["popularity"])
+            dc["tms"] = str(dc["create_time"])
+            dc["create_time"] = timeElaspe(dc["create_time"])
+            if dc.has_key("label"): dc.pop("label")
+            if not dc.has_key("utms"): dc["utms"] = dc["tms"]
+            dc_lst.append(dc)
+        doc["relatedDocs"] = dc_lst
+            
+      
     if doc.has_key("relatedChannel"): doc.pop("relatedChannel") 
-    if doc.has_key("relatedDocs2"): doc.pop("relatedDocs2")
+#     if doc.has_key("relatedDocs2"): doc.pop("relatedDocs2")
     
     if doc.has_key("relatedSites"): doc.pop("relatedSites")
-    if doc.has_key("relatedDocs"): doc.pop("relatedDocs")
+#     if doc.has_key("relatedDocs"): doc.pop("relatedDocs")
     if doc.has_key("relatedEvent"): doc.pop("relatedEvent")
     if doc.has_key("urls"): doc.pop("urls")
     if doc.has_key("eventId"): doc.pop("eventId")

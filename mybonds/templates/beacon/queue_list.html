@@ -18,7 +18,7 @@
   		<div class="tabbable  tabs-top"> <!-- Only required for left/right tabs -->
   			<ul class="nav nav-tabs">
   				<li class="active"><a href="#tab1" data-toggle="tab">频道新闻队列</a></li>
-          <li ><a href="#tab2" data-toggle="tab">移除新闻队列</a></li>
+          <li ><a href="#tab2" data-toggle="tab">获取新闻全文队列</a></li>
           <li ><a href="#tab3" data-toggle="tab">邮件发送队列</a></li>
   			</ul>
   			<div class="tab-content">
@@ -64,38 +64,34 @@
 
           <div class="tab-pane" id="tab2">
             <table class="table table-hover table-striped table-bordered table-condensed">
-              <caption>移除新闻已处理队列(显示最后5条)</caption>
+              <caption>获取新闻全文已处理队列(显示最后5条)</caption>
               <thead>
                 <tr>
-                  <th>time</th>
-                  <th>id</th>
-                  <th>channel</th>
+                  <th>time</th> 
+                  <th>url</th>
                 </tr>
               </thead>
               <tbody>
-                {% for rq in removeqdones %} 
+                {% for rq in fulltextdone %} 
                 <tr class="info">
-                  <td>{{rq.tms}}</td>
-                  <td>{{rq.docid}}</td>
+                  <td>{{rq.tms}}</td> 
                   <td>{{rq.name}}</td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>  
             <table class="table table-hover table-striped table-bordered table-condensed">
-              <caption>移除新闻待处理队列 (显示最后: {{ removeqs|length }} 条,共: {{rqcnt}} 条 ) <a href="/queuelist?delete=removedoc" >一键清空</a></caption>
+              <caption>获取新闻全文待处理队列 (显示最后: {{ fulltext|length }} 条,共: {{fqcnt}} 条 ) <a href="/queuelist?delete=fulltext" >一键清空</a></caption>
               <thead>
                 <tr>
-                  <th>time</th>
-                  <th>id</th>
-                  <th>channel</th>
+                  <th>time</th> 
+                  <th>url</th>
                 </tr>
               </thead>
               <tbody>
-                {% for rq in removeqs %} 
+                {% for rq in fulltext %} 
                 <tr class="info">
-                  <td>{{rq.tms}}</td>
-                  <td>{{rq.docid}}</td>
+                  <td>{{rq.tms}}</td> 
                   <td>{{rq.name}}</td>
                 </tr>
                 {% endfor %}

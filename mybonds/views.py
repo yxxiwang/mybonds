@@ -451,6 +451,8 @@ def queuelist(request,template_name="beacon/queue_list.html"):
     delete = request.GET.get("delete", "")
     if delete == "beacon":
         r.delete("queue:beacon")
+    elif  delete == "fulltext":
+        r.delete("queue:fulltext")
     elif  delete == "removedoc":
         r.delete("queue:removedoc")
     elif  delete == "sendemail":
@@ -466,6 +468,9 @@ def queuelist(request,template_name="beacon/queue_list.html"):
             bobj = json.loads(obj) 
 #             bobj["name"] = r.hget("bmk:"+bobj["beacon"],"name")
             bobj["name"] = bobj["channel"]
+        elif type=="fulltext": 
+            bobj = json.loads(obj)
+            bobj["name"] = bobj["urlstr"]
         return bobj
     beaconqueue_list = r.lrange("queue:beacon:processing",0,-1) + r.lrange("queue:beacon",0,20)
     bqcnt= r.llen("queue:beacon")
@@ -475,13 +480,20 @@ def queuelist(request,template_name="beacon/queue_list.html"):
     beaconqueue_list = [loadbeacon(obj) for obj in beaconqueue_list]
     beaconqueue_done_list = [loadbeacon(obj) for obj in beaconqueue_done_list]
     
-    removeq_list = r.lrange("queue:removedoc:processing",0,-1) + r.lrange("queue:removedoc",0,20)
-    rqcntdone= r.llen("queue:removedoc:done")
-    rqcnt= r.llen("queue:removedoc")
-    rqcnt = rqcnt+1 if rqcnt!=0 else 0
-    removeq_done_list = r.lrange("queue:removedoc:done",0,5)
-    removeq_list = [loadbeacon(obj,"remove")  for obj in removeq_list]
-    removeq_done_list = [loadbeacon(obj,"remove")  for obj in removeq_done_list]
+    fulltext_list = r.lrange("queue:fulltext:processing",0,-1) + r.lrange("queue:fulltext",0,20)
+    fqcntdone= r.llen("queue:fulltext:done")
+    fqcnt= r.llen("queue:fulltext")
+    fqcnt = fqcnt+1 if fqcnt!=0 else 0
+    fulltext_done_list = r.lrange("queue:fulltext:done",0,5)
+    fulltext_list = [loadbeacon(obj,"fulltext")  for obj in fulltext_list]
+    fulltext_done_list = [loadbeacon(obj,"fulltext")  for obj in fulltext_done_list]
+#     removeq_list = r.lrange("queue:removedoc:processing",0,-1) + r.lrange("queue:removedoc",0,20)
+#     rqcntdone= r.llen("queue:removedoc:done")
+#     rqcnt= r.llen("queue:removedoc")
+#     rqcnt = rqcnt+1 if rqcnt!=0 else 0
+#     removeq_done_list = r.lrange("queue:removedoc:done",0,5)
+#     removeq_list = [loadbeacon(obj,"remove")  for obj in removeq_list]
+#     removeq_done_list = [loadbeacon(obj,"remove")  for obj in removeq_done_list]
     
     sendemail_list = r.lrange("queue:sendemail:processing",0,-1) + r.lrange("queue:sendemail",0,20)
     sqcntdone= r.llen("queue:sendemail:done")
@@ -498,10 +510,14 @@ def queuelist(request,template_name="beacon/queue_list.html"):
         'bqcnt':bqcnt,
         'bqcntdone':bqcntdone,
         
-        'removeqs':removeq_list,
-        'removeqdones':removeq_done_list,
-        'rqcnt':rqcnt,
-        'rqcntdone':rqcntdone,
+#         'removeqs':removeq_list,
+#         'removeqdones':removeq_done_list,
+#         'rqcnt':rqcnt,
+#         'rqcntdone':rqcntdone,
+        'fulltext':fulltext_list,
+        'fulltextdone':fulltext_done_list,
+        'fqcnt':fqcnt,
+        'fqcntdone':fqcntdone,
         
         'sendemailqs':sendemail_list,
         'sendemailqdones':sendemail_done_list,

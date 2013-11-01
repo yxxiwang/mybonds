@@ -503,6 +503,7 @@ def newsdetail(request):
             rcobj["beaconname"]= r.hget("bmk:doc:"+rcobj["beaconid"], "name").decode("utf8")
             rc_lst.append(rcobj)
         doc["relatedchannel"] = rc_lst
+    ct_lst=[]
     if doc.has_key("category"):
         doc["category"]["beaconusr"]="doc"
         doc["category"]["beaconid"]=getHashid(doc["category"]["channelId"])
@@ -511,6 +512,8 @@ def newsdetail(request):
         if doc["category"].has_key("channelName") : doc["category"].pop("channelName")
         if doc["category"].has_key("docId") : doc["category"].pop("docId")
         if doc["category"].has_key("docCreateTime") : doc["category"].pop("docCreateTime")
+        ct_lst.append(doc["category"])
+        doc["category"] = ct_lst
     dc_lst=[]
     if doc.has_key("relatedDocs"):
         for dc in doc["relatedDocs"]:

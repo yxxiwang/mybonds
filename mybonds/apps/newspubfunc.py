@@ -352,7 +352,8 @@ def saveFulltextById(ids, url="", frombackend=False):
             pipedoc.hset("doc:" + docid, "docid", docid)
             pipedoc.hset("doc:" + docid, "title", title)
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
-            pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
+#             pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
+            pipedoc.hset("doc:" + docid, "text", "")
             pipedoc.hset("doc:" + docid, "copyNum", doc["copyNum"])
             pipedoc.hset("doc:" + docid, "popularity", doc["popularity"])
             if doc.has_key("eventId") and doc["eventId"] != -1: 
@@ -409,8 +410,8 @@ def saveFulltextById(ids, url="", frombackend=False):
                     pipedoc.hset("doc:" + docid, "docid", docid)
 #                 if not r.hexists("doc:"+docid,"title"):
                 pipedoc.hset("doc:" + docid, "title", doc["title"].rstrip()) 
-                if not r.hexists("doc:" + docid, "text"):
-                    pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
+#                 if not r.hexists("doc:" + docid, "text"):
+#                     pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
                 if not r.hexists("doc:" + docid, "copyNum"):
                     pipedoc.hset("doc:" + docid, "copyNum", doc["copyNum"])  
                 if not r.hexists("doc:" + docid, "create_time"):
@@ -466,9 +467,10 @@ def buildBeaconData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby=
         doc = rdoc.hgetall("doc:" + docid) 
         if doc == {}:
             continue  
-        if not isapi:
-            doc["tx"] = doc["text"].decode("utf8")
-        doc["text"] = subDocText(doc["text"]).decode("utf8")
+#         if not isapi:
+#             doc["tx"] = doc["text"].decode("utf8")
+#         doc["text"] = subDocText(doc["text"]).decode("utf8")
+        doc["text"] = ""
         if doc.has_key("title"): doc["title"] = doc["title"].decode("utf8") + u"\u3000"
 #         doc["domain"] = doc["domain"].decode("utf8") + u"\u3000"
         doc["domain"] = doc["domain"].decode("utf8")
@@ -556,7 +558,8 @@ def saveDocsByUrl(urlstr, headlineonly="0"):
             pipedoc.hset("doc:" + docid, "docid", docid)
             pipedoc.hset("doc:" + docid, "title", title)
     #                 pipedoc.hset("doc:"+docid,"text",subDocText(doc["text"]).replace(" ",""))
-            pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
+#             pipedoc.hset("doc:" + docid, "text", doc["text"].rstrip())
+            pipedoc.hset("doc:" + docid, "text", "")
             pipedoc.hset("doc:" + docid, "copyNum", doc["copyNum"])
             pipedoc.hset("doc:" + docid, "popularity", doc["popularity"])
             if doc.has_key("eventId") and doc["eventId"] != -1: 
@@ -689,7 +692,8 @@ def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderb
 #         doc.pop("text")
 #         doc.pop("copyNum")
 
-        doc["text"] = subDocText(doc["text"]).decode("utf8")
+#         doc["text"] = subDocText(doc["text"]).decode("utf8")
+        doc["text"] = ""
         doc["title"] = doc["title"].decode("utf8") + u"\u3000"
         doc["copyNum"] = str(doc["copyNum"])
         if doc.has_key("popularity"):

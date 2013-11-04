@@ -580,6 +580,7 @@ def beaconsave(request, template_name="beacon_list.html"):
 #             r.hset(key, "tag", beacontag)
 #             r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
 #         else:  # modify desc and so on
+            r.hset(key, "ttl", beaconname)
             r.hset(key, "crt_usr", beaconusr)
             r.hset(key, "crt_tms", getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")) 
             r.hset(key, "desc", desc)

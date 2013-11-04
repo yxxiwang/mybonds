@@ -520,6 +520,7 @@ def beaconsave(request, template_name="beacon_list.html"):
     username = getUserName(request)
     if username not in ["ltb", "wxi", "sj"] :  
         return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')
+    op = request.GET.get("op", "")
     beaconid = request.GET.get("beaconid", "")
     beaconusr = request.GET.get("beaconusr", "")
     beacontime = request.GET.get("beacontime", "")
@@ -536,10 +537,10 @@ def beaconsave(request, template_name="beacon_list.html"):
     
     quantity = log_typer(request, "beaconsave", beaconusr + ":" + beaconid)
     
-    beaconname = beaconname.replace(" ", "")
+    beaconname = beaconname.replace(" ", "").replace("|-|", ";")
     beaconmindoc = 0 if beaconmindoc == "" else beaconmindoc
     key = "bmk:" + beaconkey
-    if beaconkey == "":  # new add 
+    if op == "add":  # new add 
         beaconid = getHashid(beaconname)
         key = "bmk:" + beaconusr + ":" + beaconid
         r.hset(key, "id", beaconid)

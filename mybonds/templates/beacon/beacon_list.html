@@ -182,7 +182,7 @@
   $('#add_btn').click(function(){
     beacon_key = $('#beacon_key').val();
     beacon_usr = $('#beacon_usr').val();
-    beacon_name = $('#beacon_name').val();
+    beacon_name = $('#beacon_name').val().replace(/;/g,"|-|");
     beacon_time = $('#beacon_time').val().replace(/-/g,"").replace(/:/g,"");
     beacon_displayname = $('#beacon_displayname').val();
     beacon_desc = $('#beacon_desc').val();
@@ -197,7 +197,7 @@
         headlineonly= "1"; 
     } 
     // alert('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beacontime='+beacon_time+'&beaconusr='+beacon_usr+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly+'&beacondisplayname='+beacon_displayname+'&beacontag='+beacontag);
-    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beacontime='+beacon_time+'&beaconusr='+beacon_usr+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly+'&beacondisplayname='+beacon_displayname+'&beacontag='+beacontag);
+    window.location.href = encodeURI('/news/beaconsave/?op=add&share=1&beaconkey=&desc='+beacon_desc+'&beaconname='+beacon_name+'&beacontime='+beacon_time+'&beaconusr='+beacon_usr+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly+'&beacondisplayname='+beacon_displayname+'&beacontag='+beacontag);
     // $('#beacon_id').val("");
     // $('#beacon_name').val("");
     // $('#beacon_desc').val(""); 
@@ -206,7 +206,7 @@
   $('#save_btn').click(function(){
     beacon_key = $('#beacon_key').val();
     beacon_id = $('#beacon_id').val();
-    beacon_name = $('#beacon_name').val();
+    beacon_name = $('#beacon_name').val().replace(/;/g,"|-|");
     beacon_time = $('#beacon_time').val().replace(/-/g,"").replace(/:/g,"");
     beacon_displayname = $('#beacon_displayname').val();
     beacon_usr = $('#beacon_usr').val();
@@ -221,9 +221,9 @@
     if($("#headlineonly").is(':checked')){
         headlineonly= "1"; 
     }
-    
+    // alert(beacon_name);
     // alert('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beaconkey='+beacon_key);
-    window.location.href = encodeURI('/news/beaconsave/?share=1&beaconid='+beacon_id+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beacontime='+beacon_time+'&beaconkey='+beacon_key+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly+'&beacondisplayname='+beacon_displayname+'&beacontag='+beacontag);
+    window.location.href = encodeURI('/news/beaconsave/?op=modify&share=1&beaconid='+beacon_id+'&beaconkey='+beacon_key+'&desc='+beacon_desc+'&beaconusr='+beacon_usr+'&beaconname='+beacon_name+'&beacontime='+beacon_time+'&beaconmindoc='+beacon_mindoc+'&headlineonly='+headlineonly+'&beacondisplayname='+beacon_displayname+'&beacontag='+beacontag);
   });
 
 </script>

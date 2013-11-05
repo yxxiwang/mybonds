@@ -258,11 +258,12 @@ def docextend(request):
     beaconname = beaconname if beaconname is not None else ""
     if r.hget("navi:ori",host) is not None: beaconname = "%s-->%s" %(beaconname ,r.hget("navi:ori",host))
     
-    beaconusr= "extend"
+#     beaconusr= "extend"
+    beaconusr= "doc"
     beaconid= docid+getHashid(host)
     beacon = Beacon(beaconusr,beaconid)
     beacon.setUsecache(usecache)
-#     beacon.add(docid, beaconname=beaconname, desc=host, beacontime="", mindoc="", tag="", headlineonly="0")
+    beacon.add(docid, beaconname=beaconname, desc=host, beacontime="", mindoc="", tag="", headlineonly="0")
     udata = beacon.getExtendlist()
     udata = dataProcForApi(udata)
     udata["api"]=api

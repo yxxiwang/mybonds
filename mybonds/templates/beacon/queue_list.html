@@ -68,14 +68,14 @@
               <thead>
                 <tr>
                   <th>time</th> 
-                  <th>url</th>
+                  <th >url</th>
                 </tr>
               </thead>
               <tbody>
                 {% for rq in fulltextdone %} 
                 <tr class="info">
                   <td>{{rq.tms}}</td> 
-                  <td>{{rq.name}}</td>
+                  <td style="word-break:break-all;">{{rq.name}}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -92,7 +92,7 @@
                 {% for rq in fulltext %} 
                 <tr class="info">
                   <td>{{rq.tms}}</td> 
-                  <td>{{rq.name}}</td>
+                  <td style="word-break:break-all;">{{rq.name}}</td>
                 </tr>
                 {% endfor %}
               </tbody>

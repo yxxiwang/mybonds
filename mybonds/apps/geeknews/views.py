@@ -771,7 +771,7 @@ def beaconnews(request, template_name="beacon/beacon_news.html"):
     
     logobj = "ordey by " + orderby
     if beaconid != "":
-        logobj = r.hget("bmk:" + beaconusr + ":" + beaconid, "ttl")
+        logobj = r.hget("bmk:" + beaconusr + ":" + beaconid, "name")
     elif heartid != "":
         beaconname = r.hget("bmk:" + heartusr + ":" + heartid, "ttl")
         beaconname = to_unicode_or_bust(beaconname)

@@ -58,12 +58,13 @@
             <input id="beacon_key"  type="hidden" class="uneditable-input" placeholder="灯塔..." value="{{beaconusr}}:{{beaconid}}"> 
             <br>所属用户<br><input id="beacon_usr"  type="text" class="" placeholder="灯塔所属用户" value="{{beaconusr}}">  
             <br>生成时间<br><input id="beacon_time"  type="text" class="" placeholder="灯塔生成时间" value="{{beacontime}}"> 
-            <br>灯塔名称<br><input id="beacon_name"  type="text" class="" placeholder="灯塔名称..." value="{{beaconname}}"> 
+            <!--br>灯塔名称<br><input id="beacon_name"  type="text" class="" placeholder="灯塔名称..." value="{{beaconname}}"--> 
+            <br>灯塔名称<br><textarea id="beacon_name" rows="6"  placeholder="灯塔名称..." >{{beaconname}}</textarea> 
             <br>灯塔显示名称<br><input id="beacon_displayname"  type="text" class="" placeholder="灯塔显示名称..." value="{{beacondisplayname}}">
             <br>新闻长度<br><input id="beacon_mindoc"  type="text" class="" placeholder="灯塔文章长度" value="{{beaconmindoc}}"> 
             <br>只看热点&nbsp;&nbsp;<input id="headlineonly" class='cbox' type="checkbox" value="{{headlineonly}}" {% if headlineonly == "1" %} checked {% endif %}>
             <br>标签<br><input id="beacontag"  type="text" class="" placeholder="灯塔标签" value="{{beacontag}}"> 
-            <br>描述<br><textarea id="beacon_desc" rows="3"  placeholder="灯塔描述..." >{{beacondesc}}</textarea> 
+            <br>描述<br><textarea id="beacon_desc" rows="2"  placeholder="灯塔描述..." >{{beacondesc}}</textarea> 
             <button id="add_btn" class="btn btn-warning">新增灯塔</button>
             <button id="save_btn" class="btn btn-primary">修改保存灯塔</button>
             <!--button id="backup_btn" class="btn btn-primary">备份灯塔</button> 

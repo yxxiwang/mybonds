@@ -262,7 +262,7 @@ def docextend(request):
     beaconid= docid+getHashid(host)
     beacon = Beacon(beaconusr,beaconid)
     beacon.setUsecache(usecache)
-    beacon.add(docid, beaconname=beaconname, desc=host, beacontime="", mindoc="", tag="", headlineonly="0")
+#     beacon.add(docid, beaconname=beaconname, desc=host, beacontime="", mindoc="", tag="", headlineonly="0")
     udata = beacon.getExtendlist()
     udata = dataProcForApi(udata)
     udata["api"]=api

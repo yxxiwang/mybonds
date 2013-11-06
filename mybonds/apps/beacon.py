@@ -99,6 +99,13 @@ class Beacon:
         beaconname = beaconname.decode("utf8")
         return beaconname
     
+    def getBeaconTime(self):
+        beacontime = r.hget(self.key, "crt_tms")
+        beacontime = time.time() if beacontime is None else beacontime
+        beacontime = getTime(beacontime, formatstr="%YYear%mMouth%dDay".decode("utf8"), addtimezone=False) 
+        beacontime=beacontime.replace("Year","年".decode("utf8")).replace("Mouth","月".decode("utf8")).replace("Day","日".decode("utf8"))
+        return beacontime
+    
     def getobject(self):
         return r.hgetall(self.key)
     
@@ -214,13 +221,12 @@ class Beacon:
         key = self.key
         username=self.username
         beaconusr = self.beaconusr
-        beaconid = self.beaconid
+        beaconid = self.beaconid 
         doc_lst = r.zrevrange(key + ":doc:tms", 0, 3)
         doc = {}
         userfllws = r.zrevrange("usr:" + username+":fllw",0,-1)
         for docid in doc_lst:
             doc = rdoc.hgetall("doc:" + docid)
-            print docid
             if len(doc.keys()) == 0:
                 continue 
 #             doc["text"] = ""
@@ -236,6 +242,7 @@ class Beacon:
             doc["beaconusr"] = beaconusr
             doc["beaconid"] = beaconid 
             doc["beaconname"] = self.getBeaconName()
+            doc["beacontime"] = self.getBeaconTime()
             break 
         return doc
         

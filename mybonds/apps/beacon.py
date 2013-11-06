@@ -216,7 +216,7 @@ class Beacon:
         beaconusr = self.beaconusr
         beaconid = self.beaconid
         doc_lst = r.zrevrange(key + ":doc:tms", 0, 3)
-#         doc = {}
+        doc = {}
         userfllws = r.zrevrange("usr:" + username+":fllw",0,-1)
         for docid in doc_lst:
             doc = rdoc.hgetall("doc:" + docid)

@@ -651,6 +651,7 @@ def channelsbygroup(request):
             beacons.append(bobj)
     
     gobj["name"]=gobj["name"].decode("utf8")
+    if gobj.has_key("desc") :gobj["desc"]=gobj["desc"].decode("utf8")
     udata["group"] = gobj
     udata["beacons"] = beacons
     udata["total"] = len(beacons)

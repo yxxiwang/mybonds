@@ -295,6 +295,7 @@ def load_beacons(request):
 # @login_required
 def listbeacons_service(request):
     orderby = request.GET.get("orderby", "news")
+    ascii = request.GET.get("ascii", "1")
     beaconname = request.GET.get("beaconname", "")
     username = request.GET.get("u", getUserName(request))
     start = request.GET.get("start", "0")
@@ -375,7 +376,8 @@ def listbeacons_service(request):
     robj["message"] = "success to featch data"  
     robj["total"] = str(len(sharebeacon_list)) 
     robj["beacons"] = sharebeacon_list
-    return HttpResponse(json.dumps(robj), mimetype="application/json")
+#     return HttpResponse(json.dumps(robj), mimetype="application/json")
+    return HttpResponse(json.dumps(robj,ensure_ascii=ascii=="1"), mimetype="application/json")
             
 @login_required
 def fllowbeacon_service(request):

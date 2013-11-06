@@ -367,7 +367,8 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
 #             beaconname = beaconname.decode("utf8")
 #         beaconname = to_unicode_or_bust(r.hget(key,"ttl"))
         
-        beaconname = "" if beaconname is None  else beaconname
+        beaconname = "" if beaconname is None  else beaconname.decode("utf8")
+        beacondisplayname = "" if beacondisplayname is None  else beacondisplayname.decode("utf8")
         lst = r.zrevrange(key+":doc:tms",0,newscnt-1)
 #         sim_lst += lst
 #         newcnt = getBeaconNewsCnt(username,beaconusr,beaconid)
@@ -376,51 +377,24 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
             if len(doc.keys()) == 0:
                 continue 
     #         doc["tx"] = doc["text"]
-            doc["text"] = subDocText(doc["text"])
+#             doc["text"] = subDocText(doc["text"])
+            doc["text"] = ""
+            doc["title"] = doc["title"].decode("utf8")
+            doc["domain"] = doc["domain"].decode("utf8")
             doc["copyNum"] = str(doc["copyNum"]) 
             doc["tms"]=str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"]) 
             doc["beaconusr"] = beaconusr
             doc["beaconid"] = beaconid
-            doc["beaconttl"] = beaconname 
+#             doc["beaconttl"] = beaconname 
             doc["beaconname"] = beacondisplayname 
+            doc["beacontime"] = getBeaconTime(beaconusr,beaconid) 
             doc["newscnt"] = newscnt 
             docs.append(doc) 
 #             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)
     udata["docs"] = docs
     return udata   
-#   
-#     sim_lst = list(set(sim_lst))#去除重复新闻
-#     crt_time=time.time()
-#     for docid in sim_lst: 
-#         doc = rdoc.hgetall("doc:" + docid) 
-#         if len(doc.keys()) == 0:
-#             continue  
-#         doc["tms"]=str(doc["create_time"])
-#         elaspe = int(crt_time- int(doc["tms"])/ 1000)
-# #        print elaspe
-#         if hour_before>0 and elaspe > hour_before*3600:#取hour_before小时之内的新闻
-#             continue
-#         doc["text"] = subDocText(doc["text"])
-#         doc["copyNum"] = str(doc["copyNum"]) 
-#         doc["create_time"] = timeElaspe(doc["create_time"])   
-#         
-#         beaconstr = rdoc.hget("docid:beacons",docid)
-#         beaconusr,beaconid,beaconttl = beaconstr.split("|-|") 
-#         doc["beaconusr"] = beaconusr
-#         doc["beaconid"] = beaconid
-#         doc["beaconttl"] = beaconttl 
-#         docs.append(doc) 
-# #    docs = sorted(docs,key=lambda l:(l["beaconttl"],l["tms"]),reverse = True)
-# #     docs = sorted(docs,key=lambda l:(l["tms"]),reverse = True)
-# #    docs = docs[int(start): int(start) + int(num)]
-#     udata["docs"] = docs
-#     return udata   
-    
-
-
-
-
+#    
 def buildJsonData(username, docs, tags=None):
     seeds = []
     for hashid in docs:

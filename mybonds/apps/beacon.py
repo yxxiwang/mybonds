@@ -99,12 +99,12 @@ class Beacon:
         beaconname = beaconname.decode("utf8")
         return beaconname
     
-    def getBeaconTime(self):
-        beacontime = r.hget(self.key, "crt_tms")
-        beacontime = time.time() if beacontime is None else beacontime
-        beacontime = getTime(beacontime, formatstr="%YYear%mMouth%dDay".decode("utf8"), addtimezone=False) 
-        beacontime=beacontime.replace("Year","年".decode("utf8")).replace("Mouth","月".decode("utf8")).replace("Day","日".decode("utf8"))
-        return beacontime
+#     def getBeaconTime(self):
+#         beacontime = r.hget(self.key, "crt_tms")
+#         beacontime = time.time() if beacontime is None else beacontime
+#         beacontime = getTime(beacontime, formatstr="%YYear%mMouth%dDay".decode("utf8"), addtimezone=False) 
+#         beacontime=beacontime.replace("Year","年".decode("utf8")).replace("Mouth","月".decode("utf8")).replace("Day","日".decode("utf8"))
+#         return beacontime
     
     def getobject(self):
         return r.hgetall(self.key)
@@ -238,12 +238,13 @@ class Beacon:
             doc["copyNum"] = str(doc["copyNum"])
             doc["tms"]=str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"])
+             
             doc["isfllw"] = "true" if beaconusr+"|-|"+beaconid in userfllws else "false"
             doc["beaconusr"] = beaconusr
             doc["beaconid"] = beaconid 
             doc["beaconname"] = self.getBeaconName()
-            doc["beacontime"] = self.getBeaconTime()
-            break 
+            doc["beacontime"] = getBeaconTime(beaconusr,beaconid)
+            break
         return doc
         
     def getChannelpicklist(self):

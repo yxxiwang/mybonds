@@ -602,8 +602,10 @@ def removeDocFromChannel(request):
     
 def channelsbygroup(request):
     groupid = request.GET.get("groupid", "") 
+    orderby = request.GET.get("orderby", "desc")
     api = request.GET.get("api", "")
     username = request.GET.get("u", getUserName(request))
+    ascii = request.GET.get("ascii", "1")
     udata={} 
     beacons = [] 
     gobj = {}
@@ -630,28 +632,37 @@ def channelsbygroup(request):
 #             bobj["beaconid"]=bobj.pop("id")
 #             bobj["isfllw"] = "true"
 #             beacons.append(bobj)
-    
+    if orderby =="desc":
+        allbeacons = r.zrevrange("bmk:doc:share",0,-1)
+    else:
+        allbeacons = r.zrange("bmk:doc:share",0,-1)
+        
     mybeacons = r.zrevrange("usr:" + username+":fllw",0,-1)
-    for bstr in r.zrevrange("bmk:doc:share",0,-1):
+    for bstr in allbeacons:
         key = "bmk:"+bstr.replace("|-|",":")
         bttl = r.hget(key,"tag")
         bttl = "" if bttl is None else bttl
         if re.search(gobj["name"],bttl):
-            bobj = r.hgetall(key)
-            bobj["beaconid"]=bobj.pop("id")
+            bobj = {}
+            bobj["beaconid"]=r.hget(key,"id")
+            bobj["beaconusr"]=r.hget(key,"crt_usr")
+            bobj["beaconname"]=r.hget(key,"name").decode("utf8")
             bobj["isfllw"] = "true" if bstr in mybeacons else "false"
             beacons.append(bobj)
-
+    
+    gobj["name"]=gobj["name"].decode("utf8")
     udata["group"] = gobj
     udata["beacons"] = beacons
     udata["total"] = len(beacons)
     udata["message"]="success list beacons ." 
     udata["success"] = "true"
     udata["api"]=api
-    return HttpResponse(json.dumps(udata), mimetype="application/json") 
+#     return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
         
 def grouplist(request):
     api = request.GET.get("api", "")
+    ascii = request.GET.get("ascii", "1")
     udata={} 
     groups = [] 
     g_lst = r.zrevrange("groups", 0,-1)  # 组集合
@@ -665,7 +676,8 @@ def grouplist(request):
     udata["message"]="success list groups ." 
     udata["success"] = "true"
     udata["api"]=api
-    return HttpResponse(json.dumps(udata), mimetype="application/json") 
+#     return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
     
 def channelcounts(request):
     username = getUserName(request)

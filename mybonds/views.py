@@ -355,6 +355,7 @@ def groupsave(request, template_name="beacon/group_list.html"):
 @login_required
 def grouplist(request, template_name="beacon/group_list.html"):
     groupid = request.GET.get("groupid", "")
+    orderby = request.GET.get("orderby", "desc")
     username = getUserName(request)
     if username not in ["ltb","wxi","sj"] :  
         return HttpResponse('<h1>只有超级用户才能访问该功能..</h1>')

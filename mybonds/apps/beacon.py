@@ -224,7 +224,7 @@ class Beacon:
         beaconid = self.beaconid 
         doc_lst = r.zrevrange(key + ":doc:tms", 0, 3)
         doc = {}
-        userfllws = r.zrevrange("usr:" + username+":fllw",0,-1)
+#         userfllws = r.zrevrange("usr:" + username+":fllw",0,-1)
         for docid in doc_lst:
             doc = rdoc.hgetall("doc:" + docid)
             if len(doc.keys()) == 0:
@@ -239,7 +239,10 @@ class Beacon:
             doc["tms"]=str(doc["create_time"])
             doc["create_time"] = timeElaspe(doc["create_time"])
              
-            doc["isfllw"] = "true" if beaconusr+"|-|"+beaconid in userfllws else "false"
+            if r.zscore("usr:" + username + ":fllw", beaconusr+"|-|"+beaconid) is not None:  # 频道已经被该用户关注
+                doc["isfllw"] = "true" 
+            else:
+                doc["isfllw"] = "false" 
             doc["beaconusr"] = beaconusr
             doc["beaconid"] = beaconid 
             doc["beaconname"] = self.getBeaconName()

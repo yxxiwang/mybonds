@@ -298,6 +298,7 @@ def listbeacons_service(request):
     ascii = request.GET.get("ascii", "1")
     beaconname = request.GET.get("beaconname", "")
     username = request.GET.get("u", getUserName(request))
+    loginuser=getUserName(request)
     start = request.GET.get("start", "0")
     num = request.GET.get("num", "5")
     btype = request.GET.get("btype", "notfllw")  # fllw,notfllw,all
@@ -328,7 +329,10 @@ def listbeacons_service(request):
 #         beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
         beaobj["beaconid"] = beaid 
         beaobj["beaconusr"] = beausr 
-        beaobj["isfllw"] = "true" 
+        if r.zscore("usr:" + loginuser + ":fllw", beaconstr) is not None:  # 频道已经被该用户关注
+            beaobj["isfllw"] = "true" 
+        else:
+            beaobj["isfllw"] = "false" 
 #         beaobj["desc"] = to_unicode_or_bust(beaobj["desc"])
 #         beaobj["ttl"] = to_unicode_or_bust(beaobj["ttl"])  
         beaobj["beaconname"] = to_unicode_or_bust(r.hget(key,"name"))

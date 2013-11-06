@@ -315,65 +315,65 @@ def listbeacons_service(request):
 #         sharebeacons = r.zrevrange("bmk:doc:share:byfllw",0,-1)
 #     elif orderby=="news":
 #         sharebeacons = r.zrevrange("bmk:doc:share:bynews",0,-1) 
-    sharebeacons = r.zrevrange("bmk:doc:share", 0, -1)
+#     sharebeacons = r.zrevrange("bmk:doc:share", 0, -1)
         
 #     mybeacons = r.smembers("usr:" + username+":fllw")
     mybeacons = r.zrevrange("usr:" + username + ":fllw", 0, -1)
     for beaconstr in mybeacons:
         beausr, beaid = beaconstr.split("|-|")
-        beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
-        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
+        key = "bmk:" + beausr + ":" + beaid
+        print key
+#         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
+        beaobj={}
+#         beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
         beaobj["beaconid"] = beaid 
+        beaobj["beaconusr"] = beausr 
         beaobj["isfllw"] = "true" 
-        if not beaobj.has_key("ttl"):
-            continue
+#         beaobj["desc"] = to_unicode_or_bust(beaobj["desc"])
+#         beaobj["ttl"] = to_unicode_or_bust(beaobj["ttl"])  
+        beaobj["beaconname"] = to_unicode_or_bust(r.hget(key,"name"))
+        beaobj["beacontime"] = getBeaconTime(beausr,beaid)
+#         if not beaobj.has_key("ttl"):
+#             continue
         if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询) 
-            beaconttl = beaobj["ttl"]
+            beaconttl = r.hget(key,"ttl")
             beaconname = to_unicode_or_bust(beaconname)
             beaconttl = to_unicode_or_bust(beaconttl)  
             if re.search(beaconname, beaconttl): 
                 sharebeacon_list.append(beaobj)
         else:
             sharebeacon_list.append(beaobj)
-        
-    sharebeacons = listsub(sharebeacons, mybeacons)
-    for beaconstr in sharebeacons:
-        beausr, beaid = beaconstr.split("|-|")
-#        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
-        beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
-        beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
-        beaobj["beaconid"] = beaid
-        beaobj["isfllw"] = "false"
-        if not beaobj.has_key("ttl"):
-            continue
-        if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)  
-            beaconttl = beaobj["ttl"] 
-#                 print isinstance( beaconname, unicode )
-#                 print isinstance( beaconttl, unicode )
-            beaconname = to_unicode_or_bust(beaconname)
-            beaconttl = to_unicode_or_bust(beaconttl)
-#                 print beaconname.encode("gbk"),":",beaconttl.encode("gbk")
-            if re.search(beaconname, beaconttl):
-#                     print beaconname,"==",beaconttl
-                sharebeacon_list.append(beaobj)
-        else:
-            sharebeacon_list.append(beaobj)
-#         if r.sismember("usr:"+username+":fllw",beaconstr):#频道已经被该用户关注
-#         if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
-#             if btype == "notfllw":#选择还未被用户关注的频道
-#                 continue
-#             beaobj["isfllw"] = "true"
-#         else:#频道尚未被该用户关注
-#             if btype == "fllw":#选择的是用户已经被关注的频道
-#                 continue
-#             beaobj["isfllw"] = "false"
-#         if beaconstr in mybeacons: 
+#         
+#     sharebeacons = listsub(sharebeacons, mybeacons)
+#     for beaconstr in sharebeacons:
+#         beausr, beaid = beaconstr.split("|-|")
+#         key = "bmk:" + beausr + ":" + beaid
+# #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
+#         beaobj = {}
+#         beaobj["fllw_cnt"] = str(r.scard("bmk:" + beausr + ":" + beaid + ":fllw"))
+#         beaobj["beaconid"] = beaid
+#         beaobj["beaconusr"] = beausr 
+#         beaobj["isfllw"] = "false"
+#         beaobj["beaconname"] = to_unicode_or_bust(r.hget(key,"name"))
+#         beaobj["beacontime"] = getBeaconTime(beausr,beaid)
+#         if not beaobj.has_key("ttl"):
 #             continue
-        
-
-    sharebeacon_list = sharebeacon_list[int(start): int(start) + int(num)]
+#         if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)  
+#             beaconttl = r.hget(key,"ttl")
+# #                 print isinstance( beaconname, unicode )
+# #                 print isinstance( beaconttl, unicode )
+#             beaconname = to_unicode_or_bust(beaconname)
+#             beaconttl = to_unicode_or_bust(beaconttl)
+# #                 print beaconname.encode("gbk"),":",beaconttl.encode("gbk")
+#             if re.search(beaconname, beaconttl):
+# #                     print beaconname,"==",beaconttl
+#                 sharebeacon_list.append(beaobj)
+#         else:
+#             sharebeacon_list.append(beaobj) 
+#          
+#     sharebeacon_list = sharebeacon_list[int(start): int(start) + int(num)]
     robj["success"] = 'true'
-    robj["message"] = "success to featch data"  
+    robj["message"] = "featch data success"  
     robj["total"] = str(len(sharebeacon_list)) 
     robj["beacons"] = sharebeacon_list
 #     return HttpResponse(json.dumps(robj), mimetype="application/json")

@@ -103,6 +103,7 @@ def getTime(tms,formatstr="%Y-%m-%d %H:%M:%S",addtimezone=True):
     try:
         if addtimezone:
             tms=tms+3600*8
+        if len(str(tms))>=13: tms = tms /1000
         tdate = dt.datetime.fromtimestamp(tms).strftime(formatstr)
     except:
         print "Attembrough: i use getDate(%s,formatstr=%s) but it's report error..." % (tms,formatstr)

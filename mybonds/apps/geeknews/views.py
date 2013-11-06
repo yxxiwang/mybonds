@@ -351,7 +351,7 @@ def listbeacons_service(request):
 #                 print isinstance( beaconname, unicode )
 #                 print isinstance( beaconttl, unicode )
             beaconname = to_unicode_or_bust(beaconname)
-            beaconttl = to_unicode_or_bust(beaconttl) 
+            beaconttl = to_unicode_or_bust(beaconttl)
 #                 print beaconname.encode("gbk"),":",beaconttl.encode("gbk")
             if re.search(beaconname, beaconttl):
 #                     print beaconname,"==",beaconttl

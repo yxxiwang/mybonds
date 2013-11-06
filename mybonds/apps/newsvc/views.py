@@ -641,6 +641,7 @@ def channelsbygroup(request):
             bea = Beacon(r.hget(key,"crt_usr"),r.hget(key,"id"))
             bea.setUsername(username)
             bobj = bea.getLastDoc()
+            if bobj=={} : continue
 #             print bobj
             beacons.append(bobj)
     

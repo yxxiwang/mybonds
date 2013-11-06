@@ -615,23 +615,13 @@ def channelsbygroup(request):
         return HttpResponse(json.dumps(udata), mimetype="application/json") 
         
     gobj = r.hgetall("group:"+groupid)
-    if gobj is None:
+    if gobj is None or gobj=={}:
         udata["message"]="group is not exsist !" 
         udata["success"] = "false"
         udata["api"]=api
         return HttpResponse(json.dumps(udata), mimetype="application/json") 
     gobj["groupid"]=groupid
-#         gname = "" if gname is None else gname
-#     for bstr in mybeacons:
-# #             busr,bid = bstr.split("|-|")
-#         key = "bmk:"+bstr.replace("|-|",":")
-#         bttl = r.hget(key,"tag")
-#         bttl = "" if bttl is None else bttl
-#         if re.search(gobj["name"],bttl):
-#             bobj = r.hgetall(key)
-#             bobj["beaconid"]=bobj.pop("id")
-#             bobj["isfllw"] = "true"
-#             beacons.append(bobj)
+    
     if orderby =="desc":
         allbeacons = r.zrevrange("bmk:doc:share",0,-1)
     else:
@@ -643,11 +633,15 @@ def channelsbygroup(request):
         bttl = r.hget(key,"tag")
         bttl = "" if bttl is None else bttl
         if re.search(gobj["name"],bttl):
-            bobj = {}
-            bobj["beaconid"]=r.hget(key,"id")
-            bobj["beaconusr"]=r.hget(key,"crt_usr")
-            bobj["beaconname"]=r.hget(key,"name").decode("utf8")
-            bobj["isfllw"] = "true" if bstr in mybeacons else "false"
+#             bobj = {}
+#             bobj["beaconid"]=r.hget(key,"id")
+#             bobj["beaconusr"]=r.hget(key,"crt_usr")
+#             bobj["beaconname"]=r.hget(key,"name").decode("utf8")
+#             bobj["isfllw"] = "true" if bstr in mybeacons else "false"
+            bea = Beacon(r.hget(key,"crt_usr"),r.hget(key,"id"))
+            bea.setUsername(username)
+            bobj = bea.getLastDoc()
+            print bobj
             beacons.append(bobj)
     
     gobj["name"]=gobj["name"].decode("utf8")

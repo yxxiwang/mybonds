@@ -90,8 +90,15 @@ class Beacon:
     def getdesc(self):
         desc = r.hget(self.key, "desc")
         desc = "" if desc is None else desc
+        desc = desc.decode("utf8")
         return desc
-        
+    
+    def getBeaconName(self):
+        beaconname = r.hget(self.key, "name")
+        beaconname = "" if beaconname is None else beaconname
+        beaconname = beaconname.decode("utf8")
+        return beaconname
+    
     def getobject(self):
         return r.hgetall(self.key)
     
@@ -202,6 +209,35 @@ class Beacon:
     def savePopularyData(self):
         udata = self.getdoc(self.beaconid, self.getPopularyUrl(), tpopulary)
         return udata
+        
+    def getLastDoc(self):
+        key = self.key
+        username=self.username
+        beaconusr = self.beaconusr
+        beaconid = self.beaconid
+        doc_lst = r.zrevrange(key + ":doc:tms", 0, 3)
+#         doc = {}
+        userfllws = r.zrevrange("usr:" + username+":fllw",0,-1)
+        for docid in doc_lst:
+            doc = rdoc.hgetall("doc:" + docid)
+            print docid
+            if len(doc.keys()) == 0:
+                continue 
+#             doc["text"] = ""
+#             doc["host"] = ""
+#             doc["domain"] = ""
+#             doc["url"] = ""
+            doc["domain"]=doc["domain"].decode("utf8")
+            doc["title"]=doc["title"].decode("utf8")
+            doc["copyNum"] = str(doc["copyNum"])
+            doc["tms"]=str(doc["create_time"])
+            doc["create_time"] = timeElaspe(doc["create_time"])
+            doc["isfllw"] = "true" if beaconusr+"|-|"+beaconid in userfllws else "false"
+            doc["beaconusr"] = beaconusr
+            doc["beaconid"] = beaconid 
+            doc["beaconname"] = self.getBeaconName()
+            break 
+        return doc
         
     def getChannelpicklist(self):
         if self.beaconusr == "rd":

@@ -75,8 +75,7 @@ def emailcontent(udata):
     content_list.append("</tbody></table>")
     return "".join(content_list)
     
-def sendEmailFromUserBeacon(username,hour_before=8,otype=""):
-#    udata = getAllBeaconDocsByUser(username,hour_before=24)
+def sendEmailFromUserBeacon(username,hour_before=8,otype=""): 
     if type(hour_before).__name__ != "int":#hour_before maybe unicode,or str
         hour_before = int(hour_before)
 #    print type(hour_before).__name__
@@ -356,8 +355,6 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     lst=[]
     udata = {}
     docs = []
-#     newcnts = []
-    
     for beaconstr in beacons:#取所有关注的灯塔的相关主题文档
         beaconusr,beaconid = beaconstr.split("|-|")
         if hour_before < 0:#正常情况刷新灯塔,如果取截至到当前hour_before小时的新闻,则不需刷新灯塔(之前已经刷新过)

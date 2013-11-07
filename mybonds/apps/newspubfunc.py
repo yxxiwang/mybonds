@@ -394,11 +394,11 @@ def saveFulltextById(ids, url="", frombackend=False):
                     tftxs.save(doc) 
                 if doc.has_key("relatedChannel"):
                     for rc in doc["relatedChannel"]:
-                        beaconname = rc["channelName"][1:] if rc["channelName"].startswith("*") else rc["channelName"]
+                        beaconname = rc["channelName"].replace("*","")
                         addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
                 if doc.has_key("category"):
                     rc = doc["category"]
-                    beaconname = rc["channelName"][1:] if rc["channelName"].startswith("*") else rc["channelName"]
+                    beaconname = rc["channelName"].replace("*","")
                     addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
                 if doc.has_key("relatedDocs"):
                     saveText(doc["relatedDocs"])

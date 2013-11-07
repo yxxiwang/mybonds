@@ -212,7 +212,8 @@ class Beacon:
             beacon={}
             beacon["beaconid"]=getHashid(bea["channelId"])
             beacon["beaconusr"]="doc"
-            beaconname = bea["channelName"][1:] if bea["channelName"].startswith("*") else bea["channelName"]
+#             print to_unicode_or_bust(bea["channelName"])
+            beaconname = bea["channelName"].replace("*","")
             addBeacon("doc", beacon["beaconid"], bea["channelName"], beaconname=beaconname, desc=beaconname) 
             beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
             beacon["beaconname"]=to_unicode_or_bust(beaconname)

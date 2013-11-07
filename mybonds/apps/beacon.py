@@ -59,7 +59,7 @@ class Beacon:
         return urlstr
     
     def getChannelpickUrl(self):
-        return self.beaconUrl("relatedchannelid",self.days)
+        return self.beaconUrl("channelpick",self.days)
     
     def getEleventpickUrl(self):
         return self.beaconUrl("channeleventpick",self.days)

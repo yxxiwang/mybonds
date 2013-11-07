@@ -352,6 +352,7 @@ def relatedchannel(request):
         udata["success"] = "false"
         udata["message"] = "no such beacon"
 
+    udata["api"]=api
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
            
 

@@ -342,41 +342,16 @@ def relatedchannel(request):
         udata["success"] = "false"
         udata["message"] = "you request too many times. pls wait a moments" 
         return HttpResponse(json.dumps(udata), mimetype="application/json")
-#     if obj is None:
-#         udata["success"] = "false"
-#         udata["message"] = "it's not exists!" 
-#         return HttpResponse(json.dumps(udata), mimetype="application/json")
-    udata = procChannel("relatedchannel",beaconusr,beaconid,beaconname,days,usecache) 
-    udata = dataProcForApi(udata)
-    udata["api"]=api
-    username = getUserName(request)
-    def proc(doc):
-        doc["beaconid"]=doc.pop("docid")
-        doc["beaconusr"]="doc"
-        doc["beaconname"]=doc.pop("title")
-        doc["beacontime"]=getBeaconTime("doc",doc["beaconid"])
-        
-        if username != "":
-            beaconstr = "doc|-|"+doc["beaconid"] 
-            if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
-                doc["isfllw"] = "true"
-            else:
-                doc["isfllw"] = "false"
-                
-        if doc.has_key("domain") : doc.pop("domain")
-        if doc.has_key("eventid") : doc.pop("eventid")
-        if doc.has_key("copyNum") : doc.pop("copyNum")
-        if doc.has_key("dateStr") : doc.pop("dateStr") 
-#         if doc.has_key("create_time") : doc.pop("create_time")
-        if doc.has_key("popularity") : doc.pop("popularity")
-        if doc.has_key("validTime") : doc.pop("validTime")
-        if doc.has_key("text") : doc.pop("text")
-        addBeacon("doc",doc["beaconid"],doc["beaconid"],beaconname=doc["beaconname"],tag="auto",headlineonly="1")
-        return doc
-        
-    if udata.has_key("docs"):
-        udata["docs"] =  [ proc(doc) for doc in udata["docs"] ]
-        
+    
+    key = "bmk:%s:%s" %(beaconusr,beaconid)
+    if r.exists(key):
+        beaobj = Beacon(beaconusr,beaconid)
+        beaobj.setUsecache(usecache)
+        udata = beaobj.getRelatedchannellist()
+    else:
+        udata["success"] = "false"
+        udata["message"] = "no such beacon"
+
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
            
 

@@ -58,6 +58,9 @@ class Beacon:
             urlstr = "http://%s/research/svc?%s&after=%d&before=%d&mindoc=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, after, before, mindoc)
         return urlstr
     
+    def getRelatedChannelUrl(self):
+        return self.beaconUrl("relatedchannelid",self.days)
+    
     def getChannelpickUrl(self):
         return self.beaconUrl("channelpick",self.days)
     
@@ -198,6 +201,41 @@ class Beacon:
         udata = self.getdoc(self.beaconid, self.getExtendUrl(), textend)
         if not r.exists(self.key):
             self.add(beaconttl, beaconname, desc, beacontime, mindoc, tag, headlineonly)
+        return udata
+        
+    def getRelatedchannellist(self):
+        udata = trelate.find_one({"_id":self.beaconid})
+        if udata is None or self.usecache=="0" :
+            udata = self.saveRelatedchannelData() 
+        bea_lst=[]
+        for bea in udata["beacons"]: 
+            beacon={}
+            beacon["beaconid"]=getHashid(bea["channelId"])
+            beacon["beaconusr"]="doc"
+            beaconname = bea["channelName"][1:] if bea["channelName"].startswith("*") else bea["channelName"]
+            addBeacon("doc", beacon["beaconid"], bea["channelName"], beaconname=beaconname, desc=beaconname) 
+            beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
+            beacon["beaconname"]=to_unicode_or_bust(beaconname)
+            bea_lst.append(beacon)
+        udata["beacons"]=bea_lst
+        udata["total"]=len(bea_lst)
+        udata["success"]="true"
+        udata["message"]="getRelatedchannellist"
+        return udata
+    
+    def saveRelatedchannelData(self):
+        url = self.getRelatedChannelUrl()
+        logger.info("fetch url:" + url)
+        udata={}
+        beaconlist = bench(loadFromUrl, parms=url)
+        if beaconlist is not None or beaconlist !={}:
+            udata["_id"] = int(self.beaconid)
+            udata["beacons"] =beaconlist
+            trelate.save(udata)
+            logger.info("save doc into mongdb :" + self.beaconid)
+        else:
+            return {}
+#         udata = self.getdoc(self.beaconid, self.getRelatedChannelUrl(), trelate)
         return udata
         
     def getPopularylist(self):    

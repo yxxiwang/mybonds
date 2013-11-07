@@ -212,6 +212,7 @@ def dayDiff(create_time):
 def loadFromUrl(url):
     udata = {}
     rstr=""
+    if url == "" : return {}
     try:
         req2 = urllib2.Request(url)
         response = urllib2.urlopen(req2,timeout=60)

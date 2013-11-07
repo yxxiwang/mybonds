@@ -357,9 +357,9 @@ def relatedchannel(request):
         if username != "":
             beaconstr = "doc|-|"+doc["beaconid"] 
             if r.zscore("usr:"+username+":fllw",beaconstr) is not None:#频道已经被该用户关注
-                doc["beaconisfllw"] = "true"
+                doc["isfllw"] = "true"
             else:
-                doc["beaconisfllw"] = "false"
+                doc["isfllw"] = "false"
                 
         if doc.has_key("domain") : doc.pop("domain")
         if doc.has_key("eventid") : doc.pop("eventid")

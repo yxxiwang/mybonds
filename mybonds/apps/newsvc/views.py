@@ -164,6 +164,7 @@ def popularychannel(request):
         doc["beaconid"]=doc["docid"]
         doc["beaconusr"]="doc"
         doc["beaconname"]=doc["title"]
+        doc["beacontime"]=getBeaconTime("doc",doc["beaconid"])
   
 #         doc["domain"] = doc["domain"].decode("utf8")
         if not doc.has_key("utms"):
@@ -353,6 +354,7 @@ def relatedchannel(request):
         doc["beaconid"]=doc.pop("docid")
         doc["beaconusr"]="doc"
         doc["beaconname"]=doc.pop("title")
+        doc["beacontime"]=getBeaconTime("doc",doc["beaconid"])
         
         if username != "":
             beaconstr = "doc|-|"+doc["beaconid"] 

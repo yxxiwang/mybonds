@@ -812,7 +812,7 @@ def procChannel(datatype, beaconusr, beaconid, beaconname, days="1", usecache="1
         parm = "popularid"
         tmongo = tpopulary
     elif datatype == "relatedchannel":
-        parm = "relatedid"
+        parm = "relatedchannelid"
         tmongo = trelate
     elif datatype == "channelnews":
         parm = "channelid"

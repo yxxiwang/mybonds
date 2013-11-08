@@ -6,6 +6,7 @@ import tornado.ioloop
 import tornado.wsgi
 import sys
 import django.core.handlers.wsgi
+os.chdir("/root/mybonds")
 sys.path.append('/root') # path to your project ( if you have it in another dir).
 sys.path.append('/root/mybonds') 
 sys.path.append('/root/mybonds/apps') 

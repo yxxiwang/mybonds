@@ -27,4 +27,5 @@ encoding//build/test.py=utf-8
 encoding/<project>=UTF-8
 encoding/__init__.py=utf-8
 encoding/settings.py=utf-8
+encoding/tornado_wsgi.py=utf-8
 encoding/views.py=utf-8

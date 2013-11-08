@@ -930,11 +930,11 @@ def refreshBeacon(beaconusr, beaconid, type=""):
             logger.warn(key + " maybe deleted via front  so we ignore it...")
             
     elif not r.exists("bmk:" + beaconusr + ":" + beaconid + ":doc:tms"):  # 如果频道文章列表不存在,重新刷新数据 
-        logger.warn(key + " is not exists,retrivedocs from backend...")
         if beaconusr=="rd":
             pass
 #             pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         else:
+            logger.warn(key + " is not exists,retrivedocs from backend...")
             pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
             
     elif dt > getsysparm("KEY_UPTIME"):  # 如果上次更新时间过久,则重新刷新数据

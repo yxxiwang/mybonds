@@ -932,7 +932,8 @@ def refreshBeacon(beaconusr, beaconid, type=""):
     elif not r.exists("bmk:" + beaconusr + ":" + beaconid + ":doc:tms"):  # 如果频道文章列表不存在,重新刷新数据 
         logger.warn(key + " is not exists,retrivedocs from backend...")
         if beaconusr=="rd":
-            pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+            pass
+#             pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         else:
             pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
             

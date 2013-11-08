@@ -903,6 +903,9 @@ def refreshBeacon(beaconusr, beaconid, type=""):
 #    key = "bmk:"+username+":"+getHashid(beaconid) 
     
     key = "bmk:" + beaconusr + ":" + beaconid
+    if not r.exists(key):
+        logger.info("key is not exists,i'll back "+key)
+        return 
     logger.info("refreshBeacon "+key)
     
     dt = timeDiff(r.hget(key, "last_touch"), time.time())

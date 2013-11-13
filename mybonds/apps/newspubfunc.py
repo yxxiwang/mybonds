@@ -929,13 +929,13 @@ def refreshBeacon(beaconusr, beaconid, type=""):
         else:  # 如果没有那么巧,后台队列准备刷新该灯塔时,前台已经删除该灯塔
             logger.warn(key + " maybe deleted via front  so we ignore it...")
             
-    elif not r.exists("bmk:" + beaconusr + ":" + beaconid + ":doc:tms"):  # 如果频道文章列表不存在,重新刷新数据 
-        if beaconusr=="rd":
-            pass
-#             pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
-        else:
-            logger.warn(key + " is not exists,retrivedocs from backend...")
-            pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
+#     elif not r.exists("bmk:" + beaconusr + ":" + beaconid + ":doc:tms") :  # 如果频道文章列表不存在,重新刷新数据 
+#         if beaconusr=="rd":
+#             pass
+# #             pushQueue("hotboard",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
+#         else:
+#             logger.warn(key + " is not exists,retrivedocs from backend...")
+#             pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
             
     elif dt > getsysparm("KEY_UPTIME"):  # 如果上次更新时间过久,则重新刷新数据
         logger.warn("data is old,pushQueue(retirveSimilar)..%s,%s,%d" % (beaconusr, beaconid, dt))

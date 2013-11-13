@@ -126,6 +126,7 @@ def research(request,template_name="beacon/fulltextnew.html"):
         return HttpResponse('<h1>亲,你今天访问次数太多了..请休息一会再来</h1>') 
     ftxlist=[]
     relatedsites= [] 
+    relatedchannel=[]
     fulldoc = tftxs.find_one({"_id":docid})
     if fulldoc is not None:
 #         print fulldoc
@@ -145,6 +146,9 @@ def research(request,template_name="beacon/fulltextnew.html"):
             fulldoc["category"]["beaconusr"]="doc"
             fulldoc["category"]["beaconid"]=getHashid(fulldoc["category"]["channelId"])
             fulldoc["category"]["beaconname"]=fulldoc["category"]["channelName"] 
+        
+        if fulldoc.has_key("relatedchannel"):
+            relatedchannel = fulldoc["relatedchannel"]
             
         url = fulldoc["urls"][0].split(",")[1]
     else:
@@ -154,7 +158,7 @@ def research(request,template_name="beacon/fulltextnew.html"):
     return render_to_response(template_name, {
         'ftxlist': ftxlist, 
         'relatedsites': relatedsites, 
-        'relatedchannel': fulldoc["relatedchannel"], 
+        'relatedchannel': relatedchannel,
         'category': fulldoc["category"], 
         'docid': docid, 
         'url': url,

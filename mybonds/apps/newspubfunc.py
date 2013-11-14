@@ -640,7 +640,7 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1",orderby="utms
         logger.info("fetch url:" + urlstr)
         data = bench(loadFromUrl, parms=urlstr)
 #         print data
-        if data is None or data == {}:
+        if data is None or data == {} or data == []:
             logger.info("data is null :" + beaconid)
         else:
             udata = {}

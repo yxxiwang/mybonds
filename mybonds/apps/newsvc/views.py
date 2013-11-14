@@ -364,7 +364,7 @@ def hotboard(request):
     beaconname = request.GET.get("beaconname", "")
     usecache = request.GET.get("usecache", "1")
     ascii = request.GET.get("ascii", "1")
-    orderby = request.GET.get("orderby", "tms")
+    orderby = request.GET.get("orderby", "utms")
     api = request.GET.get("api", "")
     obj = r.hget("bmk:"+beaconusr+":"+beaconid,"name") if beaconname =="" else beaconname
     quantity = log_typer(request, "hotboard", obj)
@@ -389,7 +389,7 @@ def hotboard(request):
 #     print beaconusr,beaconid
     try:
 #         udata = buildHotBoardData(beaconusr, beaconid, start=int(start), end=int(num), isapi=True,orderby=orderby,username=username)
-        udata = newHotBoardData(beaconusr, beaconid,username=username,usecache=usecache)
+        udata = newHotBoardData(beaconusr, beaconid,username=username,usecache=usecache,orderby=orderby)
 #         print udata
     except:
         traceback.print_exc()

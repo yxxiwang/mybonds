@@ -582,7 +582,7 @@ def saveDocsByUrl(urlstr, headlineonly="0"):
              
     return udata
 
-def newHotBoardData(beaconusr, beaconid, username="", usecache="1"):
+def newHotBoardData(beaconusr, beaconid, username="", usecache="1",orderby="utms"):
 #     urlstr="http://svc.zhijixing.com/research/svc?hottopicid=%E8%B4%A2%E7%BB%8F"
 #     beaconusr="rd"
 #     beaconid="1152493"
@@ -662,6 +662,9 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1"):
     
     if udata.has_key("docs") and username != "": 
         udata["docs"] = [ proc(doc) for doc in udata["docs"] ]  
+        logger.info("newHotBoardData order by %s" % (orderby,))
+        if orderby != "utms":
+            udata["docs"] = sorted(udata["docs"], key=lambda l:(l[orderby]), reverse=True)
 #     udata["docs"]=procdata(udata["docs"])
     return udata
     

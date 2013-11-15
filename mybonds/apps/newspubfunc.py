@@ -952,7 +952,13 @@ def refreshBeacon(beaconusr, beaconid, type=""):
     else:
         logger.warn("Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt, getsysparm("KEY_UPTIME")))
 
-
+def beaconIsFollow(username,beaconusr,beaconid):
+    beaconstr=beaconusr+"|-|"+beaconid
+    if r.zscore("usr:" + username + ":fllw", beaconstr) is not None:  # 频道已经被该用户关注
+        return True
+    else:
+        return False
+                    
 def getBeaconNewsCnt(username,beaconusr,beaconid):
     """find channel's news cnt not read since user last read"""
     last_touch_tms = 0
@@ -971,7 +977,7 @@ def getBeaconNewsCnt(username,beaconusr,beaconid):
 #     print time.time()
 #     print r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
     new_cnt = r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
-    logger.debug("redis-cli zcount bmk:%s:%s:doc:tms %d %d -->%d", beaconusr,beaconid,last_touch_tms,now_tms,new_cnt) 
+#     logger.debug("redis-cli zcount bmk:%s:%s:doc:tms %d %d -->%d", beaconusr,beaconid,last_touch_tms,now_tms,new_cnt) 
     return new_cnt
         
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):

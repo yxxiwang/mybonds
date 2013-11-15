@@ -134,6 +134,8 @@ def channelpick(request):
         udata["message"] = "success retrive data"
 #     print udata
 #     udata = dataProcForApi(udata)
+    udata["beaconisfllw"] = "true" if beaconIsFollow(username,beaconusr,beaconid) else "false"
+    udata["beaconnewcnt"] = getBeaconNewsCnt(username,beaconusr,beaconid)
     udata["api"]=api 
 #     udata = procChannel("channelnews",beaconusr,beaconid,beaconname,days,usecache) 
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")

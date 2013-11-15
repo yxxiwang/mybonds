@@ -961,24 +961,27 @@ def beaconIsFollow(username,beaconusr,beaconid):
                     
 def getBeaconNewsCnt(username,beaconusr,beaconid):
     """find channel's news cnt not read since user last read"""
-    last_touch_tms = 0
-    new_cnt = 0
-    last_touch_tms = r.hget("usr:"+username+":channeltms", beaconusr+":"+beaconid)
-    last_touch_tms = 0 if last_touch_tms is None else last_touch_tms
-    now_tms = time.time()
-    
-    if os.name =="posix":
-        last_touch_tms = float(last_touch_tms)*1000
-        now_tms = float(now_tms)*1000
-    else:
-        last_touch_tms = float(last_touch_tms)
-        now_tms = float(now_tms)
-#     print last_touch_tms
-#     print time.time()
-#     print r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
-    new_cnt = r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
-#     logger.debug("redis-cli zcount bmk:%s:%s:doc:tms %d %d -->%d", beaconusr,beaconid,last_touch_tms,now_tms,new_cnt) 
-    return new_cnt
+    dockey = "bmk:%s:%s:doc:tms" %(beaconusr,beaconid)
+    doc_lst = r.zrevrange(dockey,0,-1)
+    usr_read_lst=r.zrevrange("readed:usr:"+username,0,-1)
+    islst = intersect(doc_lst,usr_read_lst)
+    return len(doc_lst) - len(islst)
+
+#     last_touch_tms = 0
+#     new_cnt = 0
+#     last_touch_tms = r.hget("usr:"+username+":channeltms", beaconusr+":"+beaconid)
+#     last_touch_tms = 0 if last_touch_tms is None else last_touch_tms
+#     now_tms = time.time()
+#     
+#     if os.name =="posix":
+#         last_touch_tms = float(last_touch_tms)*1000
+#         now_tms = float(now_tms)*1000
+#     else:
+#         last_touch_tms = float(last_touch_tms)
+#         now_tms = float(now_tms) 
+#     new_cnt = r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
+# #     logger.debug("redis-cli zcount bmk:%s:%s:doc:tms %d %d -->%d", beaconusr,beaconid,last_touch_tms,now_tms,new_cnt) 
+#     return new_cnt
         
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid

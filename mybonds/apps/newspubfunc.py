@@ -658,6 +658,7 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1",orderby="utms
             doc["beaconisfllw"] = "false" 
         
         doc["beaconname"] = r.hget("bmk:doc:"+doc["beaconid"] , "name").decode("utf8")
+        doc["beaconnewcnt"] = getBeaconNewsCnt(username,"doc",doc["beaconid"])
         return doc 
     
     if udata.has_key("docs") and username != "": 
@@ -950,6 +951,28 @@ def refreshBeacon(beaconusr, beaconid, type=""):
             pushQueue("beacon", {"beaconusr":beaconusr, "beaconid":beaconid, "days":"1"})
     else:
         logger.warn("Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt, getsysparm("KEY_UPTIME")))
+
+
+def getBeaconNewsCnt(username,beaconusr,beaconid):
+    """find channel's news cnt not read since user last read"""
+    last_touch_tms = 0
+    new_cnt = 0
+    last_touch_tms = r.hget("usr:"+username+":channeltms", beaconusr+":"+beaconid)
+    last_touch_tms = 0 if last_touch_tms is None else last_touch_tms
+    now_tms = time.time()
+    
+    if os.name =="posix":
+        last_touch_tms = float(last_touch_tms)*1000
+        now_tms = float(now_tms)*1000
+    else:
+        last_touch_tms = float(last_touch_tms)
+        now_tms = float(now_tms)
+#     print last_touch_tms
+#     print time.time()
+#     print r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
+    new_cnt = r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
+    logger.debug("redis-cli zcount bmk:%s:%s:doc:tms %d %d -->%d", beaconusr,beaconid,last_touch_tms,now_tms,new_cnt) 
+    return new_cnt
         
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid

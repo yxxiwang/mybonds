@@ -325,26 +325,6 @@ def getDataByUrl(urlstr,isservice=False):
         udata["tags"] = udata["tags"][0:40]
     return udata
 
-def getBeaconNewsCnt(username,beaconusr,beaconid):
-    """find channel's news cnt not read since user last read"""
-    last_touch_tms = 0
-    new_cnt = 0
-    last_touch_tms = r.hget("usr:"+username+":channeltms", beaconusr+":"+beaconid)
-    last_touch_tms = 0 if last_touch_tms is None else last_touch_tms
-    now_tms = time.time()
-    
-    if os.name =="posix":
-        last_touch_tms = float(last_touch_tms)*1000
-        now_tms = float(now_tms)*1000
-    else:
-        last_touch_tms = float(last_touch_tms)
-        now_tms = float(now_tms)
-#     print last_touch_tms
-#     print time.time()
-#     print r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
-    new_cnt = r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
-    return new_cnt
-        
 def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
     logger.info( "=getAllBeaconDocsByUser="+username )
 #    hour_before=8

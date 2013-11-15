@@ -155,6 +155,8 @@ def research(request,template_name="beacon/fulltextnew.html"):
         doc = rdoc.hgetall("doc:"+docid)
         ftxlist.append(doc["text"])
         url = doc["url"] if doc.has_key("url") else ""
+        
+    r.zadd("readed:usr:"+username,time.time(),docid)
     return render_to_response(template_name, {
         'ftxlist': ftxlist, 
         'relatedsites': relatedsites, 
@@ -751,7 +753,8 @@ def hotboard(request, template_name="beacon/hotboard.html"):
         if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
         rdbeacon_list.append(beaobj)
-    
+        
+    r.hset("usr:" + username + ":channeltms", beaconusr + ":" + beaconid, time.time())
     return render_to_response(template_name, {
         'udata': udata, 
         'beaconid':beaconid,  # 当前灯塔的ID

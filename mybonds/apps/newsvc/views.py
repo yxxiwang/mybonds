@@ -525,6 +525,8 @@ def newsdetail(request):
     doc["message"] = "success return data"
 #     print json.dumps(doc, ensure_ascii=False)
     doc["api"]=api
+    
+    r.zadd("readed:usr:"+username,time.time(),docid)
     return HttpResponse(json.dumps(doc,ensure_ascii=ascii=="1"), mimetype="application/json")
 #     return HttpResponse(json.dumps(doc), mimetype="application/json")
 

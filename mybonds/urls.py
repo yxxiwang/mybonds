@@ -3,6 +3,8 @@ from django.conf.urls.defaults import *
 #from django.views.generic.simple import direct_to_template
 import os
 from django.contrib import admin
+
+from django.views.generic import RedirectView
 # from emailusernames.forms import EmailAuthenticationForm
 # from registration.backends.default.urls import *
 # from geeknews.forms import UserRegistrationForm  
@@ -32,7 +34,8 @@ urlpatterns = patterns("",
     url(r'^character/$', 'mybonds.views.character', name="character"),
     url(r'^test/$', 'mybonds.views.test', name="test"),
     
-    (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/site_media/static/img/favicon.ico'}),
+#     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/site_media/static/img/favicon.ico'}),
+    url(r'^favicon\.ico$', RedirectView.as_view(url='/site_media/static/img/favicon.ico')),
     (r'^bonds/', include('bonds.urls')),
     (r'^news/', include('geeknews.urls')), 
     (r'^newsvc/', include('newsvc.urls')), 

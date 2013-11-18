@@ -81,8 +81,9 @@ def channels(num):
             if not rt == SUCCESS:
                 pushQueue("beacon",{"beaconusr":beaconusr,"beaconid":beaconid,"days":"1"})
         
-def retriveData(qtype):
-    qobj = r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing")
+def retriveData(qtype,sfx=""): 
+    qobj = r.rpoplpush("queue:" + qtype, "queue:" + qtype + ":processing:"+sfx)
+        
     if qobj is None:
         return 
     qinfo = {}
@@ -157,12 +158,12 @@ def retriveData(qtype):
     except:
         traceback.print_exc() 
     if rt == SUCCESS: # SUCCESS=0
-        qobj = r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype + ":done")
+        qobj = r.rpoplpush("queue:" + qtype + ":processing:"+sfx, "queue:" + qtype + ":done")
     elif rt == SYSERROR: # SYSERROR=-1
-        qobj = r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype + ":error")
+        qobj = r.rpoplpush("queue:" + qtype + ":processing:"+sfx, "queue:" + qtype + ":error")
     else:# COMMUNICATERROR=6 ,WARNNING=8
 #             qobj = lib.r.rpoplpush("queue:" + qtype + ":processing", "queue:" + qtype)
-        qobj = r.rpop("queue:" + qtype + ":processing")
+        qobj = r.rpop("queue:" + qtype + ":processing:"+sfx)
         qinfo = json.loads(qobj)
         cnt = qinfo["cnt"] if qinfo.has_key("cnt") else 0
         qinfo["cnt"]=cnt+1
@@ -182,12 +183,19 @@ def retriveData(qtype):
             
 def procQueue(type,codes,num,force=False):
     """save fulltext into mongodb, data from backend """
-    for i in range(r.llen("queue:" + type+":processing")):#先处理遗留的队列
-        qobj=r.rpoplpush( "queue:" + type + ":processing","queue:" + type)
-        logger.info( "move qobj%s from queue:%s:processing to queue:%s" %(qobj,type,type) )
+#     for i in range(r.llen("queue:" + type+":processing")):#先处理遗留的队列
+#         qobj=r.rpoplpush( "queue:" + type + ":processing","queue:" + type)
+#         logger.info( "move qobj%s from queue:%s:processing to queue:%s" %(qobj,type,type) )
     num = r.llen("queue:" + type) if num == -1 else num
-    for i in range(num): 
-          retriveData(type) 
+    if codes[0]=="all":
+        sfx = str(random.randint(1000, 9999))
+        for i in range(num): 
+              retriveData(type,sfx=sfx)
+    else:
+        for code in codes:
+            for i in range(num): 
+                  retriveData(type,sfx=code)
+          
             
 def loadData(codes,num,force=False):        
     """fetch beacon data from backend """

@@ -31,7 +31,8 @@ urlpatterns = patterns("",
     url(r'^groupdelete/$', 'mybonds.views.groupdelete', name="groupdelete"),
     url(r'^character/$', 'mybonds.views.character', name="character"),
     url(r'^test/$', 'mybonds.views.test', name="test"),
-
+    
+    (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/site_media/static/img/favicon.ico'}),
     (r'^bonds/', include('bonds.urls')),
     (r'^news/', include('geeknews.urls')), 
     (r'^newsvc/', include('newsvc.urls')), 

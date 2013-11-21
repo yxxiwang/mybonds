@@ -611,7 +611,7 @@ def user_delete(request):
             r.delete("usr:"+delusr+":channeltms")
             r.delete("usr:"+delusr+":buddy:all")
         return HttpResponse('user %s is deleted' % delusr)
-    return HttpResponse('something is error dont delete..' % delusr)
+    return HttpResponse('%s  is not exsists!' % username)
         
 @login_required
 def user_modify(request,template_name="beacon/usermodify.html"): 
@@ -740,7 +740,7 @@ def login_apply(request):
         robj["success"] = 'true'
         robj["message"] = "login is success" 
     else:
-        if not r.exists("usr:"+username):        
+        if not r.exists("usr:"+username):
             User.objects.create_user(username=username, email="" , password=password)
             r.hset("usr:" + username, "nm", username)
 #             r.hset("usr:" + username, "email", email) 
@@ -750,18 +750,19 @@ def login_apply(request):
             robj["success"] = 'true'
             robj["message"] = "apply is success" 
             
-            fllwkey="bmk:rd:1108470809:fllw"
-            if r.exists(fllwkey):
-                r.sadd(fllwkey,username) 
-                r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
-                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
-            
-            fllwkey="bmk:rd:954189947:fllw"
-            if r.exists(fllwkey):
-                r.sadd(fllwkey,username) 
-                r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
-                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
-        else:    
+#             fllwkey="bmk:rd:1108470809:fllw"
+#             if r.exists(fllwkey):
+#                 r.sadd(fllwkey,username) 
+#                 r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
+#                 r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
+#             
+#             fllwkey="bmk:rd:954189947:fllw"
+#             if r.exists(fllwkey):
+#                 r.sadd(fllwkey,username) 
+#                 r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
+#                 r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
+        else:
+            logger.info("we have  usr:"+username)
             robj["success"] = 'false'
             robj["message"] = "login failed" 
             robj["data"] = []

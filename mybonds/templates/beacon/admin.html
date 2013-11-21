@@ -219,6 +219,11 @@ var delete_id=""
       $('#myModal').find('#myModalLabel').text("不允许删除管理用户: "+delete_id);
       return;
     }
+    if(delete_id =="rd" || delete_id=="news" || delete_id=="doc" || delete_id=="hot" ){
+      alert("不允许删除灯塔用户!");
+      $('#myModal').find('#myModalLabel').text("不允许删除灯塔用户: "+delete_id);
+      return;
+    }
      window.location.href = encodeURI('/userdelete/?username='+delete_id);
   });
 

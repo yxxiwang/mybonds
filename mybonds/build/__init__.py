@@ -104,6 +104,24 @@ def cleanChannelCnt(op="print"):
             if op=="delete":
                 r.delete(bstr) 
                 
+def cleanChannelByCode(parms=("doc:1257408","print")):
+    """ 只清理指定的频道新闻数据."""
+    
+    if type(parms).__name__ == "str":
+        parms = (parms,) 
+    op=parms[-1]
+    (beaconusr,beaconid) = parms[0].split(":")
+    if op == "delete":
+        r.delete("channel:"+beaconusr+":"+beaconid+":doc_cts")
+        key = "bmk:"+beaconusr+":"+beaconid 
+        ttl = r.hget(key,"ttl") 
+        r.delete(key + ":doc:tms")
+        print "%s:doc:tms ---> %s  cleaned.." % (key,ttl)
+    else:
+        bkey = "bmk:"+parms[0]
+        ttl = r.hget(bkey,"ttl") 
+        print "%s ---> %s" % (bkey,ttl)
+                
 def cleanDocChannel(parms=("doc","print")):
     """ 清理由热点新闻所建立频道,并将其从用户的关注列表中清理掉."""
     def deleteBeacon(beaconusr,beaconid):            
@@ -438,7 +456,8 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
-                  python %prog cleanDocChannel  {print|delete}
+                  python %prog cleanDocChannel doc {print|delete}
+                  python %prog cleanChannelByCode doc:1257408 {print|delete}
                   python %prog replaceStormarketTitle  {print|replace} 
             """
     if len(sys.argv) >= 2:

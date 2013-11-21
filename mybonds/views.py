@@ -611,6 +611,7 @@ def user_delete(request):
             r.delete("usr:"+delusr+":channeltms")
             r.delete("usr:"+delusr+":buddy:all")
         return HttpResponse('user %s is deleted' % delusr)
+    return HttpResponse('something is error dont delete..' % delusr)
         
 @login_required
 def user_modify(request,template_name="beacon/usermodify.html"): 

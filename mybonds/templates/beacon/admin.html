@@ -118,19 +118,19 @@
                   <th>最后访问时间</th>
                   <th>最后访问入口</th>
                   <th>最后访问内容</th>
-                  <!--th>操作</th-->
+                  <th>操作</th>
                 </tr>
               </thead>
               {% endif %}
 				 			<tbody>
 							{% for usr in usrlst %} 
 				   		<tr class="info">
-				     		<td>{{usr.usr}}</td>
+				     		<td id="{{usr.usr}}">{{usr.usr}}</td>
                 <td>{{usr.ip}}</td>
                 <td>{{usr.act_tms}}</td>
                 <td>{{usr.act}}</td>
                 <td><a target="_blank" href="{{usr.url}}" title="{{usr.url}}">{{usr.o}}</a></td>
-                <!--td><a class="close" data-toggle="modal" href="#myModal"  style="float: none;" data-keyboard="true" data-backdrop="true" >x</a></td-->
+                <td><a class="close" data-toggle="modal" href="#myModal"  style="float: none;" data-keyboard="true" data-backdrop="true" >x</a></td>
 				   		</tr>
 							{% endfor %}
 				 			</tbody>
@@ -181,8 +181,8 @@
     <script src="/site_media/static/news/jquery.fancybox.pack.js"></script>
 
 {% block script %} 
-    <script>
-
+<script>
+var delete_id=""
 {% if otype == "log" %} 
   $('#log').attr('class', 'active'); 
 {% else %}
@@ -199,6 +199,28 @@
     if(event.keyCode==13 )
      window.location.href = encodeURI('/news/adm/?otype={{otype}}&query='+$('#beaconsearch').val().trim());
   })
+
+  $tag_list_box = $('div.tab-content');
+  $tag_list_box.find('.close').click(function(){ 
+      // $tag_list_box.isotope('remove', $(this).parent()); 
+      // $(this).parent().remove(); 
+      // alert() 
+      delete_id = $(this).parent().parent().find('td').attr('id'); 
+      // alert(delete_id);
+      // alert($(this).parent().parent().html());
+      $('#myModal').on('show', function () {
+        $('#myModal').find('#myModalLabel').text("删除用户: "+delete_id);
+      }) 
+  });
+
+  $('#delete_btn').click(function(){
+    if(delete_id =="wxi" || delete_id=="ltb" || delete_id=="sj" ){
+      alert("不允许删除管理用户!");
+      $('#myModal').find('#myModalLabel').text("不允许删除管理用户: "+delete_id);
+      return;
+    }
+     window.location.href = encodeURI('/userdelete/?username='+delete_id);
+  });
 
     </script>    
 {% endblock %}

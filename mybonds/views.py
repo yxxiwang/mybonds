@@ -610,7 +610,8 @@ def user_delete(request):
             r.delete("usr:"+delusr+":fllw")
             r.delete("usr:"+delusr+":channeltms")
             r.delete("usr:"+delusr+":buddy:all")
-        return HttpResponse('user %s is deleted' % delusr)
+        return HttpResponseRedirect("/news/adm/") 
+#         return HttpResponse('user %s is deleted' % delusr)
     return HttpResponse('%s  is not exsists!' % username)
         
 @login_required

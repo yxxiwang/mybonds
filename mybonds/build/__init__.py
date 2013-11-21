@@ -119,7 +119,7 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
         print "%s:doc:tms ---> %s  cleaned.." % (key,ttl)
     else:
         bkey = "bmk:"+parms[0]
-        ttl = r.hget(bkey,"ttl") 
+        ttl = r.hget(bkey,"ttl")
         print "%s ---> %s" % (bkey,ttl)
                 
 def cleanDocChannel(parms=("doc","print")):

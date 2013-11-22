@@ -308,7 +308,7 @@ def buddyhold(request):
         return HttpResponse("ok")
         
 
-@cache_control(max_age=10)
+@cache_control(max_age=5)
 def test(request, template_name="beacon/test.html"):  
     return HttpResponse("test ok")
 #     bkcolor = r.hget("tempparms","bkcolor")

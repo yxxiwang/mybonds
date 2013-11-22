@@ -17,7 +17,13 @@ import redis
 from mybonds.apps.newspubfunc import *
 from newspubfunc import *
 from mybonds.apps.newsvc import *
-from mybonds.apps.beacon import Beacon
+from mybonds.apps.beacon import Beacon 
+
+from django.views.decorators.http import last_modified
+from django.views.decorators.cache import cache_control
+
+def get_last_modified(request,slug=""):
+    return post.object.get(slug=slug).modified
 
 def index(request):     
     return HttpResponse("hello index")
@@ -359,6 +365,8 @@ def relatedchannel(request):
            
 
 @login_required
+# @last_modified(get_last_modified)
+@cache_control(max_age=10)
 def hotboard(request):
     """获取 热点频道 面板"""
     beaconid = request.GET.get("beaconid", "1968416984598300074")  

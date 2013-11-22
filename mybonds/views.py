@@ -12,6 +12,7 @@ import sys, time
 import redis
 #from django.views.generic.simple import direct_to_template
 from django.contrib.auth.decorators import login_required, permission_required
+from django.views.decorators.cache import cache_control
 from django.http import Http404
 from django.contrib import *
 from django.contrib.auth.models import User
@@ -307,26 +308,23 @@ def buddyhold(request):
         return HttpResponse("ok")
         
 
-def test(request, template_name="beacon/test.html"): 
-#     tempparmsobj = r.hgetall("tempparms")
-    bkcolor = r.hget("tempparms","bkcolor")
-    fontsize = r.hget("tempparms","fontsize")
-    padding = r.hget("tempparms","padding")
-    fontcolor = r.hget("tempparms","fontcolor")
-    fontfamily = r.hget("tempparms","fontfamily") 
-#     padding = request.GET.get("padding", "0px 9px 0px 9px") 
-#     fontcolor = request.GET.get("fontcolor", "red") 
-#     fontfamily = request.GET.get("fontfamily", """"Arial Hebrew","Microsoft Yahei";""")
-#     font = request.GET.get("font", "18.5px/1.8 Arial,\5FAE\8F6F\96C5\9ED1,\82F9\679C\4E3D\4E2D\9ED1;")
-    print fontsize,padding,bkcolor
-    return render_to_response(template_name, { 
-        'bkcolor': bkcolor, 
-        'fontsize': fontsize,
-        'padding':padding,
-        'fontcolor':fontcolor,
-        'fontfamily':fontfamily,
-#         'font':font,
-    }, context_instance=RequestContext(request))  
+@cache_control(max_age=10)
+def test(request, template_name="beacon/test.html"):  
+    return HttpResponse("test ok")
+#     bkcolor = r.hget("tempparms","bkcolor")
+#     fontsize = r.hget("tempparms","fontsize")
+#     padding = r.hget("tempparms","padding")
+#     fontcolor = r.hget("tempparms","fontcolor")
+#     fontfamily = r.hget("tempparms","fontfamily")  
+#     print fontsize,padding,bkcolor
+#     return render_to_response(template_name, { 
+#         'bkcolor': bkcolor, 
+#         'fontsize': fontsize,
+#         'padding':padding,
+#         'fontcolor':fontcolor,
+#         'fontfamily':fontfamily,
+# #         'font':font,
+#     }, context_instance=RequestContext(request))  
 
 @login_required
 def groupdelete(request, template_name="beacon/group_list.html"): 

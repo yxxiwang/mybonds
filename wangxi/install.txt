@@ -3,6 +3,9 @@
 git checkout  xxxxfile
 git pull
 
+# yum groupinstall "Development tools"
+# yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+
 °¢ÀïÔÆÖ÷»ú
 fdisk /dev/xvdb
 n 

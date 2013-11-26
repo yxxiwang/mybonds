@@ -369,7 +369,8 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
 #             doc["beaconttl"] = beaconname 
             doc["beaconname"] = beacondisplayname 
             doc["beacontime"] = getBeaconTime(beaconusr,beaconid) 
-            doc["newscnt"] = newscnt 
+            doc["beacontodaycnt"] = getBeaconTodayCnt(beaconusr,beaconid)
+#             doc["newscnt"] = newscnt 
             docs.append(doc) 
 #             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)
     udata["docs"] = docs

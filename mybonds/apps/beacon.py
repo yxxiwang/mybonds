@@ -264,6 +264,7 @@ class Beacon:
         doc_lst = r.zrevrange(key + ":doc:tms", 0, 3)
         doc = {}
 #         userfllws = r.zrevrange("usr:" + username+":fllw",0,-1)
+#         todaytms=time.mktime(dt.date.today().timetuple())
         for docid in doc_lst:
             doc = rdoc.hgetall("doc:" + docid)
             if len(doc.keys()) == 0:
@@ -286,6 +287,7 @@ class Beacon:
             doc["beaconid"] = beaconid 
             doc["beaconname"] = self.getBeaconName()
             doc["beacontime"] = getBeaconTime(beaconusr,beaconid)
+            doc["beacontodaycnt"] = getBeaconTodayCnt(beaconusr,beaconid)
             break
         return doc
         

@@ -591,6 +591,7 @@ def removeDocFromChannel(request):
     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     
 def channelsbygroup(request):
+    """取热点频道"""
     groupid = request.GET.get("groupid", "") 
     orderby = request.GET.get("orderby", "desc")
     api = request.GET.get("api", "")

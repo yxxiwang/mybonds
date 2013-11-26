@@ -959,6 +959,13 @@ def beaconIsFollow(username,beaconusr,beaconid):
     else:
         return False
                     
+                    
+def getBeaconTodayCnt(beaconusr,beaconid):
+    """find channel's news cnt today(from 0:00 to now)"""
+    todaytms=time.mktime(dt.date.today().timetuple())
+    key= "bmk:%s:%s:doc:tms" %(beaconusr,beaconid)
+    return str(r.zcount(key,todaytms*1000,time.time()*1000))
+                    
 def getBeaconNewsCnt(username,beaconusr,beaconid):
     """find channel's news cnt not read since user last read"""
     dockey = "bmk:%s:%s:doc:tms" %(beaconusr,beaconid)

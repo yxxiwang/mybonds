@@ -134,7 +134,11 @@ def cleanDocChannelByTime(parms=("now","print")):
         tms = float(parm1)
     else:
         tms = (time.time()-int(parm1)*86400)*1000
-    bstrs = r.zrangebyscore("bmk:doc:share",0,tms)
+    if op in ("delete","print"):
+        bstrs = r.zrangebyscore("bmk:doc:share",0,tms)
+    elif op in ("deleteafter","printafter"):#几天前向后删除
+        bstrs = r.zrangebyscore("bmk:doc:share",tms,time.time()*1000)
+        
     for bstr in bstrs:
         (beaconusr,beaconid) = bstr.split("|-|")
         key = "bmk:"+beaconusr+":"+beaconid 
@@ -143,7 +147,7 @@ def cleanDocChannelByTime(parms=("now","print")):
             if ttl.startswith("*"):
                 print "[skipped] bmk:%s -->%s" % (bstr.replace("|-|",":"),ttl)
             else:
-                if op =="delete":
+                if op =="delete" or op == "deleteafter":
                     print "bmk:%s -->%s deleted..." % (bstr.replace("|-|",":"),ttl)
                     deleteBeacon(beaconusr,beaconid)
                 else:

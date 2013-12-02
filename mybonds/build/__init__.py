@@ -106,7 +106,6 @@ def cleanChannelCnt(op="print"):
                 
 def cleanChannelByCode(parms=("doc:1257408","print")):
     """ 只清理指定的频道新闻数据."""
-    
     if type(parms).__name__ == "str":
         parms = (parms,) 
     op=parms[-1]
@@ -121,22 +120,52 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
         bkey = "bmk:"+parms[0]
         ttl = r.hget(bkey,"ttl")
         print "%s ---> %s" % (bkey,ttl)
+        
+def cleanDocChannelByTime(parms=("now","print")): 
+    if type(parms).__name__ == "str":
+        parms = (parms,) 
+    parm1=parms[0]
+    op = parms[-1]
+    if parm1=="now":
+        tms = time.time()*1000
+    elif len(parm1)==10:
+        tms = float(parm1)*1000
+    elif len(parm1)==13:
+        tms = float(parm1)
+    else:
+        tms = (time.time()-int(parm1)*86400)*1000
+    bstrs = r.zrangebyscore("bmk:doc:share",0,tms)
+    for bstr in bstrs:
+        (beaconusr,beaconid) = bstr.split("|-|")
+        key = "bmk:"+beaconusr+":"+beaconid 
+        ttl = r.hget(key,"ttl").strip()
+        if beaconusr =="doc":
+            if ttl.startswith("*"):
+                print "[skipped] bmk:%s -->%s" % (bstr.replace("|-|",":"),ttl)
+            else:
+                if op =="delete":
+                    print "bmk:%s -->%s deleted..." % (bstr.replace("|-|",":"),ttl)
+                    deleteBeacon(beaconusr,beaconid)
+                else:
+                    print "bmk:%s -->%s" % (bstr.replace("|-|",":"),ttl)
+#                 cleanChannelByCode((bstr.replace("|-|",":"),op))
                 
+def deleteBeacon(beaconusr,beaconid):            
+    r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid)
+    r.zrem("bmk:doc:share:byfllw",beaconusr+"|-|"+beaconid) 
+    r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid) 
+    r.zrem("usr:" + beaconusr+":fllw",beaconusr+"|-|"+beaconid)
+    r.delete("channel:"+beaconusr+":"+beaconid+":doc_cts")
+    key = "bmk:"+beaconusr+":"+beaconid
+    for usr in r.smembers(key+":fllw"):
+        r.zrem("usr:" + usr+":fllw",beaconusr+"|-|"+beaconid)
+    r.delete(key + ":doc:tms")
+    r.delete(key + ":fllw")
+    r.delete(key)
+###########deleteBeacon is over######################
+    
 def cleanDocChannel(parms=("doc","print")):
-    """ 清理由热点新闻所建立频道,并将其从用户的关注列表中清理掉."""
-    def deleteBeacon(beaconusr,beaconid):            
-        r.zrem("bmk:doc:share",beaconusr+"|-|"+beaconid)
-        r.zrem("bmk:doc:share:byfllw",beaconusr+"|-|"+beaconid) 
-        r.zrem("bmk:doc:share:bynews",beaconusr+"|-|"+beaconid) 
-        r.zrem("usr:" + beaconusr+":fllw",beaconusr+"|-|"+beaconid)
-        r.delete("channel:"+beaconusr+":"+beaconid+":doc_cts")
-        key = "bmk:"+beaconusr+":"+beaconid
-        for usr in r.smembers(key+":fllw"):
-            r.zrem("usr:" + usr+":fllw",beaconusr+"|-|"+beaconid)
-        r.delete(key + ":doc:tms")
-        r.delete(key + ":fllw")
-        r.delete(key)
-    ###########deleteBeacon is over######################
+    """ 清理由热点新闻所建立频道,并将其从用户的关注列表中清理掉.""" 
     
     if type(parms).__name__ == "str":
         parms = (parms,) 
@@ -168,7 +197,7 @@ def replaceStormarketTitle(op="print"):
     
 def cleanCopynum(parms):
     """清理copynum里面的过时的docid的数据"""
-    
+    pass
     
 def cleanBeacon(op="print"):
     """ 清理已经删除的频道,并将其从用户的关注列表中清理掉."""
@@ -456,6 +485,7 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
+                  python %prog cleanDocChannelByTime {7|now} {print|delete}
                   python %prog cleanDocChannel doc {print|delete}
                   python %prog cleanChannelByCode doc:1257408 {print|delete}
                   python %prog replaceStormarketTitle  {print|replace} 

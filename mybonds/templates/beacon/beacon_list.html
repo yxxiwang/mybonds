@@ -18,9 +18,8 @@
         <div class="row-fluid"><!-- 左边 灯塔入口坐标文档 -->
           <div id="beacon-container"  class="beacon-container span2" style="border-style: dotted;border-width:1px;border-color:#CBDEF1;">
 
+          {% if beaconid == "" %} 
             {% for beacon in beacons %}
-
-              {% if beaconid == beacon.id %} 
               <div class="tag-item span12"  style="margin-left:0px;">
                 <span id='{{beacon.id}}' name='{{beacon.crt_usr}}' class="label label-info">{{beacon.name}}
                 <!--span class="badge ">{{beacon.cnt}}</span-->
@@ -28,10 +27,16 @@
                 <!--a class='close' data-dismiss='tag-item' style="float: none;">×</a-->
                 <a class="close" data-toggle="modal" href="#myModal"  style="float: none;" data-keyboard="true" data-backdrop="true" >×</a>
               </div>  
-            {% endif %}
-              
             {% endfor %}
-
+          {% else %}
+              <div class="tag-item span12"  style="margin-left:0px;">
+                <span id='{{beaconid}}' name='{{beaconusr}}' class="label label-info">{{beacondisplayname}}
+                <!--span class="badge ">{{beacon.cnt}}</span-->
+                </span>
+                <!--a class='close' data-dismiss='tag-item' style="float: none;">×</a-->
+                <a class="close" data-toggle="modal" href="#myModal"  style="float: none;" data-keyboard="true" data-backdrop="true" >×</a>
+              </div>  
+          {% endif %}
           </div>
 
           <div class="span7"><!-- 中间灯塔similar文档 --> 

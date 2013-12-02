@@ -216,3 +216,23 @@ npm install socket.io
 npm install redis
 安装完后运行以下命令以查看module结构：
 npm list
+
+
+==============yum install git====================
+需要先添加EPEL(Extra Packages for Enterprise Linux) repository:
+
+CentOS5.x 32-bit(x86/i386):
+
+ rpm -Uvh http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+
+CentOS5.x 64-bit(x64):
+
+ rpm -Uvh http://dl.fedoraproject.org/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm
+
+ CentOS6.x32-bit (x86/i386):
+
+ rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
+
+CentOS6.x 64-bit(x64):
+
+ rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-5.noarch.rpm

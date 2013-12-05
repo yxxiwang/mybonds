@@ -392,10 +392,10 @@ def saveFulltextById(ids, url="", frombackend=False):
     #                 doc.pop("relatedDocs")
                     logger.info("save fulltext in mongodb:" + doc["_id"])
                     tftxs.save(doc) 
-                if doc.has_key("relatedChannel"):
-                    for rc in doc["relatedChannel"]:
-                        beaconname = rc["channelName"].replace("*","")
-                        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
+#                 if doc.has_key("relatedChannel"):
+#                     for rc in doc["relatedChannel"]:
+#                         beaconname = rc["channelName"].replace("*","")
+#                         addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
                 if doc.has_key("category"):
                     rc = doc["category"]
                     beaconname = rc["channelName"].replace("*","")

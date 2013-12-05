@@ -489,7 +489,7 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
-                  python %prog cleanDocChannelByTime {7|now} {print|delete}
+                  python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter}
                   python %prog cleanDocChannel doc {print|delete}
                   python %prog cleanChannelByCode doc:1257408 {print|delete}
                   python %prog replaceStormarketTitle  {print|replace} 

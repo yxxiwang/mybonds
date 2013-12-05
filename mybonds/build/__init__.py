@@ -145,7 +145,7 @@ def cleanDocChannelByTime(parms=("now","print","notwithstar")):
         key = "bmk:"+beaconusr+":"+beaconid 
         ttl = r.hget(key,"ttl").strip()
         if beaconusr =="doc":
-            if ttl.startswith("*") or not withstar:
+            if ttl.startswith("*") and not withstar:
                 print "[skipped] bmk:%s -->%s" % (bstr.replace("|-|",":"),ttl)
             else:
                 if op =="delete" or op == "deleteafter":

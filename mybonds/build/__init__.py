@@ -121,11 +121,12 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
         ttl = r.hget(bkey,"ttl")
         print "%s ---> %s" % (bkey,ttl)
         
-def cleanDocChannelByTime(parms=("now","print")): 
+def cleanDocChannelByTime(parms=("now","print","notwithstar")): 
     if type(parms).__name__ == "str":
         parms = (parms,) 
     parm1=parms[0]
-    op = parms[-1]
+    op = parms[1]
+    withstar = parms[2]=="withstar"
     if parm1=="now":
         tms = time.time()*1000
     elif len(parm1)==10:
@@ -144,7 +145,7 @@ def cleanDocChannelByTime(parms=("now","print")):
         key = "bmk:"+beaconusr+":"+beaconid 
         ttl = r.hget(key,"ttl").strip()
         if beaconusr =="doc":
-            if ttl.startswith("*"):
+            if ttl.startswith("*") or not withstar:
                 print "[skipped] bmk:%s -->%s" % (bstr.replace("|-|",":"),ttl)
             else:
                 if op =="delete" or op == "deleteafter":
@@ -489,7 +490,7 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
-                  python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter}
+                  python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter} {not|withstar}
                   python %prog cleanDocChannel doc {print|delete}
                   python %prog cleanChannelByCode doc:1257408 {print|delete}
                   python %prog replaceStormarketTitle  {print|replace} 

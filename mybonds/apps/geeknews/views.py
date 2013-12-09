@@ -142,10 +142,10 @@ def research(request,template_name="beacon/fulltextnew.html"):
                 rc_lst.append(rcobj)
             fulldoc["relatedchannel"] = rc_lst
         
-        if fulldoc.has_key("category"):
-            fulldoc["category"]["beaconusr"]="doc"
-            fulldoc["category"]["beaconid"]=getHashid(fulldoc["category"]["channelId"])
-            fulldoc["category"]["beaconname"]=fulldoc["category"]["channelName"] 
+#         if fulldoc.has_key("category"):
+#             fulldoc["category"]["beaconusr"]="doc"
+#             fulldoc["category"]["beaconid"]=getHashid(fulldoc["category"]["channelId"])
+#             fulldoc["category"]["beaconname"]=fulldoc["category"]["channelName"] 
         
         if fulldoc.has_key("relatedchannel"):
             relatedchannel = fulldoc["relatedchannel"]
@@ -161,7 +161,8 @@ def research(request,template_name="beacon/fulltextnew.html"):
         'ftxlist': ftxlist, 
         'relatedsites': relatedsites, 
         'relatedchannel': relatedchannel,
-        'category': fulldoc["category"], 
+#         'category': fulldoc["category"], 
+        'category': "",
         'docid': docid, 
         'url': url,
         'tempparmsobj':r.hgetall("tempparms"),

@@ -489,7 +489,8 @@ def newsdetail(request):
             rcobj={}
             rcobj["beaconusr"]="doc"
             rcobj["beaconid"]=getHashid(rc["channelId"])
-            rcobj["beaconname"]= r.hget("bmk:doc:"+rcobj["beaconid"], "name").decode("utf8")
+            rcobj["beaconname"]= r.hget("bmk:doc:"+rcobj["beaconid"], "name")
+            rcobj["beaconname"] = rcobj["beaconname"].decode("utf8") if rcobj["beaconname"] is not None else rc["channelId"]
             rc_lst.append(rcobj)
         doc["relatedchannel"] = rc_lst
     ct_lst=[]

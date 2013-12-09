@@ -749,7 +749,7 @@ def hotboard(request, template_name="beacon/hotboard.html"):
         beausr, beaid = beaconstr.split("|-|") 
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
 #         beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid + ":fllw")
-#         beaobj["new_cnt"] = getBeaconNewsCnt(username, beausr, beaid)
+#         beaobj["new_cnt"] = getBeaconNotReadCnt(username, beausr, beaid)
         beaobj["id"] = beaid
         if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
@@ -846,7 +846,7 @@ def beaconnews(request, template_name="beacon/beacon_news.html"):
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
         beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid + ":fllw")
         beaobj["id"] = beaid
-        beaobj["new_cnt"] = getBeaconNewsCnt(username, beausr, beaid)
+        beaobj["new_cnt"] = getBeaconNotReadCnt(username, beausr, beaid)
         if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
         myfllw_list.append(beaobj)
@@ -857,7 +857,7 @@ def beaconnews(request, template_name="beacon/beacon_news.html"):
 #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
         beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid + ":fllw")
-        beaobj["new_cnt"] = getBeaconNewsCnt(username, beausr, beaid)
+        beaobj["new_cnt"] = getBeaconNotReadCnt(username, beausr, beaid)
         beaobj["id"] = beaid
         if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue

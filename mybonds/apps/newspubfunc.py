@@ -658,7 +658,7 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1",orderby="utms
             doc["beaconisfllw"] = "false" 
         
         doc["beaconname"] = r.hget("bmk:doc:"+doc["beaconid"] , "name").decode("utf8")
-        doc["beaconnewcnt"] = getBeaconNewsCnt(username,"doc",doc["beaconid"])
+        doc["beaconnotreadcnt"] = getBeaconNotReadCnt(username,"doc",doc["beaconid"])
         return doc 
     
     if udata.has_key("docs") and username != "": 
@@ -969,7 +969,7 @@ def getBeaconTodayCnt(beaconusr,beaconid):
     key= "bmk:%s:%s:doc:tms" %(beaconusr,beaconid)
     return str(r.zcount(key,todaytms*1000,time.time()*1000))
                     
-def getBeaconNewsCnt(username,beaconusr,beaconid):
+def getBeaconNotReadCnt(username,beaconusr,beaconid):
     """find channel's news cnt not read since user last read"""
     dockey = "bmk:%s:%s:doc:tms" %(beaconusr,beaconid)
     doc_lst = r.zrevrange(dockey,0,-1)

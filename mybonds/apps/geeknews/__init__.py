@@ -351,7 +351,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
         beacondisplayname = "" if beacondisplayname is None  else beacondisplayname.decode("utf8")
         lst = r.zrevrange(key+":doc:tms",0,newscnt-1)
 #         sim_lst += lst
-#         newcnt = getBeaconNewsCnt(username,beaconusr,beaconid)
+#         newcnt = getBeaconNotReadCnt(username,beaconusr,beaconid)
         for docid in lst:
             doc = rdoc.hgetall("doc:" + docid)
             if len(doc.keys()) == 0:
@@ -370,6 +370,7 @@ def getAllBeaconDocsByUser(username,start=0,num=100,hour_before=-1,newscnt=10):
             doc["beaconname"] = beacondisplayname 
             doc["beacontime"] = getBeaconTime(beaconusr,beaconid) 
             doc["beacontodaycnt"] = getBeaconTodayCnt(beaconusr,beaconid)
+            doc["beaconnotreadcnt"] = getBeaconNotReadCnt(username,beaconusr,beaconid)
 #             doc["newscnt"] = newscnt 
             docs.append(doc) 
 #             rdoc.hset("docid:beacons",sid,beaconusr+"|-|"+beaconid+"|-|"+beaconname)

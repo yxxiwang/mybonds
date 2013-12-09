@@ -294,6 +294,7 @@ class Beacon:
             doc["beaconname"] = self.getBeaconName()
             doc["beacontime"] = getBeaconTime(beaconusr,beaconid)
             doc["beacontodaycnt"] = getBeaconTodayCnt(beaconusr,beaconid)
+            doc["beaconnotreadcnt"] = getBeaconNotReadCnt(username,beaconusr,beaconid)
             break
         return doc
         

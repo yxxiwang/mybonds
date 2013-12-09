@@ -881,7 +881,10 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     elif beaconusr == "stockmarket":
         channelparm = "channelid"
     else:
-        channelparm = "channelpick"
+        if channel.split("%3B")[0].isdigit():# 对于 4888695645407970852;3137937558442478445 这样的频道 改为用eventid=
+            channelparm = "eventid"
+        else:
+            channelparm = "channelpick"
         
     today = dt.date.fromtimestamp(time.time())
 #     after = time.mktime(today.timetuple())

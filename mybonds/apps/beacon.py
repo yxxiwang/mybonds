@@ -44,7 +44,13 @@ class Beacon:
         if channelparm == "extendid":
             channelparm= "%s=%s:%s" % (channelparm,channel,self.getdesc())
         else:
-            channelparm = "%s=%s" % (channelparm,channel)
+            if channel.split("%3B")[0].isdigit():# 对于 4888695645407970852;3137937558442478445 这样的频道 改为用eventid=
+                channelparm = "%s=%s" % ("eventid",channel)
+            else:
+                channelparm = "%s=%s" % (channelparm,channel)
+                
+        
+        
         today = dt.date.fromtimestamp(time.time()) 
         if daybefore == -1:
             after = 0

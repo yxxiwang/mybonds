@@ -637,6 +637,7 @@ def channelsbygroup(request):
             bea.setUsername(username)
             bobj = bea.getLastDoc()
             if bobj=={} : continue
+            if time.time() - int(bobj["tms"])/1000 >86400*2 : continue
 #             print bobj
             beacons.append(bobj)
     

@@ -111,11 +111,12 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
     op=parms[-1]
     (beaconusr,beaconid) = parms[0].split(":")
     if op == "delete":
-        r.delete("channel:"+beaconusr+":"+beaconid+":doc_cts")
-        key = "bmk:"+beaconusr+":"+beaconid 
-        ttl = r.hget(key,"ttl") 
-        r.delete(key + ":doc:tms")
-        print "%s:doc:tms ---> %s  cleaned.." % (key,ttl)
+        deleteBeacon(beaconusr,beaconid)
+#         r.delete("channel:"+beaconusr+":"+beaconid+":doc_cts")
+#         key = "bmk:"+beaconusr+":"+beaconid 
+#         ttl = r.hget(key,"ttl") 
+#         r.delete(key + ":doc:tms")
+#         print "%s:doc:tms ---> %s  cleaned.." % (key,ttl)
     else:
         bkey = "bmk:"+parms[0]
         ttl = r.hget(bkey,"ttl")

@@ -440,9 +440,9 @@ def saveFulltextById(ids, url="", frombackend=False):
         return udata
     
     if url != "" :
-        urlstr = url
-        logger.info("=saveFulltextById===" + urlstr)
-        udata = saveFile(urlstr)
+#         urlstr = url
+        logger.info("=saveFulltextById===" + url)
+        udata = saveFile(url)
     else:
         logger.info("=saveFulltextById===" + ids)
         udata = procids(ids)

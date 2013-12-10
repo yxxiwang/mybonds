@@ -176,16 +176,20 @@ def cleanDocChannel(parms=("doc","print")):
         parms = (parms,) 
     op=parms[-1]
     for usr in parms[:-1]:
-        if usr=="" : usr="doc" 
-        
+        if usr=="" : usr="doc"  
         for bstr in r.zrevrange("bmk:doc:share",0,-1):
             bkey = "bmk:"+bstr.replace("|-|",":")
+            (beaconusr,beaconid) = bstr.split("|-|")
             ttl = r.hget(bkey,"ttl") 
-    #         if ttl is None or (ttl.isdigit() and len(ttl) > 6 ):
-            if bstr.split("|-|")[0] == usr:
+            tag = r.hget(bkey,"tag")
+    #         if ttl is None or (ttl.isdigit() and len(ttl) > 6 
+            if beaconusr== usr:
+                if tag is not None and usr =="doc" : 
+                    print "%s ---> %s --> %s jumped.." % (bkey,ttl, tag)
+                    continue
                 print "%s ---> %s" % (bkey,ttl)
                 if op=="delete" :
-                    deleteBeacon(bstr.split("|-|")[0],bstr.split("|-|")[1])
+                    deleteBeacon(beaconusr,beaconid)
                     if ttl is not None : rdoc.delete("doc:"+ttl) 
             
 def replaceStormarketTitle(op="print"):        

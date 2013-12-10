@@ -184,7 +184,7 @@ def cleanDocChannel(parms=("doc","print")):
             tag = r.hget(bkey,"tag")
     #         if ttl is None or (ttl.isdigit() and len(ttl) > 6 
             if beaconusr== usr:
-                if tag is not None and usr =="doc" : 
+                if tag !="" and usr =="doc" : 
                     print "%s ---> %s --> %s jumped.." % (bkey,ttl, tag)
                     continue
                 print "%s ---> %s" % (bkey,ttl)

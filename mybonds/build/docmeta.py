@@ -50,7 +50,7 @@ def channels(num):
         
 #         print "proc %s:%s and num is %d" %(beaconusr,beaconid,num)
         if not r.exists("bmk:"+beaconusr+":"+beaconid):#如果该频道不存在
-            logger.warnning("bmk:%s:%s is not exist!" %(beaconusr,beaconid) )
+            logger.warning("bmk:%s:%s is not exist!" %(beaconusr,beaconid) )
             continue
         
         if beaconusr not in ["rd","extend"]:

@@ -337,7 +337,7 @@ def saveFulltextById(ids, url="", frombackend=False):
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
             
-            if not rdoc.hexists("doc:" + docid, "url"):
+            if not rdoc.hexists("doc:" + docid, "host"):
                 if tms - long(doc["create_time"]) / 1000 > 86400 * 60:  # 如果是一个月以前的新闻
                     logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid, tms - long(doc["create_time"]) / 1000))
                 else:
@@ -392,10 +392,10 @@ def saveFulltextById(ids, url="", frombackend=False):
     #                 doc.pop("relatedDocs")
                     logger.info("save fulltext in mongodb:" + doc["_id"])
                     tftxs.save(doc) 
-#                 if doc.has_key("relatedChannel"):
-#                     for rc in doc["relatedChannel"]:
-#                         beaconname = rc["channelName"].replace("*","")
-#                         addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
+                if doc.has_key("relatedChannel"):
+                    for rc in doc["relatedChannel"]:
+                        beaconname = rc["channelName"].replace("*","")
+                        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
                 if doc.has_key("category"):
                     rc = doc["category"]
                     beaconname = rc["channelName"].replace("*","")
@@ -543,7 +543,7 @@ def saveDocsByUrl(urlstr, headlineonly="0"):
     #             docid = getHashid(doc["url"]) 
             docid = str(doc["docId"])
             
-            if not rdoc.hexists("doc:" + docid, "url"):
+            if not rdoc.hexists("doc:" + docid, "host"):
                 if tms - long(doc["create_time"]) / 1000 > 86400 * 60:  # 如果是一个月以前的新闻
                     logger.debug("jump fulltext doc:%s, sub tms is %d" % (docid, tms - long(doc["create_time"]) / 1000))
                 else:

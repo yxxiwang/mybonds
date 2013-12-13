@@ -40,11 +40,10 @@ class Beacon:
         
 #         if beaconusr=="rd":
 #             channelparm = "%s=%s" % ("hottopicid",channel)
-            
         if channelparm == "extendid":
             channelparm= "%s=%s:%s" % (channelparm,channel,self.getdesc())
         else:
-            if channel.split("%3B")[0].isdigit():# 对于 4888695645407970852;3137937558442478445 这样的频道 改为用eventid=
+            if channel.split("%3B")[0].isdigit() and channelparm=="channelpick":# 对于 4888695645407970852;3137937558442478445 这样的频道 改为用eventid=
                 channelparm = "%s=%s" % ("eventid",channel)
             else:
                 channelparm = "%s=%s" % (channelparm,channel)
@@ -210,13 +209,13 @@ class Beacon:
         return udata
         
     def getRelatedchannellist(self):
-        udata = trelate.find_one({"_id":int(self.beaconid)})
+        udata = trelate.find_one({"_id":self.beaconid})
         if udata is None or self.usecache=="0" :
             udata = self.saveRelatedchannelData() 
         bea_lst=[]
         for bea in udata["beacons"]: 
-            beacon={}
-            beacon["beaconid"]=getHashid(bea["channelId"])
+            beacon={} 
+            beacon["beaconid"]=str(getHashid(bea["channelId"]))
             beacon["beaconusr"]="doc"
 #             print to_unicode_or_bust(bea["channelName"])
             beaconname = bea["channelName"].replace("*","")

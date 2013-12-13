@@ -210,7 +210,7 @@ class Beacon:
         return udata
         
     def getRelatedchannellist(self):
-        udata = trelate.find_one({"_id":self.beaconid})
+        udata = trelate.find_one({"_id":int(self.beaconid)})
         if udata is None or self.usecache=="0" :
             udata = self.saveRelatedchannelData() 
         bea_lst=[]

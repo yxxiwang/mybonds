@@ -634,7 +634,7 @@ def channelsbygroup(request):
 #             bobj["beaconname"]=r.hget(key,"name").decode("utf8")
 #             bobj["isfllw"] = "true" if bstr in mybeacons else "false"
             beacontime = r.hget(key,"crt_tms")
-            if time.time() - float(beacontime) >86400*7 : continue
+            if time.time() - float(beacontime) >86400*30 : continue
             bea = Beacon(r.hget(key,"crt_usr"),r.hget(key,"id"))
             bea.setUsername(username)
             bobj = bea.getLastDoc()

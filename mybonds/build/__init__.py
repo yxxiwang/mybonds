@@ -182,14 +182,15 @@ def cleanDocChannel(parms=("doc","print")):
             bkey = "bmk:"+bstr.replace("|-|",":")
             (beaconusr,beaconid) = bstr.split("|-|")
             ttl = r.hget(bkey,"ttl") 
-            tag = r.hget(bkey,"tag")
+            tag = r.hget(bkey,"tag") 
+            name = r.hget(bkey,"name")
     #         if ttl is None or (ttl.isdigit() and len(ttl) > 6 
             if beaconusr== usr:
                 if tag !="" and usr =="doc" : 
                     print "%s ---> %s --> %s jumped.." % (bkey,ttl, tag)
                     continue
                 print "%s ---> %s" % (bkey,ttl)
-                if op=="delete" :
+                if op=="delete" and name.isdigit():
                     deleteBeacon(beaconusr,beaconid)
                     if ttl is not None : rdoc.delete("doc:"+ttl) 
             

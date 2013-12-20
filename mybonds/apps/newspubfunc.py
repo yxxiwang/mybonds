@@ -672,8 +672,11 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1",orderby="utms
 def getBeaconTime(beaconusr,beaconid):
     beacontime = r.hget("bmk:"+beaconusr+":"+beaconid, "crt_tms")
     beacontime = time.time() if beacontime is None else beacontime
-    beacontime = getTime(beacontime, formatstr="%YYear%mMouth%dDay".decode("utf8"), addtimezone=False) 
-    beacontime=beacontime.replace("Year","年".decode("utf8")).replace("Mouth","月".decode("utf8")).replace("Day","日".decode("utf8"))
+    beacontime = getTime(beacontime, formatstr="%mMouth%d".decode("utf8"), addtimezone=False) 
+    beacontime=beacontime.replace("Mouth",".")
+
+#     beacontime = getTime(beacontime, formatstr="%YYear%mMouth%dDay".decode("utf8"), addtimezone=False) 
+#     beacontime=beacontime.replace("Year","年".decode("utf8")).replace("Mouth","月".decode("utf8")).replace("Day","日".decode("utf8"))
     return beacontime
     
 def buildHotBoardData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby="tms", username=""):

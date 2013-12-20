@@ -190,7 +190,7 @@ def cleanDocChannel(parms=("doc","print")):
                     print "%s ---> %s --> %s jumped.." % (bkey,ttl, tag)
                     continue
                 print "%s ---> %s" % (bkey,ttl)
-                if op=="delete" and name.isdigit():
+                if op=="delete" :
                     deleteBeacon(beaconusr,beaconid)
                     if ttl is not None : rdoc.delete("doc:"+ttl) 
             

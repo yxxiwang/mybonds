@@ -653,6 +653,49 @@ def channelsbygroup(request):
 #     return HttpResponse(json.dumps(udata), mimetype="application/json") 
     return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
         
+def findbeacon(request):
+    api = request.GET.get("api", "")
+    ascii = request.GET.get("ascii", "1")
+    beaconname = request.GET.get("beaconname", "")
+    udata={} 
+    beacon_search = [] 
+    
+    if not beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)
+        udata["message"]="beaconname is null !" 
+        udata["success"] = "false"
+        udata["api"]=api
+        return HttpResponse(json.dumps(udata), mimetype="application/json") 
+        
+    sharebeacons = r.zrevrange("bmk:doc:share",0,-1)
+    for beaconstr in sharebeacons:
+        beausr, beaid = beaconstr.split("|-|") 
+        beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
+        if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
+            continue
+        
+        if beaobj.has_key("name"):
+            beaconttl = beaobj["name"]
+        else:
+            continue
+        beaconname = to_unicode_or_bust(beaconname)
+        beaconttl = to_unicode_or_bust(beaconttl, "utf8") 
+        if re.search(beaconname, beaconttl):
+            beaobj["beacontime"] = getBeaconTime(beausr,beaid)
+            beacon_search.append(beaobj) 
+    udata["beacons"] = beacon_search
+    udata["total"] = len(beacon_search)
+    udata["message"]="success list beacons ." 
+    udata["success"] = "true"
+    udata["api"]=api
+#     return HttpResponse(json.dumps(udata), mimetype="application/json") 
+    return HttpResponse(json.dumps(udata,ensure_ascii=ascii=="1"), mimetype="application/json")
+            
+#         beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid + ":fllw")
+#         beaobj["new_cnt"] = getBeaconNotReadCnt(username, beausr, beaid)
+#         beaobj["id"] = beaid
+#         sharebeacon_list.append(beaobj)
+          
+    
 def grouplist(request):
     api = request.GET.get("api", "")
     ascii = request.GET.get("ascii", "1")

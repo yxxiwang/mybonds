@@ -18,5 +18,6 @@ urlpatterns = patterns('newsvc.views',
     url(r'^grouplist/$', 'grouplist', name="grouplist"), 
     url(r'^channelsbygroup/$', 'channelsbygroup', name="channelsbygroup"), 
     url(r'^channelcounts/$', 'channelcounts', name="channelcounts"),  
+    url(r'^findbeacon/$', 'findbeacon', name="findbeacon"),  
     # upload lswdata 
 )

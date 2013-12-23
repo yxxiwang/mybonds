@@ -659,7 +659,7 @@ def findbeacon(request):
     beaconname = request.GET.get("beaconname", "")
     udata={} 
     beacon_search = [] 
-    
+    beaconname = beaconname.replace("%20", "").replace(" ", "")
     if beaconname == "":  # 根据beaconid取所有同名的灯塔(如果是查询)
         udata["message"]="beaconname is null !" 
         udata["success"] = "false"

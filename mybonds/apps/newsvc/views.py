@@ -674,17 +674,21 @@ def findbeacon(request):
             continue
         
         if beaobj.has_key("name"):
-            beaconttl = beaobj["name"]
+            beaname = beaobj["name"]
         else:
             continue
         beaconname = to_unicode_or_bust(beaconname)
-        beaconttl = to_unicode_or_bust(beaconttl, "utf8") 
-        if re.search(beaconname, beaconttl):
-            beaobj["beacontime"] = getBeaconTime(beausr,beaid)
-            beacon_search.append(beaobj) 
+        beaname = to_unicode_or_bust(beaname, "utf8") 
+        if re.search(beaconname, beaname):
+            beacon ={}
+            beacon["beacontime"] = getBeaconTime(beausr,beaid)
+            beacon["beaconid"] = beaid
+            beacon["beaconname"] = beaobj.pop("name").decode("utf8")
+            beacon["beaconusr"] = beaobj.pop("crt_usr") 
+            beacon_search.append(beacon) 
     udata["beacons"] = beacon_search
     udata["total"] = len(beacon_search)
-    udata["message"]="success list beacons ." 
+    udata["message"]="success find beacons ." 
     udata["success"] = "true"
     udata["api"]=api
 #     return HttpResponse(json.dumps(udata), mimetype="application/json") 

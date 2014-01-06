@@ -163,8 +163,8 @@ def sendemail(content, rcv_email, title=""):
     return 8
 
 def timeElaspe(create_time, real=False):
-    elaspestr = ""
-    create_time = int(create_time)
+    elaspestr = "" 
+    create_time = int(float(create_time)) 
     if create_time == 0:
         return "历史旧闻".decode("utf8")
     current_time = time.time()
@@ -675,10 +675,10 @@ def getBeaconTime(beaconusr,beaconid):
     beacontime = r.hget("bmk:"+beaconusr+":"+beaconid, "crt_tms")
     beacontime = time.time() if beacontime is None else beacontime
     
-#     beacontime = timeElaspe(int(beacontime))
-    
-    beacontime = getTime(beacontime, formatstr="%mMouth%d".decode("utf8"), addtimezone=False) 
-    beacontime=beacontime.replace("Mouth",".")
+    beacontime = timeElaspe(beacontime)
+
+#     beacontime = getTime(beacontime, formatstr="%mMouth%d".decode("utf8"), addtimezone=False) 
+#     beacontime=beacontime.replace("Mouth",".")
 
 #     beacontime = getTime(beacontime, formatstr="%YYear%mMouth%dDay".decode("utf8"), addtimezone=False) 
 #     beacontime=beacontime.replace("Year","年".decode("utf8")).replace("Mouth","月".decode("utf8")).replace("Day","日".decode("utf8"))

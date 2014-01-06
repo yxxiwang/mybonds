@@ -674,8 +674,11 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1",orderby="utms
 def getBeaconTime(beaconusr,beaconid):
     beacontime = r.hget("bmk:"+beaconusr+":"+beaconid, "crt_tms")
     beacontime = time.time() if beacontime is None else beacontime
-    beacontime = getTime(beacontime, formatstr="%mMouth%d".decode("utf8"), addtimezone=False) 
-    beacontime=beacontime.replace("Mouth",".")
+    
+    beacontime = timeElaspe(beacontime)
+    
+#     beacontime = getTime(beacontime, formatstr="%mMouth%d".decode("utf8"), addtimezone=False) 
+#     beacontime=beacontime.replace("Mouth",".")
 
 #     beacontime = getTime(beacontime, formatstr="%YYear%mMouth%dDay".decode("utf8"), addtimezone=False) 
 #     beacontime=beacontime.replace("Year","年".decode("utf8")).replace("Mouth","月".decode("utf8")).replace("Day","日".decode("utf8"))
@@ -1005,12 +1008,12 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
         refreshBeacon(beaconusr, beaconid)
         return
     
-    if beaconttl.isdigit() and len(beaconttl)==6:
-        if getsysparm("APPID")!="stock":
+    if beaconttl.isdigit() and len(beaconttl)==6:#如果频道是股票
+        if getsysparm("APPID")!="stock":#非股票应用不添加股票频道
             logger.info("--Beacon is stock,it's jumped--" + beaconttl)
             return
-    else:
-        if getsysparm("APPID")=="stock":
+    else:#如果频道不是股票
+        if getsysparm("APPID")=="stock": #股票应用只添加股票频道
             logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
             return
     logger.info("--addBeacon--" + beaconttl)

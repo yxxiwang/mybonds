@@ -1011,7 +1011,7 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
             return
     else:
         if getsysparm("APPID")=="stock":
-            logger.info("--Beacon is stock,it's jumped--" + beaconttl)
+            logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
             return
     logger.info("--addBeacon--" + beaconttl)
         

@@ -1148,7 +1148,8 @@ def sendemailfornews(request):
 #            content+="\r\n\r\n"+doc["url"]
 #            sendemail(content,usr_email,title)
      
-    return HttpResponse("sendemail is okay.")
+    robj["success"] = 'true'
+    return HttpResponse(json.dumps(robj), mimetype="application/json")
     
 @login_required
 def captchalist(request, template_name="beacon/captcha.html"):

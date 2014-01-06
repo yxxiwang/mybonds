@@ -546,6 +546,7 @@ def sysparms(request,template_name="beacon/sysparms.html"):
         parmtype = request.POST.get("parmtype", "system");
         print parmtype 
         if parmtype == "system":
+            appid = request.POST.get("appid", "news");
             redis_expire = request.POST.get("redis_expire", "186400");
             backend_domain = request.POST.get("backend_domain", "svc.zhijixing.com");
             domain = request.POST.get("domain", "www.9cloudx.com");
@@ -556,6 +557,7 @@ def sysparms(request,template_name="beacon/sysparms.html"):
             quantity_duration = request.POST.get("quantity_duration", "300"); 
             loglevel = request.POST.get("loglevel", "info"); 
             failed_retry_times = request.POST.get("failed_retry_times", "3");  
+            r.hset("sysparms","appid",appid)
             r.hset("sysparms","redis_expire",int(redis_expire))
             r.hset("sysparms","backend_domain",backend_domain)
             r.hset("sysparms","domain",domain)

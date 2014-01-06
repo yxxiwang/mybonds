@@ -534,9 +534,11 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
 #         r.zadd(key,int(tms),'{"id":%s,"num":%d}' %(docid,doc["copyNum"]))
         tms=getTime(int(tms)/1000)
         tms = re.sub(r":|-|\s", "", tms)
-        r.zadd(doc_tcnt_key,long(tms),docid)
-        r.hset("copynum",docid,doc["copyNum"])
-        r.zadd(doc_dcnt_key,int(tdate),docid)
+        if getsysparm("APPID")=="stock":
+            r.zadd(doc_tcnt_key,long(tms),docid)
+            r.hset("copynum",docid,doc["copyNum"])
+            r.zadd(doc_dcnt_key,int(tdate),docid)
+        
     ##### end for #####
     if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
         r.rename(key+":doc:tms:bak",key+":doc:tms")

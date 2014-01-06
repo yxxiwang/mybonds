@@ -32,6 +32,11 @@ GSSAPIAuthentication no
 #GSSAPIAuthentication yes
 
 
+yum groupinstall "Development tools"
+yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+
+
+
 wget http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 rpm -ivh nginx-release-centos-6-0.el6.ngx.noarch.rpm                  
 yum -y install nginx
@@ -43,16 +48,21 @@ yum -y install libevent-devel
 yum -y install readline-devel 
 
 yum -y install libtool gcc-c++
+yum -y install sysstat
 
 easy_install pip
+# if needed
+pip install -U distribute
+
 pip install ipython
 easy_install django
-pip install Pinax
-pip install django-debug_toolbar
+#pip install Pinax
+#pip install django-debug_toolbar
 pip install django-compressor
 pip install django-staticfiles
-pip install pinax_theme_bootstrap
+#pip install pinax_theme_bootstrap
 
+pip install tornado
 pip install supervisor
 pip install apscheduler
 pip install argparse
@@ -128,7 +138,7 @@ python setup.py install
 django-admin.py startproject mybonds
  
 python manage.py syncdb 
-
+python manage.py startapp [appname].
 
 cat >>/root/.bash_profile  <<EOF 
 export PYTHONPATH=/root/mybonds
@@ -235,4 +245,4 @@ CentOS5.x 64-bit(x64):
 
 CentOS6.x 64-bit(x64):
 
- rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-5.noarch.rpm
+ rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm

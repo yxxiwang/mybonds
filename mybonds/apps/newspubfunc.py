@@ -44,6 +44,7 @@ sysparms_hkey = {
     "BACKEND_DOMAIN":"backend_domain",
     "DOMAIN":"domain",
     "LOGLEVEL":"loglevel",
+    "APPID":"appid",
 }
 
 # REDIS_EXPIRETIME = int(r.hget("sysparms", "redis_expire")) if r.hexists("sysparms","redis_expire") else 186400
@@ -69,6 +70,7 @@ if not r.hexists("sysparms", "redis_expire"):
     r.hset("sysparms", "backend_domain", "svc.zhijixing.com")
     r.hset("sysparms", "domain", "www.9cloudx.com")
     r.hset("sysparms", "loglevel", "info")
+    r.hset("sysparms", "appid", "news")
     
 def loginit(LOGLEVEL):
     if LOGLEVEL is None or LOGLEVEL == "" or LOGLEVEL.lower() == "info":
@@ -1002,6 +1004,11 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
         logger.info("--Beacon is exists, refreshBeacon: " + beaconttl)
         refreshBeacon(beaconusr, beaconid)
         return
+    
+    if beaconttl.isdigit() and len(beaconttl)==6:
+        if getsysparm("APPID")!="stock":
+            logger.info("--Beacon is stock,it's jumped--" + beaconttl)
+            return
     else:
         logger.info("--addBeacon--" + beaconttl)
         

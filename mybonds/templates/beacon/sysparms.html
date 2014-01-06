@@ -7,62 +7,19 @@
 
       <div class="tabbable tabs-left span9"> <!-- Only required for left/right tabs -->
         <ul class="nav nav-tabs">
-          <li class="active"><a href="#tab1" data-toggle="tab">模板参数信息</a></li>
-          <li><a href="#tab2" data-target='#tab2'  data-toggle="tab">系统参数信息</a></li>
+          <li class="active"><a href="#tab1" data-toggle="tab">系统参数信息</a></li>
+          <li><a href="#tab2" data-target='#tab2'  data-toggle="tab"></a>模板参数信息</li>
         </ul>
 
         <div class="tab-content "> 
 
-          <div class="tab-pane active" id="tab1">
-            <form class="well_wxi form-horizontal" method="post" action="/sysparms/" id="sysparms" style="padding-left:10px;"> 
-              {% csrf_token %} 
-              <input id="parmtype" name="parmtype" type="hidden" class="uneditable-input" value="template"> 
-              <fieldset>
-              <div class="control-group">
-                <legend>模板参数信息修改</legend>
-                <label class="control-label" for="fontsize">字体大小</label>
-                <div class="controls">  
-                <input type="text" id="fontsize" name="fontsize" placeholder="50px" value="{{tempparmsobj.fontsize}}">
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="fontcolor">字体颜色</label>
-                <div class="controls">  
-                <input type="text" id="fontcolor" name="fontcolor" placeholder="red"  value="{{tempparmsobj.fontcolor}}" >
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="fontfamily">字体类型</label>
-                <div class="controls">  
-                <input type="text" id="fontfamily" name="fontfamily" placeholder=' "Arial Hebrew","Microsoft Yahei" 'value="{{tempparmsobj.fontfamily}}" >
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="bkcolor">背景色</label>
-                <div class="controls">  
-                <input type="text" id="bkcolor" name="bkcolor" placeholder="#f5f5f5"  value="{{tempparmsobj.bkcolor}}" ></p>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="padding">间距</label>
-                <div class="controls">  
-                <input type="text" id="padding" name="padding" placeholder="0px 9px 6px 9px"  value="{{tempparmsobj.padding}}" > 依次定义:上 右 下 左 的边距</p>
-                </div>
-              </div>
-              <div class="control-group">
-                <span class="help-block"> </span>
-                <label class="control-label"> </label>
-                <button type="submit" class="btn">保存</button>
-              </div>
-              </fieldset>
-            </form>
-          </div>
-
-          <div class="tab-pane " id="tab2"> 
+          <div class="tab-pane active" id="tab1"> 
             <form class="well_wxi form-horizontal" method="post" action="/sysparms/" id="sysparms" style="padding-left:10px;"> 
               {% csrf_token %} 
               <input id="parmtype" name="parmtype" type="hidden" class="uneditable-input" value="system"> 
               <fieldset>
+
+
               <div class="control-group">
                 <legend>系统参数信息修改</legend>
                 <label class="control-label" for="redis_expire">系统超时时间(秒)</label>
@@ -70,6 +27,14 @@
                 <input type="text" id="redis_expire" name="redis_expire" disabled placeholder="系统超时时间(秒)" value="{{sysparmsobj.redis_expire}}">
                 </div>
               </div>
+
+              <div class="control-group">
+                <label class="control-label" for="appid">应用类别</label>
+                <div class="controls">  
+                <input type="text" id="appid" name="appid" placeholder="应用类别"  value="{{sysparmsobj.appid}}" >
+                </div>
+              </div>
+              
               <div class="control-group">
                 <label class="control-label" for="backend_domain">后台域名地址</label>
                 <div class="controls">  
@@ -122,6 +87,52 @@
                 <label class="control-label">异步处理失败重试次数</label>
                 <div class="controls">  
                 <input type="text" id="failed_retry_times" name="failed_retry_times" placeholder="异步处理失败重试次数" tabindex="2" value="{{sysparmsobj.failed_retry_times}}">
+                </div>
+              </div>
+              <div class="control-group">
+                <span class="help-block"> </span>
+                <label class="control-label"> </label>
+                <button type="submit" class="btn">保存</button>
+              </div>
+              </fieldset>
+            </form>
+          </div>
+
+
+          <div class="tab-pane " id="tab2">
+            <form class="well_wxi form-horizontal" method="post" action="/sysparms/" id="sysparms" style="padding-left:10px;"> 
+              {% csrf_token %} 
+              <input id="parmtype" name="parmtype" type="hidden" class="uneditable-input" value="template"> 
+              <fieldset>
+              <div class="control-group">
+                <legend>模板参数信息修改</legend>
+                <label class="control-label" for="fontsize">字体大小</label>
+                <div class="controls">  
+                <input type="text" id="fontsize" name="fontsize" placeholder="50px" value="{{tempparmsobj.fontsize}}">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="fontcolor">字体颜色</label>
+                <div class="controls">  
+                <input type="text" id="fontcolor" name="fontcolor" placeholder="red"  value="{{tempparmsobj.fontcolor}}" >
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="fontfamily">字体类型</label>
+                <div class="controls">  
+                <input type="text" id="fontfamily" name="fontfamily" placeholder=' "Arial Hebrew","Microsoft Yahei" 'value="{{tempparmsobj.fontfamily}}" >
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="bkcolor">背景色</label>
+                <div class="controls">  
+                <input type="text" id="bkcolor" name="bkcolor" placeholder="#f5f5f5"  value="{{tempparmsobj.bkcolor}}" ></p>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="padding">间距</label>
+                <div class="controls">  
+                <input type="text" id="padding" name="padding" placeholder="0px 9px 6px 9px"  value="{{tempparmsobj.padding}}" > 依次定义:上 右 下 左 的边距</p>
                 </div>
               </div>
               <div class="control-group">

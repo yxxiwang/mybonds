@@ -1010,7 +1010,10 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
             logger.info("--Beacon is stock,it's jumped--" + beaconttl)
             return
     else:
-        logger.info("--addBeacon--" + beaconttl)
+        if getsysparm("APPID")=="stock":
+            logger.info("--Beacon is stock,it's jumped--" + beaconttl)
+            return
+    logger.info("--addBeacon--" + beaconttl)
         
     beaconname = beaconttl if beaconname == "" else beaconname
 #     beacontime = getTime(time.time(), formatstr="%Y%m%d%H%M%S") if beacontime == "" else beacontime

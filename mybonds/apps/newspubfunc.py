@@ -675,7 +675,7 @@ def getBeaconTime(beaconusr,beaconid):
     beacontime = r.hget("bmk:"+beaconusr+":"+beaconid, "crt_tms")
     beacontime = time.time() if beacontime is None else beacontime
     
-    beacontime = timeElaspe(beacontime)
+    beacontime = timeElaspe(float(beacontime)*1000)
 
 #     beacontime = getTime(beacontime, formatstr="%mMouth%d".decode("utf8"), addtimezone=False) 
 #     beacontime=beacontime.replace("Mouth",".")

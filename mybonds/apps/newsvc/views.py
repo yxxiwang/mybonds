@@ -673,6 +673,9 @@ def findbeacon(request):
         if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
         
+        if not beaobj["ttl"].startswith("*"):
+            continue
+        
         if beaobj.has_key("name"):
             beaname = beaobj["name"]
         else:

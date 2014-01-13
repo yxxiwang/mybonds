@@ -43,16 +43,18 @@ yum -y install nginx
 
 yum -y install pcre-devel dstat tcl
 yum -y install pcre-static git
-yum -y install python-setuptools python-devel python-simplejson python-config
+yum -y install python-devel python-simplejson python-config
 yum -y install libevent-devel 
 yum -y install readline-devel 
 
 yum -y install libtool gcc-c++
 yum -y install sysstat
 
+yum -y install python-setuptools
 easy_install pip
 # if needed
 pip install -U distribute
+pip install setuptools --no-use-wheel --upgrade
 
 pip install ipython
 easy_install django
@@ -246,3 +248,30 @@ CentOS5.x 64-bit(x64):
 CentOS6.x 64-bit(x64):
 
  rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+ 
+ 
+ 
+ 1,channelsbygroup接口支持多个groupid,
+ 2,给所有*的频道增加一个tag,定时清理没有tag的频道
+ 
+ vrmp
+ 无线局域网适配器 无线网络连接:
+
+   连接特定的 DNS 后缀 . . . . . . . :
+   描述. . . . . . . . . . . . . . . : 11b/g/n  Wireless LAN Mini-PCI Express Adapter II
+   物理地址. . . . . . . . . . . . . : 68-A3-C4-3A-F5-92
+   DHCP 已启用 . . . . . . . . . . . : 是
+   自动配置已启用. . . . . . . . . . : 是
+   本地链接 IPv6 地址. . . . . . . . : fe80::4d8f:aec3:9366:f3a5%10(首选)
+   IPv4 地址 . . . . . . . . . . . . : 172.31.117.111(首选)
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   获得租约的时间  . . . . . . . . . : 2014年1月8日 9:45:31
+   租约过期的时间  . . . . . . . . . : 2014年1月8日 15:45:32
+   默认网关. . . . . . . . . . . . . : 172.31.117.10
+   DHCP 服务器 . . . . . . . . . . . : 172.31.117.10
+   DHCPv6 IAID . . . . . . . . . . . : 241738692
+   DHCPv6 客户端 DUID  . . . . . . . : 00-01-00-01-17-92-F9-1B-68-A3-C4-3A-F5-92
+   DNS 服务器  . . . . . . . . . . . : 114.114.114.114
+                                       8.8.8.8
+   主 WINS 服务器  . . . . . . . . . : 172.31.117.10
+   TCPIP 上的 NetBIOS  . . . . . . . : 已启用

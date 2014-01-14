@@ -664,7 +664,7 @@ def newHotBoardData(beaconusr, beaconid, username="", usecache="1",orderby="utms
         return doc 
     
     if udata.has_key("docs") and username != "": 
-        udata["docs"] = [ proc(doc) for doc in udata["docs"] if r.exsist("bmk:doc:"+doc["beaconid"]) ]  
+        udata["docs"] = [ proc(doc) for doc in udata["docs"] if r.exists("bmk:doc:"+doc["beaconid"]) ]  
         logger.info("newHotBoardData order by %s" % (orderby,))
         if orderby != "utms":
             udata["docs"] = sorted(udata["docs"], key=lambda l:(l[orderby]), reverse=True)

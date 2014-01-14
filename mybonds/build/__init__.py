@@ -264,11 +264,11 @@ def cleanBeacon(op="print"):
 def beaconNameHash(op="print"):
     print "==beaconNameHash=="
     for bstr in r.zrevrange("bmk:doc:share",0,-1):
-        print "proc %s" % bstr
+#         print "proc %s" % bstr
         bkey = "bmk:"+bstr.replace("|-|",":")
         ttl = r.hget(bkey,"ttl")
         if ttl is None:
-            print "%s is null in %s,should remove!" % (bkey , key)
+            print "%s is null,should remove!" % (bkey)
         else:
             r.hset("beacon:channel:bak",ttl,bkey)
     r.rename("beacon:channel:bak","beacon:channel")

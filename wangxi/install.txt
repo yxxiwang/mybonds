@@ -83,6 +83,14 @@ pip install fabric
 pip install paramiko
 pip install PyRSS2Gen
 
+########### Installing redis(but it's 2.4 version) ########################
+wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
+yum install redis -y
+service redis start
+
+
 ############ Installing rdbtools #########################
 pip install rdbtools
 
@@ -250,7 +258,46 @@ CentOS6.x 64-bit(x64):
  rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
  
  
- 
+=================git 使用==========================
+git config --global user.name yxxiwang
+git config --global user.email yxxiwang@gmail.com
+
+#git config --global push.default simple
+#(if git version is 1.x)
+git config --global push.default matching 
+
+cd ~/wangxi/mysite
+git init
+ls >master.lst
+git add .
+git commit -m "initial commit"
+git status
+
+git checkout -b new_feature
+#(or) git branch new_featuregit checkout new_feature
+git branch
+ls >new_feature.lst
+git add .
+git commit -m "adds my new feature"
+
+git checkout master
+git merge new_feature
+
+git show 
+git log
+git checkout dbdff167e87b97f0f956b7a3f5729914678cc266
+
+git remote add origin https://yxxiwang@bitbucket.org/yxxiwang/wang.git
+git push origin master
+
+#git remote set-url origin https://yxxiwang@bitbucket.org/yxxiwang/wang.git
+git clone https://yxxiwang@bitbucket.org/yxxiwang/wang.git
+
+
+
+
+
+
  1,channelsbygroup接口支持多个groupid,
  2,给所有*的频道增加一个tag,定时清理没有tag的频道
  

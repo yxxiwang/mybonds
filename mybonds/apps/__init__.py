@@ -104,6 +104,7 @@ def getTime(tms,formatstr="%Y-%m-%d %H:%M:%S",addtimezone=True):
         if addtimezone:
             tms=tms+3600*8
         if tms>=1000000000000: tms = tms /1000
+#         if tms>=pow(10,12): tms = tms /1000
 #         print tms,type(tms)
         tdate = dt.datetime.fromtimestamp(tms).strftime(formatstr)
     except:

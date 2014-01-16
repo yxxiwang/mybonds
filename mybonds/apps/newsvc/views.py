@@ -419,6 +419,7 @@ def newsdetail(request):
     rtype=request.GET.get("rtype", "string")
     ascii = request.GET.get("ascii", "1")
     api = request.GET.get("api", "")
+    usecache = request.GET.get("usecache", "1")
     udata={}
     doc ={}
     udata["api"]=api
@@ -426,7 +427,9 @@ def newsdetail(request):
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
     quantity = log_typer(request, "newsFullText", docid)
-    
+    if usecache == "0":
+        from mybonds.build import saveFullText
+        saveFullText(docid)
     def list2dict(lst,key):
         rtlst=[]
         for el in lst:

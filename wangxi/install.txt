@@ -281,7 +281,7 @@ git add .
 git commit -m "adds my new feature"
 
 git checkout master
-git merge new_feature
+git merge --no-ff new_feature
 
 git show 
 git log

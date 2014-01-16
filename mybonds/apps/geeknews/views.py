@@ -120,6 +120,7 @@ def feedbackform(request):
 def research(request,template_name="beacon/fulltextnew.html"): 
     username = getUserName(request) 
     docid = request.GET.get("docid", "")
+    usecache = request.GET.get("usecache", "1")
     name = r.hget("doc:"+docid,"name")
     quantity = log_typer(request, "reserch", name)
     if quantity > getsysparm("QUANTITY"):
@@ -127,6 +128,11 @@ def research(request,template_name="beacon/fulltextnew.html"):
     ftxlist=[]
     relatedsites= [] 
     relatedchannel=[]
+    
+    if usecache == "0":
+        from mybonds.build import saveFullText
+        saveFullText(docid)
+        
     fulldoc = tftxs.find_one({"_id":docid})
     if fulldoc is not None:
 #         print fulldoc

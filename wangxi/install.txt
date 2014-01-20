@@ -290,6 +290,8 @@ git checkout dbdff167e87b97f0f956b7a3f5729914678cc266
 git remote add origin https://yxxiwang@bitbucket.org/yxxiwang/wang.git
 git push origin master
 
+#https://github.com/yxxiwang/mybonds.git
+
 #git remote set-url origin https://yxxiwang@bitbucket.org/yxxiwang/wang.git
 git clone https://yxxiwang@bitbucket.org/yxxiwang/wang.git
 

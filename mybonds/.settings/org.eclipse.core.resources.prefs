@@ -23,7 +23,6 @@ encoding//build/rtchannelclient.py=utf-8
 encoding//build/rtchannelserv.py=utf-8
 encoding//build/stockcountsbackend.py=utf-8
 encoding//build/stockcountsclient.py=utf-8
-encoding//build/test.py=utf-8
 encoding/<project>=UTF-8
 encoding/__init__.py=utf-8
 encoding/settings.py=utf-8

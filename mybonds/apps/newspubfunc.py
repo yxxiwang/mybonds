@@ -1000,7 +1000,17 @@ def getBeaconNotReadCnt(username,beaconusr,beaconid):
     new_cnt = r.zcount("bmk:" + beaconusr + ":" + beaconid +":doc:tms", last_touch_tms, now_tms)
 #     logger.debug("redis-cli zcount bmk:%s:%s:doc:tms %d %d -->%d", beaconusr,beaconid,last_touch_tms,now_tms,new_cnt) 
     return str(new_cnt)
-        
+    
+def beaconisstock(ttl):
+    if ttl.startswith("*"):
+        ttl=ttl[1:]
+    else:
+        pass
+    if ttl.isdigit() and len(ttl)==6:
+        return True
+    else:
+        return False
+         
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.hexists(key, "ttl"):
@@ -1008,14 +1018,22 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
         refreshBeacon(beaconusr, beaconid)
         return
     
-    if beaconttl.isdigit() and len(beaconttl)==6:#如果频道是股票
-        if getsysparm("APPID")!="stock":#非股票应用不添加股票频道
-            logger.info("--Beacon is stock,it's jumped--" + beaconttl)
-            return
-    else:#如果频道不是股票
-        if getsysparm("APPID")=="stock": #股票应用只添加股票频道
-            logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
-            return
+    if getsysparm("APPID")!="stock" and beaconisstock(beaconttl):#非股票应用不添加股票频道
+        logger.info("--Beacon is stock,it's jumped--" + beaconttl)
+        return
+    
+    if getsysparm("APPID")=="stock" and not beaconisstock(beaconttl): #股票应用只添加股票频道
+        logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
+        return
+#     
+#     if beaconttl.isdigit() and len(beaconttl)==6:#如果频道是股票
+#         if getsysparm("APPID")!="stock":#非股票应用不添加股票频道
+#             logger.info("--Beacon is stock,it's jumped--" + beaconttl)
+#             return
+#     else:#如果频道不是股票
+#         if getsysparm("APPID")=="stock": #股票应用只添加股票频道
+#             logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
+#             return
     logger.info("--addBeacon--" + beaconttl)
         
     beaconname = beaconttl if beaconname == "" else beaconname

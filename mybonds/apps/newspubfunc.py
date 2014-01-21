@@ -1024,7 +1024,7 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
     
     if getsysparm("APPID")=="stock" and not beaconisstock(beaconttl): #股票应用只添加股票频道
         logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
-        return
+        return 
 #     
 #     if beaconttl.isdigit() and len(beaconttl)==6:#如果频道是股票
 #         if getsysparm("APPID")!="stock":#非股票应用不添加股票频道

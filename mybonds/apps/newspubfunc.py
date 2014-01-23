@@ -1002,10 +1002,11 @@ def getBeaconNotReadCnt(username,beaconusr,beaconid):
     return str(new_cnt)
     
 def beaconisstock(ttl):
-    if ttl.startswith("*"):
-        ttl=ttl[1:]
-    else:
-        pass
+#     if ttl.startswith("*"):
+#         ttl=ttl[1:]
+#     else:
+#         pass
+    ttl=ttl[1:]
     if ttl.isdigit() and len(ttl)==6:
         return True
     else:

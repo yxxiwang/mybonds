@@ -237,6 +237,18 @@ npm install redis
 安装完后运行以下命令以查看module结构：
 npm list
 
+============== install zookeeper ==========================================
+#for java
+wget http://mirrors.cnnic.cn/apache/zookeeper/stable/zookeeper-3.4.5.tar.gz
+tar -xvf zookeeper-3.4.5.tar.gz
+cp zookeeper-3.4.5/conf/zoo_sample.cfg zookeeper-3.4.5/conf/zoo.cfg
+sh zookeeper-3.4.5/bin/zkServer.sh start
+#for c,python
+cd zookeeper-3.4.5/src/c/
+./configure
+make
+make install
+
 
 ==============yum install git====================
 需要先添加EPEL(Extra Packages for Enterprise Linux) repository:

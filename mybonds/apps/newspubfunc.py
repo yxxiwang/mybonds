@@ -1056,7 +1056,7 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
     r.hset(key, "cnt", 0) 
     r.hset(key, "mindoc", mindoc) 
     r.hset(key, "tag", tag) 
-    r.hset(key, "headlineonly", headlineonly) 
+    r.hset(key, "headlineonly", "23") 
     
     r.zadd("usr:" + beaconusr + ":fllw", time.time(), beaconusr + "|-|" + beaconid)
     r.zadd("bmk:doc:share", long(beacontime), beaconusr + "|-|" + beaconid)

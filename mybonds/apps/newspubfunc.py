@@ -1016,12 +1016,12 @@ def beaconisstock(ttl):
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid
     if r.hexists(key, "ttl"):
-        logger.info("--Beacon is exists, refreshBeacon: " + beaconttl)
+        logger.info("--Beacon is exists, refreshBeacon: " + beaconttl+" <-"+key)
         refreshBeacon(beaconusr, beaconid)
         return
     
     if getsysparm("APPID")!="stock" and beaconisstock(beaconttl):#非股票应用不添加股票频道
-        logger.info("--Beacon is stock,it's jumped--" + beaconttl)
+        logger.info("--Beacon is stock,it's jumped--" + beaconttl+" <-"+key)
         return
     
     if getsysparm("APPID")=="stock" and not beaconisstock(beaconttl): #股票应用只添加股票频道
@@ -1037,7 +1037,7 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
 #             logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
 #             return
 
-    logger.info("--addBeacon--" + beaconttl)
+    logger.info("--addBeacon--" + beaconttl+" <-"+key)
         
     beaconname = beaconttl if beaconname == "" else beaconname
 #     beacontime = getTime(time.time(), formatstr="%Y%m%d%H%M%S") if beacontime == "" else beacontime

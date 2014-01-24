@@ -184,12 +184,10 @@ def cleanDocStockChannel(parms=("doc","print")):
             name = r.hget(bkey,"name")
             if beaconusr== usr:
                 if beaconisstock(ttl):
-                    print "%s ---> %s --> %s jumped.." % (bkey,ttl, tag)
-                    continue
-                print "%s ---> %s" % (bkey,ttl)
-                if op=="delete" :
-                    deleteBeacon(beaconusr,beaconid)
-                    if ttl is not None : rdoc.delete("doc:"+ttl) 
+                    print "%s ---> %s" % (bkey,ttl)  
+                    if op=="delete" :
+                        deleteBeacon(beaconusr,beaconid)
+                        if ttl is not None : rdoc.delete("doc:"+ttl) 
                     
 def cleanDocChannel(parms=("doc","print")):
     """ 清理由热点新闻所建立频道,并将其从用户的关注列表中清理掉.""" 

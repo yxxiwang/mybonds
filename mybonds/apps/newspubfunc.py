@@ -1006,6 +1006,7 @@ def beaconisstock(ttl):
 #         ttl=ttl[1:]
 #     else:
 #         pass
+    if ttl is not None: ttl = ttl.strip()
     ttl=ttl[1:]
     if ttl.isdigit() and len(ttl)==6:
         return True

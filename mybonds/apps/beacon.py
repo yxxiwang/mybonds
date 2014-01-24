@@ -161,40 +161,40 @@ class Beacon:
         else:
             logger.warn("Attembrough: oh,refreshBeacon....but i have nothing to do .. bcz time is %d ,uptms=%d" % (dt, getsysparm("KEY_UPTIME")))
             
-    def add(self, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
-        key = self.key
-        beaconusr = self.beaconusr
-        beaconid = self.beaconid 
-        if r.hexists(key, "ttl"):
-            logger.info("--Beacon is exists." + beaconttl)
-            self.refresh()
-            return
-        else:
-            logger.info("--addBeacon--" + beaconttl)
-            
-        beaconname = beaconttl if beaconname == "" else beaconname
-        beacontime = getTime(time.time(), formatstr="%Y%m%d%H%M%S") if beacontime == "" else beacontime
-        mindoc = "0" if mindoc == "" else mindoc 
-        
-        r.hset(key, "id", beaconid)
-        r.hset(key, "ttl", beaconttl)
-        r.hset(key, "name", beaconname)
-        r.hset(key, "desc", desc)
-        r.hset(key, "crt_usr", beaconusr)
-        r.hset(key, "crt_tms", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S"))) 
-        r.hset(key, "last_touch", 0) 
-        r.hset(key, "last_update", 0) 
-        r.hset(key, "cnt", 0) 
-        r.hset(key, "mindoc", mindoc) 
-        r.hset(key, "tag", tag) 
-        r.hset(key, "headlineonly", headlineonly) 
-        
-        r.zadd("usr:" + beaconusr + ":fllw", time.time(), beaconusr + "|-|" + beaconid)
-        r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
-        r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
-        r.zadd("bmk:doc:share:bynews", time.time() , beaconusr + "|-|" + beaconid)
-        
-        self.refresh()
+#     def add(self, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
+#         key = self.key
+#         beaconusr = self.beaconusr
+#         beaconid = self.beaconid 
+#         if r.hexists(key, "ttl"):
+#             logger.info("--Beacon is exists." + beaconttl)
+#             self.refresh()
+#             return
+#         else:
+#             logger.info("--addBeacon--" + beaconttl)
+#             
+#         beaconname = beaconttl if beaconname == "" else beaconname
+#         beacontime = getTime(time.time(), formatstr="%Y%m%d%H%M%S") if beacontime == "" else beacontime
+#         mindoc = "0" if mindoc == "" else mindoc 
+#         
+#         r.hset(key, "id", beaconid)
+#         r.hset(key, "ttl", beaconttl)
+#         r.hset(key, "name", beaconname)
+#         r.hset(key, "desc", desc)
+#         r.hset(key, "crt_usr", beaconusr)
+#         r.hset(key, "crt_tms", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S"))) 
+#         r.hset(key, "last_touch", 0) 
+#         r.hset(key, "last_update", 0) 
+#         r.hset(key, "cnt", 0) 
+#         r.hset(key, "mindoc", mindoc) 
+#         r.hset(key, "tag", tag) 
+#         r.hset(key, "headlineonly", headlineonly) 
+#         
+#         r.zadd("usr:" + beaconusr + ":fllw", time.time(), beaconusr + "|-|" + beaconid)
+#         r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
+#         r.zadd("bmk:doc:share:byfllw", time.time(), beaconusr + "|-|" + beaconid)
+#         r.zadd("bmk:doc:share:bynews", time.time() , beaconusr + "|-|" + beaconid)
+#         
+#         self.refresh()
         
     def getExtendlist(self):    
         udata = textend.find_one({"_id":self.beaconid})
@@ -204,8 +204,9 @@ class Beacon:
     
     def saveExtendData(self): 
         udata = self.getdoc(self.beaconid, self.getExtendUrl(), textend)
-        if not r.exists(self.key):
-            self.add(beaconttl, beaconname, desc, beacontime, mindoc, tag, headlineonly)
+#         if not r.exists(self.key): 
+#             addBeacon("doc", self.beaconid, beaconttl,beaconname=beaconname, desc=desc)
+# #             self.add(beaconttl, beaconname, desc, beacontime, mindoc, tag, headlineonly)
         return udata
         
     def getRelatedchannellist(self):
@@ -333,7 +334,8 @@ class Beacon:
                 eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
                 if eventid !="-1" and not r.exists("bmk:doc:"+eventid) :
                     beaconname = doc.get("title",str(doc["docId"]))
-                    self.add("doc",eventid,eventid,beaconname=beaconname,tag="auto",headlineonly="1")
+#                     self.add("doc",eventid,eventid,beaconname=beaconname,tag="auto",headlineonly="1")
+                    addBeacon("doc", eventid, eventid,beaconname=beaconname, desc=beaconname)
                 
         if r.exists(key+":doc:tms:bak"):#如果频道数据为空,那么将不会有 key+":doc:tms:bak" 存在,rename的方法会返回错误
             r.rename(key+":doc:tms:bak",key+":doc:tms")
@@ -353,8 +355,9 @@ class Beacon:
             if not doc.has_key("utms"):
                 doc["utms"] = doc["tms"]  
             doc["copyNum"] = str(doc["copyNum"])  
-            if doc.has_key("eventid") : doc.pop("eventid")
-            self.add(doc["beaconid"],beaconname=doc["beaconname"],tag="auto",headlineonly="1")
+            if doc.has_key("eventid") : doc.pop("eventid") 
+            addBeacon("doc", doc["beaconid"], doc["beaconname"],beaconname=doc["beaconname"], desc=doc["beaconname"])
+#             self.add(doc["beaconid"],beaconname=doc["beaconname"],tag="auto",headlineonly="1")
             return doc
             
         udata = self.getPopularylist()

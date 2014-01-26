@@ -454,7 +454,7 @@ def saveRelatedDocs(relatedurl,relatedid):
         beaconname = doc.get("title",docid)
         eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
         if eventid !="-1":
-            addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly="1") 
+            addBeacon("doc",docid,docid,beaconname=beaconname,tag="auto",headlineonly="13") 
 
     udata["_id"]=relatedid
     trelate.save(udata)
@@ -522,7 +522,7 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
             eventid = str(doc["eventId"]) if doc.has_key("eventId") else "-1"
             if eventid !="-1" and not r.exists("bmk:doc:"+eventid) :
                 beaconname = doc.get("title",str(doc["docId"]))
-                addBeacon("doc",eventid,eventid,beaconname=beaconname,tag="auto",headlineonly=headlineonly)
+                addBeacon("doc",eventid,eventid,beaconname=beaconname,tag="auto",headlineonly="10")
             
 ################ 统计信息   ############################
         docid= str(doc["docId"])

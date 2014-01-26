@@ -574,7 +574,7 @@ def beaconsave(request, template_name="beacon_list.html"):
         r.hset(key, "cnt", 0) 
         r.hset(key, "mindoc", beaconmindoc) 
         r.hset(key, "tag", beacontag) 
-        r.hset(key, "headlineonly", headlineonly) 
+        r.hset(key, "headlineonly", "11") 
         
         r.zadd("usr:" + beaconusr + ":fllw", time.time(), beaconusr + "|-|" + beaconid)
         r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
@@ -605,7 +605,7 @@ def beaconsave(request, template_name="beacon_list.html"):
             r.hset(key, "desc", desc)
             r.hset(key, "mindoc", beaconmindoc) 
             r.hset(key, "name", beacondisplayname)
-            r.hset(key, "headlineonly", headlineonly) 
+            r.hset(key, "headlineonly", "12") 
             r.hset(key, "tag", beacontag) 
             r.zadd("bmk:doc:share", long(getUnixTimestamp(beacontime, "%Y%m%d%H%M%S")), beaconusr + "|-|" + beaconid)
             

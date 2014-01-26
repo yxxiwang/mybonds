@@ -570,7 +570,7 @@ def saveDocsByUrl(urlstr, headlineonly="0"):
             pipedoc.hset("doc:" + docid, "utms", tms)
             tms = tms + 1 
             pipedoc.hset("doc:" + docid, "domain", doc["domain"]) 
-            pipedoc.hset("doc:" + docid, "isheadline", headlineonly) 
+#             pipedoc.hset("doc:" + docid, "isheadline", headlineonly) 
                 
             pipedoc.expire("doc:" + docid, getsysparm("DOC_EXPIRETIME") * 3)
 #         print "to be save fulltext_ids is ",ids 

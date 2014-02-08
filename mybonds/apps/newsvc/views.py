@@ -601,6 +601,8 @@ def channelsbygroup(request):
     """取热点频道"""
     groupid = request.GET.get("groupid", "") 
     orderby = request.GET.get("orderby", "desc")
+    start = request.GET.get("start", "0")
+    num = request.GET.get("num", "20")
     api = request.GET.get("api", "")
     username = request.GET.get("u", getUserName(request))
     ascii = request.GET.get("ascii", "1")
@@ -648,7 +650,7 @@ def channelsbygroup(request):
     gobj["name"]=gobj["name"].decode("utf8")
     if gobj.has_key("desc") :gobj["desc"]=gobj["desc"].decode("utf8")
     udata["group"] = gobj
-    udata["beacons"] = beacons
+    udata["beacons"] = beacons[int(start):int(start)+int(num)]
     udata["total"] = len(beacons)
     udata["message"]="success list beacons ." 
     udata["success"] = "true"

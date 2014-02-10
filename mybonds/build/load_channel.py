@@ -35,11 +35,11 @@ def load_data(input,parms):
         if line=="":
             continue
         dlist = line.split(",")
-        (usr,name,desc) = dlist[0],dlist[1],dlist[2]
+        (disname,name,usr,tag) = dlist[0],dlist[1],dlist[2],dlist[3]
         
-        tag ="" 
-        if len(dlist) >=5:
-            tag = dlist[4]
+#         tag ="" 
+#         if len(dlist) >=5:
+#             tag = dlist[4]
         #if usr=="stockmarket":
         #    continue
 #         desc = name if desc=="" or desc is None else ""
@@ -50,21 +50,22 @@ def load_data(input,parms):
             continue
         
 #         print dlist
-        print "usr=%s;id=%s;name=%s;desc=%s" % (usr,id,name,desc)
+        print "usr=%s;id=%s;name=%s;tag=%s" % (usr,id,name,tag)
         r.zadd("bmk:doc:share",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:byfllw",time.time(),usr+"|-|"+id)
         r.zadd("bmk:doc:share:bynews",time.time(),usr+"|-|"+id)
         r.zadd("usr:" + usr+":fllw",time.time(),usr+"|-|"+id)
         beaobj = r.hset("bmk:" + usr + ":" + id,"id",id)
         beaobj = r.hset("bmk:" + usr + ":" + id,"ttl",name)
-        beaobj = r.hset("bmk:" + usr + ":" + id,"name",desc)
-        beaobj = r.hset("bmk:" + usr + ":" + id,"desc",desc)
+        beaobj = r.hset("bmk:" + usr + ":" + id,"name",disname)
+        beaobj = r.hset("bmk:" + usr + ":" + id,"desc",disname)
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_usr",usr)
         beaobj = r.hset("bmk:" + usr + ":" + id,"crt_tms",time.time())
         beaobj = r.hset("bmk:" + usr + ":" + id,"last_touch",0)
         beaobj = r.hset("bmk:" + usr + ":" + id,"last_update",0)
         beaobj = r.hset("bmk:" + usr + ":" + id,"cnt",0)
-        beaobj = r.hset("bmk:" + usr + ":" + id,"tag",tag.replace(";", ",")) 
+        beaobj = r.hset("bmk:" + usr + ":" + id,"tag",tag)
+#         beaobj = r.hset("bmk:" + usr + ":" + id,"tag",tag.replace(";", ",")) 
         
 if __name__ == "__main__":
     parms =""

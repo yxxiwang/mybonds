@@ -515,7 +515,7 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
-                  python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter} {not|withstar}
+                  python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter} {notwithstar|withstar}
                   python %prog cleanDocChannel doc {print|delete}
                   python %prog cleanDocStockChannel doc {print|delete}
                   python %prog cleanChannelByCode doc:1257408 {print|delete}

@@ -220,6 +220,12 @@ SET PASSWORD FOR 'root'@'localhost' = PASSWORD('secret_password');
 
 chkconfig --levels 345 mysqld on
 
+===from jangnan==
+执行“yum install mysql-server.x86_64”安装MySQL数据库。
+执行“service mysqld start”启动MySQL服务。
+执行“/usr/bin/mysqladmin -u root password root123”配置MySQL的管理员密码为"root123"
+执行“mysql -uroot -p”后键入密码进入Mysql环境。
+依次执行“grant all privileges on *.* to root@'%' identified by 'root123';”和“flush privileges;”为外部环境使用数据库配置权限
 
 ====================nodejs=============================
 yum install openssl-devel

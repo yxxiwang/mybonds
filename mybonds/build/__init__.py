@@ -122,12 +122,12 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
         ttl = r.hget(bkey,"ttl")
         print "%s ---> %s" % (bkey,ttl)
         
-def cleanDocChannelByTime(parms=("now","print","notwithstar")): 
+def cleanDocChannelByTime(parms=("now","print","notwithtag")): 
     if type(parms).__name__ == "str":
         parms = (parms,) 
     parm1=parms[0]
     op = parms[1]
-    withstar = parms[2]=="withstar"
+    withtag = parms[2]=="withtag"
     if parm1=="now":
         tms = time.time()*1000
     elif len(parm1)==10:
@@ -145,15 +145,17 @@ def cleanDocChannelByTime(parms=("now","print","notwithstar")):
         (beaconusr,beaconid) = bstr.split("|-|")
         key = "bmk:"+beaconusr+":"+beaconid 
         ttl = r.hget(key,"ttl")
+        tag= r.hget(key,"tag")
+        tag = "" if tag is None else tag
         if beaconusr =="doc":
-            if ttl.startswith("*") and not withstar:
-                print "[skipped] bmk:%s -->%s" % (bstr.replace("|-|",":"),ttl)
+            if tag!="" and not withtag:
+                print "[skipped] bmk:%s -->%s(%s)" % (bstr.replace("|-|",":"),ttl,tag)
             else:
                 if op =="delete" or op == "deleteafter":
-                    print "bmk:%s -->%s deleted..." % (bstr.replace("|-|",":"),ttl)
+                    print "bmk:%s -->%s(%s) deleted..." % (bstr.replace("|-|",":"),ttl,tag)
                     deleteBeacon(beaconusr,beaconid)
                 else:
-                    print "bmk:%s -->%s" % (bstr.replace("|-|",":"),ttl)
+                    print "bmk:%s -->%s(%s)" % (bstr.replace("|-|",":"),ttl,tag)
 #                 cleanChannelByCode((bstr.replace("|-|",":"),op))
                 
 def deleteBeacon(beaconusr,beaconid):            
@@ -515,7 +517,7 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
-                  python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter} {notwithstar|withstar}
+                  python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter} {notwithtag|withtag}
                   python %prog cleanDocChannel doc {print|delete}
                   python %prog cleanDocStockChannel doc {print|delete}
                   python %prog cleanChannelByCode doc:1257408 {print|delete}

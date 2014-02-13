@@ -632,6 +632,7 @@ def channelsbygroup(request):
         key = "bmk:"+bstr.replace("|-|",":")
         bttl = r.hget(key,"tag")
         bttl = "" if bttl is None else bttl
+#         print bttl,gobj["name"]
         if re.search(gobj["name"],bttl):
 #             bobj = {}
 #             bobj["beaconid"]=r.hget(key,"id")

@@ -216,17 +216,17 @@ def apply(request):
                 log_typer(request, "apply", "none")
                 greeting_typer(username, "apply", username)
 
-                fllwkey="bmk:rd:1108470809:fllw"
+                fllwkey="bmk:doc:1032313:fllw"
                 if r.exists(fllwkey):
                     r.sadd(fllwkey,username) 
-                    r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
-                    r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
+                    r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1032313")
+                    r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1032313")
                 
-                fllwkey="bmk:rd:954189947:fllw"
+                fllwkey="bmk:doc:1257408:fllw"
                 if r.exists(fllwkey):
                     r.sadd(fllwkey,username) 
-                    r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
-                    r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
+                    r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1257408")
+                    r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1257408")
 #                 print user.is_authenticated()
 #                 urlstr="http://%s/news/sfllowbeacon/?u=%s&fllwopt=add&beaconid=1108470809&beaconusr=rd" %(getsysparm("DOMAIN"),username)
 #                 loadFromUrl(urlstr)

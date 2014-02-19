@@ -220,7 +220,7 @@ class Beacon:
             beacon["beaconusr"]="doc"
 #             print to_unicode_or_bust(bea["channelName"])
             beaconname = bea["channelName"].replace("*","")
-            addBeacon("doc", beacon["beaconid"], bea["channelName"], beaconname=beaconname, desc=beaconname) 
+            addBeacon("doc", beacon["beaconid"], bea["channelName"], beaconname=beaconname, desc=beaconname,tag="频道关联".decode("utf8")) 
             beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
             beacon["beaconname"]=to_unicode_or_bust(beaconname)
             bea_lst.append(beacon)

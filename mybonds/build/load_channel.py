@@ -44,7 +44,8 @@ def load_data(input,parms):
         #    continue
 #         desc = name if desc=="" or desc is None else ""
 #         name = to_unicode_or_bust(name)
-        id = getHashid(name)
+#         id = getHashid(name) 
+        id = getHashid(name.decode("utf8"))
         
         if r.zscore("bmk:doc:share",usr+"|-|"+id) and parms !="force":
             continue

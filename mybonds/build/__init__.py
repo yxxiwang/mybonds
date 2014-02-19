@@ -332,6 +332,11 @@ def stockChannelHash():
             print "proc %s:%s <----%s" %(beaconusr,beaconid,name)
             r.hset("stock:channel",name,"%s:%s" % (beaconusr,beaconid))
             
+def getHash(name):
+    print getHashid(name)
+
+#     return getHashid(name)
+
 def conceptChannelHash(op="show"):
     """建立一个根据概念股票代码到频道key的hash"""
     import CfgGrp

@@ -139,7 +139,7 @@ def cleanChannelByTag(parms=("11111","print")):
             ttl = r.hget(bkey,"ttl") 
             tag = r.hget(bkey,"tag") 
             name = r.hget(bkey,"name")
-            tag = tag.strip()
+#             tag = tag.strip()
             if re.search(gobj["name"],tag):
                 print "bmk:%s -->%s(%s)" % (bstr.replace("|-|",":"),ttl,tag) 
                 if op=="delete" :
@@ -333,8 +333,7 @@ def stockChannelHash():
             r.hset("stock:channel",name,"%s:%s" % (beaconusr,beaconid))
             
 def getHash(name):
-    print getHashid(name)
-
+    print getHashid(name) 
 #     return getHashid(name)
 
 def conceptChannelHash(op="show"):

@@ -397,11 +397,11 @@ def saveFulltextById(ids, url="", frombackend=False):
                 if doc.has_key("relatedChannel"):
                     for rc in doc["relatedChannel"]:
                         beaconname = rc["channelName"].replace("*","")
-                        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
+                        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="关联".decode("utf8"))
                 if doc.has_key("category"):
                     rc = doc["category"]
                     beaconname = rc["channelName"].replace("*","")
-                    addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"])
+                    addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="分类".decode("utf8"))
                 if doc.has_key("relatedDocs"):
                     saveText(doc["relatedDocs"])
                 

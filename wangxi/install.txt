@@ -227,6 +227,12 @@ chkconfig --levels 345 mysqld on
 执行“mysql -uroot -p”后键入密码进入Mysql环境。
 依次执行“grant all privileges on *.* to root@'%' identified by 'root123';”和“flush privileges;”为外部环境使用数据库配置权限
 
+yum install mysql-server.x86_64
+service mysqld start
+/usr/bin/mysqladmin -u root password root123
+mysql -uroot -p
+grant all privileges on *.* to root@'%' identified by 'root123';
+flush privileges;
 ====================nodejs=============================
 yum install openssl-devel
 wget http://nodejs.org/dist/node-latest.tar.gz

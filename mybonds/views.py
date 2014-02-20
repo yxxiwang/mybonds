@@ -101,16 +101,16 @@ def apply_service(request):
         robj["data"] = r.hgetall("usr:" + username)
         greeting_typer(username, "apply", username) 
  
-        addchannelforuser("bmk:doc:1257408:fllw",username)#银行
-        addchannelforuser("bmk:doc:699457:fllw",username)#信托
-        addchannelforuser("bmk:doc:712662:fllw",username)#保险
-        addchannelforuser("bmk:doc:1085227:fllw",username)#股市
-        addchannelforuser("bmk:doc:1032313:fllw",username)#科技
-        addchannelforuser("bmk:doc:717188:fllw",username)#创投 
-        addchannelforuser("bmk:doc:1092317:fllw",username)#能源
-        addchannelforuser("bmk:doc:894866:fllw",username)#期货 
-        addchannelforuser("bmk:doc:775067:fllw",username)#外汇 
-        addchannelforuser("bmk:doc:26133388:fllw",username)#房地产
+        addchannelforuser("doc","1257408",username)#银行
+        addchannelforuser("doc","699457",username)#信托
+        addchannelforuser("doc","712662",username)#保险
+        addchannelforuser("doc","1085227",username)#股市
+        addchannelforuser("doc","1032313",username)#科技
+        addchannelforuser("doc","717188",username)#创投 
+        addchannelforuser("doc","1092317",username)#能源
+        addchannelforuser("doc","894866",username)#期货 
+        addchannelforuser("doc","775067",username)#外汇 
+        addchannelforuser("doc","26133388",username)#房地产
         
     else:
         robj["success"] = 'false'
@@ -216,16 +216,16 @@ def apply(request):
                 log_typer(request, "apply", "none")
                 greeting_typer(username, "apply", username)
  
-                addchannelforuser("bmk:doc:1257408:fllw",username)#银行
-                addchannelforuser("bmk:doc:699457:fllw",username)#信托
-                addchannelforuser("bmk:doc:712662:fllw",username)#保险
-                addchannelforuser("bmk:doc:1085227:fllw",username)#股市
-                addchannelforuser("bmk:doc:1032313:fllw",username)#科技
-                addchannelforuser("bmk:doc:717188:fllw",username)#创投 
-                addchannelforuser("bmk:doc:1092317:fllw",username)#能源
-                addchannelforuser("bmk:doc:894866:fllw",username)#期货 
-                addchannelforuser("bmk:doc:775067:fllw",username)#外汇 
-                addchannelforuser("bmk:doc:26133388:fllw",username)#房地产
+                addchannelforuser("doc","1257408",username)#银行
+                addchannelforuser("doc","699457",username)#信托
+                addchannelforuser("doc","712662",username)#保险
+                addchannelforuser("doc","1085227",username)#股市
+                addchannelforuser("doc","1032313",username)#科技
+                addchannelforuser("doc","717188",username)#创投 
+                addchannelforuser("doc","1092317",username)#能源
+                addchannelforuser("doc","894866",username)#期货 
+                addchannelforuser("doc","775067",username)#外汇 
+                addchannelforuser("doc","26133388",username)#房地产
                 
 #                 print user.is_authenticated()
 #                 urlstr="http://%s/news/sfllowbeacon/?u=%s&fllwopt=add&beaconid=1108470809&beaconusr=rd" %(getsysparm("DOMAIN"),username)
@@ -724,7 +724,7 @@ def character(request, template_name="beacon/suggestion.html"):
         "user": userobj,
     }, context_instance=RequestContext(request))
     
-def addchannelforuser(fllwkey,username):
+def addchannelforuser(busr,bid,username):
     """
     fllwkey="bmk:doc:1257408:fllw"
     if r.exists(fllwkey):
@@ -732,11 +732,12 @@ def addchannelforuser(fllwkey,username):
         r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1257408")
         r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1257408")
     """
-#     fllwkey="bmk:doc:1257408:fllw"
+    fllwkey="bmk:%s:%s:fllw" % (busr,bid)
     if r.exists(fllwkey[:-5]):
         r.sadd(fllwkey,username) 
-        r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1257408")
-        r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1257408")
+        r.zadd("usr:" + username+ ":fllw" ,time.time(), busr+"|-|"+bid )
+        r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey), busr+"|-|"+bid )
+        logger.info( "add %s to %s " % (fllwkey,username) )
         
 def login_apply(request):
     username = request.GET.get("usr", "");
@@ -767,16 +768,16 @@ def login_apply(request):
             robj["success"] = 'true'
             robj["message"] = "apply is success"  
 
-            addchannelforuser("bmk:doc:1257408:fllw",username)#银行
-            addchannelforuser("bmk:doc:699457:fllw",username)#信托
-            addchannelforuser("bmk:doc:712662:fllw",username)#保险
-            addchannelforuser("bmk:doc:1085227:fllw",username)#股市
-            addchannelforuser("bmk:doc:1032313:fllw",username)#科技
-            addchannelforuser("bmk:doc:717188:fllw",username)#创投 
-            addchannelforuser("bmk:doc:1092317:fllw",username)#能源
-            addchannelforuser("bmk:doc:894866:fllw",username)#期货 
-            addchannelforuser("bmk:doc:775067:fllw",username)#外汇 
-            addchannelforuser("bmk:doc:26133388:fllw",username)#房地产
+            addchannelforuser("doc","1257408",username)#银行
+            addchannelforuser("doc","699457",username)#信托
+            addchannelforuser("doc","712662",username)#保险
+            addchannelforuser("doc","1085227",username)#股市
+            addchannelforuser("doc","1032313",username)#科技
+            addchannelforuser("doc","717188",username)#创投 
+            addchannelforuser("doc","1092317",username)#能源
+            addchannelforuser("doc","894866",username)#期货 
+            addchannelforuser("doc","775067",username)#外汇 
+            addchannelforuser("doc","26133388",username)#房地产
         else:
             logger.info("we have  usr:"+username)
             robj["success"] = 'false'

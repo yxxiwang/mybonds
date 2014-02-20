@@ -733,7 +733,7 @@ def addchannelforuser(fllwkey,username):
         r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1257408")
     """
 #     fllwkey="bmk:doc:1257408:fllw"
-    if r.exists(fllwkey):
+    if r.exists(fllwkey[:-5]):
         r.sadd(fllwkey,username) 
         r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1257408")
         r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1257408")

@@ -101,17 +101,18 @@ def apply_service(request):
         robj["data"] = r.hgetall("usr:" + username)
         greeting_typer(username, "apply", username)
 
-        fllwkey="bmk:rd:1108470809:fllw"
+
+        fllwkey="bmk:doc:1032313:fllw"
         if r.exists(fllwkey):
             r.sadd(fllwkey,username) 
-            r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
-            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
+            r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1032313")
+            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1032313")
         
-        fllwkey="bmk:rd:954189947:fllw"
+        fllwkey="bmk:doc:1257408:fllw"
         if r.exists(fllwkey):
             r.sadd(fllwkey,username) 
-            r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
-            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
+            r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1257408")
+            r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1257408")
     else:
         robj["success"] = 'false'
         robj["message"] = "disabled account!" 
@@ -753,17 +754,18 @@ def login_apply(request):
             robj["success"] = 'true'
             robj["message"] = "apply is success" 
             
-#             fllwkey="bmk:rd:1108470809:fllw"
-#             if r.exists(fllwkey):
-#                 r.sadd(fllwkey,username) 
-#                 r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|1108470809")
-#                 r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|1108470809")
-#             
-#             fllwkey="bmk:rd:954189947:fllw"
-#             if r.exists(fllwkey):
-#                 r.sadd(fllwkey,username) 
-#                 r.zadd("usr:" + username+ ":fllw" ,time.time(), "rd|-|954189947")
-#                 r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"rd|-|954189947")
+
+            fllwkey="bmk:doc:1032313:fllw"
+            if r.exists(fllwkey):
+                r.sadd(fllwkey,username) 
+                r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1032313")
+                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1032313")
+            
+            fllwkey="bmk:doc:1257408:fllw"
+            if r.exists(fllwkey):
+                r.sadd(fllwkey,username) 
+                r.zadd("usr:" + username+ ":fllw" ,time.time(), "doc|-|1257408")
+                r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey),"doc|-|1257408")
         else:
             logger.info("we have  usr:"+username)
             robj["success"] = 'false'

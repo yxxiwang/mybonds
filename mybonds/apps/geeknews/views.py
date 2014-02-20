@@ -863,7 +863,7 @@ def beaconnews(request, template_name="beacon/beacon_news.html"):
 #        print "bmk:" + beausr + ":" + beaid +"==="+str(r.scard("bmk:" + beausr + ":" + beaid+":fllw"))
         beaobj = r.hgetall("bmk:" + beausr + ":" + beaid) 
         beaobj["fllw_cnt"] = r.scard("bmk:" + beausr + ":" + beaid + ":fllw")
-        beaobj["new_cnt"] = getBeaconNotReadCnt(username, beausr, beaid)
+#         beaobj["new_cnt"] = getBeaconNotReadCnt(username, beausr, beaid)
         beaobj["id"] = beaid
         if not beaobj.has_key("ttl"):  # 如果该灯塔已经被删除了(脏数据)
             continue
@@ -898,7 +898,7 @@ def beaconnews(request, template_name="beacon/beacon_news.html"):
         'udata': udata,
         'mybeacons':mybeacon_list,
         'myfllw_list':myfllw_list,
-        'sharebeacons':sharebeacon_list,
+        'sharebeacons':sharebeacon_list[0:20],
         'beaconid':beaconid,  # 当前灯塔的ID
         'beaconusr':beaconusr,  # 当前灯塔的ID
         'beaconname':beaconname,  # 当前灯塔的名称

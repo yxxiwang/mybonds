@@ -327,7 +327,8 @@ def stockChannelHash():
     for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
         beaconusr,beaconid = beaconstr.split("|-|")
         key = "bmk:%s:%s" % (beaconusr,beaconid)
-        name = r.hget(key,"ttl")
+        name = r.hget(key,"ttl")#*万科A(000002)
+        name = name.split("(")[1][:-1]
         if name.isdigit():
             print "proc %s:%s <----%s" %(beaconusr,beaconid,name)
             r.hset("stock:channel",name,"%s:%s" % (beaconusr,beaconid))

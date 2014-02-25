@@ -3,8 +3,10 @@
 git checkout  xxxxfile
 git pull
 
-# yum groupinstall "Development tools"
-# yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+wget http://mirrors.163.com/.help/CentOS6-Base-163.repo -O /etc/yum.repos.d/CentOS6-Base-163.repo
+
+# yum -y groupinstall "Development tools"
+# yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
 
 °¢ÀïÔÆÖ÷»ú
 fdisk /dev/xvdb
@@ -32,10 +34,8 @@ GSSAPIAuthentication no
 #GSSAPIAuthentication yes
 
 
-yum groupinstall "Development tools"
+yum -y groupinstall "Development tools"
 yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
-
-
 
 wget http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 rpm -ivh nginx-release-centos-6-0.el6.ngx.noarch.rpm                  
@@ -92,7 +92,35 @@ rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
 yum install redis -y
 service redis start
 
+########### install maven##############################
+#wget http://mirrors.hust.edu.cn/apache/maven/maven-3/3.2.1/binaries/apache-maven-3.2.1-bin.tar.gz
+#tar xvf apache-maven-3.2.1-bin.tar.gz 
+#cat >> /root/.bash_profile <<EOF
+#export M2_HOME=/usr/local/apache-maven/apache-maven-3.2.1 
+#export M2=$M2_HOME/bin 
+#export PATH=$M2:$PATH
+#
+#EOF
+#source /root/.bash_profile
 
+yum -y install gcc libxml2-devel libxslt-devel cyrus-sasl-devel cyrus-sasl-gssapi mysql-devel python-devel python-setuptools python-simplejson sqlite-devel ant openldap openldap-devel openldap-python
+yum -y install java-1.7.0-openjdk java-1.7.0-openjdk-devel ldapjdk
+mvn -version
+
+wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+yum install apache-maven
+mkdir /usr/share/apache-maven/conf/logging/
+cat > /usr/share/apache-maven/conf/logging/simplelogger.properties <<EOF 
+org.slf4j.simpleLogger.defaultLogLevel=info
+org.slf4j.simpleLogger.showDateTime=false
+org.slf4j.simpleLogger.showThreadName=false
+org.slf4j.simpleLogger.showLogName=false
+org.slf4j.simpleLogger.logFile=System.out
+org.slf4j.simpleLogger.levelInBrackets=true
+org.slf4j.simpleLogger.log.Sisu=info
+org.slf4j.simpleLogger.warnLevelString=WARNING
+
+EOF
 ############ Installing rdbtools #########################
 pip install rdbtools
 

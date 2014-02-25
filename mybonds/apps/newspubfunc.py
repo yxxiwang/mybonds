@@ -508,20 +508,20 @@ def buildBeaconData(beaconusr, beaconid, start=0, end= -1, isapi=False, orderby=
                 cobj["beaconname"] = r.hget("bmk:" + ckey.split(":")[1] + ":" + ckey.split(":")[2], "name")
                 channels.append(cobj)
                 
-    if beaconusr + ":" + beaconid in r.hvals("stock:channel"):  # 如果是概念频道
-        for bstr in r.zrevrange("bmk:doc:share", 0, -1):
-            bkey = "bmk:" + bstr.replace("|-|", ":")
-            tags = r.hget(bkey, "tag") 
-            tags = "" if tags is None else tags
-            if re.search(r.hget(key, "ttl"), tags): 
-                cobj = {}
-                cobj["beaconttl"] = r.hget(bkey, "ttl")
-                cobj["beaconusr"] = r.hget(bkey, "crt_usr")
-                cobj["beaconid"] = r.hget(bkey, "id")
-                cobj["beaconname"] = r.hget(bkey, "name")
-                if cobj in channels:
-                    continue
-                channelfromtags.append(cobj)   
+#     if beaconusr + ":" + beaconid in r.hvals("stock:channel"):  # 如果是概念频道
+#         for bstr in r.zrevrange("bmk:doc:share", 0, -1):
+#             bkey = "bmk:" + bstr.replace("|-|", ":")
+#             tags = r.hget(bkey, "tag") 
+#             tags = "" if tags is None else tags
+#             if re.search(r.hget(key, "ttl"), tags): 
+#                 cobj = {}
+#                 cobj["beaconttl"] = r.hget(bkey, "ttl")
+#                 cobj["beaconusr"] = r.hget(bkey, "crt_usr")
+#                 cobj["beaconid"] = r.hget(bkey, "id")
+#                 cobj["beaconname"] = r.hget(bkey, "name")
+#                 if cobj in channels:
+#                     continue
+#                 channelfromtags.append(cobj)   
             
     udata["channels"] = channels
     udata["channelfromtags"] = channelfromtags

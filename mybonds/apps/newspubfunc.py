@@ -370,7 +370,7 @@ def saveFulltextById(ids, url="", frombackend=False):
                 
             pipedoc.expire("doc:" + docid, getsysparm("DOC_EXPIRETIME") * 3)
 #         print "to be save fulltext_ids is ",ids 
-        if len(ids) > 0: 
+        if len(ids) > 0 and getsysparm("APPID")!="stock": 
             urlstr = "http://%s/research/svc?docid=%s" % (getsysparm("BACKEND_DOMAIN"), ids)
             pushQueue("fulltext", {"urlstr":urlstr}) 
 #             saveFulltextById(ids)
@@ -1022,7 +1022,7 @@ def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime
     
 #     if getsysparm("APPID")=="stock" and not beaconisstock(beaconttl): #股票应用只添加股票频道
     if getsysparm("APPID")=="stock": #股票应用不添加关联频道
-        logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
+#         logger.info("--Beacon is not stock,it's jumped--" + beaconttl)
         return 
     
     if getsysparm("APPID")!="stock" and beaconisstock(beaconttl):#非股票应用不添加股票频道

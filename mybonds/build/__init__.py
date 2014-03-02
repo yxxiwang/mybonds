@@ -204,6 +204,9 @@ def cleanStockChannel(parms=("print")):
         beaconusr,beaconid = beaconstr.split("|-|")
         key = "bmk:%s:%s" % (beaconusr,beaconid)
         ttl = r.hget(key,"ttl")#*万科A(000002)
+        if ttl is None:
+            print "%s --->ttl is none" % (key)  
+            continue
         if len(ttl.split("("))<=1:
             continue
         ttl = ttl.split("(")[1][:-1] 

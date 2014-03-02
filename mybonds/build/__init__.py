@@ -196,24 +196,22 @@ def deleteBeacon(beaconusr,beaconid):
     r.delete(key)
 ###########deleteBeacon is over######################
     
-def cleanDocStockChannel(parms=("doc","print")):
+def cleanStockChannel(parms=("print")):
     if type(parms).__name__ == "str":
         parms = (parms,) 
     op=parms[-1]
-    for usr in parms[:-1]:
-        if usr=="" : usr="doc"  
-        for bstr in r.zrevrange("bmk:doc:share",0,-1):
-            bkey = "bmk:"+bstr.replace("|-|",":")
-            (beaconusr,beaconid) = bstr.split("|-|")
-            ttl = r.hget(bkey,"ttl") 
-            tag = r.hget(bkey,"tag") 
-            name = r.hget(bkey,"name")
-            if beaconusr== usr:
-                if beaconisstock(ttl):
-                    print "%s ---> %s" % (bkey,ttl)  
-                    if op=="delete" :
-                        deleteBeacon(beaconusr,beaconid)
-                        if ttl is not None : rdoc.delete("doc:"+ttl) 
+    for beaconstr in r.zrevrange("bmk:doc:share",0,-1):
+        beaconusr,beaconid = beaconstr.split("|-|")
+        key = "bmk:%s:%s" % (beaconusr,beaconid)
+        ttl = r.hget(key,"ttl")#*万科A(000002)
+        if len(ttl.split("("))<=1:
+            continue
+        ttl = ttl.split("(")[1][:-1] 
+        if ttl.isdigit():
+            print "%s ---> %s" % (key,ttl)  
+            if op=="delete" :
+                deleteBeacon(beaconusr,beaconid)
+#                 if ttl is not None : rdoc.delete("doc:"+ttl)  
                     
 def cleanDocChannel(parms=("doc","print")):
     """ 清理由热点新闻所建立频道,并将其从用户的关注列表中清理掉.""" 
@@ -549,7 +547,7 @@ if __name__ == "__main__":
                   python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter} {notwithtag|withtag}
                   python %prog cleanDocChannel doc {print|delete}
                   python %prog cleanChannelByTag 111111 {print|delete}
-                  python %prog cleanDocStockChannel doc {print|delete}
+                  python %prog cleanStockChannel {print|delete}
                   python %prog cleanChannelByCode doc:1257408 {print|delete}
                   python %prog replaceStormarketTitle  {print|replace} 
             """

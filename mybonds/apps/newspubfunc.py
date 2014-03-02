@@ -1005,13 +1005,21 @@ def beaconisstock(ttl):
 #     if ttl.startswith("*"):
 #         ttl=ttl[1:]
 #     else:
-#         pass
-    if ttl is not None: ttl = ttl.strip()
-    ttl=ttl[1:]
-    if ttl.isdigit() and len(ttl)==6:
+#         pass  
+    if len(ttl.split("("))<=1:
+        return False
+    ttl = ttl.split("(")[1][:-1] 
+    if ttl.isdigit(): 
         return True
     else:
         return False
+                
+#     if ttl is not None: ttl = ttl.strip()
+#     ttl=ttl[1:]
+#     if ttl.isdigit() and len(ttl)==6:
+#         return True
+#     else:
+#         return False
          
 def addBeacon(beaconusr, beaconid, beaconttl, beaconname="", desc="", beacontime="", mindoc="", tag="", headlineonly="0"):
     key = "bmk:" + beaconusr + ":" + beaconid

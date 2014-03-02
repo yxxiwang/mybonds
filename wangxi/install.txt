@@ -102,9 +102,8 @@ service redis start
 #
 #EOF
 #source /root/.bash_profile
-
-yum -y install gcc libxml2-devel libxslt-devel cyrus-sasl-devel cyrus-sasl-gssapi mysql-devel python-devel python-setuptools python-simplejson sqlite-devel ant openldap openldap-devel openldap-python
 yum -y install java-1.7.0-openjdk java-1.7.0-openjdk-devel ldapjdk
+yum -y install gcc libxml2-devel libxslt-devel cyrus-sasl-devel cyrus-sasl-gssapi mysql-devel python-devel python-setuptools python-simplejson sqlite-devel ant openldap openldap-devel openldap-python
 mvn -version
 
 wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo

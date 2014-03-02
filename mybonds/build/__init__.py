@@ -207,9 +207,9 @@ def cleanStockChannel(parms=("print")):
         if ttl is None:
             print "%s --->ttl is none" % (key)  
             continue
-        if len(ttl.split("("))<=1:
+        if len(ttl.split("(")) !=2 :
             continue
-        ttl = ttl.split("(")[1][:-1] 
+        ttl = ttl.split("(")[0][1:]  
         if ttl.isdigit():
             print "%s ---> %s" % (key,ttl)  
             if op=="delete" :

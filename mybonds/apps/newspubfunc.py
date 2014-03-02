@@ -1008,7 +1008,7 @@ def beaconisstock(ttl):
 #         pass  
     if len(ttl.split("("))<=1:
         return False
-    ttl = ttl.split("(")[1][:-1] 
+    ttl = ttl.split("(")[0][1:] 
     if ttl.isdigit(): 
         return True
     else:

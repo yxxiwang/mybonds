@@ -910,6 +910,7 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     else:
         urlstr = "http://%s/research/svc?%s=%s&after=%d&before=%d&mindoc=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel, after, before, mindoc)
     
+    urlstr=urlstr+"&max=100"
 #     if beaconusr == "rd" or beaconusr=="doc":
 #         urlstr = "http://%s/research/svc?%s=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, channel)
     return urlstr

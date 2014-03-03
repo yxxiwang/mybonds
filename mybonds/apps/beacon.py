@@ -48,8 +48,6 @@ class Beacon:
             else:
                 channelparm = "%s=%s" % (channelparm,channel)
                 
-        
-        
         today = dt.date.fromtimestamp(time.time()) 
         if daybefore == -1:
             after = 0
@@ -61,6 +59,8 @@ class Beacon:
             urlstr = "http://%s/research/svc?%s&after=%d&before=%d" % (getsysparm("BACKEND_DOMAIN"), channelparm, after, before)
         else:
             urlstr = "http://%s/research/svc?%s&after=%d&before=%d&mindoc=%s" % (getsysparm("BACKEND_DOMAIN"), channelparm, after, before, mindoc)
+        
+        urlstr=urlstr+"&max=100"
         return urlstr
     
     def getRelatedChannelUrl(self):

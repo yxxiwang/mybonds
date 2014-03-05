@@ -5,8 +5,9 @@ git pull
 
 wget http://mirrors.163.com/.help/CentOS6-Base-163.repo -O /etc/yum.repos.d/CentOS6-Base-163.repo
 
-# yum -y groupinstall "Development tools"
-# yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+yum grouplist
+yum -y groupinstall "Development tools"
+yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
 
 阿里云主机
 fdisk /dev/xvdb
@@ -27,15 +28,18 @@ mkfs.xfs -f -i size=1024 /dev/xvdb1
 vi /etc/yum.conf
 把 exclude=kernel*  删掉
 yum -y update
-yum install gcc make dstat
+yum -y install gcc make dstat telnet
 
 修改 /etc/ssh/sshd_config 文件为以下内容
 GSSAPIAuthentication no
 #GSSAPIAuthentication yes
 
+sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_config
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+service sshd restart
 
 yum -y groupinstall "Development tools"
-yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
 
 wget http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 rpm -ivh nginx-release-centos-6-0.el6.ngx.noarch.rpm                  
@@ -59,6 +63,7 @@ pip install setuptools --no-use-wheel --upgrade
 pip install --upgrade setuptools
 
 pip install ipython
+
 easy_install django
 #pip install Pinax
 #pip install django-debug_toolbar

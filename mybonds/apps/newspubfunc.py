@@ -886,7 +886,7 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     if beaconusr == "rd":
         channelparm = "hottopicid"
 #         channelparm = "channeleventpick"
-    elif beaconusr == "stockmarket":
+    elif beaconusr == "stockmark":
         channelparm = "channelid"
     else:
         if channel.split("%3B")[0].isdigit():# 对于 4888695645407970852;3137937558442478445 这样的频道 改为用eventid=

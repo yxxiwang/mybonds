@@ -509,7 +509,7 @@ def refreshDocs(beaconusr, beaconid,days="1",force=False):
     for doc in docs:
         if doc is None:
             continue
-        if beaconusr=="doc" or beaconusr=="stockmarket" :
+        if beaconusr=="doc" or beaconusr=="stockmark" :
             r.zadd(key+":doc:tms",int(doc["create_time"]),str(doc["docId"]))  
         else:
             r.zadd(key+":doc:tms:bak",int(doc["create_time"]),str(doc["docId"]))

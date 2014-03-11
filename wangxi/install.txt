@@ -7,7 +7,7 @@ wget http://mirrors.163.com/.help/CentOS6-Base-163.repo -O /etc/yum.repos.d/Cent
 
 yum grouplist
 yum -y groupinstall "Development tools"
-yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel lvm2
 
 °¢ÀïÔÆÖ÷»ú
 fdisk /dev/xvdb
@@ -38,6 +38,32 @@ sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_conf
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 service sshd restart
 
+##################python 2.7 install #################
+wget http://www.python.org/ftp/python/2.7.2/Python-2.7.2.tgz
+tar -zvxf Python-2.7.2.tgz  
+cd Python-2.7.2
+./configure
+make
+make install
+python setup.py install  
+
+####if need###
+mv /usr/bin/python /usr/bin/python.bak  
+ln -s /usr/local/bin/python /usr/bin/python  
+vi /usr/bin/yum
+
+##################  end  python install  #####################################
+pip install setuptools zope.interface Twisted w3lib pyOpenSSL
+
+#pip install scrapy
+wget https://pypi.python.org/packages/source/S/Scrapy/Scrapy-0.22.2.tar.gz#md5=fd412ee5db549e1990fef9beb6a2ff1a
+tar -xvf Scr*
+cd Scr*
+python setup.py install 
+
+ftp://ftp.figlet.org/pub/figlet/program/unix/figlet-2.2.5.tar.gz
+tar -xvf figlet-2.2.5.tar.gz;cd figlet-2.2.5 ; make install;
+
 yum -y groupinstall "Development tools"
 yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
 
@@ -55,13 +81,13 @@ yum -y install libtool gcc-c++
 yum -y install sysstat
 
 yum -y install python-setuptools
+
 easy_install pip
 # if needed
 pip install -U distribute
 pip install setuptools --no-use-wheel --upgrade
 
 pip install --upgrade setuptools
-
 pip install ipython
 
 easy_install django

@@ -122,6 +122,29 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
         ttl = r.hget(bkey,"ttl")
         print "%s ---> %s" % (bkey,ttl)
         
+        
+def relateChannelAndStock(parms=("829105579","print")):
+    """ 根据groupid关联股票频道."""  
+    if type(parms).__name__ == "str":
+        parms = (parms,) 
+    op=parms[-1]
+    for groupid in parms[:-1]:
+        gobj = r.hgetall("group:"+groupid)
+        if gobj is None or gobj=={}:
+            print "group is not exsist !"  
+            continue
+        gobj["groupid"]=groupid
+        for bstr in r.zrevrange("bmk:doc:share",0,-1):
+            bkey = "bmk:"+bstr.replace("|-|",":")
+            (beaconusr,beaconid) = bstr.split("|-|")
+            ttl = r.hget(bkey,"ttl") 
+            tag = r.hget(bkey,"tag") 
+            name = r.hget(bkey,"name")
+#             tag = tag.strip()
+            if re.search(gobj["name"],tag):
+                print "bmk:%s -->%s(%s)" % (bstr.replace("|-|",":"),ttl,tag)
+                
+    
 def cleanChannelByTag(parms=("11111","print")):
     """ 根据groupid清理频道."""  
     if type(parms).__name__ == "str":
@@ -549,6 +572,7 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
+                  python %prog relateChannelAndStock 829105579 
                   python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter} {notwithtag|withtag}
                   python %prog cleanDocChannel doc {print|delete}
                   python %prog cleanChannelByTag 111111 {print|delete}

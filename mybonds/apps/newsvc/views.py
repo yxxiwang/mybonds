@@ -339,6 +339,7 @@ def relatedchannel(request):
     beaconusr = request.GET.get("beaconusr", "doc") 
     beaconname = request.GET.get("beaconname", "") 
     usecache = request.GET.get("usecache", "1")
+    version = request.GET.get("version", "new")
     days = request.GET.get("days", "all")
     api = request.GET.get("api", "")
     ascii = request.GET.get("ascii", "1")
@@ -355,7 +356,10 @@ def relatedchannel(request):
     if r.exists(key):
         beaobj = Beacon(beaconusr,beaconid)
         beaobj.setUsecache(usecache)
-        udata = beaobj.getRelatedchannellist()
+        if version =="old":
+            udata = beaobj.getRelatedchannellist_OLD()
+        else:
+            udata = beaobj.getRelatedchannellist()
     else:
         udata["success"] = "false"
         udata["message"] = "no such beacon"

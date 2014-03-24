@@ -209,6 +209,58 @@ class Beacon:
 # #             self.add(beaconttl, beaconname, desc, beacontime, mindoc, tag, headlineonly)
         return udata
         
+    def getRelatedStock(self):
+        udata = trelate.find_one({"_id":self.beaconid})
+        if udata is None or self.usecache=="0" :
+            udata = self.saveRelatedchannelData() 
+        bea_lst=[]
+        for bea in udata["beacons"]["relatedStock"]: 
+            beacon={} 
+            beacon["beaconid"]=str(getHashid(bea["channelId"]))
+            beacon["beaconusr"]="doc"
+#             print to_unicode_or_bust(bea["channelName"])
+            beaconname = bea["channelName"].replace("*","")
+            addBeacon("doc", beacon["beaconid"], bea["channelName"], beaconname=beaconname, desc=beaconname,tag="频道关联".decode("utf8")) 
+            beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
+            beacon["beaconname"]=to_unicode_or_bust(beaconname)
+            bea_lst.append(beacon)
+        udata["beacons"]=bea_lst
+        udata["total"]=len(bea_lst)
+        udata["success"]="true"
+        udata["message"]="getRelatedchannellist"
+        return udata
+           
+    def getRelatedchannellist_OLD(self):
+        udata = trelate.find_one({"_id":self.beaconid})
+        if udata is None or self.usecache=="0" :
+            udata = self.saveRelatedchannelData() 
+        bea_lst=[]
+        for bea in udata["beacons"]["relatedEvent"]: 
+            beacon={} 
+            beacon["beaconid"]=str(getHashid(bea["channelId"]))
+            beacon["beaconusr"]="doc"
+#             print to_unicode_or_bust(bea["channelName"])
+            beaconname = bea["channelName"].replace("*","")
+            addBeacon("doc", beacon["beaconid"], bea["channelName"], beaconname=beaconname, desc=beaconname,tag="频道关联".decode("utf8")) 
+            beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
+            beacon["beaconname"]=to_unicode_or_bust(beaconname)
+            bea_lst.append(beacon) 
+        for bea in udata["beacons"]["relatedStock"]: 
+            beacon={} 
+            beacon["beaconid"]=str(getHashid(bea["channelId"]))
+            beacon["beaconusr"]="doc"
+#             print to_unicode_or_bust(bea["channelName"])
+            beaconname = bea["channelName"].replace("*","")
+            addBeacon("doc", beacon["beaconid"], bea["channelName"], beaconname=beaconname, desc=beaconname,tag="频道关联".decode("utf8")) 
+            beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
+            beacon["beaconname"]=to_unicode_or_bust(beaconname)
+            bea_lst.append(beacon)
+        udata["beacons"]=bea_lst
+        udata["total"]=len(bea_lst)
+        udata["success"]="true"
+        udata["message"]="getRelatedchannellist"
+        return udata
+    
     def getRelatedchannellist(self):
         udata = trelate.find_one({"_id":self.beaconid})
         if udata is None or self.usecache=="0" :
@@ -224,6 +276,8 @@ class Beacon:
             beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
             beacon["beaconname"]=to_unicode_or_bust(beaconname)
             bea_lst.append(beacon)
+        udata["eventbeacons"]=bea_lst
+        bea_lst=[]
         for bea in udata["beacons"]["relatedStock"]: 
             beacon={} 
             beacon["beaconid"]=str(getHashid(bea["channelId"]))
@@ -234,8 +288,8 @@ class Beacon:
             beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
             beacon["beaconname"]=to_unicode_or_bust(beaconname)
             bea_lst.append(beacon)
-        udata["beacons"]=bea_lst
-        udata["total"]=len(bea_lst)
+        udata["stockbeacons"]=bea_lst
+        udata["total"]=len(bea_lst)+len(udata["eventbeacons"])
         udata["success"]="true"
         udata["message"]="getRelatedchannellist"
         return udata

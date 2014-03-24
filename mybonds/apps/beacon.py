@@ -289,6 +289,7 @@ class Beacon:
             beacon["beaconname"]=to_unicode_or_bust(beaconname)
             bea_lst.append(beacon)
         udata["stockbeacons"]=bea_lst
+        udata.pop("beacons")
         udata["total"]=len(bea_lst)+len(udata["eventbeacons"])
         udata["success"]="true"
         udata["message"]="getRelatedchannellist"

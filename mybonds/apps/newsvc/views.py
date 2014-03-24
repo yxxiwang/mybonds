@@ -339,7 +339,7 @@ def relatedchannel(request):
     beaconusr = request.GET.get("beaconusr", "doc") 
     beaconname = request.GET.get("beaconname", "") 
     usecache = request.GET.get("usecache", "1")
-    version = request.GET.get("version", "new")
+    version = request.GET.get("version", "old")
     days = request.GET.get("days", "all")
     api = request.GET.get("api", "")
     ascii = request.GET.get("ascii", "1")

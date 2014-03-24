@@ -214,7 +214,17 @@ class Beacon:
         if udata is None or self.usecache=="0" :
             udata = self.saveRelatedchannelData() 
         bea_lst=[]
-        for bea in udata["beacons"]: 
+        for bea in udata["beacons"]["relatedEvent"]: 
+            beacon={} 
+            beacon["beaconid"]=str(getHashid(bea["channelId"]))
+            beacon["beaconusr"]="doc"
+#             print to_unicode_or_bust(bea["channelName"])
+            beaconname = bea["channelName"].replace("*","")
+            addBeacon("doc", beacon["beaconid"], bea["channelName"], beaconname=beaconname, desc=beaconname,tag="频道关联".decode("utf8")) 
+            beacon["beacontime"]=getBeaconTime("doc",beacon["beaconid"])
+            beacon["beaconname"]=to_unicode_or_bust(beaconname)
+            bea_lst.append(beacon)
+        for bea in udata["beacons"]["relatedStock"]: 
             beacon={} 
             beacon["beaconid"]=str(getHashid(bea["channelId"]))
             beacon["beaconusr"]="doc"

@@ -356,10 +356,10 @@ def relatedchannel(request):
     if r.exists(key):
         beaobj = Beacon(beaconusr,beaconid)
         beaobj.setUsecache(usecache)
-        if version =="old":
-            udata = beaobj.getRelatedchannellist_OLD()
-        else:
+        if version =="new":
             udata = beaobj.getRelatedchannellist()
+        else:
+            udata = beaobj.getRelatedchannellist_OLD()
     else:
         udata["success"] = "false"
         udata["message"] = "no such beacon"

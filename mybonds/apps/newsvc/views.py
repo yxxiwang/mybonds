@@ -424,6 +424,7 @@ def newsdetail(request):
     ascii = request.GET.get("ascii", "1")
     api = request.GET.get("api", "")
     usecache = request.GET.get("usecache", "1")
+    version = request.GET.get("version", "old")
     udata={}
     doc ={}
     udata["api"]=api
@@ -490,19 +491,39 @@ def newsdetail(request):
             beacon_lst.append(sobj)
             addBeacon("news", getHashid(domain), domain, beaconname=domain, desc=host, beacontime="", mindoc="", tag="新闻媒体,媒体".decode("utf8"), headlineonly="0")
         doc["relatedsites"] = beacon_lst
+        
     rc_lst=[]
-    if doc.has_key("relatedChannel"):
-        for rc in doc["relatedChannel"]:
-            rcobj={}
-            rcobj["beaconusr"]="doc"
-            rcobj["beaconid"]=getHashid(rc["channelId"])
-            
-            if not r.exists("bmk:doc:"+rcobj["beaconid"]) : continue
-            
-            rcobj["beaconname"]= r.hget("bmk:doc:"+rcobj["beaconid"], "name")
-            rcobj["beaconname"] = rcobj["beaconname"].decode("utf8") if rcobj["beaconname"] is not None else rc["channelId"]
-            rc_lst.append(rcobj)
-        doc["relatedchannel"] = rc_lst
+    rcs_lst=[]
+    if doc.has_key("related"):
+        if doc["related"].has_key("relatedEvent"):
+            for rc in doc["related"]["relatedEvent"]:
+                rcobj={}
+                rcobj["beaconusr"]="doc"
+                rcobj["beaconid"]=getHashid(rc["channelId"])
+                
+                if not r.exists("bmk:doc:"+rcobj["beaconid"]) : continue
+                
+                rcobj["beaconname"]= r.hget("bmk:doc:"+rcobj["beaconid"], "name")
+                rcobj["beaconname"] = rcobj["beaconname"].decode("utf8") if rcobj["beaconname"] is not None else rc["channelId"]
+                rc_lst.append(rcobj)
+                
+        if doc["related"].has_key("relatedStock"):
+            for rc in doc["related"]["relatedStock"]:
+                rcobj={}
+                rcobj["beaconusr"]="doc"
+                rcobj["beaconid"]=getHashid(rc["channelId"])
+                
+                if not r.exists("bmk:doc:"+rcobj["beaconid"]) : continue
+                
+                rcobj["beaconname"]= r.hget("bmk:doc:"+rcobj["beaconid"], "name")
+                rcobj["beaconname"] = rcobj["beaconname"].decode("utf8") if rcobj["beaconname"] is not None else rc["channelId"]
+                rcs_lst.append(rcobj)
+        if version == "new":
+            doc["relatedevent"] = rc_lst
+            doc["relatedstock"] = rcs_lst
+        else:
+            doc["relatedchannel"] = rc_lst+rcs_lst
+    
     ct_lst=[]
     if doc.has_key("category"):
         doc["category"]["beaconusr"]="doc"
@@ -533,6 +554,7 @@ def newsdetail(request):
             
       
     if doc.has_key("relatedChannel"): doc.pop("relatedChannel") 
+    if doc.has_key("related"): doc.pop("related") 
 #     if doc.has_key("relatedDocs2"): doc.pop("relatedDocs2")
     
     if doc.has_key("relatedSites"): doc.pop("relatedSites")

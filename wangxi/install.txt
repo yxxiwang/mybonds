@@ -118,6 +118,7 @@ pip install fabric
 pip install paramiko
 pip install PyRSS2Gen
 
+pip install thrift hbase-thrift
 ########### Installing redis(but it's 2.4 version) ########################
 wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm

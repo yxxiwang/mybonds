@@ -44,7 +44,7 @@ def get_captcha(request):
 
 def apply_service(request):
     username = request.GET.get("usr", "");
-#     username = username.lower()
+    username = username.lower()
     password = request.GET.get("pwd", "");
     email = request.GET.get("email", "");
     captcha = request.GET.get("captcha", "");
@@ -142,7 +142,7 @@ def apply(request):
     
     if  request.method == 'POST':
         username = request.POST.get("username", "");
-#         username = username.lower()
+        username = username.lower()
         password = request.POST.get("password", "");
         email = request.POST.get("email", "yxxiwang@gmail.com");
         captcha = request.POST.get("captcha", "111111");
@@ -739,9 +739,9 @@ def addchannelforuser(busr,bid,username):
         r.zadd("bmk:doc:share:byfllw",r.scard(fllwkey), busr+"|-|"+bid )
         logger.info( "add %s to %s " % (fllwkey,username) )
         
-def login_apply(request):
+def login_apply(request): 
     username = request.GET.get("usr", "");
-#     username = username.lower()
+    username = username.lower()
     password = request.GET.get("pwd", "");
     api = request.GET.get("api", "")
     robj = {}
@@ -788,7 +788,7 @@ def login_apply(request):
     
 def login_service(request):
     username = request.GET.get("usr", "");
-#     username = username.lower()
+    username = username.lower()
     password = request.GET.get("pwd", "");
     api = request.GET.get("api", "")
     robj = {}
@@ -829,7 +829,7 @@ def login(request):
 
     if  request.method == 'POST':
         username = request.POST.get("username", "");
-#         username = username.lower()
+        username = username.lower()
         password = request.POST.get("password", "");
         user = auth.authenticate(username=username, password=password)
         if user is not None and user.is_active:

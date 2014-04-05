@@ -128,27 +128,30 @@ def updateChannelAndStock(parms=("24")):
     udata = loadFromUrl(urlstr) 
     udata.reverse()
     for rc in udata:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}
-#         beaid = getHashid(doc["channelId"])        
+        beaid = getHashid(rc["channelId"])        
         beaconname = rc["channelName"].replace("*","")
-        addBeacon("stockmark", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
+        addBeacon("stockmark",beaid, rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
 #         r.hset("bmk:stockmark:" + getHashid(rc["channelId"]),"crt_tms",time.time())
-        bttl = r.hget("bmk:stockmark:"+getHashid(rc["channelId"]),"tag")
-        bttl = "" if bttl is None else bttl 
-        if not re.search("热门股票".decode("utf8"),bttl):
-            r.zadd("bmk:doc:share",time.time(),"stockmark|-|"+getHashid(rc["channelId"]))
+        btag = r.hget("bmk:stockmark:"+beaid,"tag")
+        btag = "" if btag is None else btag 
+        if not re.search("热门股票".decode("utf8"),btag):
+            r.hset("bmk:stockmark:" + beaid,"tag",btag+"热门股票")
+            
+        r.zadd("bmk:doc:share",time.time(),"stockmark|-|"+beaid)
         
     urlstr = "http://%s/research/svc?hotconcept=%s" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
     udata = loadFromUrl(urlstr) 
     udata.reverse()
     for rc in udata:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}
-#         beaid = getHashid(doc["channelId"])        
+        beaid = getHashid(rc["channelId"])        
         beaconname = rc["channelName"].replace("*","")
-        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门概念".decode("utf8"))
+        addBeacon("doc", beaid, rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门概念".decode("utf8"))
         
-        bttl = r.hget("bmk:stockmark:"+getHashid(rc["channelId"]),"tag")
-        bttl = "" if bttl is None else bttl 
-        if not re.search("热门概念".decode("utf8"),bttl):
-            r.zadd("bmk:doc:share",time.time(),"doc|-|"+getHashid(rc["channelId"]))
+        btag = r.hget("bmk:stockmark:"+beaid,"tag")
+        btag = "" if btag is None else btag 
+        if not re.search("热门概念".decode("utf8"),btag):
+            r.hset("bmk:doc:" + beaid,"tag",btag+"热门概念")  
+        r.zadd("bmk:doc:share",time.time(),"doc|-|"+beaid)
 
     
 def relateChannelAndStock(parms=("829105579","print")):

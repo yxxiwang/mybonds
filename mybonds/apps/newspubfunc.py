@@ -889,9 +889,10 @@ def beaconUrl(beaconusr, beaconid, daybefore=1):
     elif beaconusr == "stockmark":
         channelparm = "channelid"
     else:
-        if channel.split("%3B")[0].isdigit():# 对于 4888695645407970852;3137937558442478445 这样的频道 改为用eventid=
-            channelparm = "eventid"
-        else:
+        #当然,产品设计的规则总是变来变去,所以,之前这块改动的内容现在不用了.
+#         if channel.split("%3B")[0].isdigit():# 对于 4888695645407970852;3137937558442478445 这样的频道 改为用eventid=
+#             channelparm = "eventid"
+#         else:
             channelparm = "channelpick"
         
     today = dt.date.fromtimestamp(time.time())

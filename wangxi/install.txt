@@ -9,6 +9,8 @@ yum grouplist
 yum -y groupinstall "Development tools"
 yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel lvm2
 
+yum -y install tomcat6 tomcat6-webapps tomcat6-admin-webapps tomcat6-docs-webapp tomcat6-javadoc
+
 °¢ÀïÔÆÖ÷»ú
 fdisk /dev/xvdb
 n 

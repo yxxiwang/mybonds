@@ -133,10 +133,11 @@ def updateChannelAndStock(parms="24"):
         beaconname = rc["channelName"].replace("*","")
         print "-------------proc %s(%s)---------------" % ("stockmark:"+beaid,beaconname)
         addBeacon("stockmark",beaid, rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
-#         r.hset("bmk:stockmark:" + getHashid(rc["channelId"]),"crt_tms",time.time())
+        
 #         btag = r.hget("bmk:stockmark:"+beaid,"tag")
 #         btag = "" if btag is None else btag 
 #         if not re.search("热门股票".decode("utf8"),btag):
+        r.hset("bmk:stockmark:" + beaid,"crt_tms",time.time())
         r.hset("bmk:stockmark:" + beaid,"tag","热门股票".decode("utf8")) 
         r.zadd("bmk:doc:share",time.time(),"stockmark|-|"+beaid)
         
@@ -153,6 +154,7 @@ def updateChannelAndStock(parms="24"):
 #         btag = r.hget("bmk:stockmark:"+beaid,"tag")
 #         btag = "" if btag is None else btag 
 #         if not re.search("热门概念".decode("utf8"),btag):
+        r.hset("bmk:doc:" + beaid,"crt_tms",time.time())
         r.hset("bmk:doc:" + beaid,"tag","热门概念".decode("utf8"))  
         r.zadd("bmk:doc:share",time.time(),"doc|-|"+beaid)
 

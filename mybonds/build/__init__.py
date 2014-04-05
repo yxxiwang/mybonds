@@ -149,7 +149,7 @@ def updateChannelAndStock(parms=("24")):
 #         btag = r.hget("bmk:stockmark:"+beaid,"tag")
 #         btag = "" if btag is None else btag 
 #         if not re.search("热门概念".decode("utf8"),btag):
-        r.hset("bmk:doc:" + beaid,"tag",btag+"热门概念".decode("utf8"))  
+        r.hset("bmk:doc:" + beaid,"tag","热门概念".decode("utf8"))  
         r.zadd("bmk:doc:share",time.time(),"doc|-|"+beaid)
 
     

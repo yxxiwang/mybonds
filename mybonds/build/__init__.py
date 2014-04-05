@@ -132,11 +132,10 @@ def updateChannelAndStock(parms=("24")):
         beaconname = rc["channelName"].replace("*","")
         addBeacon("stockmark",beaid, rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
 #         r.hset("bmk:stockmark:" + getHashid(rc["channelId"]),"crt_tms",time.time())
-        btag = r.hget("bmk:stockmark:"+beaid,"tag")
-        btag = "" if btag is None else btag 
-        if not re.search("热门股票".decode("utf8"),btag):
-            r.hset("bmk:stockmark:" + beaid,"tag",btag+"热门股票")
-            
+#         btag = r.hget("bmk:stockmark:"+beaid,"tag")
+#         btag = "" if btag is None else btag 
+#         if not re.search("热门股票".decode("utf8"),btag):
+        r.hset("bmk:stockmark:" + beaid,"tag","热门股票".decode("utf8")) 
         r.zadd("bmk:doc:share",time.time(),"stockmark|-|"+beaid)
         
     urlstr = "http://%s/research/svc?hotconcept=%s" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
@@ -147,10 +146,10 @@ def updateChannelAndStock(parms=("24")):
         beaconname = rc["channelName"].replace("*","")
         addBeacon("doc", beaid, rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门概念".decode("utf8"))
         
-        btag = r.hget("bmk:stockmark:"+beaid,"tag")
-        btag = "" if btag is None else btag 
-        if not re.search("热门概念".decode("utf8"),btag):
-            r.hset("bmk:doc:" + beaid,"tag",btag+"热门概念")  
+#         btag = r.hget("bmk:stockmark:"+beaid,"tag")
+#         btag = "" if btag is None else btag 
+#         if not re.search("热门概念".decode("utf8"),btag):
+        r.hset("bmk:doc:" + beaid,"tag",btag+"热门概念".decode("utf8"))  
         r.zadd("bmk:doc:share",time.time(),"doc|-|"+beaid)
 
     

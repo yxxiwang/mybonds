@@ -140,7 +140,7 @@ def updateChannelAndStock(parms="24"):
         r.hset("bmk:stockmark:" + beaid,"tag","热门股票".decode("utf8")) 
         r.zadd("bmk:doc:share",time.time(),"stockmark|-|"+beaid)
         
-    urlstr = "http://%s/research/svc?hotconcept=%s" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
+    urlstr = "http://%s/research/svc?hotconcept=%s" % (getsysparm("BACKEND_DOMAIN"), parms)    
     udata = loadFromUrl(urlstr) 
     udata.reverse()
     print urlstr

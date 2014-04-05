@@ -131,7 +131,8 @@ def updateChannelAndStock(parms=("24")):
 #         beaid = getHashid(doc["channelId"])        
         beaconname = rc["channelName"].replace("*","")
         addBeacon("stockmark", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
-        r.hset("bmk:stockmark:" + getHashid(rc["channelId"]),"crt_tms",time.time())
+#         r.hset("bmk:stockmark:" + getHashid(rc["channelId"]),"crt_tms",time.time())
+        r.zadd("bmk:doc:share",time.time(),"stockmark|-|"+getHashid(rc["channelId"]))
         
     urlstr = "http://%s/research/svc?hotconcept=%s" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
     udata = loadFromUrl(urlstr) 
@@ -140,7 +141,7 @@ def updateChannelAndStock(parms=("24")):
 #         beaid = getHashid(doc["channelId"])        
         beaconname = rc["channelName"].replace("*","")
         addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门概念".decode("utf8"))
-        r.hset("bmk:doc:" + getHashid(rc["channelId"]),"crt_tms",time.time())
+        r.zadd("bmk:doc:share",time.time(),"doc|-|"+getHashid(rc["channelId"]))
 
     
 def relateChannelAndStock(parms=("829105579","print")):

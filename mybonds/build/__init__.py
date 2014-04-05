@@ -123,6 +123,26 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
         print "%s ---> %s" % (bkey,ttl)
         
         
+def updateChannelAndStock(parms=("24")):
+    urlstr = "http://%s/research/svc?hotstock=%d" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
+    udata = loadFromUrl(urlstr) 
+    udata.reverse()
+    for rc in udata["docs"]:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}
+#         beaid = getHashid(doc["channelId"])        
+        beaconname = rc["channelName"].replace("*","")
+        addBeacon("stockmark", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
+        r.hset("bmk:stockmark:" + getHashid(rc["channelId"]),"crt_tms",time.time())
+        
+    urlstr = "http://%s/research/svc?hotconcept=%d" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
+    udata = loadFromUrl(urlstr) 
+    udata.reverse()
+    for rc in udata["docs"]:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}
+#         beaid = getHashid(doc["channelId"])        
+        beaconname = rc["channelName"].replace("*","")
+        addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
+        r.hset("bmk:doc:" + getHashid(rc["channelId"]),"crt_tms",time.time())
+
+    
 def relateChannelAndStock(parms=("829105579","print")):
     """ 根据groupid关联股票频道."""  
     if type(parms).__name__ == "str":
@@ -572,6 +592,7 @@ if __name__ == "__main__":
                   python %prog saveFullText {docids} 
                   python %prog getTime 
                   python %prog getUnixTime 
+                  python %prog updateChannelAndStock 24 
                   python %prog relateChannelAndStock 829105579 
                   python %prog cleanDocChannelByTime {7|now} {print|delete|printafter|deleteafter} {notwithtag|withtag}
                   python %prog cleanDocChannel doc {print|delete}

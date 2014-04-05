@@ -124,7 +124,7 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
         
         
 def updateChannelAndStock(parms=("24")):
-    urlstr = "http://%s/research/svc?hotstock=%d" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
+    urlstr = "http://%s/research/svc?hotstock=%s" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
     udata = loadFromUrl(urlstr) 
     udata.reverse()
     for rc in udata["docs"]:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}
@@ -133,7 +133,7 @@ def updateChannelAndStock(parms=("24")):
         addBeacon("stockmark", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
         r.hset("bmk:stockmark:" + getHashid(rc["channelId"]),"crt_tms",time.time())
         
-    urlstr = "http://%s/research/svc?hotconcept=%d" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
+    urlstr = "http://%s/research/svc?hotconcept=%s" % (getsysparm("BACKEND_DOMAIN"), parms[0])    
     udata = loadFromUrl(urlstr) 
     udata.reverse()
     for rc in udata["docs"]:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}

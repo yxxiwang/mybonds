@@ -35,8 +35,8 @@ def load_data(input,parms):
         if line=="":
             continue
         dlist = line.split(",")
-        (disname,name,usr,tag) = dlist[0],dlist[1],dlist[2],dlist[3]
-        
+        (disname,name,usr,tag) = dlist[0],dlist[1],dlist[2],dlist[3:]
+        tag = ",".join(tag)
 #         tag ="" 
 #         if len(dlist) >=5:
 #             tag = dlist[4]

@@ -394,6 +394,18 @@ def saveFulltextById(ids, url="", frombackend=False):
     #                 doc.pop("relatedDocs")
                     logger.info("save fulltext in mongodb:" + doc["_id"])
                     tftxs.save(doc) 
+                
+                if doc.has_key("related"):
+                    if doc["related"].has_key("relatedEvent"):
+                        for rc in doc["related"]["relatedEvent"]:
+                            beaconname = rc["channelName"].replace("*","")
+                            addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="新闻关联".decode("utf8"))
+                            
+                    if doc["related"].has_key("relatedStock"):
+                        for rc in doc["related"]["relatedStock"]:
+                            beaconname = rc["channelName"].replace("*","")
+                            addBeacon("doc", getHashid(rc["channelId"]), rc["channelName"], beaconname=beaconname, desc=rc["channelName"],tag="新闻关联".decode("utf8"))
+                
                 if doc.has_key("relatedChannel"):
                     for rc in doc["relatedChannel"]:
                         beaconname = rc["channelName"].replace("*","")

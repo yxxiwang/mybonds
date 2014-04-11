@@ -131,7 +131,7 @@ def updateChannelAndStock(parms="24"):
     for rc in udata:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}
         beaid = getHashid(rc["channelId"])        
         beaconname = rc["channelName"].replace("*","")
-        print "-------------proc %s(%s)---------------" % ("stockmark:"+beaid,beaconname.decode("utf8"))
+#         print "-------------proc %s(%s)---------------" % ("stockmark:"+beaid,beaconname.decode("utf8"))
         addBeacon("stockmark",beaid, rc["channelId"], beaconname=beaconname, desc=rc["channelName"],tag="热门股票".decode("utf8"))
         
 #         btag = r.hget("bmk:stockmark:"+beaid,"tag")

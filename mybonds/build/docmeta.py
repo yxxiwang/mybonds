@@ -212,6 +212,7 @@ def loadData(codes,num,force=False):
             
 def initProc(types,codes,num,force=False): 
     """type should be one of load,beacon,fulltext,sendemail,removedoc """
+    updateChannelAndStock(24)
     try:
         for type in types:
             if type == "load":

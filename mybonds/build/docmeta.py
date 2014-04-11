@@ -21,7 +21,7 @@ else:#os.name=="posix"
     path.append("/root")
 
 # from mybonds.apps import *
-# import __init__ as lib
+import __init__ as lib
 
 from mybonds.apps.geeknews import *  
 from mybonds.apps.newspubfunc import *  
@@ -212,7 +212,7 @@ def loadData(codes,num,force=False):
             
 def initProc(types,codes,num,force=False): 
     """type should be one of load,beacon,fulltext,sendemail,removedoc """
-    updateChannelAndStock("24")
+    lib.updateChannelAndStock("24")
     try:
         for type in types:
             if type == "load":

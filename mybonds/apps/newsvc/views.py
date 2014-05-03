@@ -431,7 +431,8 @@ def newsdetail(request):
     if docid =="":
         return HttpResponse(json.dumps(udata), mimetype="application/json")
     
-    quantity = log_typer(request, "newsFullText", docid)
+    obj = rdoc.hget("doc:"+docid,"title") 
+    quantity = log_typer(request, "newsFullText", obj)
     if usecache == "0":
         from mybonds.build import saveFullText
         saveFullText(docid)

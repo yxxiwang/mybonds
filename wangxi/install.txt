@@ -2,6 +2,7 @@
 #git reset --hard origin/master
 git checkout  xxxxfile
 git pull
+ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime 
 
 wget http://mirrors.163.com/.help/CentOS6-Base-163.repo -O /etc/yum.repos.d/CentOS6-Base-163.repo
 
@@ -394,3 +395,10 @@ git clone https://yxxiwang@bitbucket.org/yxxiwang/wang.git
 yum -y install boost boost-devel boost*
 pip install importlib
 pip install pydoop
+###############################
+perl -pi -e "s/RSYNC_ENABLE=false/RSYNC_ENABLE=true/" /etc/default/rsync
+
+perl -F: -lane 'print $F[0]' /etc/passwd
+
+Á¢¿Ì¹Ø±Õ SELINUX
+/usr/sbin/setenforce 0

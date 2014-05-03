@@ -124,10 +124,10 @@ def cleanChannelByCode(parms=("doc:1257408","print")):
         
         
 def updateChannelAndStock(parms="24"):
-    urlstr = "http://%s/research/svc?hotstock=%s" % (getsysparm("BACKEND_DOMAIN"), parms)    
-    udata = loadFromUrl(urlstr) 
-    udata.reverse()
-    print urlstr
+    urlstr = "http://%s/research/svc?hotstock=%s" % (getsysparm("BACKEND_DOMAIN"), parms) 
+    print urlstr   
+    udata = loadFromUrl(urlstr)
+    if not udata=={} : udata.reverse() 
     for rc in udata:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}
         beaid = getHashid(rc["channelId"])        
         beaconname = rc["channelName"].replace("*","")
@@ -142,9 +142,9 @@ def updateChannelAndStock(parms="24"):
         r.zadd("bmk:doc:share",time.time(),"stockmark|-|"+beaid)
         
     urlstr = "http://%s/research/svc?hotconcept=%s" % (getsysparm("BACKEND_DOMAIN"), parms)    
-    udata = loadFromUrl(urlstr) 
-    udata.reverse()
     print urlstr
+    udata = loadFromUrl(urlstr) 
+    if not udata=={} : udata.reverse()
     for rc in udata:#{"channelName":"000002(万科Ａ)","channelId":"*000002(万科Ａ)","eventCreateTime":-1,"docId":-1,"docCreateTime":-1,"size":0}
         beaid = getHashid(rc["channelId"])        
         beaconname = rc["channelName"].replace("*","")
